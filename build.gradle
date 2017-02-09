@@ -1,0 +1,102 @@
+
+// For those who want the bleeding edge
+buildscript {
+    repositories {
+        jcenter()
+        maven {
+            name = "forge"
+            url = "http://files.minecraftforge.net/maven"
+        }
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+    }
+}
+
+plugins {
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
+}
+
+repositories {
+    maven {
+        url "http://dvs1.progwml6.com/files/maven"
+    }
+    maven {
+        url 'http://maven.epoxide.xyz'
+    }
+    maven {
+        url 'http://dogforce-games.com/maven'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'maven-publish'
+
+version = "0.1.0"
+group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
+archivesBaseName = "ToolBelt-1.10.2"
+
+minecraft {
+    version = "1.10.2-12.18.3.2221"
+    runDir = "run"
+
+    mappings = "stable_29"
+
+    replace "@VERSION@", project.version
+    replaceIn "ToolBelt.java"
+
+    useDepAts = true
+}
+
+jar {
+    classifier = 'slim'
+}
+
+shadowJar {
+    classifier = ''
+    dependencies {
+        include(dependency(':Commons-1.10.2:'))
+        exclude '*CraftTweaker*'
+        exclude '*Baubles*'
+    }
+    relocate 'gigaherz.common', 'gigaherz.toolbelt.shadow.common'
+}
+
+reobf {
+    shadowJar { mappingType = 'SEARGE' }
+}
+
+tasks.build.dependsOn reobfShadowJar
+
+artifacts {
+    archives shadowJar
+    archives sourceJar
+}
+
+dependencies {
+    deobfCompile "gigaherz.commons:Commons-1.10.2:0.5.1"
+
+    compile fileTree(dir: 'libs', include: '*.jar')
+}
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+compileJava {
+    sourceCompatibility = 1.8
+    targetCompatibility = 1.8
+    options.encoding = 'UTF-8'
+}
+
+processResources {
+    inputs.property "version", project.version
+    inputs.property "mcversion", project.minecraft.version
+
+    from(sourceSets.main.resources.srcDirs) {
+        include 'mcmod.info'
+        expand 'version':project.version, 'mcversion':project.minecraft.version
+    }
+
+    from(sourceSets.main.resources.srcDirs) {
+        exclude 'mcmod.info'
+    }
+}
