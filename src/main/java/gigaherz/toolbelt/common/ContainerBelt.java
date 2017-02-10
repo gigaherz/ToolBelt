@@ -9,13 +9,17 @@ import net.minecraftforge.items.IItemHandler;
 
 import javax.annotation.Nullable;
 
-public class ContainerChestItem extends Container
+public class ContainerBelt extends Container
 {
-    public ContainerChestItem(IInventory playerInventory, IItemHandler beltInventory, int blockedSlot)
+    public final int beltSlots;
+
+    public ContainerBelt(IInventory playerInventory, IItemHandler beltInventory, int blockedSlot)
     {
-        for (int k = 0; k < 9; ++k)
+        beltSlots = beltInventory.getSlots();
+        int xoff = ((9- beltSlots)*18)/2;
+        for (int k = 0; k < beltSlots; ++k)
         {
-            this.addSlotToContainer(new SlotNoBelts(beltInventory, k, 8 + k * 18, 18));
+            this.addSlotToContainer(new SlotBelt(beltInventory, k, 8 + xoff + k * 18, 20));
         }
 
         bindPlayerInventory(playerInventory, blockedSlot);
@@ -30,8 +34,8 @@ public class ContainerChestItem extends Container
                 int index = j1 + l * 9 + 9;
                 this.addSlotToContainer(
                         blockedSlot == index
-                                ? new SlotLocked(playerInventory, index, 8 + j1 * 18, l * 18 + 49)
-                                : new Slot(playerInventory, index, 8 + j1 * 18, l * 18 + 49)
+                                ? new SlotLocked(playerInventory, index, 8 + j1 * 18, l * 18 + 51)
+                                : new Slot(playerInventory, index, 8 + j1 * 18, l * 18 + 51)
                 );
             }
         }
@@ -40,8 +44,8 @@ public class ContainerChestItem extends Container
         {
             this.addSlotToContainer(
                     blockedSlot == i1
-                            ? new SlotLocked(playerInventory, i1, 8 + i1 * 18, 107)
-                            : new Slot(playerInventory, i1, 8 + i1 * 18, 107)
+                            ? new SlotLocked(playerInventory, i1, 8 + i1 * 18, 109)
+                            : new Slot(playerInventory, i1, 8 + i1 * 18, 109)
             );
         }
     }

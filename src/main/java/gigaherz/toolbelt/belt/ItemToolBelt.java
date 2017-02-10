@@ -66,12 +66,23 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         return BaubleType.BELT;
     }
 
+    public static boolean isItemValid(@Nullable ItemStack stack)
+    {
+        if (stack == null)
+            return true;
+        if (stack.getItem() instanceof ItemToolBelt)
+            return false;
+        if (stack.getMaxStackSize() != 1)
+            return false;
+        return true;
+    }
+
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt)
     {
         return new ICapabilitySerializable<NBTTagCompound>()
         {
-            final ItemStackHandler items = new ItemStackHandler(9);
+            final ItemStackHandler items = new ToolBeltInventory();
 
             @Override
             public NBTTagCompound serializeNBT()
@@ -103,5 +114,36 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
                 return null;
             }
         };
+    }
+
+    private static int[] xpCost = {3,5,8,12,15,20,30};
+    public static int getUpgradeXP(ItemStack stack)
+    {
+        IItemHandler items = stack.getCapability(CAP, null);
+        if (items == null)
+            return -1;
+
+        if (items.getSlots() >= 9)
+            return Integer.MAX_VALUE;
+
+        if (items.getSlots() < 2)
+            return 1;
+
+        return xpCost[items.getSlots()-2];
+    }
+
+    @Nullable
+    public static ItemStack upgrade(ItemStack stack)
+    {
+        stack = stack.copy();
+        ToolBeltInventory items = (ToolBeltInventory)stack.getCapability(CAP, null);
+        if (items == null)
+            return null;
+
+        if (items.getSlots() >= 9)
+            return stack;
+
+        items.setSize(items.getSlots()+1);
+        return stack;
     }
 }

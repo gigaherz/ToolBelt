@@ -5,9 +5,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.SlotItemHandler;
 
-public class SlotNoBelts extends SlotItemHandler
+public class SlotBelt extends SlotItemHandler
 {
-    public SlotNoBelts(IItemHandler itemHandler, int index, int xPosition, int yPosition)
+    public SlotBelt(IItemHandler itemHandler, int index, int xPosition, int yPosition)
     {
         super(itemHandler, index, xPosition, yPosition);
     }
@@ -15,7 +15,7 @@ public class SlotNoBelts extends SlotItemHandler
     @Override
     public boolean isItemValid(ItemStack stack)
     {
-        if (stack != null && stack.getItem() instanceof ItemToolBelt)
+        if (!ItemToolBelt.isItemValid(stack))
             return false;
         return super.isItemValid(stack);
     }

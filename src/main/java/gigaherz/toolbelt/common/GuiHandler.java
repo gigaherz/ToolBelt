@@ -1,5 +1,6 @@
 package gigaherz.toolbelt.common;
 
+import gigaherz.toolbelt.belt.ToolBeltInventory;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
@@ -8,7 +9,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.IGuiHandler;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nullable;
 
@@ -29,13 +29,13 @@ public class GuiHandler implements IGuiHandler
                 ItemStack heldItem = player.getHeldItem(EnumHand.values()[x]);
                 if (heldItem != null)
                 {
-                    IItemHandlerModifiable inventory = (IItemHandlerModifiable)heldItem.getCapability(CAP, null);
+                    ToolBeltInventory inventory = (ToolBeltInventory)heldItem.getCapability(CAP, null);
 
                     int blockedSlot = -1;
                     if (player.getHeldItemMainhand() == heldItem)
                         blockedSlot = player.inventory.currentItem;
 
-                    return new ContainerChestItem(player.inventory, inventory, blockedSlot);
+                    return new ContainerBelt(player.inventory, inventory, blockedSlot);
                 }
                 break;
         }
@@ -52,13 +52,13 @@ public class GuiHandler implements IGuiHandler
                 ItemStack heldItem = player.getHeldItem(EnumHand.values()[x]);
                 if (heldItem != null)
                 {
-                    IItemHandlerModifiable inventory = (IItemHandlerModifiable)heldItem.getCapability(CAP, null);
+                    ToolBeltInventory inventory = (ToolBeltInventory)heldItem.getCapability(CAP, null);
 
                     int blockedSlot = -1;
                     if (player.getHeldItemMainhand() == heldItem)
                         blockedSlot = player.inventory.currentItem;
 
-                    return new GuiChestItem(player.inventory, inventory, blockedSlot, heldItem);
+                    return new GuiBelt(player.inventory, inventory, blockedSlot, heldItem);
                 }
                 break;
         }

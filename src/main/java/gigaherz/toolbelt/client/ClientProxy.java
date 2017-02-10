@@ -2,8 +2,10 @@ package gigaherz.toolbelt.client;
 
 import gigaherz.toolbelt.ISideProxy;
 import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.belt.ItemToolBelt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -22,6 +24,7 @@ public class ClientProxy implements ISideProxy
     public static void registerModels(ModelRegistryEvent event)
     {
         registerItemModel(ToolBelt.belt);
+        registerItemModel(ToolBelt.pouch);
     }
 
     @SubscribeEvent
@@ -33,7 +36,9 @@ public class ClientProxy implements ISideProxy
             ToolBelt.logger.warn("POKE! {0}", mc.world.getTotalWorldTime());
             if (mc.currentScreen == null)
             {
-                mc.displayGuiScreen(GuiRadialMenu.instance);
+                ItemStack inHand = mc.player.getHeldItemMainhand();
+                if (ItemToolBelt.isItemValid(inHand))
+                    mc.displayGuiScreen(GuiRadialMenu.instance);
             }
         }
     }
