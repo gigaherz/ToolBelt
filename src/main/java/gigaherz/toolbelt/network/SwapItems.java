@@ -9,20 +9,14 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 public class SwapItems
         implements IMessage
 {
-    @CapabilityInject(IItemHandler.class)
-    public static Capability<IItemHandler> CAP;
-
     public int swapWith;
 
     public SwapItems()
@@ -66,9 +60,7 @@ public class SwapItems
         if (stack == null)
             return;
 
-        ToolBeltInventory cap = (ToolBeltInventory)stack.getCapability(CAP, null);
-        if (cap == null)
-            return;
+        ToolBeltInventory cap = ItemToolBelt.getItems(stack);
 
         ItemStack inHand = player.getHeldItemMainhand();
 

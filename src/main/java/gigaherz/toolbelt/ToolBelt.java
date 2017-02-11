@@ -1,7 +1,9 @@
 package gigaherz.toolbelt;
 
+import com.google.common.collect.Lists;
 import gigaherz.common.ItemRegistered;
 import gigaherz.toolbelt.belt.ItemToolBelt;
+import gigaherz.toolbelt.belt.ToolBeltInventory;
 import gigaherz.toolbelt.common.GuiHandler;
 import gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.block.Block;
@@ -18,11 +20,18 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
+
+import java.lang.ref.Reference;
+import java.lang.ref.ReferenceQueue;
+import java.lang.ref.WeakReference;
+import java.util.Iterator;
+import java.util.List;
 
 @Mod.EventBusSubscriber
 @Mod(modid = ToolBelt.MODID,
@@ -64,16 +73,10 @@ public class ToolBelt
         );
     }
 
-    public static void registerTileEntities()
-    {
-    }
-
     @EventHandler
     public void preInit(FMLPreInitializationEvent event)
     {
         logger = event.getModLog();
-
-        registerTileEntities();
 
         channel = NetworkRegistry.INSTANCE.newSimpleChannel(CHANNEL);
 
@@ -125,6 +128,39 @@ public class ToolBelt
         ev.setMaterialCost(1);
 
         ev.setOutput(ItemToolBelt.upgrade(left));
+    }
+
+    private static final List<Reference<? extends ToolBeltInventory>> listeners = Lists.newArrayList();
+    private static final ReferenceQueue<ToolBeltInventory> deadListeners = new ReferenceQueue<>();
+
+    public static void addWeakListener(ToolBeltInventory e)
+    {
+        listeners.add(new WeakReference<>(e, deadListeners));
+    }
+
+    @SubscribeEvent
+    public static void onUpdate(TickEvent.ServerTickEvent ev)
+    {
+        for (Reference<? extends ToolBeltInventory>
+             ref = deadListeners.poll();
+             ref != null;
+             ref = deadListeners.poll())
+        {
+            listeners.remove(ref);
+        }
+
+        for (Iterator<Reference<? extends ToolBeltInventory>> it = listeners.iterator(); it.hasNext(); )
+        {
+            ToolBeltInventory belt = it.next().get();
+            if (belt == null)
+            {
+                it.remove();
+            }
+            else
+            {
+                belt.update();
+            }
+        }
     }
 
     public static ResourceLocation location(String path)
