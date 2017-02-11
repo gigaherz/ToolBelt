@@ -1,7 +1,6 @@
 package gigaherz.toolbelt.client;
 
 import com.google.common.collect.Lists;
-import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.belt.ToolBeltInventory;
@@ -14,14 +13,15 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.settings.GameSettings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import net.minecraftforge.items.IItemHandler;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
@@ -29,7 +29,12 @@ import java.util.List;
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class GuiRadialMenu extends GuiScreen
 {
-    public static final GuiScreen instance = new GuiRadialMenu();
+    final ToolBeltInventory inventory;
+
+    public GuiRadialMenu(ToolBeltInventory inv)
+    {
+        inventory = inv;
+    }
 
     @SubscribeEvent
     public static void overlayEvent(RenderGameOverlayEvent.Pre event)
@@ -37,7 +42,7 @@ public class GuiRadialMenu extends GuiScreen
         if (event.getType() != RenderGameOverlayEvent.ElementType.CROSSHAIRS)
             return;
 
-        if (Minecraft.getMinecraft().currentScreen == instance)
+        if (Minecraft.getMinecraft().currentScreen instanceof GuiRadialMenu)
         {
             event.setCanceled(true);
         }
@@ -48,7 +53,7 @@ public class GuiRadialMenu extends GuiScreen
     {
         super.updateScreen();
 
-        if (!Keyboard.isKeyDown(ClientProxy.keyOpenToolMenu.getKeyCode()))
+        if (!GameSettings.isKeyDown(ClientProxy.keyOpenToolMenu))
             Minecraft.getMinecraft().displayGuiScreen(null);
     }
 
@@ -61,23 +66,17 @@ public class GuiRadialMenu extends GuiScreen
         if (!ItemToolBelt.isItemValid(inHand))
             return;
 
-        ItemStack stack = BeltFinder.instance.findStack(mc.player);
-        if (stack == null)
-            return;
-
-        ToolBeltInventory cap = ItemToolBelt.getItems(stack);
-
         List<Integer> items = Lists.newArrayList();
-        for (int i=0;i<cap.getSlots();i++)
+        for (int i = 0; i< inventory.getSlots(); i++)
         {
-            ItemStack inSlot = cap.getStackInSlot(i);
+            ItemStack inSlot = inventory.getStackInSlot(i);
             if (inSlot != null && inSlot.stackSize > 0)
                 items.add(i);
         }
 
         boolean hasAddButton = false;
         int numItems = items.size();
-        if (numItems < cap.getSlots() && inHand != null && inHand.stackSize > 0)
+        if (numItems < inventory.getSlots() && inHand != null && inHand.stackSize > 0)
         {
             hasAddButton = true;
             numItems++;
@@ -121,23 +120,17 @@ public class GuiRadialMenu extends GuiScreen
         if (!ItemToolBelt.isItemValid(inHand))
             return;
 
-        ItemStack stack = BeltFinder.instance.findStack(mc.player);
-        if (stack == null)
-            return;
-
-        ToolBeltInventory cap = ItemToolBelt.getItems(stack);
-
         List<ItemStack> items = Lists.newArrayList();
-        for (int i=0;i<cap.getSlots();i++)
+        for (int i = 0; i< inventory.getSlots(); i++)
         {
-            ItemStack inSlot = cap.getStackInSlot(i);
+            ItemStack inSlot = inventory.getStackInSlot(i);
             if (inSlot != null && inSlot.stackSize > 0)
                 items.add(inSlot);
         }
 
         boolean hasAddButton = false;
         int numItems = items.size();
-        if (numItems < cap.getSlots() && inHand != null && inHand.stackSize > 0)
+        if (numItems < inventory.getSlots() && inHand != null && inHand.stackSize > 0)
         {
             hasAddButton = true;
             numItems++;

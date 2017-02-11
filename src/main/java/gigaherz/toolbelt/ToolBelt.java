@@ -135,30 +135,36 @@ public class ToolBelt
 
     public static void addWeakListener(ToolBeltInventory e)
     {
-        listeners.add(new WeakReference<>(e, deadListeners));
+        synchronized(listeners)
+        {
+            listeners.add(new WeakReference<>(e, deadListeners));
+        }
     }
 
     @SubscribeEvent
     public static void onUpdate(TickEvent.ServerTickEvent ev)
     {
-        for (Reference<? extends ToolBeltInventory>
-             ref = deadListeners.poll();
-             ref != null;
-             ref = deadListeners.poll())
+        synchronized(listeners)
         {
-            listeners.remove(ref);
-        }
-
-        for (Iterator<Reference<? extends ToolBeltInventory>> it = listeners.iterator(); it.hasNext(); )
-        {
-            ToolBeltInventory belt = it.next().get();
-            if (belt == null)
+            for (Reference<? extends ToolBeltInventory>
+                 ref = deadListeners.poll();
+                 ref != null;
+                 ref = deadListeners.poll())
             {
-                it.remove();
+                listeners.remove(ref);
             }
-            else
+
+            for (Iterator<Reference<? extends ToolBeltInventory>> it = listeners.iterator(); it.hasNext(); )
             {
-                belt.update();
+                ToolBeltInventory belt = it.next().get();
+                if (belt == null)
+                {
+                    it.remove();
+                }
+                else
+                {
+                    belt.update();
+                }
             }
         }
     }

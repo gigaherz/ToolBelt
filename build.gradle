@@ -1,5 +1,3 @@
-
-// For those who want the bleeding edge
 buildscript {
     repositories {
         jcenter()
@@ -30,9 +28,8 @@ repositories {
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
-apply plugin: 'maven-publish'
 
-version = "0.1.0"
+version = "1.0.1"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.10.2"
 

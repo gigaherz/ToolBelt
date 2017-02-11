@@ -1,8 +1,10 @@
 package gigaherz.toolbelt.client;
 
+import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ISideProxy;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.belt.ItemToolBelt;
+import gigaherz.toolbelt.belt.ToolBeltInventory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.item.ItemStack;
@@ -28,7 +30,7 @@ public class ClientProxy implements ISideProxy
     }
 
     @SubscribeEvent
-    public static void handleKeys(InputEvent.KeyInputEvent ev)
+    public static void handleKeys(InputEvent ev)
     {
         Minecraft mc = Minecraft.getMinecraft();
         while (keyOpenToolMenu.isPressed())
@@ -38,7 +40,15 @@ public class ClientProxy implements ISideProxy
             {
                 ItemStack inHand = mc.player.getHeldItemMainhand();
                 if (ItemToolBelt.isItemValid(inHand))
-                    mc.displayGuiScreen(GuiRadialMenu.instance);
+                {
+                    ItemStack stack = BeltFinder.instance.findStack(mc.player);
+                    if (stack == null)
+                        return;
+
+                    ToolBeltInventory cap = ItemToolBelt.getItems(stack);
+
+                    mc.displayGuiScreen(new GuiRadialMenu(cap));
+                }
             }
         }
     }
@@ -46,6 +56,7 @@ public class ClientProxy implements ISideProxy
     @Override
     public void init()
     {
-        ClientRegistry.registerKeyBinding(keyOpenToolMenu = new KeyBinding("key.toolbelt.open", Keyboard.KEY_Y, "key.toolbelt.category"));
+        ClientRegistry.registerKeyBinding(keyOpenToolMenu =
+                new KeyBinding("key.toolbelt.open", Keyboard.KEY_R, "key.toolbelt.category"));
     }
 }
