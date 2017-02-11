@@ -23,15 +23,13 @@ import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.Iterator;
 import java.util.List;
 
 public class ItemToolBelt extends ItemRegistered implements IBauble
@@ -100,7 +98,6 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
     {
         return new ICapabilityProvider()
         {
-            //final ItemStackHandler items = new ToolBeltInventory();
             final ItemStack itemStack = stack;
 
             @Override
@@ -131,16 +128,12 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
 
     public static int getSlotsCount(ItemStack stack)
     {
-        int size = 0;
+        int size = 2;
 
         NBTTagCompound nbt = stack.getTagCompound();
         if (nbt != null)
         {
-            NBTTagCompound itemsTag = nbt.getCompoundTag("Items");
-            if (itemsTag != null)
-            {
-                size = itemsTag.getInteger("Size");
-            }
+            size = nbt.getInteger("Size");
         }
         return size;
     }
@@ -151,17 +144,10 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         if (nbt == null)
         {
             nbt = new NBTTagCompound();
+            nbt.setTag("Items", new NBTTagList());
         }
 
-        NBTTagCompound itemsTag = nbt.getCompoundTag("Items");
-        if (itemsTag == null)
-        {
-            itemsTag = new NBTTagCompound();
-            itemsTag.setTag("Items", new NBTTagList());
-            nbt.setTag("Items", itemsTag);
-        }
-        itemsTag.setInteger("Size", newSize);
-
+        nbt.setInteger("Size", newSize);
         stack.setTagCompound(nbt);
     }
 
