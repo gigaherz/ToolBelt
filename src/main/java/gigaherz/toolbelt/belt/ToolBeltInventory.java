@@ -49,21 +49,8 @@ public class ToolBeltInventory extends ItemStackHandler
     @Override
     public NBTTagCompound serializeNBT()
     {
-        NBTTagList nbtTagList = new NBTTagList();
-        for (int i = 0; i < stacks.length; i++)
-        {
-            if (stacks[i] != null)
-            {
-                NBTTagCompound itemTag = new NBTTagCompound();
-                itemTag.setInteger("Slot", i);
-                stacks[i].writeToNBT(itemTag);
-                nbtTagList.appendTag(itemTag);
-            }
-        }
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setTag("Items", nbtTagList);
-        nbt.setInteger("Size", stacks.length);
-        return nbt;
+        return writeNBT(nbt);
     }
 
     // Ensure that the serialization is always compatible, even if it were to change upstream

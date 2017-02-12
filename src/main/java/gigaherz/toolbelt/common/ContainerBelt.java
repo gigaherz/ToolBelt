@@ -69,14 +69,14 @@ public class ContainerBelt extends Container
             assert itemstack1 != null;
             itemstack = itemstack1.copy();
 
-            if (index < 9)
+            if (index < beltSlots)
             {
-                if (!this.mergeItemStack(itemstack1, 9, this.inventorySlots.size(), true))
+                if (!this.mergeItemStack(itemstack1, beltSlots, this.inventorySlots.size(), true))
                 {
                     return null;
                 }
             }
-            else if (!this.mergeItemStack(itemstack1, 0, 9, false))
+            else if (!this.mergeItemStack(itemstack1, 0, beltSlots, false))
             {
                 return null;
             }
