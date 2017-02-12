@@ -141,7 +141,7 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         return new ToolBeltInventory(stack);
     }
 
-    private static int[] xpCost = {3,5,8,12,15,20,30};
+    public static int[] xpCost = {3,5,8,12,15,20,30};
     public static int getUpgradeXP(ItemStack stack)
     {
         int slots = getSlotsCount(stack);
@@ -164,6 +164,16 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
 
         stack = stack.copy();
         setSlotsCount(stack, slots+1);
+        return stack;
+    }
+
+    public ItemStack getStack(int upgradeLevel)
+    {
+        if (upgradeLevel < 0 || upgradeLevel >= 9)
+            return ItemStack.EMPTY;
+
+        ItemStack stack = new ItemStack(this);
+        setSlotsCount(stack, upgradeLevel+2);
         return stack;
     }
 }
