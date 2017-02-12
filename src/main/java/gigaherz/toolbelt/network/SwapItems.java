@@ -1,6 +1,7 @@
 package gigaherz.toolbelt.network;
 
 import gigaherz.toolbelt.BeltFinder;
+import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.belt.ToolBeltInventory;
 import io.netty.buffer.ByteBuf;
@@ -64,7 +65,7 @@ public class SwapItems
 
         ItemStack inHand = player.getHeldItemMainhand();
 
-        if (!ItemToolBelt.isItemValid(inHand))
+        if (!Config.isItemStackAllowed(inHand))
             return;
 
         if (swapWith < 0)

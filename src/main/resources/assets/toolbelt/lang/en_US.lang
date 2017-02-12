@@ -1,4 +1,5 @@
 item.toolbelt.belt.name=Tool Belt
+item.toolbelt.pouch.name=Belt Pouch
 key.toolbelt.open=Swap Tool
 key.toolbelt.category=Tool Belt
 text.toolbelt.empty=EMPTY

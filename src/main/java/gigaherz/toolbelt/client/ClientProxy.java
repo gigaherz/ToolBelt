@@ -1,6 +1,7 @@
 package gigaherz.toolbelt.client;
 
 import gigaherz.toolbelt.BeltFinder;
+import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ISideProxy;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.belt.ItemToolBelt;
@@ -13,11 +14,12 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.input.Keyboard;
 
 import static gigaherz.common.client.ModelHelpers.registerItemModel;
 
-@Mod.EventBusSubscriber
+@Mod.EventBusSubscriber(Side.CLIENT)
 public class ClientProxy implements ISideProxy
 {
     public static KeyBinding keyOpenToolMenu;
@@ -39,7 +41,7 @@ public class ClientProxy implements ISideProxy
             if (mc.currentScreen == null)
             {
                 ItemStack inHand = mc.player.getHeldItemMainhand();
-                if (ItemToolBelt.isItemValid(inHand))
+                if (Config.isItemStackAllowed(inHand))
                 {
                     ItemStack stack = BeltFinder.instance.findStack(mc.player);
                     if (stack == null)

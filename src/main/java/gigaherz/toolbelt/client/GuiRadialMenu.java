@@ -1,6 +1,7 @@
 package gigaherz.toolbelt.client;
 
 import com.google.common.collect.Lists;
+import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.belt.ToolBeltInventory;
@@ -63,7 +64,7 @@ public class GuiRadialMenu extends GuiScreen
         super.mouseReleased(mouseX, mouseY, state);
 
         ItemStack inHand = mc.player.getHeldItemMainhand();
-        if (!ItemToolBelt.isItemValid(inHand))
+        if (!Config.isItemStackAllowed(inHand))
             return;
 
         List<Integer> items = Lists.newArrayList();
@@ -117,7 +118,7 @@ public class GuiRadialMenu extends GuiScreen
         super.drawScreen(mouseX, mouseY, partialTicks);
 
         ItemStack inHand = mc.player.getHeldItemMainhand();
-        if (!ItemToolBelt.isItemValid(inHand))
+        if (!Config.isItemStackAllowed(inHand))
             return;
 
         List<ItemStack> items = Lists.newArrayList();

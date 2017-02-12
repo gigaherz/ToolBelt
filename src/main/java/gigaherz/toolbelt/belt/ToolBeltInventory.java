@@ -1,5 +1,6 @@
 package gigaherz.toolbelt.belt;
 
+import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
@@ -87,7 +88,7 @@ public class ToolBeltInventory extends ItemStackHandler
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
     {
-        if (!ItemToolBelt.isItemValid(stack))
+        if (!Config.isItemStackAllowed(stack))
             return stack;
         return super.insertItem(slot, stack, simulate);
     }

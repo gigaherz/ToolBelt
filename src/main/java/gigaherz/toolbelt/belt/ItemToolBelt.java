@@ -78,17 +78,6 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         return true;
     }
 
-    public static boolean isItemValid(@Nullable ItemStack stack)
-    {
-        if (stack == null)
-            return true;
-        if (stack.getItem() instanceof ItemToolBelt)
-            return false;
-        if (stack.getMaxStackSize() != 1)
-            return false;
-        return true;
-    }
-
     @Override
     public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt)
     {

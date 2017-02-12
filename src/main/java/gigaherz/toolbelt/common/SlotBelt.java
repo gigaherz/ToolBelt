@@ -1,5 +1,6 @@
 package gigaherz.toolbelt.common;
 
+import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
@@ -15,7 +16,7 @@ public class SlotBelt extends SlotItemHandler
     @Override
     public boolean isItemValid(ItemStack stack)
     {
-        if (!ItemToolBelt.isItemValid(stack))
+        if (!Config.isItemStackAllowed(stack))
             return false;
         return super.isItemValid(stack);
     }
