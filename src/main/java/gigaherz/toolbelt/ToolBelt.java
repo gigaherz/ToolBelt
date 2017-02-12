@@ -46,7 +46,7 @@ public class ToolBelt
     public static final String VERSION = "@VERSION@";
     public static final String CHANNEL = MODID;
 
-    public static Item belt;
+    public static ItemToolBelt belt;
     public static Item pouch;
 
     @Mod.Instance(value = ToolBelt.MODID)

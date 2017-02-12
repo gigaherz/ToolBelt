@@ -7,13 +7,19 @@ import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.belt.ToolBeltInventory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.AbstractClientPlayer;
+import net.minecraft.client.entity.EntityOtherPlayerMP;
+import net.minecraft.client.renderer.entity.RenderManager;
+import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.input.Keyboard;
 
@@ -60,5 +66,8 @@ public class ClientProxy implements ISideProxy
     {
         ClientRegistry.registerKeyBinding(keyOpenToolMenu =
                 new KeyBinding("key.toolbelt.open", Keyboard.KEY_R, "key.toolbelt.category"));
+
+        RenderPlayer render = ReflectionHelper.getPrivateValue(RenderManager.class, Minecraft.getMinecraft().getRenderManager(), "field_178637_m", "playerRenderer");
+        render.addLayer(new LayerToolBelt(render));
     }
 }

@@ -73,6 +73,9 @@ artifacts {
 dependencies {
     deobfCompile "gigaherz.commons:Commons-1.10.2:0.5.1"
 
+    deobfCompile "mezz.jei:jei_1.11.2:4.2.5.233:api"
+    runtime "mezz.jei:jei_1.11.2:4.2.5.233"
+
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 
