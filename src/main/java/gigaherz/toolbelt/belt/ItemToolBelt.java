@@ -27,7 +27,7 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nullable;
 import java.util.List;
 
-@Optional.Interface(modid="Baubles", iface="baubles.api.IBauble")
+@Optional.Interface(modid="baubles", iface="baubles.api.IBauble")
 public class ItemToolBelt extends ItemRegistered implements IBauble
 {
     @CapabilityInject(IItemHandler.class)
@@ -41,19 +41,19 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
     }
 
     @Override
-    public EnumActionResult onItemUse(ItemStack stack, EntityPlayer playerIn, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
-        playerIn.openGui(ToolBelt.instance, GuiHandler.BELT, worldIn, hand.ordinal(), 0, 0);
+        player.openGui(ToolBelt.instance, GuiHandler.BELT, worldIn, hand.ordinal(), 0, 0);
 
         return EnumActionResult.SUCCESS;
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(ItemStack stack, World worldIn, EntityPlayer playerIn, EnumHand hand)
+    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand)
     {
         playerIn.openGui(ToolBelt.instance, GuiHandler.BELT, worldIn, hand.ordinal(), 0, 0);
 
-        return new ActionResult<>(EnumActionResult.SUCCESS, stack);
+        return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(hand));
     }
 
     @Override
@@ -155,7 +155,6 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         return xpCost[slots-2];
     }
 
-    @Nullable
     public static ItemStack upgrade(ItemStack stack)
     {
         int slots = getSlotsCount(stack);

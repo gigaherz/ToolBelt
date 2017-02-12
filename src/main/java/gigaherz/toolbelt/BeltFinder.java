@@ -11,14 +11,13 @@ public class BeltFinder
 {
     public static BeltFinder instance = new BeltFinder();
 
-    @Nullable
     public ItemStack findStack(EntityPlayer player)
     {
         IInventory playerInv = player.inventory;
         for(int i=0;i<playerInv.getSizeInventory();i++)
         {
             ItemStack inSlot = playerInv.getStackInSlot(i);
-            if (inSlot != null && inSlot.stackSize > 0)
+            if (inSlot.getCount() > 0)
             {
                 if (inSlot.getItem() instanceof ItemToolBelt)
                 {
@@ -27,6 +26,6 @@ public class BeltFinder
             }
         }
 
-        return null;
+        return ItemStack.EMPTY;
     }
 }

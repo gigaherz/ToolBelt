@@ -39,7 +39,6 @@ public class Config
 
     private static final Pattern itemRegex = Pattern.compile("^(?<item>([a-zA-Z-0-9_]+:)?[a-zA-Z-0-9_]+)(?:@((?<meta>[0-9]+)|(?<any>any)))?$");
 
-    @Nullable
     private static ItemStack parseItemStack(String itemString)
     {
         Matcher matcher = itemRegex.matcher(itemString);
@@ -47,14 +46,14 @@ public class Config
         if (!matcher.matches())
         {
             ToolBelt.logger.warn("Could not parse item " + itemString);
-            return null;
+            return ItemStack.EMPTY;
         }
 
         Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(matcher.group("item")));
         if (item == null)
         {
             ToolBelt.logger.warn("Could not parse item " + itemString);
-            return null;
+            return ItemStack.EMPTY;
         }
 
         String anyString = matcher.group("meta");
@@ -66,9 +65,9 @@ public class Config
         return new ItemStack(item, 1, meta);
     }
 
-    public static boolean isItemStackAllowed(@Nullable final ItemStack stack)
+    public static boolean isItemStackAllowed(final ItemStack stack)
     {
-        if (stack == null)
+        if (stack.getCount() <= 0)
             return true;
 
         if (whiteList.stream().anyMatch((s) -> OreDictionary.itemMatches(s, stack, false)))

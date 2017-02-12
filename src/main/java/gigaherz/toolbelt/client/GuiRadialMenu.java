@@ -71,13 +71,13 @@ public class GuiRadialMenu extends GuiScreen
         for (int i = 0; i< inventory.getSlots(); i++)
         {
             ItemStack inSlot = inventory.getStackInSlot(i);
-            if (inSlot != null && inSlot.stackSize > 0)
+            if (inSlot.getCount() > 0)
                 items.add(i);
         }
 
         boolean hasAddButton = false;
         int numItems = items.size();
-        if (numItems < inventory.getSlots() && inHand != null && inHand.stackSize > 0)
+        if (numItems < inventory.getSlots() && inHand.getCount() > 0)
         {
             hasAddButton = true;
             numItems++;
@@ -125,26 +125,26 @@ public class GuiRadialMenu extends GuiScreen
         for (int i = 0; i< inventory.getSlots(); i++)
         {
             ItemStack inSlot = inventory.getStackInSlot(i);
-            if (inSlot != null && inSlot.stackSize > 0)
+            if (inSlot.getCount() > 0)
                 items.add(inSlot);
         }
 
         boolean hasAddButton = false;
         int numItems = items.size();
-        if (numItems < inventory.getSlots() && inHand != null && inHand.stackSize > 0)
+        if (numItems < inventory.getSlots() && inHand.getCount() > 0)
         {
             hasAddButton = true;
             numItems++;
         }
         if (numItems <= 0)
         {
-            drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.empty"), width/2, (height-fontRendererObj.FONT_HEIGHT)/2, 0xFFFFFFFF);
+            drawCenteredString(fontRenderer, I18n.format("text.toolbelt.empty"), width/2, (height-fontRenderer.FONT_HEIGHT)/2, 0xFFFFFFFF);
             return;
         }
 
         if (hasAddButton)
         {
-            drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.insert"), width / 2, height/2 + 45 - fontRendererObj.FONT_HEIGHT / 2, 0xFFFFFFFF);
+            drawCenteredString(fontRenderer, I18n.format("text.toolbelt.insert"), width / 2, height/2 + 45 - fontRenderer.FONT_HEIGHT / 2, 0xFFFFFFFF);
         }
 
         int x = width / 2;
@@ -175,10 +175,10 @@ public class GuiRadialMenu extends GuiScreen
 
         if (hasMouseOver)
         {
-            if (inHand != null && inHand.stackSize > 0)
-                drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.swap"), width / 2, (height - fontRendererObj.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+            if (inHand.getCount() > 0)
+                drawCenteredString(fontRenderer, I18n.format("text.toolbelt.swap"), width / 2, (height - fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
             else
-                drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.extract"), width / 2, (height - fontRendererObj.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+                drawCenteredString(fontRenderer, I18n.format("text.toolbelt.extract"), width / 2, (height - fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
         }
 
         RenderHelper.enableGUIStandardItemLighting();
@@ -187,7 +187,7 @@ public class GuiRadialMenu extends GuiScreen
             float angle1 = ((i/(float)numItems) + 0.25f) * 2 * (float)Math.PI;
             float posX = x - 8 + 45 * (float) Math.cos(angle1);
             float posY = y - 8 + 45 * (float) Math.sin(angle1);
-            ItemStack inSlot = null;
+            ItemStack inSlot = ItemStack.EMPTY;
             if (hasAddButton)
             {
                 if (i > 0)
@@ -200,7 +200,7 @@ public class GuiRadialMenu extends GuiScreen
                 inSlot = items.get(i);
             }
 
-            if (inSlot != null)
+            if (inSlot.getCount() > 0)
                 mc.getRenderItem().renderItemAndEffectIntoGUI(inSlot, (int) posX, (int) posY);
         }
         RenderHelper.disableStandardItemLighting();

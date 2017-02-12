@@ -5,6 +5,7 @@ import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -31,55 +32,42 @@ public class ToolBeltInventory extends ItemStackHandler
     private NBTTagCompound writeNBT(NBTTagCompound nbt)
     {
         NBTTagList nbtTagList = new NBTTagList();
-        for (int i = 0; i < stacks.length; i++)
+        for (int i = 0; i < stacks.size(); i++)
         {
-            if (stacks[i] != null)
+            if (!stacks.get(i).isEmpty())
             {
                 NBTTagCompound itemTag = new NBTTagCompound();
                 itemTag.setInteger("Slot", i);
-                stacks[i].writeToNBT(itemTag);
+                stacks.get(i).writeToNBT(itemTag);
                 nbtTagList.appendTag(itemTag);
             }
         }
         nbt.setTag("Items", nbtTagList);
-        nbt.setInteger("Size", stacks.length);
+        nbt.setInteger("Size", stacks.size());
         return nbt;
     }
 
     @Override
     public NBTTagCompound serializeNBT()
     {
-        NBTTagList nbtTagList = new NBTTagList();
-        for (int i = 0; i < stacks.length; i++)
-        {
-            if (stacks[i] != null)
-            {
-                NBTTagCompound itemTag = new NBTTagCompound();
-                itemTag.setInteger("Slot", i);
-                stacks[i].writeToNBT(itemTag);
-                nbtTagList.appendTag(itemTag);
-            }
-        }
         NBTTagCompound nbt = new NBTTagCompound();
-        nbt.setTag("Items", nbtTagList);
-        nbt.setInteger("Size", stacks.length);
-        return nbt;
+        return writeNBT(nbt);
     }
 
     // Ensure that the serialization is always compatible, even if it were to change upstream
     @Override
     public void deserializeNBT(NBTTagCompound nbt)
     {
-        setSize(nbt.hasKey("Size", Constants.NBT.TAG_INT) ? nbt.getInteger("Size") : stacks.length);
+        setSize(nbt.hasKey("Size", Constants.NBT.TAG_INT) ? nbt.getInteger("Size") : stacks.size());
         NBTTagList tagList = nbt.getTagList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tagList.tagCount(); i++)
         {
             NBTTagCompound itemTags = tagList.getCompoundTagAt(i);
             int slot = itemTags.getInteger("Slot");
 
-            if (slot >= 0 && slot < stacks.length)
+            if (slot >= 0 && slot < stacks.size())
             {
-                stacks[slot] = ItemStack.loadItemStackFromNBT(itemTags);
+                stacks.set(slot, new ItemStack(itemTags));
             }
         }
         onLoad();
@@ -96,7 +84,10 @@ public class ToolBeltInventory extends ItemStackHandler
     @Override
     public void setSize(int newCount)
     {
-        stacks = Arrays.copyOf(stacks, newCount);
+        NonNullList<ItemStack> oldStacks = stacks;
+        stacks = NonNullList.withSize(newCount, ItemStack.EMPTY);
+        for (int i=0;i<Math.min(oldStacks.size(),stacks.size());i++)
+            stacks.set(i, oldStacks.get(i));
         needsUpdate = true;
     }
 

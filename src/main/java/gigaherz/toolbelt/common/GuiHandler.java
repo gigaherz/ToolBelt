@@ -22,7 +22,7 @@ public class GuiHandler implements IGuiHandler
         {
             case BELT:
                 ItemStack heldItem = player.getHeldItem(EnumHand.values()[x]);
-                if (heldItem != null)
+                if (heldItem.getCount() > 0)
                 {
                     ToolBeltInventory inventory = ItemToolBelt.getItems(heldItem);
 
@@ -45,7 +45,7 @@ public class GuiHandler implements IGuiHandler
         {
             case BELT:
                 ItemStack heldItem = player.getHeldItem(EnumHand.values()[x]);
-                if (heldItem != null)
+                if (heldItem.getCount() > 0)
                 {
                     ToolBeltInventory inventory = ItemToolBelt.getItems(heldItem);
 

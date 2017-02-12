@@ -38,8 +38,8 @@ import java.util.List;
 @Mod.EventBusSubscriber
 @Mod(modid = ToolBelt.MODID,
         version = ToolBelt.VERSION,
-        acceptedMinecraftVersions = "[1.9.4,1.11.0)",
-        dependencies = "after:baubles;required-after:Forge@[12.16.0.1825,)")
+        acceptedMinecraftVersions = "[1.11.0,1.12.0)",
+        dependencies = "after:baubles")
 public class ToolBelt
 {
     public static final String MODID = "toolbelt";
@@ -120,9 +120,9 @@ public class ToolBelt
     {
         ItemStack left = ev.getLeft();
         ItemStack right = ev.getRight();
-        if (left == null || left.stackSize <= 0 || left.getItem() != belt)
+        if (left.getCount() <= 0 || left.getItem() != belt)
             return;
-        if (right == null || right.stackSize <= 0 ||right.getItem() != pouch)
+        if (right.getCount() <= 0 ||right.getItem() != pouch)
             return;
         int cost = ItemToolBelt.getUpgradeXP(left);
         if (cost < 0)

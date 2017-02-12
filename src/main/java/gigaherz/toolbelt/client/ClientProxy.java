@@ -44,7 +44,7 @@ public class ClientProxy implements ISideProxy
                 if (Config.isItemStackAllowed(inHand))
                 {
                     ItemStack stack = BeltFinder.instance.findStack(mc.player);
-                    if (stack == null)
+                    if (stack.getCount() <= 0)
                         return;
 
                     ToolBeltInventory cap = ItemToolBelt.getItems(stack);

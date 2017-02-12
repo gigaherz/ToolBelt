@@ -46,7 +46,7 @@ public class SwapItems
         @Override
         public IMessage onMessage(final SwapItems message, MessageContext ctx)
         {
-            final EntityPlayerMP player = ctx.getServerHandler().playerEntity;
+            final EntityPlayerMP player = ctx.getServerHandler().player;
             final WorldServer world = (WorldServer) player.world;
 
             world.addScheduledTask(() -> swapItem(message.swapWith, player));
@@ -58,7 +58,7 @@ public class SwapItems
     public static void swapItem(int swapWith, EntityPlayer player)
     {
         ItemStack stack = BeltFinder.instance.findStack(player);
-        if (stack == null)
+        if (stack.getCount() <= 0)
             return;
 
         ToolBeltInventory cap = ItemToolBelt.getItems(stack);
