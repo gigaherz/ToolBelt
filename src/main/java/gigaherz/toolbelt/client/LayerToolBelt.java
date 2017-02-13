@@ -14,6 +14,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHandSide;
 
+import javax.annotation.Nullable;
+
 public class LayerToolBelt implements LayerRenderer<EntityPlayer>
 {
     private final RenderLivingBase<?> livingEntityRenderer;
@@ -29,7 +31,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
         boolean flag = player.getPrimaryHand() == EnumHandSide.RIGHT;
 
         ItemStack stack = BeltFinder.instance.findStack(player);
-        if (stack.getCount() <= 0)
+        if (stack == null || stack.stackSize <= 0)
             return;
 
         ToolBeltInventory cap = ItemToolBelt.getItems(stack);
@@ -40,7 +42,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
         ItemStack leftItem = flag ? firstItem : secondItem;
         ItemStack rightItem = flag ? secondItem : firstItem;
 
-        if (!leftItem.isEmpty() || !rightItem.isEmpty())
+        if (leftItem != null || rightItem != null)
         {
             GlStateManager.pushMatrix();
 
@@ -57,27 +59,27 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
         }
     }
 
-    private void renderHeldItem(EntityLivingBase player, ItemStack stack, ItemCameraTransforms.TransformType cameraTransform, EnumHandSide handSide)
+    private void renderHeldItem(EntityLivingBase player, @Nullable ItemStack stack, ItemCameraTransforms.TransformType cameraTransform, EnumHandSide handSide)
     {
-        if (!stack.isEmpty())
-        {
-            GlStateManager.pushMatrix();
+        if (stack == null)
+            return;
 
-            if (player.isSneaking())
-            {
-                GlStateManager.translate(0.0F, 0.2F, 0.0F);
-            }
-            // Forge: moved this call down, fixes incorrect offset while sneaking.
-            this.translateToBody();
-            if (handSide == EnumHandSide.LEFT)
-                GlStateManager.translate(-4.2 / 16.0F, 0.6f, 0);
-            else
-                GlStateManager.translate(4.2 / 16.0F, 0.6f, 0);
-            GlStateManager.rotate(40.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.scale(0.5f, 0.5f, 0.5f);
-            Minecraft.getMinecraft().getItemRenderer().renderItemSide(player, stack, cameraTransform, handSide == EnumHandSide.LEFT);
-            GlStateManager.popMatrix();
+        GlStateManager.pushMatrix();
+
+        if (player.isSneaking())
+        {
+            GlStateManager.translate(0.0F, 0.2F, 0.0F);
         }
+        // Forge: moved this call down, fixes incorrect offset while sneaking.
+        this.translateToBody();
+        if (handSide == EnumHandSide.LEFT)
+            GlStateManager.translate(-4.2 / 16.0F, 0.6f, 0);
+        else
+            GlStateManager.translate(4.2 / 16.0F, 0.6f, 0);
+        GlStateManager.rotate(40.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.scale(0.5f, 0.5f, 0.5f);
+        Minecraft.getMinecraft().getItemRenderer().renderItemSide(player, stack, cameraTransform, handSide == EnumHandSide.LEFT);
+        GlStateManager.popMatrix();
     }
 
     protected void translateToBody()

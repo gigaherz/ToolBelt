@@ -168,10 +168,11 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         return stack;
     }
 
+    @Nullable
     public ItemStack getStack(int upgradeLevel)
     {
         if (upgradeLevel < 0 || upgradeLevel >= 9)
-            return ItemStack.EMPTY;
+            return null;
 
         ItemStack stack = new ItemStack(this);
         setSlotsCount(stack, upgradeLevel+2);
