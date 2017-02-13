@@ -122,7 +122,7 @@ public class ToolBelt
         ItemStack right = ev.getRight();
         if (left.getCount() <= 0 || left.getItem() != belt)
             return;
-        if (right.getCount() <= 0 ||right.getItem() != pouch)
+        if (right.getCount() <= 0 || right.getItem() != pouch)
             return;
         int cost = ItemToolBelt.getUpgradeXP(left);
         if (cost < 0)
@@ -141,7 +141,7 @@ public class ToolBelt
 
     public static void addWeakListener(ToolBeltInventory e)
     {
-        synchronized(listeners)
+        synchronized (listeners)
         {
             listeners.add(new WeakReference<>(e, deadListeners));
         }
@@ -150,7 +150,7 @@ public class ToolBelt
     @SubscribeEvent
     public static void onUpdate(TickEvent.ServerTickEvent ev)
     {
-        synchronized(listeners)
+        synchronized (listeners)
         {
             for (Reference<? extends ToolBeltInventory>
                  ref = deadListeners.poll();

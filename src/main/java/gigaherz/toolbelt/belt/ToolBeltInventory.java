@@ -9,8 +9,6 @@ import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.ItemStackHandler;
 
-import java.util.Arrays;
-
 public class ToolBeltInventory extends ItemStackHandler
 {
     boolean needsUpdate;
@@ -86,8 +84,8 @@ public class ToolBeltInventory extends ItemStackHandler
     {
         NonNullList<ItemStack> oldStacks = stacks;
         stacks = NonNullList.withSize(newCount, ItemStack.EMPTY);
-        for (int i=0;i<Math.min(oldStacks.size(),stacks.size());i++)
-            stacks.set(i, oldStacks.get(i));
+        for (int i = 0; i < Math.min(oldStacks.size(), stacks.size()); i++)
+        { stacks.set(i, oldStacks.get(i)); }
         needsUpdate = true;
     }
 

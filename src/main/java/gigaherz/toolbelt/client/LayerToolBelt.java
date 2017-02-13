@@ -60,29 +60,29 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
     private void renderHeldItem(EntityLivingBase player, ItemStack stack, ItemCameraTransforms.TransformType cameraTransform, EnumHandSide handSide)
     {
         if (!stack.isEmpty())
-        {
-            GlStateManager.pushMatrix();
+            return;
 
-            if (player.isSneaking())
-            {
-                GlStateManager.translate(0.0F, 0.2F, 0.0F);
-            }
-            // Forge: moved this call down, fixes incorrect offset while sneaking.
-            this.translateToBody();
-            if (handSide == EnumHandSide.LEFT)
-                GlStateManager.translate(-4.2 / 16.0F, 0.6f, 0);
-            else
-                GlStateManager.translate(4.2 / 16.0F, 0.6f, 0);
-            GlStateManager.rotate(40.0F, 1.0F, 0.0F, 0.0F);
-            GlStateManager.scale(0.5f, 0.5f, 0.5f);
-            Minecraft.getMinecraft().getItemRenderer().renderItemSide(player, stack, cameraTransform, handSide == EnumHandSide.LEFT);
-            GlStateManager.popMatrix();
+        GlStateManager.pushMatrix();
+
+        if (player.isSneaking())
+        {
+            GlStateManager.translate(0.0F, 0.2F, 0.0F);
         }
+        // Forge: moved this call down, fixes incorrect offset while sneaking.
+        this.translateToBody();
+        if (handSide == EnumHandSide.LEFT)
+            GlStateManager.translate(-4.2 / 16.0F, 0.6f, 0);
+        else
+            GlStateManager.translate(4.2 / 16.0F, 0.6f, 0);
+        GlStateManager.rotate(40.0F, 1.0F, 0.0F, 0.0F);
+        GlStateManager.scale(0.5f, 0.5f, 0.5f);
+        Minecraft.getMinecraft().getItemRenderer().renderItemSide(player, stack, cameraTransform, handSide == EnumHandSide.LEFT);
+        GlStateManager.popMatrix();
     }
 
     protected void translateToBody()
     {
-        ((ModelBiped)this.livingEntityRenderer.getMainModel()).bipedBody.postRender(0.0625F);
+        ((ModelBiped) this.livingEntityRenderer.getMainModel()).bipedBody.postRender(0.0625F);
     }
 
     @Override

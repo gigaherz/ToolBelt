@@ -7,8 +7,6 @@ import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 
-import javax.annotation.Nullable;
-
 public class ContainerBelt extends Container
 {
     public final int beltSlots;
@@ -16,7 +14,7 @@ public class ContainerBelt extends Container
     public ContainerBelt(IInventory playerInventory, IItemHandler beltInventory, int blockedSlot)
     {
         beltSlots = beltInventory.getSlots();
-        int xoff = ((9- beltSlots)*18)/2;
+        int xoff = ((9 - beltSlots) * 18) / 2;
         for (int k = 0; k < beltSlots; ++k)
         {
             this.addSlotToContainer(new SlotBelt(beltInventory, k, 8 + xoff + k * 18, 20));

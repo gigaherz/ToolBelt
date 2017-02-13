@@ -8,8 +8,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 
-import javax.annotation.Nullable;
-
 public class BeltFinderBaubles extends BeltFinder
 {
     @CapabilityInject(IBaublesItemHandler.class)
@@ -21,7 +19,7 @@ public class BeltFinderBaubles extends BeltFinder
     public ItemStack findStack(EntityPlayer player)
     {
         IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
-        for(int i=0;i<baubles.getSlots();i++)
+        for (int i = 0; i < baubles.getSlots(); i++)
         {
             ItemStack inSlot = baubles.getStackInSlot(i);
             if (inSlot.getCount() > 0)
