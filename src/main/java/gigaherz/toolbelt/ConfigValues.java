@@ -2,7 +2,7 @@ package gigaherz.toolbelt;
 
 import net.minecraftforge.common.config.Config;
 
-@Config(modid=ToolBelt.MODID)
+@Config(modid = ToolBelt.MODID)
 public class ConfigValues
 {
 }

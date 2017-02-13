@@ -22,7 +22,7 @@ public class BeltFinderBaubles extends BeltFinder
     public ItemStack findStack(EntityPlayer player)
     {
         IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
-        for(int i=0;i<baubles.getSlots();i++)
+        for (int i = 0; i < baubles.getSlots(); i++)
         {
             ItemStack inSlot = baubles.getStackInSlot(i);
             if (inSlot != null && inSlot.stackSize > 0)

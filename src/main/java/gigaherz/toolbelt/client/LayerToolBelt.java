@@ -84,7 +84,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
 
     protected void translateToBody()
     {
-        ((ModelBiped)this.livingEntityRenderer.getMainModel()).bipedBody.postRender(0.0625F);
+        ((ModelBiped) this.livingEntityRenderer.getMainModel()).bipedBody.postRender(0.0625F);
     }
 
     @Override

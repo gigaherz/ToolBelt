@@ -13,7 +13,9 @@ import net.minecraftforge.items.IItemHandler;
 @SideOnly(Side.CLIENT)
 public class GuiBelt extends GuiContainer
 {
-    /** The ResourceLocation containing the chest GUI texture. */
+    /**
+     * The ResourceLocation containing the chest GUI texture.
+     */
     private static final ResourceLocation GUI_TEXTURE = ToolBelt.location("textures/gui/belt.png");
     private final IInventory playerInventory;
     private final ItemStack beltStack;
@@ -48,9 +50,9 @@ public class GuiBelt extends GuiContainer
         int j = (this.height - this.ySize) / 2;
         this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
 
-        int slots = ((ContainerBelt)this.inventorySlots).beltSlots;
-        int width = slots*18;
-        int x = 7 + ((9-slots)*18)/2;
-        this.drawTexturedModalRect(i+x, j+19, 0, this.ySize, width, 18);
+        int slots = ((ContainerBelt) this.inventorySlots).beltSlots;
+        int width = slots * 18;
+        int x = 7 + ((9 - slots) * 18) / 2;
+        this.drawTexturedModalRect(i + x, j + 19, 0, this.ySize, width, 18);
     }
 }

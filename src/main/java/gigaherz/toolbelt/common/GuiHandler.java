@@ -18,7 +18,7 @@ public class GuiHandler implements IGuiHandler
     @Override
     public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
     {
-        switch(id)
+        switch (id)
         {
             case BELT:
                 ItemStack heldItem = player.getHeldItem(EnumHand.values()[x]);
@@ -41,7 +41,7 @@ public class GuiHandler implements IGuiHandler
     @Override
     public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
     {
-        switch(id)
+        switch (id)
         {
             case BELT:
                 ItemStack heldItem = player.getHeldItem(EnumHand.values()[x]);

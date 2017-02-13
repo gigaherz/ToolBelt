@@ -15,7 +15,7 @@ public class BeltFinder
     public ItemStack findStack(EntityPlayer player)
     {
         IInventory playerInv = player.inventory;
-        for(int i=0;i<playerInv.getSizeInventory();i++)
+        for (int i = 0; i < playerInv.getSizeInventory(); i++)
         {
             ItemStack inSlot = playerInv.getStackInSlot(i);
             if (inSlot != null && inSlot.stackSize > 0)

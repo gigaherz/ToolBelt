@@ -1,10 +1,10 @@
 package gigaherz.toolbelt.integration;
 
-import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.belt.ItemToolBelt;
-import mezz.jei.api.*;
+import mezz.jei.api.IJeiRuntime;
+import mezz.jei.api.IModPlugin;
+import mezz.jei.api.IModRegistry;
+import mezz.jei.api.ISubtypeRegistry;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
-import net.minecraft.item.ItemStack;
 
 @mezz.jei.api.JEIPlugin
 public class JeiPlugin implements IModPlugin

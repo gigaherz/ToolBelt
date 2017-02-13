@@ -27,7 +27,7 @@ import net.minecraftforge.items.IItemHandler;
 import javax.annotation.Nullable;
 import java.util.List;
 
-@Optional.Interface(modid="Baubles", iface="baubles.api.IBauble")
+@Optional.Interface(modid = "Baubles", iface = "baubles.api.IBauble")
 public class ItemToolBelt extends ItemRegistered implements IBauble
 {
     @CapabilityInject(IItemHandler.class)
@@ -63,7 +63,7 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
 
         int size = getSlotsCount(stack);
 
-        tooltip.add(I18n.format("text.toolbelt.tooltip", size-2, size));
+        tooltip.add(I18n.format("text.toolbelt.tooltip", size - 2, size));
     }
 
     @Override
@@ -141,7 +141,8 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         return new ToolBeltInventory(stack);
     }
 
-    public static int[] xpCost = {3,5,8,12,15,20,30};
+    public static int[] xpCost = {3, 5, 8, 12, 15, 20, 30};
+
     public static int getUpgradeXP(ItemStack stack)
     {
         int slots = getSlotsCount(stack);
@@ -152,7 +153,7 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         if (slots < 2)
             return 1;
 
-        return xpCost[slots-2];
+        return xpCost[slots - 2];
     }
 
     @Nullable
@@ -164,7 +165,7 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
             return stack.copy();
 
         stack = stack.copy();
-        setSlotsCount(stack, slots+1);
+        setSlotsCount(stack, slots + 1);
         return stack;
     }
 
@@ -175,7 +176,7 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
             return null;
 
         ItemStack stack = new ItemStack(this);
-        setSlotsCount(stack, upgradeLevel+2);
+        setSlotsCount(stack, upgradeLevel + 2);
         return stack;
     }
 }

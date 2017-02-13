@@ -3,7 +3,6 @@ package gigaherz.toolbelt.client;
 import com.google.common.collect.Lists;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.belt.ToolBeltInventory;
 import gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
@@ -21,8 +20,6 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
-import org.lwjgl.input.Keyboard;
-import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
 import java.util.List;
@@ -68,7 +65,7 @@ public class GuiRadialMenu extends GuiScreen
             return;
 
         List<Integer> items = Lists.newArrayList();
-        for (int i = 0; i< inventory.getSlots(); i++)
+        for (int i = 0; i < inventory.getSlots(); i++)
         {
             ItemStack inSlot = inventory.getStackInSlot(i);
             if (inSlot != null && inSlot.stackSize > 0)
@@ -88,20 +85,20 @@ public class GuiRadialMenu extends GuiScreen
         int x = width / 2;
         int y = height / 2;
 
-        double a = Math.toDegrees(Math.atan2(mouseY-y,mouseX-x));
-        double d = Math.sqrt(Math.pow(mouseX-x,2)+Math.pow(mouseY-y,2));
-        float s0 = (((0-0.5f)/(float)numItems) + 0.25f) * 360;
+        double a = Math.toDegrees(Math.atan2(mouseY - y, mouseX - x));
+        double d = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
+        float s0 = (((0 - 0.5f) / (float) numItems) + 0.25f) * 360;
         if (a < s0) a += 360;
 
-        for(int i=0;i<numItems;i++)
+        for (int i = 0; i < numItems; i++)
         {
-            float s = (((i-0.5f)/(float)numItems) + 0.25f) * 360;
-            float e = (((i+0.5f)/(float)numItems) + 0.25f) * 360;
+            float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
+            float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
             if (a >= s && a < e && d >= 30 && d < 60)
             {
                 int swapWith;
                 if (hasAddButton)
-                    swapWith = i == 0 ? -1 : items.get(i-1);
+                    swapWith = i == 0 ? -1 : items.get(i - 1);
                 else
                     swapWith = items.get(i);
                 SwapItems.swapItem(swapWith, mc.player);
@@ -122,7 +119,7 @@ public class GuiRadialMenu extends GuiScreen
             return;
 
         List<ItemStack> items = Lists.newArrayList();
-        for (int i = 0; i< inventory.getSlots(); i++)
+        for (int i = 0; i < inventory.getSlots(); i++)
         {
             ItemStack inSlot = inventory.getStackInSlot(i);
             if (inSlot != null && inSlot.stackSize > 0)
@@ -138,33 +135,33 @@ public class GuiRadialMenu extends GuiScreen
         }
         if (numItems <= 0)
         {
-            drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.empty"), width/2, (height-fontRendererObj.FONT_HEIGHT)/2, 0xFFFFFFFF);
+            drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.empty"), width / 2, (height - fontRendererObj.FONT_HEIGHT) / 2, 0xFFFFFFFF);
             return;
         }
 
         if (hasAddButton)
         {
-            drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.insert"), width / 2, height/2 + 45 - fontRendererObj.FONT_HEIGHT / 2, 0xFFFFFFFF);
+            drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.insert"), width / 2, height / 2 + 45 - fontRendererObj.FONT_HEIGHT / 2, 0xFFFFFFFF);
         }
 
         int x = width / 2;
         int y = height / 2;
 
-        double a = Math.toDegrees(Math.atan2(mouseY-y,mouseX-x));
-        double d = Math.sqrt(Math.pow(mouseX-x,2)+Math.pow(mouseY-y,2));
-        float s0 = (((0-0.5f)/(float)numItems) + 0.25f) * 360;
+        double a = Math.toDegrees(Math.atan2(mouseY - y, mouseX - x));
+        double d = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
+        float s0 = (((0 - 0.5f) / (float) numItems) + 0.25f) * 360;
         if (a < s0) a += 360;
 
         boolean hasMouseOver = false;
-        for(int i=0;i<numItems;i++)
+        for (int i = 0; i < numItems; i++)
         {
-            float s = (((i-0.5f)/(float)numItems) + 0.25f) * 360;
-            float e = (((i+0.5f)/(float)numItems) + 0.25f) * 360;
+            float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
+            float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
             if (a >= s && a < e && d >= 30 && d < 60)
             {
                 drawPieArc(x, y, zLevel, 30, 60, s, e, 255, 255, 255, 64);
 
-                if (i > 0 ||!hasAddButton)
+                if (i > 0 || !hasAddButton)
                     hasMouseOver = true;
             }
             else
@@ -182,9 +179,9 @@ public class GuiRadialMenu extends GuiScreen
         }
 
         RenderHelper.enableGUIStandardItemLighting();
-        for(int i=0;i<numItems;i++)
+        for (int i = 0; i < numItems; i++)
         {
-            float angle1 = ((i/(float)numItems) + 0.25f) * 2 * (float)Math.PI;
+            float angle1 = ((i / (float) numItems) + 0.25f) * 2 * (float) Math.PI;
             float posX = x - 8 + 45 * (float) Math.cos(angle1);
             float posY = y - 8 + 45 * (float) Math.sin(angle1);
             ItemStack inSlot = null;
@@ -207,6 +204,7 @@ public class GuiRadialMenu extends GuiScreen
     }
 
     private static final float PRECISION = 5;
+
     public void drawPieArc(float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
     {
         GlStateManager.disableAlpha();
@@ -215,16 +213,16 @@ public class GuiRadialMenu extends GuiScreen
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         float angle = endAngle - startAngle;
-        int sections = Math.max(1, MathHelper.ceil(angle/PRECISION));
+        int sections = Math.max(1, MathHelper.ceil(angle / PRECISION));
 
-        startAngle = (float)Math.toRadians(startAngle);
-        endAngle = (float)Math.toRadians(endAngle);
+        startAngle = (float) Math.toRadians(startAngle);
+        endAngle = (float) Math.toRadians(endAngle);
         angle = endAngle - startAngle;
 
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-        for (int i=0;i<sections;i++)
+        for (int i = 0; i < sections; i++)
         {
             float angle1 = startAngle + (i / (float) sections) * angle;
             float angle2 = startAngle + ((i + 1) / (float) sections) * angle;
