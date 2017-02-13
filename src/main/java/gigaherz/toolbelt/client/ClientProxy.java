@@ -23,6 +23,8 @@ import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.input.Keyboard;
 
+import java.util.Map;
+
 import static gigaherz.common.client.ModelHelpers.registerItemModel;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
@@ -67,7 +69,12 @@ public class ClientProxy implements ISideProxy
         ClientRegistry.registerKeyBinding(keyOpenToolMenu =
                 new KeyBinding("key.toolbelt.open", Keyboard.KEY_R, "key.toolbelt.category"));
 
-        RenderPlayer render = ReflectionHelper.getPrivateValue(RenderManager.class, Minecraft.getMinecraft().getRenderManager(), "field_178637_m", "playerRenderer");
+        Map<String, RenderPlayer> skinMap = Minecraft.getMinecraft().getRenderManager().getSkinMap();
+
+        RenderPlayer render = skinMap.get("default");
+        render.addLayer(new LayerToolBelt(render));
+
+        render = skinMap.get("slim");
         render.addLayer(new LayerToolBelt(render));
     }
 }
