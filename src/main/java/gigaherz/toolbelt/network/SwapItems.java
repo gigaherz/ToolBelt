@@ -57,7 +57,11 @@ public class SwapItems
 
     public static void swapItem(int swapWith, EntityPlayer player)
     {
-        ItemStack stack = BeltFinder.instance.findStack(player);
+        BeltFinder.BeltGetter getter = BeltFinder.instance.findStack(player);
+        if (getter == null)
+            return;
+
+        ItemStack stack = getter.getBelt();
         if (stack.getCount() <= 0)
             return;
 

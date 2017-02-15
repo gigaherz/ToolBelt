@@ -136,45 +136,6 @@ public class ToolBelt
         ev.setOutput(ItemToolBelt.upgrade(left));
     }
 
-    private static final List<Reference<? extends ToolBeltInventory>> listeners = Lists.newArrayList();
-    private static final ReferenceQueue<ToolBeltInventory> deadListeners = new ReferenceQueue<>();
-
-    public static void addWeakListener(ToolBeltInventory e)
-    {
-        synchronized (listeners)
-        {
-            listeners.add(new WeakReference<>(e, deadListeners));
-        }
-    }
-
-    @SubscribeEvent
-    public static void onUpdate(TickEvent.ServerTickEvent ev)
-    {
-        synchronized (listeners)
-        {
-            for (Reference<? extends ToolBeltInventory>
-                 ref = deadListeners.poll();
-                 ref != null;
-                 ref = deadListeners.poll())
-            {
-                listeners.remove(ref);
-            }
-
-            for (Iterator<Reference<? extends ToolBeltInventory>> it = listeners.iterator(); it.hasNext(); )
-            {
-                ToolBeltInventory belt = it.next().get();
-                if (belt == null)
-                {
-                    it.remove();
-                }
-                else
-                {
-                    belt.update();
-                }
-            }
-        }
-    }
-
     public static ResourceLocation location(String path)
     {
         return new ResourceLocation(MODID, path);
