@@ -1,8 +1,10 @@
 package gigaherz.toolbelt.client;
 
 import com.google.common.collect.Lists;
+import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.belt.ToolBeltInventory;
 import gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
@@ -27,11 +29,18 @@ import java.util.List;
 @Mod.EventBusSubscriber(Side.CLIENT)
 public class GuiRadialMenu extends GuiScreen
 {
-    final ToolBeltInventory inventory;
+    private final BeltFinder.BeltGetter getter;
+    private ItemStack stackEquipped;
+    private ToolBeltInventory inventory;
+    private final Minecraft mc;
+    private List<ItemStack> cachedStacks = null;
 
-    public GuiRadialMenu(ToolBeltInventory inv)
+    GuiRadialMenu(BeltFinder.BeltGetter getter)
     {
-        inventory = inv;
+        this.getter = getter;
+        this.stackEquipped = getter.getBelt();
+        inventory = stackEquipped != null ? ItemToolBelt.getItems(stackEquipped) : null;
+        mc = Minecraft.getMinecraft();
     }
 
     @SubscribeEvent
@@ -51,7 +60,29 @@ public class GuiRadialMenu extends GuiScreen
     {
         super.updateScreen();
 
-        if (!GameSettings.isKeyDown(ClientProxy.keyOpenToolMenu))
+        ItemStack inHand = mc.player.getHeldItemMainhand();
+        if (!Config.isItemStackAllowed(inHand))
+        {
+            inventory = null;
+        }
+        else
+        {
+            ItemStack stack = getter.getBelt();
+            if (stack == null)
+            {
+                inventory = null;
+                stackEquipped = null;
+            }
+            // Reference comparison intended
+            else if (stackEquipped != stack)
+            {
+                stackEquipped = stack;
+                inventory = ItemToolBelt.getItems(stack);
+                cachedStacks = null;
+            }
+        }
+
+        if (inventory == null || !GameSettings.isKeyDown(ClientProxy.keyOpenToolMenu))
             Minecraft.getMinecraft().displayGuiScreen(null);
     }
 
@@ -59,6 +90,9 @@ public class GuiRadialMenu extends GuiScreen
     protected void mouseReleased(int mouseX, int mouseY, int state)
     {
         super.mouseReleased(mouseX, mouseY, state);
+
+        if (inventory == null)
+            return;
 
         ItemStack inHand = mc.player.getHeldItemMainhand();
         if (!Config.isItemStackAllowed(inHand))
@@ -114,17 +148,25 @@ public class GuiRadialMenu extends GuiScreen
     {
         super.drawScreen(mouseX, mouseY, partialTicks);
 
+        if (inventory == null)
+            return;
+
+        List<ItemStack> items = cachedStacks;
+        if (items == null)
+        {
+            items = Lists.newArrayList();
+            for (int i = 0; i < inventory.getSlots(); i++)
+            {
+                ItemStack inSlot = inventory.getStackInSlot(i);
+                if (inSlot != null && inSlot.stackSize > 0)
+                    items.add(inSlot);
+            }
+            cachedStacks = items;
+        }
+
         ItemStack inHand = mc.player.getHeldItemMainhand();
         if (!Config.isItemStackAllowed(inHand))
             return;
-
-        List<ItemStack> items = Lists.newArrayList();
-        for (int i = 0; i < inventory.getSlots(); i++)
-        {
-            ItemStack inSlot = inventory.getStackInSlot(i);
-            if (inSlot != null && inSlot.stackSize > 0)
-                items.add(inSlot);
-        }
 
         boolean hasAddButton = false;
         int numItems = items.size();
@@ -205,7 +247,7 @@ public class GuiRadialMenu extends GuiScreen
 
     private static final float PRECISION = 5;
 
-    public void drawPieArc(float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
+    private void drawPieArc(float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
     {
         GlStateManager.disableAlpha();
         GlStateManager.enableBlend();

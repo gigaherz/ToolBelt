@@ -19,7 +19,7 @@ public class BeltFinderBaubles extends BeltFinder
     }
 
     @Nullable
-    public ItemStack findStack(EntityPlayer player)
+    public BeltGetter findStack(EntityPlayer player)
     {
         IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
         for (int i = 0; i < baubles.getSlots(); i++)
@@ -29,11 +29,31 @@ public class BeltFinderBaubles extends BeltFinder
             {
                 if (inSlot.getItem() instanceof ItemToolBelt)
                 {
-                    return inSlot;
+                    return new BaublesBeltGetter(player, i);
                 }
             }
         }
 
         return super.findStack(player);
+    }
+
+    private class BaublesBeltGetter implements BeltGetter
+    {
+        private final EntityPlayer thePlayer;
+        private final int slotNumber;
+
+        private BaublesBeltGetter(EntityPlayer thePlayer, int slotNumber)
+        {
+            this.thePlayer = thePlayer;
+            this.slotNumber = slotNumber;
+        }
+
+        @Override
+        @Nullable
+        public ItemStack getBelt()
+        {
+            IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(thePlayer);
+            return baubles.getStackInSlot(slotNumber);
+        }
     }
 }

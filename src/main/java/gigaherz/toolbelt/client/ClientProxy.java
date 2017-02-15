@@ -46,13 +46,11 @@ public class ClientProxy implements ISideProxy
                 ItemStack inHand = mc.player.getHeldItemMainhand();
                 if (Config.isItemStackAllowed(inHand))
                 {
-                    ItemStack stack = BeltFinder.instance.findStack(mc.player);
-                    if (stack == null)
+                    BeltFinder.BeltGetter getter = BeltFinder.instance.findStack(mc.player);
+                    if (getter == null)
                         return;
 
-                    ToolBeltInventory cap = ItemToolBelt.getItems(stack);
-
-                    mc.displayGuiScreen(new GuiRadialMenu(cap));
+                    mc.displayGuiScreen(new GuiRadialMenu(getter));
                 }
             }
         }

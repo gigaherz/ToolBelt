@@ -30,7 +30,11 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
     {
         boolean flag = player.getPrimaryHand() == EnumHandSide.RIGHT;
 
-        ItemStack stack = BeltFinder.instance.findStack(player);
+        BeltFinder.BeltGetter getter = BeltFinder.instance.findStack(player);
+        if (getter == null)
+            return;
+
+        ItemStack stack = getter.getBelt();
         if (stack == null || stack.stackSize <= 0)
             return;
 
