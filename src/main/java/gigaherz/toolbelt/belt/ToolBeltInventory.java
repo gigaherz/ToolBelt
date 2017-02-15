@@ -1,19 +1,12 @@
 package gigaherz.toolbelt.belt;
 
 import gigaherz.toolbelt.Config;
-import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
-
-import javax.annotation.Nullable;
-import java.util.Arrays;
 
 public class ToolBeltInventory implements IItemHandlerModifiable
 {
@@ -36,7 +29,6 @@ public class ToolBeltInventory implements IItemHandlerModifiable
     }
 
     @Override
-    @Nullable
     public ItemStack getStackInSlot(int slot)
     {
         validateSlotIndex(slot);
@@ -47,19 +39,20 @@ public class ToolBeltInventory implements IItemHandlerModifiable
             if (itemTags.getInteger("Slot") != slot)
                 continue;
 
-            return ItemStack.loadItemStackFromNBT(itemTags);
+            return new ItemStack(itemTags);
         }
 
-        return null;
+        return ItemStack.EMPTY;
     }
 
     @Override
-    public void setStackInSlot(int slot, @Nullable ItemStack stack)
+    public void setStackInSlot(int slot, ItemStack stack)
     {
         validateSlotIndex(slot);
 
         NBTTagCompound itemTag = null;
-        if (stack != null)
+        boolean hasStack = stack.getCount() > 0;
+        if (hasStack)
         {
             itemTag = new NBTTagCompound();
             itemTag.setInteger("Slot", slot);
@@ -73,85 +66,83 @@ public class ToolBeltInventory implements IItemHandlerModifiable
             if (existing.getInteger("Slot") != slot)
                 continue;
 
-            if (stack != null)
+            if (hasStack)
                 tagList.set(i, itemTag);
             else
                 tagList.removeTag(i);
             return;
         }
 
-        if (stack != null)
+        if (hasStack)
             tagList.appendTag(itemTag);
 
         nbt.setTag("Items", tagList);
     }
 
     @Override
-    @Nullable
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
     {
         if (!Config.isItemStackAllowed(stack))
             return stack;
 
-        if (stack == null || stack.stackSize == 0)
-            return null;
+        if (stack.getCount() <= 0)
+            return ItemStack.EMPTY;
 
         validateSlotIndex(slot);
 
         ItemStack existing = getStackInSlot(slot);
 
-        int limit = getStackLimit(slot, stack);
+        int limit = stack.getMaxStackSize();
 
-        if (existing != null)
+        if (existing.getCount() > 0)
         {
             if (!ItemHandlerHelper.canItemStacksStack(stack, existing))
                 return stack;
 
-            limit -= existing.stackSize;
+            limit -= existing.getCount();
         }
 
         if (limit <= 0)
             return stack;
 
-        boolean reachedLimit = stack.stackSize > limit;
+        boolean reachedLimit = stack.getCount() > limit;
 
         if (!simulate)
         {
-            if (existing == null)
+            if (existing.getCount() <= 0)
             {
                 existing = reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack;
             }
             else
             {
-                existing.stackSize += reachedLimit ? limit : stack.stackSize;
+                existing.grow(reachedLimit ? limit : stack.getCount());
             }
             setStackInSlot(slot, existing);
         }
 
-        return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.stackSize - limit) : null;
+        return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit) : ItemStack.EMPTY;
     }
 
     @Override
-    @Nullable
     public ItemStack extractItem(int slot, int amount, boolean simulate)
     {
         if (amount == 0)
-            return null;
+            return ItemStack.EMPTY;
 
         validateSlotIndex(slot);
 
         ItemStack existing = getStackInSlot(slot);
 
-        if (existing == null)
-            return null;
+        if (existing.getCount() <= 0)
+            return ItemStack.EMPTY;
 
         int toExtract = Math.min(amount, existing.getMaxStackSize());
 
-        if (existing.stackSize <= toExtract)
+        if (existing.getCount() <= toExtract)
         {
             if (!simulate)
             {
-                setStackInSlot(slot, null);
+                setStackInSlot(slot, ItemStack.EMPTY);
             }
             return existing;
         }
@@ -159,19 +150,19 @@ public class ToolBeltInventory implements IItemHandlerModifiable
         {
             if (!simulate)
             {
-                setStackInSlot(slot, ItemHandlerHelper.copyStackWithSize(existing, existing.stackSize - toExtract));
+                setStackInSlot(slot, ItemHandlerHelper.copyStackWithSize(existing, existing.getCount() - toExtract));
             }
             return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
         }
     }
 
-    //@Override
-    public int getStackLimit(int slot, ItemStack stack)
+    @Override
+    public int getSlotLimit(int slot)
     {
-        return stack.getMaxStackSize();
+        return 64;
     }
 
-    protected void validateSlotIndex(int slot)
+    private void validateSlotIndex(int slot)
     {
         if (slot < 0 || slot >= getSlots())
             throw new RuntimeException("Slot " + slot + " not in valid range - [0," + getSlots() + ")");

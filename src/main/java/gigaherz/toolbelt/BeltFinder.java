@@ -5,10 +5,13 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 
+import javax.annotation.Nullable;
+
 public class BeltFinder
 {
     public static BeltFinder instance = new BeltFinder();
 
+    @Nullable
     public BeltGetter findStack(EntityPlayer player)
     {
         IInventory playerInv = player.inventory;
@@ -24,12 +27,11 @@ public class BeltFinder
             }
         }
 
-        return ItemStack.EMPTY;
+        return null;
     }
 
     public interface BeltGetter
     {
-        @Nullable
         ItemStack getBelt();
     }
 
@@ -45,7 +47,6 @@ public class BeltFinder
         }
 
         @Override
-        @Nullable
         public ItemStack getBelt()
         {
             return thePlayer.inventory.getStackInSlot(slotNumber);

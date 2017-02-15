@@ -68,7 +68,7 @@ public class GuiRadialMenu extends GuiScreen
         else
         {
             ItemStack stack = getter.getBelt();
-            if (stack == null)
+            if (stack.getCount() <= 0)
             {
                 inventory = null;
                 stackEquipped = null;

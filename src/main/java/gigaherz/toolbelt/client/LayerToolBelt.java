@@ -63,7 +63,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
 
     private void renderHeldItem(EntityLivingBase player, ItemStack stack, ItemCameraTransforms.TransformType cameraTransform, EnumHandSide handSide)
     {
-        if (!stack.isEmpty())
+        if (stack.isEmpty())
             return;
 
         GlStateManager.pushMatrix();
