@@ -168,7 +168,7 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         return stack;
     }
 
-    public ItemStack getStack(int upgradeLevel)
+    public ItemStack of(int upgradeLevel)
     {
         if (upgradeLevel < 0 || upgradeLevel >= 9)
             return ItemStack.EMPTY;
