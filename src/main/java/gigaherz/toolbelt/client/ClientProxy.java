@@ -4,8 +4,6 @@ import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ISideProxy;
 import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.belt.ItemToolBelt;
-import gigaherz.toolbelt.belt.ToolBeltInventory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.settings.KeyBinding;
@@ -35,12 +33,12 @@ public class ClientProxy implements ISideProxy
     }
 
     @SubscribeEvent
-    public static void handleKeys(InputEvent ev)
+    public static void handleKeys(InputEvent ev) // Not a mistake, I want both kb & mouse events handled.
     {
         Minecraft mc = Minecraft.getMinecraft();
+
         while (keyOpenToolMenu.isPressed())
         {
-            ToolBelt.logger.warn("POKE! {0}", mc.world.getTotalWorldTime());
             if (mc.currentScreen == null)
             {
                 ItemStack inHand = mc.player.getHeldItemMainhand();

@@ -29,7 +29,7 @@ repositories {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.2.0"
+version = "1.3.0"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.10.2"
 
@@ -73,8 +73,8 @@ artifacts {
 dependencies {
     deobfCompile "gigaherz.commons:Commons-1.10.2:0.5.1"
 
-    deobfCompile "mezz.jei:jei_1.10.2:3.14.6.408:api"
-    runtime "mezz.jei:jei_1.10.2:3.14.6.408"
+    deobfCompile "mezz.jei:jei_1.10.2:3.14.7.415:api"
+    runtime "mezz.jei:jei_1.10.2:3.14.7.415"
 
     compile fileTree(dir: 'libs', include: '*.jar')
 }

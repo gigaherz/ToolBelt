@@ -1,18 +1,14 @@
 package gigaherz.toolbelt.belt;
 
 import gigaherz.toolbelt.Config;
-import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraftforge.common.util.Constants;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nullable;
-import java.util.Arrays;
 
 public class ToolBeltInventory implements IItemHandlerModifiable
 {

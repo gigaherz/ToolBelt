@@ -1,9 +1,7 @@
 package gigaherz.toolbelt;
 
-import com.google.common.collect.Lists;
 import gigaherz.common.ItemRegistered;
 import gigaherz.toolbelt.belt.ItemToolBelt;
-import gigaherz.toolbelt.belt.ToolBeltInventory;
 import gigaherz.toolbelt.common.GuiHandler;
 import gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.block.Block;
@@ -21,7 +19,6 @@ import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
@@ -29,11 +26,6 @@ import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
-import java.lang.ref.Reference;
-import java.lang.ref.ReferenceQueue;
-import java.lang.ref.WeakReference;
-import java.util.Iterator;
-import java.util.List;
 
 @Mod.EventBusSubscriber
 @Mod(modid = ToolBelt.MODID,

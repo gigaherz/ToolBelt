@@ -7,3 +7,4 @@ text.toolbelt.swap=SWAP
 text.toolbelt.insert=INSERT
 text.toolbelt.extract=EXTRACT
 text.toolbelt.tooltip=Upgrades: %s (%s slots)
+text.toolbelt.jei.belt.upgrade=Anvil (Belt Upgrade)

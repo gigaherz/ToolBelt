@@ -179,4 +179,14 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         setSlotsCount(stack, upgradeLevel + 2);
         return stack;
     }
+
+    public ItemStack of(int upgradeLevel)
+    {
+        if (upgradeLevel < 0 || upgradeLevel >= 9)
+            throw new IllegalArgumentException("upgradeLevel must be between 0 and 9, inclusive.");
+
+        ItemStack stack = new ItemStack(this);
+        setSlotsCount(stack, upgradeLevel + 2);
+        return stack;
+    }
 }
