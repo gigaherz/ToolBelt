@@ -33,12 +33,12 @@ public class ClientProxy implements ISideProxy
     }
 
     @SubscribeEvent
-    public static void handleKeys(InputEvent ev)
+    public static void handleKeys(InputEvent ev) // Not a mistake, I want both kb & mouse events handled.
     {
         Minecraft mc = Minecraft.getMinecraft();
+
         while (keyOpenToolMenu.isPressed())
         {
-            ToolBelt.logger.warn("POKE! {0}", mc.world.getTotalWorldTime());
             if (mc.currentScreen == null)
             {
                 ItemStack inHand = mc.player.getHeldItemMainhand();
