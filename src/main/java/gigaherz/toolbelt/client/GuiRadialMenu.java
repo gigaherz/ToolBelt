@@ -195,7 +195,7 @@ public class GuiRadialMenu extends GuiScreen
         if (a < s0) a += 360;
 
         boolean hasMouseOver = false;
-        ItemStack itemMouseOver = null;
+        ItemStack itemMouseOver = ItemStack.EMPTY;
         for (int i = 0; i < numItems; i++)
         {
             float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
@@ -208,7 +208,7 @@ public class GuiRadialMenu extends GuiScreen
                 {
                     hasMouseOver = true;
 
-                    ItemStack inSlot = null;
+                    ItemStack inSlot = ItemStack.EMPTY;
                     if (hasAddButton)
                     {
                         if (i > 0)
@@ -221,8 +221,7 @@ public class GuiRadialMenu extends GuiScreen
                         inSlot = items.get(i);
                     }
 
-                    if (inSlot != null)
-                        itemMouseOver = inSlot;
+                    itemMouseOver = inSlot;
                 }
             }
             else
@@ -263,7 +262,7 @@ public class GuiRadialMenu extends GuiScreen
         }
         RenderHelper.disableStandardItemLighting();
 
-        if (itemMouseOver != null)
+        if (itemMouseOver.getCount() > 0)
             renderToolTip(itemMouseOver, mouseX, mouseY);
     }
 
