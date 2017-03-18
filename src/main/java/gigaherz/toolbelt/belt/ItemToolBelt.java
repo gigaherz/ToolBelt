@@ -17,6 +17,7 @@ import net.minecraft.util.EnumActionResult;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -118,7 +119,7 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         NBTTagCompound nbt = stack.getTagCompound();
         if (nbt != null)
         {
-            size = nbt.getInteger("Size");
+            size = MathHelper.clamp(nbt.getInteger("Size"), 2, 9);
         }
         return size;
     }
