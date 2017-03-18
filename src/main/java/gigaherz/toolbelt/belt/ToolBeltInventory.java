@@ -4,6 +4,7 @@ import gigaherz.toolbelt.Config;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -12,22 +13,27 @@ import javax.annotation.Nullable;
 
 public class ToolBeltInventory implements IItemHandlerModifiable
 {
-    private final NBTTagCompound nbt;
+    private final ItemStack itemStack;
 
     ToolBeltInventory(ItemStack itemStack)
+    {
+        this.itemStack = itemStack;
+    }
+
+    private NBTTagCompound getTag()
     {
         NBTTagCompound tag;
         tag = itemStack.getTagCompound();
         if (tag == null)
             itemStack.setTagCompound(tag = new NBTTagCompound());
-        nbt = tag;
+        return tag;
     }
 
     // Ensure that the serialization is always compatible, even if it were to change upstream
     @Override
     public int getSlots()
     {
-        return nbt.hasKey("Size", Constants.NBT.TAG_INT) ? nbt.getInteger("Size") : 2;
+        return MathHelper.clamp(getTag().getInteger("Size"), 2, 9);
     }
 
     @Override
@@ -35,7 +41,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
     public ItemStack getStackInSlot(int slot)
     {
         validateSlotIndex(slot);
-        NBTTagList tagList = nbt.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+        NBTTagList tagList = getTag().getTagList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tagList.tagCount(); i++)
         {
             NBTTagCompound itemTags = tagList.getCompoundTagAt(i);
@@ -61,7 +67,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
             stack.writeToNBT(itemTag);
         }
 
-        NBTTagList tagList = nbt.getTagList("Items", Constants.NBT.TAG_COMPOUND);
+        NBTTagList tagList = getTag().getTagList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tagList.tagCount(); i++)
         {
             NBTTagCompound existing = tagList.getCompoundTagAt(i);
@@ -78,7 +84,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
         if (stack != null)
             tagList.appendTag(itemTag);
 
-        nbt.setTag("Items", tagList);
+        getTag().setTag("Items", tagList);
     }
 
     @Override
