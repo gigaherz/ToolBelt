@@ -9,10 +9,7 @@ import gigaherz.toolbelt.belt.ToolBeltInventory;
 import gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.VertexBuffer;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
@@ -32,7 +29,6 @@ public class GuiRadialMenu extends GuiScreen
     private final BeltFinder.BeltGetter getter;
     private ItemStack stackEquipped;
     private ToolBeltInventory inventory;
-    private final Minecraft mc;
     private List<ItemStack> cachedStacks = null;
 
     GuiRadialMenu(BeltFinder.BeltGetter getter)
@@ -40,7 +36,6 @@ public class GuiRadialMenu extends GuiScreen
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
         inventory = stackEquipped != null ? ItemToolBelt.getItems(stackEquipped) : null;
-        mc = Minecraft.getMinecraft();
     }
 
     @SubscribeEvent
@@ -239,6 +234,7 @@ public class GuiRadialMenu extends GuiScreen
                 drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.extract"), width / 2, (height - fontRendererObj.FONT_HEIGHT) / 2, 0xFFFFFFFF);
         }
 
+
         RenderHelper.enableGUIStandardItemLighting();
         for (int i = 0; i < numItems; i++)
         {
@@ -259,7 +255,10 @@ public class GuiRadialMenu extends GuiScreen
             }
 
             if (inSlot != null)
-                mc.getRenderItem().renderItemAndEffectIntoGUI(inSlot, (int) posX, (int) posY);
+            {
+                this.itemRender.renderItemAndEffectIntoGUI(inSlot, (int) posX, (int) posY);
+                this.itemRender.renderItemOverlayIntoGUI(this.fontRendererObj, inSlot, (int) posX, (int) posY, "");
+            }
         }
         RenderHelper.disableStandardItemLighting();
 
