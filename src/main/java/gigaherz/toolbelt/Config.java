@@ -29,7 +29,7 @@ public class Config
         Property wl = config.get("tileEntities", "whitelist", new String[0]);
 
         blackList.addAll(Arrays.stream(bl.getStringList()).map(Config::parseItemStack).filter(Objects::nonNull).collect(Collectors.toList()));
-        blackList.addAll(Arrays.stream(bl.getStringList()).map(Config::parseItemStack).filter(Objects::nonNull).collect(Collectors.toList()));
+        whiteList.addAll(Arrays.stream(wl.getStringList()).map(Config::parseItemStack).filter(Objects::nonNull).collect(Collectors.toList()));
         if (!bl.wasRead() || !wl.wasRead())
             config.save();
     }
