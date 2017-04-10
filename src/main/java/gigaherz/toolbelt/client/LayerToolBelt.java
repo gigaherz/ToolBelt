@@ -1,6 +1,7 @@
 package gigaherz.toolbelt.client;
 
 import gigaherz.toolbelt.BeltFinder;
+import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.belt.ToolBeltInventory;
@@ -11,7 +12,6 @@ import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
-import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -69,6 +69,9 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
     public void doRenderLayer(EntityPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
         boolean flag = player.getPrimaryHand() == EnumHandSide.RIGHT;
+
+        if (!Config.showBeltOnPlayers)
+            return;
 
         BeltFinder.BeltGetter getter = BeltFinder.instance.findStack(player);
         if (getter == null)

@@ -189,6 +189,14 @@ public class GuiRadialMenu extends GuiScreen
         float s0 = (((0 - 0.5f) / (float) numItems) + 0.25f) * 360;
         if (a < s0) a += 360;
 
+        GlStateManager.disableAlpha();
+        GlStateManager.enableBlend();
+        GlStateManager.disableTexture2D();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+        Tessellator tessellator = Tessellator.getInstance();
+        VertexBuffer buffer = tessellator.getBuffer();
+        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         boolean hasMouseOver = false;
         ItemStack itemMouseOver = ItemStack.EMPTY;
         for (int i = 0; i < numItems; i++)
@@ -197,7 +205,7 @@ public class GuiRadialMenu extends GuiScreen
             float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
             if (a >= s && a < e && d >= 30 && d < 60)
             {
-                drawPieArc(x, y, zLevel, 30, 60, s, e, 255, 255, 255, 64);
+                drawPieArc(buffer, x, y, zLevel, 30, 60, s, e, 255, 255, 255, 64);
 
                 if (i > 0 || !hasAddButton)
                 {
@@ -221,9 +229,11 @@ public class GuiRadialMenu extends GuiScreen
             }
             else
             {
-                drawPieArc(x, y, zLevel, 30, 60, s, e, 0, 0, 0, 64);
+                drawPieArc(buffer, x, y, zLevel, 30, 60, s, e, 0, 0, 0, 64);
             }
         }
+        tessellator.draw();
+        GlStateManager.enableTexture2D();
 
         if (hasMouseOver)
         {
@@ -267,13 +277,8 @@ public class GuiRadialMenu extends GuiScreen
 
     private static final float PRECISION = 5;
 
-    private void drawPieArc(float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
+    private void drawPieArc(VertexBuffer buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
     {
-        GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
-        GlStateManager.disableTexture2D();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
         float angle = endAngle - startAngle;
         int sections = Math.max(1, MathHelper.ceil(angle / PRECISION));
 
@@ -281,9 +286,6 @@ public class GuiRadialMenu extends GuiScreen
         endAngle = (float) Math.toRadians(endAngle);
         angle = endAngle - startAngle;
 
-        Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         for (int i = 0; i < sections; i++)
         {
             float angle1 = startAngle + (i / (float) sections) * angle;
@@ -303,8 +305,6 @@ public class GuiRadialMenu extends GuiScreen
             buffer.pos(pos2InX, pos2InY, z).color(r, g, b, a).endVertex();
             buffer.pos(pos2OutX, pos2OutY, z).color(r, g, b, a).endVertex();
         }
-        tessellator.draw();
-        GlStateManager.enableTexture2D();
     }
 
     @Override

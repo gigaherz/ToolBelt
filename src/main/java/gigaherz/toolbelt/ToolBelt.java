@@ -31,7 +31,8 @@ import java.io.File;
 @Mod(modid = ToolBelt.MODID,
         version = ToolBelt.VERSION,
         acceptedMinecraftVersions = "[1.11.0,1.12.0)",
-        dependencies = "after:baubles;after:jei@[4.2.6,)")
+        dependencies = "after:baubles;after:jei@[4.2.6,)",
+        guiFactory = "gigaherz.toolbelt.client.config.ConfigGuiFactory")
 public class ToolBelt
 {
     public static final String MODID = "toolbelt";
