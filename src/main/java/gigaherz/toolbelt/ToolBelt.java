@@ -88,7 +88,7 @@ public class ToolBelt
     public void init(FMLInitializationEvent event)
     {
         proxy.init();
-        GameRegistry.addShapelessRecipe(new ItemStack(belt, 1), Items.SLIME_BALL, Items.STRING, Items.PAPER);
+
         NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler = new GuiHandler());
 
         GameRegistry.addRecipe(new ItemStack(belt),
