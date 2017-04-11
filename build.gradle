@@ -31,13 +31,13 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.4.0"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "ToolBelt-1.10.2"
+archivesBaseName = "ToolBelt-1.11.2"
 
 minecraft {
-    version = "1.10.2-12.18.3.2221"
+    version = "1.11.2-13.20.0.2228"
     runDir = "run"
 
-    mappings = "stable_29"
+    mappings = "snapshot_20170410"
 
     replace "@VERSION@", project.version
     replaceIn "ToolBelt.java"
@@ -52,7 +52,7 @@ jar {
 shadowJar {
     classifier = ''
     dependencies {
-        include(dependency(':Commons-1.10.2:'))
+        include(dependency(':Commons-1.11.2:'))
         exclude '*CraftTweaker*'
         exclude '*Baubles*'
     }
@@ -71,10 +71,10 @@ artifacts {
 }
 
 dependencies {
-    deobfCompile "gigaherz.commons:Commons-1.10.2:0.5.1"
+    deobfCompile "gigaherz.commons:Commons-1.11.2:0.5.2"
 
-    deobfCompile "mezz.jei:jei_1.10.2:3.14.7.415:api"
-    runtime "mezz.jei:jei_1.10.2:3.14.7.415"
+    deobfCompile "mezz.jei:jei_1.11.2:4.2.10.248:api"
+    runtime "mezz.jei:jei_1.11.2:4.2.10.248"
 
     compile fileTree(dir: 'libs', include: '*.jar')
 }
