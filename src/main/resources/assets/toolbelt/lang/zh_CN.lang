@@ -7,3 +7,5 @@ text.toolbelt.swap=交换
 text.toolbelt.insert=放入
 text.toolbelt.extract=取出
 text.toolbelt.tooltip=升级数量：%s（%s格）
+text.toolbelt.jei.belt.upgrade=铁砧（皮带升级）
+text.toolbelt.name=工具皮带
