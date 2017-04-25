@@ -40,7 +40,7 @@ public class Config
         bl.setComment("List of items to disallow from placing in the belt.");
 
         Property wl = config.get("items", "whitelist", new String[0]);
-        bl.setComment("List of items to force-allow placing in the belt. Takes precedence over blacklist.");
+        wl.setComment("List of items to force-allow placing in the belt. Takes precedence over blacklist.");
 
         Property releaseToSwapProperty = config.get("input", "releaseToSwap", false);
         releaseToSwapProperty.setComment("If set to TRUE, releasing the menu key (R) will activate the swap. Requires a click otherwise (default).");
