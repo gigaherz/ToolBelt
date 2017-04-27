@@ -22,21 +22,28 @@ import java.util.stream.Collectors;
 
 public class Config
 {
+    private static final Set<String> blackListString = Sets.newHashSet();
+    private static final Set<String> whiteListString = Sets.newHashSet();
     private static final Set<ItemStack> blackList = Sets.newHashSet();
     private static final Set<ItemStack> whiteList = Sets.newHashSet();
 
     public static boolean showBeltOnPlayers = true;
-    public static boolean showOwnBelt = true;
+
+    public static boolean releaseToSwap = false;
 
     public static ConfigCategory display;
+    public static ConfigCategory input;
 
     static void loadConfig(Configuration config)
     {
-        Property bl = config.get("tileEntities", "blacklist", new String[0]);
+        Property bl = config.get("items", "blacklist", new String[0]);
         bl.setComment("List of items to disallow from placing in the belt.");
 
-        Property wl = config.get("tileEntities", "whitelist", new String[0]);
+        Property wl = config.get("items", "whitelist", new String[0]);
         bl.setComment("List of items to force-allow placing in the belt. Takes precedence over blacklist.");
+
+        Property releaseToSwapProperty = config.get("input", "releaseToSwap", false);
+        releaseToSwapProperty.setComment("If set to TRUE, releasing the menu key (R) will activate the swap. Requires a click otherwise (default).");
 
         Property showBeltOnPlayersProperty = config.get("display", "showBeltOnPlayers", true);
         showBeltOnPlayersProperty.setComment("If set to FALSE, the belts and tools will NOT draw on players.");
@@ -44,17 +51,29 @@ public class Config
         display = config.getCategory("display");
         display.setComment("Options for customizing the display of tools on the player");
 
+        input = config.getCategory("input");
+        input.setComment("Options for customizing the interaction with the radial menu");
+
         showBeltOnPlayers = showBeltOnPlayersProperty.getBoolean();
 
-        blackList.addAll(Arrays.stream(bl.getStringList()).map(Config::parseItemStack).filter(Objects::nonNull).collect(Collectors.toList()));
-        whiteList.addAll(Arrays.stream(wl.getStringList()).map(Config::parseItemStack).filter(Objects::nonNull).collect(Collectors.toList()));
-        if (!bl.wasRead() || !wl.wasRead() || !showBeltOnPlayersProperty.wasRead())
+        releaseToSwap = releaseToSwapProperty.getBoolean();
+
+        blackListString.addAll(Arrays.asList(bl.getStringList()));
+        whiteListString.addAll(Arrays.asList(wl.getStringList()));
+        if (!bl.wasRead() || !wl.wasRead() || !releaseToSwapProperty.wasRead() || !showBeltOnPlayersProperty.wasRead())
             config.save();
+    }
+
+    public static void postInit()
+    {
+        blackList.addAll(blackListString.stream().map(Config::parseItemStack).collect(Collectors.toList()));
+        whiteList.addAll(blackListString.stream().map(Config::parseItemStack).collect(Collectors.toList()));
     }
 
     public static void refresh()
     {
         showBeltOnPlayers = display.get("showBeltOnPlayers").getBoolean();
+        releaseToSwap = input.get("releaseToSwap").getBoolean();
     }
 
     private static final Pattern itemRegex = Pattern.compile("^(?<item>([a-zA-Z-0-9_]+:)?[a-zA-Z-0-9_]+)(?:@((?<meta>[0-9]+)|(?<any>any)))?$");
