@@ -19,8 +19,10 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import java.io.IOException;
 import java.util.List;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
@@ -77,8 +79,23 @@ public class GuiRadialMenu extends GuiScreen
             }
         }
 
-        if (inventory == null || !GameSettings.isKeyDown(ClientProxy.keyOpenToolMenu))
+        if (inventory == null)
+        {
             Minecraft.getMinecraft().displayGuiScreen(null);
+        }
+        else if (!GameSettings.isKeyDown(ClientProxy.keyOpenToolMenu))
+        {
+            if (Config.releaseToSwap)
+            {
+                int x = Mouse.getEventX() * this.width / this.mc.displayWidth;
+                int y = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
+                mouseReleased(x, y, -1);
+            }
+            else
+            {
+                Minecraft.getMinecraft().displayGuiScreen(null);
+            }
+        }
     }
 
     @Override
@@ -132,10 +149,11 @@ public class GuiRadialMenu extends GuiScreen
                     swapWith = items.get(i);
                 SwapItems.swapItem(swapWith, mc.player);
                 ToolBelt.channel.sendToServer(new SwapItems(swapWith));
-                Minecraft.getMinecraft().displayGuiScreen(null);
                 break;
             }
         }
+
+        Minecraft.getMinecraft().displayGuiScreen(null);
     }
 
     @Override

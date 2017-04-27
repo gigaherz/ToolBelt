@@ -37,6 +37,8 @@ public class ConfigGui extends GuiConfig
 
         configElements.addAll(new ConfigElement(Config.display).getChildElements());
 
+        configElements.addAll(new ConfigElement(Config.input).getChildElements());
+
         return configElements;
     }
 }
