@@ -35,7 +35,7 @@ public class Config
         bl.setComment("List of items to disallow from placing in the belt.");
 
         Property wl = config.get("tileEntities", "whitelist", new String[0]);
-        bl.setComment("List of items to force-allow placing in the belt. Takes precedence over blacklist.");
+        wl.setComment("List of items to force-allow placing in the belt. Takes precedence over blacklist.");
 
         Property showBeltOnPlayersProperty = config.get("display", "showBeltOnPlayers", true);
         showBeltOnPlayersProperty.setComment("If set to FALSE, the belts and tools will NOT draw on players.");
