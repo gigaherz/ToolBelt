@@ -81,8 +81,7 @@ public class ToolBelt
         logger.debug("Final message number: " + messageNumber);
 
         File configurationFile = event.getSuggestedConfigurationFile();
-        Configuration config = new Configuration(configurationFile);
-        Config.loadConfig(config);
+        Config.loadConfig(configurationFile);
     }
 
     @EventHandler

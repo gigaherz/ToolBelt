@@ -18,14 +18,6 @@ public class ConfigGui extends GuiConfig
         super(parent, getConfigElements(), ToolBelt.MODID, false, false, getTitle());
     }
 
-    @Override
-    public void onGuiClosed()
-    {
-        super.onGuiClosed();
-
-        Config.refresh();
-    }
-
     private static String getTitle()
     {
         return I18n.format("text." + ToolBelt.MODID + ".name");
