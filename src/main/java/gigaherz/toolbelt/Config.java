@@ -9,9 +9,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
+import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.Set;
@@ -21,20 +24,22 @@ import java.util.stream.Collectors;
 
 public class Config
 {
+    private static Configuration config;
+    public static ConfigCategory display;
+    public static ConfigCategory input;
+
     private static final Set<String> blackListString = Sets.newHashSet();
     private static final Set<String> whiteListString = Sets.newHashSet();
     private static final Set<ItemStack> blackList = Sets.newHashSet();
     private static final Set<ItemStack> whiteList = Sets.newHashSet();
 
     public static boolean showBeltOnPlayers = true;
-
     public static boolean releaseToSwap = false;
 
-    public static ConfigCategory display;
-    public static ConfigCategory input;
-
-    static void loadConfig(Configuration config)
+    static void loadConfig(File configurationFile)
     {
+        config = new Configuration(configurationFile);
+
         Property bl = config.get("items", "blacklist", new String[0]);
         bl.setComment("List of items to disallow from placing in the belt.");
 
@@ -66,13 +71,24 @@ public class Config
     public static void postInit()
     {
         blackList.addAll(blackListString.stream().map(Config::parseItemStack).collect(Collectors.toList()));
-        whiteList.addAll(blackListString.stream().map(Config::parseItemStack).collect(Collectors.toList()));
+        whiteList.addAll(whiteListString.stream().map(Config::parseItemStack).collect(Collectors.toList()));
     }
 
     public static void refresh()
     {
         showBeltOnPlayers = display.get("showBeltOnPlayers").getBoolean();
         releaseToSwap = input.get("releaseToSwap").getBoolean();
+    }
+
+    @SubscribeEvent
+    public static void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent event)
+    {
+        if (ToolBelt.MODID.equals(event.getModID()))
+        {
+            if(config.hasChanged())
+                config.save();
+            refresh();
+        }
     }
 
     private static final Pattern itemRegex = Pattern.compile("^(?<item>([a-zA-Z-0-9_]+:)?[a-zA-Z-0-9_]+)(?:@((?<meta>[0-9]+)|(?<any>any)))?$");
