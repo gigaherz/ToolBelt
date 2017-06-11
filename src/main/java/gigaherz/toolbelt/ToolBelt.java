@@ -5,6 +5,8 @@ import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.common.GuiHandler;
 import gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.block.Block;
+import net.minecraft.client.gui.recipebook.RecipeList;
+import net.minecraft.client.util.RecipeBookClient;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.init.Items;
 import net.minecraft.item.Item;
@@ -27,10 +29,13 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import org.apache.logging.log4j.Logger;
 
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 
 @Mod.EventBusSubscriber
 @Mod(modid = ToolBelt.MODID,
@@ -58,6 +63,9 @@ public class ToolBelt
     public static GuiHandler guiHandler;
 
     public static SimpleNetworkWrapper channel;
+
+    public static ShapedRecipes beltRecipe;
+    public static ShapedRecipes pouchRecipe;
 
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event)
@@ -113,8 +121,8 @@ public class ToolBelt
                 's', Items.STRING);
         */
 
-        CraftingManager.func_193372_a(location("belt"), new ShapedRecipes(
-                location("belt").toString(), 3, 3, NonNullList.func_193580_a(
+        beltRecipe = new ShapedRecipes(
+                "toolbelt", 3, 3, NonNullList.func_193580_a(
                 Ingredient.field_193370_a,
                 Ingredient.func_193367_a(Items.STRING),
                 Ingredient.func_193367_a(Items.LEATHER),
@@ -125,10 +133,10 @@ public class ToolBelt
                 Ingredient.func_193367_a(Items.LEATHER),
                 Ingredient.func_193367_a(Items.IRON_INGOT),
                 Ingredient.func_193367_a(Items.LEATHER)),
-                new ItemStack(belt)));
+                new ItemStack(belt));
 
-        CraftingManager.func_193372_a(location("pouch"), new ShapedRecipes(
-                location("pouch").toString(), 3, 3, NonNullList.func_193580_a(
+        pouchRecipe = new ShapedRecipes(
+                "toolpouch", 3, 3, NonNullList.func_193580_a(
                 Ingredient.field_193370_a,
                 Ingredient.func_193367_a(Items.STRING),
                 Ingredient.func_193367_a(Items.GOLD_INGOT),
@@ -139,7 +147,12 @@ public class ToolBelt
                 Ingredient.func_193367_a(Items.STRING),
                 Ingredient.func_193367_a(Items.LEATHER),
                 Ingredient.func_193367_a(Items.STRING)),
-                new ItemStack(pouch)));
+                new ItemStack(pouch));
+
+        CraftingManager.func_193372_a(location("belt"), beltRecipe);
+        CraftingManager.func_193372_a(location("pouch"), pouchRecipe);
+
+        proxy.initAfter();
     }
 
     @EventHandler

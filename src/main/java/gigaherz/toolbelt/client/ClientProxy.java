@@ -5,17 +5,23 @@ import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ISideProxy;
 import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.recipebook.RecipeList;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.client.util.RecipeBookClient;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.relauncher.ReflectionHelper;
 import net.minecraftforge.fml.relauncher.Side;
 import org.lwjgl.input.Keyboard;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.Map;
 
 import static gigaherz.common.client.ModelHelpers.registerItemModel;
@@ -59,6 +65,7 @@ public class ClientProxy implements ISideProxy
     {
         ClientRegistry.registerKeyBinding(keyOpenToolMenu =
                 new KeyBinding("key.toolbelt.open", Keyboard.KEY_R, "key.toolbelt.category"));
+        //keyOpenToolMenu.
 
         Map<String, RenderPlayer> skinMap = Minecraft.getMinecraft().getRenderManager().getSkinMap();
 
@@ -67,5 +74,28 @@ public class ClientProxy implements ISideProxy
 
         render = skinMap.get("slim");
         render.addLayer(new LayerToolBelt(render));
+    }
+
+    @Override
+    public void initAfter()
+    {
+        // Temporary recipe tab registration
+        Method m_getRecipelisting = ReflectionHelper.findMethod(RecipeBookClient.class, "func_194082_a", "func_194082_a", CreativeTabs.class);
+        try
+        {
+            RecipeList listBelt = (RecipeList) m_getRecipelisting.invoke(null, CreativeTabs.TOOLS);
+            listBelt.func_192709_a(ToolBelt.beltRecipe);
+
+            RecipeList listPouch = (RecipeList) m_getRecipelisting.invoke(null, CreativeTabs.TOOLS);
+            listPouch.func_192709_a(ToolBelt.pouchRecipe);
+        }
+        catch (IllegalAccessException e)
+        {
+            e.printStackTrace();
+        }
+        catch (InvocationTargetException e)
+        {
+            e.printStackTrace();
+        }
     }
 }
