@@ -213,7 +213,7 @@ public class GuiRadialMenu extends GuiScreen
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
         Tessellator tessellator = Tessellator.getInstance();
-        VertexBuffer buffer = tessellator.getBuffer();
+        BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         boolean hasMouseOver = false;
         ItemStack itemMouseOver = ItemStack.EMPTY;
@@ -295,7 +295,7 @@ public class GuiRadialMenu extends GuiScreen
 
     private static final float PRECISION = 5;
 
-    private void drawPieArc(VertexBuffer buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
+    private void drawPieArc(BufferBuilder buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
     {
         float angle = endAngle - startAngle;
         int sections = Math.max(1, MathHelper.ceil(angle / PRECISION));

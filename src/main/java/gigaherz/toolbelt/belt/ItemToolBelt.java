@@ -1,11 +1,12 @@
 package gigaherz.toolbelt.belt;
 
-import baubles.api.BaubleType;
-import baubles.api.IBauble;
+//import baubles.api.BaubleType;
+//import baubles.api.IBauble;
 import gigaherz.common.ItemRegistered;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.common.GuiHandler;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -29,7 +30,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 @Optional.Interface(modid = "baubles", iface = "baubles.api.IBauble")
-public class ItemToolBelt extends ItemRegistered implements IBauble
+public class ItemToolBelt extends ItemRegistered
+        //implements IBauble
 {
     @CapabilityInject(IItemHandler.class)
     public static Capability<IItemHandler> ITEM_HANDLER;
@@ -58,22 +60,22 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
     }
 
     @Override
-    public void addInformation(ItemStack stack, EntityPlayer playerIn, List<String> tooltip, boolean advanced)
+    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced)
     {
-        super.addInformation(stack, playerIn, tooltip, advanced);
+        super.addInformation(stack, world, tooltip, advanced);
 
         int size = getSlotsCount(stack);
 
         tooltip.add(I18n.format("text.toolbelt.tooltip", size - 2, size));
     }
 
-    @Override
-    public BaubleType getBaubleType(ItemStack itemStack)
-    {
-        return BaubleType.BELT;
-    }
+    //@Override
+    //public BaubleType getBaubleType(ItemStack itemStack)
+    //{
+    //    return BaubleType.BELT;
+    //}
 
-    @Override
+    //@Override
     public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player)
     {
         return true;

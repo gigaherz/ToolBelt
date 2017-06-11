@@ -7,7 +7,7 @@ buildscript {
         }
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.2-SNAPSHOT'
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
     }
 }
 
@@ -31,13 +31,13 @@ apply plugin: 'net.minecraftforge.gradle.forge'
 
 version = "1.6.1"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "ToolBelt-1.11.2"
+archivesBaseName = "ToolBelt-1.12.0"
 
 minecraft {
-    version = "1.11.2-13.20.0.2228"
+    version = "1.12-14.21.0.2321"
     runDir = "run"
 
-    mappings = "snapshot_20170410"
+    mappings = "snapshot_20170611"
 
     replace "@VERSION@", project.version
     replaceIn "ToolBelt.java"
@@ -73,8 +73,8 @@ artifacts {
 dependencies {
     deobfCompile "gigaherz.commons:Commons-1.11.2:0.5.2"
 
-    deobfCompile "mezz.jei:jei_1.11.2:4.2.10.248:api"
-    runtime "mezz.jei:jei_1.11.2:4.2.10.248"
+    deobfCompile "mezz.jei:jei_1.12:4.6.0.59:api"
+    runtime "mezz.jei:jei_1.12:4.6.0.59"
 
     compile fileTree(dir: 'libs', include: '*.jar')
 }
