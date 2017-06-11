@@ -75,27 +75,4 @@ public class ClientProxy implements ISideProxy
         render = skinMap.get("slim");
         render.addLayer(new LayerToolBelt(render));
     }
-
-    @Override
-    public void initAfter()
-    {
-        // Temporary recipe tab registration
-        Method m_getRecipelisting = ReflectionHelper.findMethod(RecipeBookClient.class, "func_194082_a", "func_194082_a", CreativeTabs.class);
-        try
-        {
-            RecipeList listBelt = (RecipeList) m_getRecipelisting.invoke(null, CreativeTabs.TOOLS);
-            listBelt.func_192709_a(ToolBelt.beltRecipe);
-
-            RecipeList listPouch = (RecipeList) m_getRecipelisting.invoke(null, CreativeTabs.TOOLS);
-            listPouch.func_192709_a(ToolBelt.pouchRecipe);
-        }
-        catch (IllegalAccessException e)
-        {
-            e.printStackTrace();
-        }
-        catch (InvocationTargetException e)
-        {
-            e.printStackTrace();
-        }
-    }
 }

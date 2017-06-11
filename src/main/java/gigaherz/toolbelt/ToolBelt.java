@@ -94,38 +94,13 @@ public class ToolBelt
 
         File configurationFile = event.getSuggestedConfigurationFile();
         Config.loadConfig(configurationFile);
-    }
 
-    @EventHandler
-    public void init(FMLInitializationEvent event)
-    {
-        proxy.init();
-
-        NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler = new GuiHandler());
-
-        /*
-        GameRegistry.addRecipe(new ItemStack(belt),
-                "sls",
-                "l l",
-                "lil",
-                'l', Items.LEATHER,
-                'i', Items.IRON_INGOT,
-                's', Items.STRING);
-
-        GameRegistry.addRecipe(new ItemStack(pouch),
-                "sgs",
-                "l l",
-                "sls",
-                'l', Items.LEATHER,
-                'g', Items.GOLD_INGOT,
-                's', Items.STRING);
-        */
 
         Ingredient ingredientString = fromItem(Items.STRING);
         Ingredient ingredientLeather = fromItem(Items.LEATHER);
         Ingredient ingredientIronIngot = fromItem(Items.IRON_INGOT);
         Ingredient ingredientGoldIngot = fromItem(Items.GOLD_INGOT);
-        
+
         beltRecipe = new ShapedRecipes(
                 "toolbelt", 3, 3, NonNullList.func_193580_a(
                 Ingredient.field_193370_a,
@@ -156,8 +131,33 @@ public class ToolBelt
 
         CraftingManager.func_193372_a(location("belt"), beltRecipe);
         CraftingManager.func_193372_a(location("pouch"), pouchRecipe);
+    }
 
-        proxy.initAfter();
+    @EventHandler
+    public void init(FMLInitializationEvent event)
+    {
+        proxy.init();
+
+        NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler = new GuiHandler());
+
+        /*
+        GameRegistry.addRecipe(new ItemStack(belt),
+                "sls",
+                "l l",
+                "lil",
+                'l', Items.LEATHER,
+                'i', Items.IRON_INGOT,
+                's', Items.STRING);
+
+        GameRegistry.addRecipe(new ItemStack(pouch),
+                "sgs",
+                "l l",
+                "sls",
+                'l', Items.LEATHER,
+                'g', Items.GOLD_INGOT,
+                's', Items.STRING);
+        */
+
     }
 
     private Ingredient fromItem(Item item)
