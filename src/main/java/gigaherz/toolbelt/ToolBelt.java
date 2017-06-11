@@ -121,38 +121,53 @@ public class ToolBelt
                 's', Items.STRING);
         */
 
+        Ingredient ingredientString = fromItem(Items.STRING);
+        Ingredient ingredientLeather = fromItem(Items.LEATHER);
+        Ingredient ingredientIronIngot = fromItem(Items.IRON_INGOT);
+        Ingredient ingredientGoldIngot = fromItem(Items.GOLD_INGOT);
+        
         beltRecipe = new ShapedRecipes(
                 "toolbelt", 3, 3, NonNullList.func_193580_a(
                 Ingredient.field_193370_a,
-                Ingredient.func_193367_a(Items.STRING),
-                Ingredient.func_193367_a(Items.LEATHER),
-                Ingredient.func_193367_a(Items.STRING),
-                Ingredient.func_193367_a(Items.LEATHER),
+                ingredientString,
+                ingredientLeather,
+                ingredientString,
+                ingredientLeather,
                 Ingredient.field_193370_a,
-                Ingredient.func_193367_a(Items.LEATHER),
-                Ingredient.func_193367_a(Items.LEATHER),
-                Ingredient.func_193367_a(Items.IRON_INGOT),
-                Ingredient.func_193367_a(Items.LEATHER)),
+                ingredientLeather,
+                ingredientLeather,
+                ingredientIronIngot,
+                ingredientLeather),
                 new ItemStack(belt));
 
         pouchRecipe = new ShapedRecipes(
                 "toolpouch", 3, 3, NonNullList.func_193580_a(
                 Ingredient.field_193370_a,
-                Ingredient.func_193367_a(Items.STRING),
-                Ingredient.func_193367_a(Items.GOLD_INGOT),
-                Ingredient.func_193367_a(Items.STRING),
-                Ingredient.func_193367_a(Items.LEATHER),
+                ingredientString,
+                ingredientGoldIngot,
+                ingredientString,
+                ingredientLeather,
                 Ingredient.field_193370_a,
-                Ingredient.func_193367_a(Items.LEATHER),
-                Ingredient.func_193367_a(Items.STRING),
-                Ingredient.func_193367_a(Items.LEATHER),
-                Ingredient.func_193367_a(Items.STRING)),
+                ingredientLeather,
+                ingredientString,
+                ingredientLeather,
+                ingredientString),
                 new ItemStack(pouch));
 
         CraftingManager.func_193372_a(location("belt"), beltRecipe);
         CraftingManager.func_193372_a(location("pouch"), pouchRecipe);
 
         proxy.initAfter();
+    }
+
+    private Ingredient fromItem(Item item)
+    {
+        if (!item.getHasSubtypes())
+            return Ingredient.func_193369_a(new ItemStack(item));
+
+        NonNullList<ItemStack> stacks = NonNullList.create();
+        item.getSubItems(CreativeTabs.SEARCH, stacks);
+        return Ingredient.func_193369_a(stacks.toArray(new ItemStack[stacks.size()]));
     }
 
     @EventHandler
