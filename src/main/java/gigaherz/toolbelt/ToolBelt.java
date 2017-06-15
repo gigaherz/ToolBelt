@@ -64,9 +64,6 @@ public class ToolBelt
 
     public static SimpleNetworkWrapper channel;
 
-    public static ShapedRecipes beltRecipe;
-    public static ShapedRecipes pouchRecipe;
-
     @SubscribeEvent
     public static void registerBlocks(RegistryEvent.Register<Block> event)
     {
@@ -94,43 +91,6 @@ public class ToolBelt
 
         File configurationFile = event.getSuggestedConfigurationFile();
         Config.loadConfig(configurationFile);
-
-
-        Ingredient ingredientString = fromItem(Items.STRING);
-        Ingredient ingredientLeather = fromItem(Items.LEATHER);
-        Ingredient ingredientIronIngot = fromItem(Items.IRON_INGOT);
-        Ingredient ingredientGoldIngot = fromItem(Items.GOLD_INGOT);
-
-        beltRecipe = new ShapedRecipes(
-                "toolbelt", 3, 3, NonNullList.func_193580_a(
-                Ingredient.field_193370_a,
-                ingredientString,
-                ingredientLeather,
-                ingredientString,
-                ingredientLeather,
-                Ingredient.field_193370_a,
-                ingredientLeather,
-                ingredientLeather,
-                ingredientIronIngot,
-                ingredientLeather),
-                new ItemStack(belt));
-
-        pouchRecipe = new ShapedRecipes(
-                "toolpouch", 3, 3, NonNullList.func_193580_a(
-                Ingredient.field_193370_a,
-                ingredientString,
-                ingredientGoldIngot,
-                ingredientString,
-                ingredientLeather,
-                Ingredient.field_193370_a,
-                ingredientLeather,
-                ingredientString,
-                ingredientLeather,
-                ingredientString),
-                new ItemStack(pouch));
-
-        CraftingManager.func_193372_a(location("belt"), beltRecipe);
-        CraftingManager.func_193372_a(location("pouch"), pouchRecipe);
     }
 
     @EventHandler
@@ -139,35 +99,6 @@ public class ToolBelt
         proxy.init();
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler = new GuiHandler());
-
-        /*
-        GameRegistry.addRecipe(new ItemStack(belt),
-                "sls",
-                "l l",
-                "lil",
-                'l', Items.LEATHER,
-                'i', Items.IRON_INGOT,
-                's', Items.STRING);
-
-        GameRegistry.addRecipe(new ItemStack(pouch),
-                "sgs",
-                "l l",
-                "sls",
-                'l', Items.LEATHER,
-                'g', Items.GOLD_INGOT,
-                's', Items.STRING);
-        */
-
-    }
-
-    private Ingredient fromItem(Item item)
-    {
-        if (!item.getHasSubtypes())
-            return Ingredient.func_193369_a(new ItemStack(item));
-
-        NonNullList<ItemStack> stacks = NonNullList.create();
-        item.getSubItems(CreativeTabs.SEARCH, stacks);
-        return Ingredient.func_193369_a(stacks.toArray(new ItemStack[stacks.size()]));
     }
 
     @EventHandler
