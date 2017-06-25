@@ -30,18 +30,21 @@ public class GuiBelt extends GuiContainer
         this.ySize = 133;
     }
 
-    /**
-     * Draw the foreground layer for the GuiContainer (everything in front of the items)
-     */
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    {
+        this.drawDefaultBackground();
+        super.drawScreen(mouseX, mouseY, partialTicks);
+    }
+
+    @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
         this.fontRenderer.drawString(this.beltStack.getDisplayName(), 8, 6, 4210752);
         this.fontRenderer.drawString(this.playerInventory.getDisplayName().getUnformattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
-    /**
-     * Draws the background layer of this container (behind the items).
-     */
+    @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
