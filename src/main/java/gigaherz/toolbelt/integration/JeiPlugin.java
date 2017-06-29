@@ -5,7 +5,6 @@ import gigaherz.toolbelt.ToolBelt;
 import mezz.jei.api.*;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
 import mezz.jei.api.recipe.IRecipeCategoryRegistration;
-import mezz.jei.api.recipe.IRecipeWrapper;
 import mezz.jei.api.recipe.IVanillaRecipeFactory;
 import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
 import net.minecraft.item.ItemStack;
@@ -46,7 +45,7 @@ public class JeiPlugin implements IModPlugin
                 vanillaFactory.createAnvilRecipe(ToolBelt.belt.of(4), pouch, Collections.singletonList(ToolBelt.belt.of(5))),
                 vanillaFactory.createAnvilRecipe(ToolBelt.belt.of(5), pouch, Collections.singletonList(ToolBelt.belt.of(6))),
                 vanillaFactory.createAnvilRecipe(ToolBelt.belt.of(6), pouch, Collections.singletonList(ToolBelt.belt.of(7)))
-                ), VanillaRecipeCategoryUid.ANVIL);
+        ), VanillaRecipeCategoryUid.ANVIL);
     }
 
     @Override
