@@ -1,5 +1,6 @@
 package gigaherz.toolbelt.common;
 
+import gigaherz.toolbelt.BeltFinder;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.IInventory;
@@ -46,6 +47,14 @@ public class ContainerBelt extends Container
                             : new Slot(playerInventory, i1, 8 + i1 * 18, 109)
             );
         }
+    }
+
+    @Override
+    public void onContainerClosed(EntityPlayer playerIn)
+    {
+        super.onContainerClosed(playerIn);
+        if (!playerIn.world.isRemote)
+            BeltFinder.sendSync(playerIn);
     }
 
     @Override
