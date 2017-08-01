@@ -1,0 +1,10 @@
+item.toolbelt.belt.name=Werkzeug Gürtel
+item.toolbelt.pouch.name=Gürtel Tasche
+key.toolbelt.open=Werkzeug wechseln
+key.toolbelt.category=Werkzeug Gürtel
+text.toolbelt.empty=LEER
+text.toolbelt.swap=WECHSELN
+text.toolbelt.insert=EINFÜGEN
+text.toolbelt.extract=Entfernen
+text.toolbelt.tooltip=Upgrades: %s (%s Plätze)
+text.toolbelt.jei.belt.upgrade=Amboss (Gürtel Upgrade)

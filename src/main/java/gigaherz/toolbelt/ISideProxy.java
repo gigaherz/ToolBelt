@@ -1,6 +1,15 @@
 package gigaherz.toolbelt;
 
+import gigaherz.toolbelt.network.BeltContentsChange;
+
 public interface ISideProxy
 {
-    void init();
+    default void init()
+    {
+    }
+
+    default void handleBeltContentsChange(BeltContentsChange message)
+    {
+
+    }
 }
