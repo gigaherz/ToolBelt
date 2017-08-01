@@ -18,7 +18,6 @@ import net.minecraftforge.oredict.OreDictionary;
 import javax.annotation.Nullable;
 import java.io.File;
 import java.util.Arrays;
-import java.util.Objects;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -80,11 +79,11 @@ public class Config
         blackListString.addAll(Arrays.asList(bl.getStringList()));
         whiteListString.addAll(Arrays.asList(wl.getStringList()));
         if (!bl.wasRead() ||
-            !wl.wasRead() ||
-            !releaseToSwapProperty.wasRead() ||
-            !showBeltOnPlayersProperty.wasRead() ||
-            !clipMouseToCircleProperty.wasRead() ||
-            !allowClickOutsideBoundsProperty.wasRead())
+                !wl.wasRead() ||
+                !releaseToSwapProperty.wasRead() ||
+                !showBeltOnPlayersProperty.wasRead() ||
+                !clipMouseToCircleProperty.wasRead() ||
+                !allowClickOutsideBoundsProperty.wasRead())
         {
             config.save();
         }
@@ -107,7 +106,7 @@ public class Config
     {
         if (ToolBelt.MODID.equals(event.getModID()))
         {
-            if(config.hasChanged())
+            if (config.hasChanged())
                 config.save();
             refresh();
         }

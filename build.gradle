@@ -29,7 +29,7 @@ repositories {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.6.1"
+version = "1.7.0"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.10.2"
 

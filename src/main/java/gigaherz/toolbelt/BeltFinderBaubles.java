@@ -75,7 +75,7 @@ public class BeltFinderBaubles extends BeltFinder
             BeltContentsChange message = new BeltContentsChange(thePlayer, BAUBLES, slotNumber, getBelt());
             ((WorldServer) thePlayer.world).getEntityTracker().getTrackingPlayers(thePlayer).forEach((p) -> {
                 if (p instanceof EntityPlayerMP)
-                    ToolBelt.channel.sendTo(message, (EntityPlayerMP)p);
+                    ToolBelt.channel.sendTo(message, (EntityPlayerMP) p);
             });
         }
     }

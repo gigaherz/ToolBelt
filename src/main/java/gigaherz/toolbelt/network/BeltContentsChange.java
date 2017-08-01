@@ -1,22 +1,13 @@
 package gigaherz.toolbelt.network;
 
-import gigaherz.toolbelt.BeltFinder;
-import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.belt.ItemToolBelt;
-import gigaherz.toolbelt.belt.ToolBeltInventory;
 import io.netty.buffer.ByteBuf;
-import io.netty.buffer.ByteBufUtil;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.items.ItemHandlerHelper;
 
 public class BeltContentsChange
         implements IMessage

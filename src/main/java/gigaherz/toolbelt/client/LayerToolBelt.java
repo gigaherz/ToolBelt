@@ -31,7 +31,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
     private final ModelBase beltModel = new ModelBase()
     {
         final ModelRenderer belt = new ModelRenderer(this);
-        final ModelRenderer buckle = new ModelRenderer(this, 10,10);
+        final ModelRenderer buckle = new ModelRenderer(this, 10, 10);
         final ModelRenderer pocketL = new ModelRenderer(this, 0, 10);
         final ModelRenderer pocketR = new ModelRenderer(this, 0, 10);
 
@@ -40,10 +40,10 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
 
             buckle.addBox(-2.5f, 9.5f, -3.5f, 5, 5, 1);
 
-            pocketL.addBox(-2,12,5, 4, 4, 1);
-            pocketL.rotateAngleY = (float)Math.toRadians(-90);
-            pocketR.addBox(-2,12,5, 4, 4, 1);
-            pocketR.rotateAngleY = (float)Math.toRadians(90);
+            pocketL.addBox(-2, 12, 5, 4, 4, 1);
+            pocketL.rotateAngleY = (float) Math.toRadians(-90);
+            pocketR.addBox(-2, 12, 5, 4, 4, 1);
+            pocketR.rotateAngleY = (float) Math.toRadians(90);
         }
 
         @Override
@@ -56,7 +56,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
             pocketR.render(scale);
 
             GlStateManager.pushMatrix();
-            GlStateManager.scale(0.8f,1,1);
+            GlStateManager.scale(0.8f, 1, 1);
             buckle.render(scale);
             GlStateManager.popMatrix();
         }
@@ -117,7 +117,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
         }
 
         GlStateManager.translate(0.0F, 0.19F, 0.0F);
-        GlStateManager.scale(0.85f,0.6f,0.78f);
+        GlStateManager.scale(0.85f, 0.6f, 0.78f);
 
         this.livingEntityRenderer.bindTexture(TEXTURE_BELT);
         this.beltModel.render(player, 0, 0, 0, 0, 0, scale);

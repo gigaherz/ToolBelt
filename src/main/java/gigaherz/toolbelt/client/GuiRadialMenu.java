@@ -9,8 +9,10 @@ import gigaherz.toolbelt.belt.ToolBeltInventory;
 import gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.gui.ScaledResolution;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.GlStateManager;
+import net.minecraft.client.renderer.RenderHelper;
+import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.VertexBuffer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.settings.GameSettings;
@@ -33,6 +35,8 @@ public class GuiRadialMenu extends GuiScreen
     private ToolBeltInventory inventory;
     private List<ItemStack> cachedStacks = null;
 
+    boolean closing;
+    boolean doneClosing;
     double startAnimation;
 
     private int selectedItem = -1;
@@ -44,7 +48,7 @@ public class GuiRadialMenu extends GuiScreen
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
         inventory = stackEquipped != null ? ItemToolBelt.getItems(stackEquipped) : null;
-        startAnimation = Minecraft.getMinecraft().world.getTotalWorldTime() + (double)Minecraft.getMinecraft().getRenderPartialTicks();
+        startAnimation = Minecraft.getMinecraft().world.getTotalWorldTime() + (double) Minecraft.getMinecraft().getRenderPartialTicks();
     }
 
     @SubscribeEvent
@@ -63,6 +67,18 @@ public class GuiRadialMenu extends GuiScreen
     public void updateScreen()
     {
         super.updateScreen();
+
+        if (closing)
+        {
+            if (doneClosing)
+            {
+                Minecraft.getMinecraft().displayGuiScreen(null);
+
+                ClientProxy.wipeOpen();
+            }
+
+            return;
+        }
 
         ItemStack inHand = mc.player.getHeldItemMainhand();
         if (!Config.isItemStackAllowed(inHand))
@@ -100,7 +116,7 @@ public class GuiRadialMenu extends GuiScreen
             }
             else
             {
-                Minecraft.getMinecraft().displayGuiScreen(null);
+                animateClose();
             }
         }
     }
@@ -109,6 +125,9 @@ public class GuiRadialMenu extends GuiScreen
     protected void mouseReleased(int mouseX, int mouseY, int state)
     {
         super.mouseReleased(mouseX, mouseY, state);
+
+        if (closing)
+            return;
 
         if (inventory == null)
             return;
@@ -146,15 +165,14 @@ public class GuiRadialMenu extends GuiScreen
             ToolBelt.channel.sendToServer(new SwapItems(swapWith));
         }
 
-        Minecraft.getMinecraft().displayGuiScreen(null);
-
-        ClientProxy.wipeOpen();
+        animateClose();
     }
 
-    @Override
-    protected void keyTyped(char typedChar, int keyCode) throws IOException
+    private void animateClose()
     {
-        super.keyTyped(typedChar, keyCode);
+        closing = true;
+        doneClosing = false;
+        startAnimation = Minecraft.getMinecraft().world.getTotalWorldTime() + (double) Minecraft.getMinecraft().getRenderPartialTicks();
     }
 
     @Override
@@ -200,60 +218,68 @@ public class GuiRadialMenu extends GuiScreen
             drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.insert"), width / 2, height / 2 + 45 - fontRendererObj.FONT_HEIGHT / 2, 0xFFFFFFFF);
         }
 
-        float openAnimation = (float)(Minecraft.getMinecraft().world.getTotalWorldTime() + partialTicks - startAnimation);
-
         final float OPEN_ANIMATION_LENGTH = 2.5f;
 
-        float animProgress = Math.min(1, openAnimation / OPEN_ANIMATION_LENGTH);
+        float openAnimation = closing
+                ? (float) (1 - ((Minecraft.getMinecraft().world.getTotalWorldTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH))
+                : (float) ((Minecraft.getMinecraft().world.getTotalWorldTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH);
+
+        if (closing && openAnimation <= 0)
+            doneClosing = true;
+
+        float animProgress = MathHelper.clamp(openAnimation, 0, 1);
         float radiusIn = Math.max(0.1f, 30 * animProgress);
         float radiusOut = radiusIn * 2;
         float itemRadius = (radiusIn + radiusOut) * 0.5f;
-        float animTop = (1-animProgress) * height / 2.0f;
+        float animTop = (1 - animProgress) * height / 2.0f;
 
         int x = width / 2;
         int y = height / 2;
 
-        if (GameSettings.isKeyDown(ClientProxy.keyCycleToolMenuL))
+        if (!closing)
         {
-            if (!keyCycleBeforeL)
+            if (GameSettings.isKeyDown(ClientProxy.keyCycleToolMenuL))
             {
-                selectedItem--;
-                if (selectedItem < 0)
-                    selectedItem = numItems - 1;
-                setMousePosition(
-                        x+itemRadius * Math.cos(-0.5*Math.PI -selectedItem * 2 * Math.PI / numItems),
-                        y+itemRadius * Math.sin(-0.5*Math.PI +selectedItem * 2 * Math.PI / numItems)
-                );
-            }
-            keyCycleBeforeL = true;
-        }
-        else
-        {
-            keyCycleBeforeL = false;
-        }
-
-        if (GameSettings.isKeyDown(ClientProxy.keyCycleToolMenuR))
-        {
-            if (!keyCycleBeforeR)
-            {
-                if (selectedItem < 0)
-                    selectedItem = 0;
-                else
+                if (!keyCycleBeforeL)
                 {
-                    selectedItem++;
-                    if (selectedItem >= numItems)
-                        selectedItem = 0;
+                    selectedItem--;
+                    if (selectedItem < 0)
+                        selectedItem = numItems - 1;
+                    setMousePosition(
+                            x + itemRadius * Math.cos(-0.5 * Math.PI - selectedItem * 2 * Math.PI / numItems),
+                            y + itemRadius * Math.sin(-0.5 * Math.PI + selectedItem * 2 * Math.PI / numItems)
+                    );
                 }
-                setMousePosition(
-                        x+itemRadius * Math.cos(-0.5*Math.PI -selectedItem * 2 * Math.PI / numItems),
-                        y+itemRadius * Math.sin(-0.5*Math.PI +selectedItem * 2 * Math.PI / numItems)
-                );
+                keyCycleBeforeL = true;
             }
-            keyCycleBeforeR = true;
-        }
-        else
-        {
-            keyCycleBeforeR = false;
+            else
+            {
+                keyCycleBeforeL = false;
+            }
+
+            if (GameSettings.isKeyDown(ClientProxy.keyCycleToolMenuR))
+            {
+                if (!keyCycleBeforeR)
+                {
+                    if (selectedItem < 0)
+                        selectedItem = 0;
+                    else
+                    {
+                        selectedItem++;
+                        if (selectedItem >= numItems)
+                            selectedItem = 0;
+                    }
+                    setMousePosition(
+                            x + itemRadius * Math.cos(-0.5 * Math.PI - selectedItem * 2 * Math.PI / numItems),
+                            y + itemRadius * Math.sin(-0.5 * Math.PI + selectedItem * 2 * Math.PI / numItems)
+                    );
+                }
+                keyCycleBeforeR = true;
+            }
+            else
+            {
+                keyCycleBeforeR = false;
+            }
         }
 
         double a = Math.toDegrees(Math.atan2(mouseY - y, mouseX - x));
@@ -267,7 +293,7 @@ public class GuiRadialMenu extends GuiScreen
         GlStateManager.disableTexture2D();
         GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
 
-        GlStateManager.translate(0, animTop,0);
+        GlStateManager.translate(0, animTop, 0);
 
         Tessellator tessellator = Tessellator.getInstance();
         VertexBuffer buffer = tessellator.getBuffer();
@@ -275,15 +301,18 @@ public class GuiRadialMenu extends GuiScreen
         boolean hasMouseOver = false;
         ItemStack itemMouseOver = null;
 
-        for (int i = 0; i < numItems; i++)
+        if (!closing)
         {
-            float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
-            float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
-            if (a >= s && a < e && d >= radiusIn && d < radiusOut)
-            if (a >= s && a < e && d >= radiusIn && (d < radiusOut || Config.clipMouseToCircle || Config.allowClickOutsideBounds))
+            for (int i = 0; i < numItems; i++)
             {
-                selectedItem = i;
-                break;
+                float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
+                float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
+                if (a >= s && a < e && d >= radiusIn && d < radiusOut)
+                    if (a >= s && a < e && d >= radiusIn && (d < radiusOut || Config.clipMouseToCircle || Config.allowClickOutsideBounds))
+                    {
+                        selectedItem = i;
+                        break;
+                    }
             }
         }
 
@@ -324,10 +353,10 @@ public class GuiRadialMenu extends GuiScreen
 
         if (Config.clipMouseToCircle)
         {
-            double scaledX = Mouse.getX() - (mc.displayWidth/2.0f);
-            double scaledY = Mouse.getY() - (mc.displayHeight/2.0f);
+            double scaledX = Mouse.getX() - (mc.displayWidth / 2.0f);
+            double scaledY = Mouse.getY() - (mc.displayHeight / 2.0f);
 
-            double distance = Math.sqrt(scaledX*scaledX + scaledY*scaledY);
+            double distance = Math.sqrt(scaledX * scaledX + scaledY * scaledY);
             double radius = 60.0 * (mc.displayWidth / width);
 
             if (distance > radius)

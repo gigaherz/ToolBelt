@@ -2,7 +2,6 @@ package gigaherz.toolbelt;
 
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.network.BeltContentsChange;
-import net.minecraft.entity.EntityTracker;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
@@ -10,7 +9,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.WorldServer;
 
 import javax.annotation.Nullable;
-import java.util.Set;
 
 import static gigaherz.toolbelt.network.BeltContentsChange.ContainingInventory.MAIN;
 
@@ -85,7 +83,7 @@ public class BeltFinder
             BeltContentsChange message = new BeltContentsChange(thePlayer, MAIN, slotNumber, getBelt());
             ((WorldServer) thePlayer.world).getEntityTracker().getTrackingPlayers(thePlayer).forEach((p) -> {
                 if (p instanceof EntityPlayerMP)
-                    ToolBelt.channel.sendTo(message, (EntityPlayerMP)p);
+                    ToolBelt.channel.sendTo(message, (EntityPlayerMP) p);
             });
         }
     }

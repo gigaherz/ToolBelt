@@ -1,6 +1,5 @@
 package gigaherz.toolbelt.client;
 
-import baubles.api.BaublesApi;
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ISideProxy;
@@ -95,8 +94,8 @@ public class ClientProxy implements ISideProxy
             Entity entity = Minecraft.getMinecraft().world.getEntityByID(message.player);
             if (!(entity instanceof EntityPlayer))
                 return;
-            EntityPlayer player = (EntityPlayer)entity;
-            switch(message.where)
+            EntityPlayer player = (EntityPlayer) entity;
+            switch (message.where)
             {
                 case MAIN:
                     player.inventory.setInventorySlotContents(message.slot, message.stack);

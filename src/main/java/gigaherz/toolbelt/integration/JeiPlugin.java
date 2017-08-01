@@ -63,7 +63,6 @@ public class JeiPlugin implements IModPlugin
                 new BeltUpgradeRecipeWrapper(ToolBelt.belt.of(4), pouch, ToolBelt.belt.of(5), ItemToolBelt.xpCost[4]),
                 new BeltUpgradeRecipeWrapper(ToolBelt.belt.of(5), pouch, ToolBelt.belt.of(6), ItemToolBelt.xpCost[5]),
                 new BeltUpgradeRecipeWrapper(ToolBelt.belt.of(6), pouch, ToolBelt.belt.of(7), ItemToolBelt.xpCost[6])));
-
     }
 
     @Override

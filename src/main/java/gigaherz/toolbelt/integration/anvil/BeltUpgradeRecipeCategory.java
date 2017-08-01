@@ -17,38 +17,43 @@ import net.minecraft.util.ResourceLocation;
 public class BeltUpgradeRecipeCategory extends BlankRecipeCategory<BeltUpgradeRecipeWrapper>
 {
     private static final String TITLE = "text." + ToolBelt.MODID + ".jei.belt.upgrade";
-	public static final String UID = ToolBelt.MODID + ".anvil";
+    public static final String UID = ToolBelt.MODID + ".anvil";
 
-	private final IDrawable background;
+    private final IDrawable background;
 
-	public BeltUpgradeRecipeCategory(IGuiHelper guiHelper) {
-		ResourceLocation backgroundLocation = new ResourceLocation("textures/gui/container/anvil.png");
-		background = guiHelper.createDrawable(backgroundLocation, 16, 40, 145, 37);
-	}
+    public BeltUpgradeRecipeCategory(IGuiHelper guiHelper)
+    {
+        ResourceLocation backgroundLocation = new ResourceLocation("textures/gui/container/anvil.png");
+        background = guiHelper.createDrawable(backgroundLocation, 16, 40, 145, 37);
+    }
 
-	@Override
-	public String getUid() {
-		return UID;
-	}
+    @Override
+    public String getUid()
+    {
+        return UID;
+    }
 
-	@Override
-	public String getTitle() {
-		return I18n.format(TITLE);
-	}
+    @Override
+    public String getTitle()
+    {
+        return I18n.format(TITLE);
+    }
 
-	@Override
-	public IDrawable getBackground() {
-		return background;
-	}
+    @Override
+    public IDrawable getBackground()
+    {
+        return background;
+    }
 
-	@Override
-	public void setRecipe(IRecipeLayout recipeLayout, BeltUpgradeRecipeWrapper recipeWrapper, IIngredients ingredients) {
-		IGuiItemStackGroup guiItemStacks = recipeLayout.getItemStacks();
+    @Override
+    public void setRecipe(IRecipeLayout recipeLayout, BeltUpgradeRecipeWrapper recipeWrapper, IIngredients ingredients)
+    {
+        IGuiItemStackGroup guiItemStacks = recipeLayout.getItemStacks();
 
-		guiItemStacks.init(0, true, 10, 6);
-		guiItemStacks.init(1, true, 59, 6);
-		guiItemStacks.init(2, false, 117, 6);
+        guiItemStacks.init(0, true, 10, 6);
+        guiItemStacks.init(1, true, 59, 6);
+        guiItemStacks.init(2, false, 117, 6);
 
-		guiItemStacks.set(ingredients);
-	}
+        guiItemStacks.set(ingredients);
+    }
 }

@@ -17,7 +17,7 @@ public class BeltEvents
         if (!(entity instanceof EntityPlayer))
             return;
 
-        EntityPlayer player = (EntityPlayer)entity;
+        EntityPlayer player = (EntityPlayer) entity;
         BeltFinder.sendSync(player);
     }
 }
