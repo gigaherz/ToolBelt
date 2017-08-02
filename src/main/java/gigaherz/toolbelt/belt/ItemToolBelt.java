@@ -2,7 +2,6 @@ package gigaherz.toolbelt.belt;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
-
 import gigaherz.common.ItemRegistered;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.common.GuiHandler;

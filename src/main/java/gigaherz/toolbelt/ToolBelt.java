@@ -3,6 +3,7 @@ package gigaherz.toolbelt;
 import gigaherz.common.ItemRegistered;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.common.GuiHandler;
+import gigaherz.toolbelt.network.BeltContentsChange;
 import gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
@@ -75,6 +76,7 @@ public class ToolBelt
 
         int messageNumber = 0;
         channel.registerMessage(SwapItems.Handler.class, SwapItems.class, messageNumber++, Side.SERVER);
+        channel.registerMessage(BeltContentsChange.Handler.class, BeltContentsChange.class, messageNumber++, Side.CLIENT);
         logger.debug("Final message number: " + messageNumber);
 
         File configurationFile = event.getSuggestedConfigurationFile();

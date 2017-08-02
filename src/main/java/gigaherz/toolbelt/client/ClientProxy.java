@@ -4,9 +4,12 @@ import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ISideProxy;
 import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.network.BeltContentsChange;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.settings.KeyBinding;
+import net.minecraft.entity.Entity;
+import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -24,6 +27,8 @@ import static gigaherz.common.client.ModelHelpers.registerItemModel;
 public class ClientProxy implements ISideProxy
 {
     public static KeyBinding keyOpenToolMenu;
+    public static KeyBinding keyCycleToolMenuL;
+    public static KeyBinding keyCycleToolMenuR;
 
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event)
@@ -54,12 +59,25 @@ public class ClientProxy implements ISideProxy
         }
     }
 
+    public static void wipeOpen()
+    {
+        while (keyOpenToolMenu.isPressed())
+        {
+        }
+    }
+
     @Override
     public void init()
     {
         ClientRegistry.registerKeyBinding(keyOpenToolMenu =
                 new KeyBinding("key.toolbelt.open", Keyboard.KEY_R, "key.toolbelt.category"));
         //keyOpenToolMenu.
+
+        ClientRegistry.registerKeyBinding(keyCycleToolMenuL =
+                new KeyBinding("key.toolbelt.cycle.left", 0, "key.toolbelt.category"));
+
+        ClientRegistry.registerKeyBinding(keyCycleToolMenuR =
+                new KeyBinding("key.toolbelt.cycle.right", 0, "key.toolbelt.category"));
 
         Map<String, RenderPlayer> skinMap = Minecraft.getMinecraft().getRenderManager().getSkinMap();
 
@@ -68,5 +86,25 @@ public class ClientProxy implements ISideProxy
 
         render = skinMap.get("slim");
         render.addLayer(new LayerToolBelt(render));
+    }
+
+    @Override
+    public void handleBeltContentsChange(final BeltContentsChange message)
+    {
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            Entity entity = Minecraft.getMinecraft().world.getEntityByID(message.player);
+            if (!(entity instanceof EntityPlayer))
+                return;
+            EntityPlayer player = (EntityPlayer) entity;
+            switch (message.where)
+            {
+                case MAIN:
+                    player.inventory.setInventorySlotContents(message.slot, message.stack);
+                    break;
+                case BAUBLES:
+                    BeltFinder.instance.setToBaubles(player, message.slot, message.stack);
+                    break;
+            }
+        });
     }
 }

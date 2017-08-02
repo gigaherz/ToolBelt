@@ -82,5 +82,7 @@ public class SwapItems
             player.setHeldItem(EnumHand.MAIN_HAND, inSlot);
             cap.setStackInSlot(swapWith, inHand);
         }
+
+        getter.syncToClients();
     }
 }

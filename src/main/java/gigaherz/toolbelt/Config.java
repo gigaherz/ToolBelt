@@ -37,6 +37,9 @@ public class Config
     public static boolean showBeltOnPlayers = true;
     public static boolean releaseToSwap = false;
 
+    public static boolean clipMouseToCircle = true;
+    public static boolean allowClickOutsideBounds = true;
+
     static void loadConfig(File configurationFile)
     {
         config = new Configuration(configurationFile);
@@ -53,6 +56,12 @@ public class Config
         Property showBeltOnPlayersProperty = config.get("display", "showBeltOnPlayers", true);
         showBeltOnPlayersProperty.setComment("If set to FALSE, the belts and tools will NOT draw on players.");
 
+        Property clipMouseToCircleProperty = config.get("input", "clipMouseToCircle", false);
+        clipMouseToCircleProperty.setComment("If set to TRUE, the radial menu will try to prevent the mouse from leaving the outer circle.");
+
+        Property allowClickOutsideBoundsProperty = config.get("input", "allowClickOutsideBounds", false);
+        allowClickOutsideBoundsProperty.setComment("If set to TRUE, the radial menu will allow clicking outside the outer circle to activate the items.");
+
         display = config.getCategory("display");
         display.setComment("Options for customizing the display of tools on the player");
 
@@ -63,10 +72,20 @@ public class Config
 
         releaseToSwap = releaseToSwapProperty.getBoolean();
 
+        clipMouseToCircle = clipMouseToCircleProperty.getBoolean();
+        allowClickOutsideBounds = allowClickOutsideBoundsProperty.getBoolean();
+
         blackListString.addAll(Arrays.asList(bl.getStringList()));
         whiteListString.addAll(Arrays.asList(wl.getStringList()));
-        if (!bl.wasRead() || !wl.wasRead() || !releaseToSwapProperty.wasRead() || !showBeltOnPlayersProperty.wasRead())
+        if (!bl.wasRead() ||
+                !wl.wasRead() ||
+                !releaseToSwapProperty.wasRead() ||
+                !showBeltOnPlayersProperty.wasRead() ||
+                !clipMouseToCircleProperty.wasRead() ||
+                !allowClickOutsideBoundsProperty.wasRead())
+        {
             config.save();
+        }
     }
 
     public static void postInit()
