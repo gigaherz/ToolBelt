@@ -25,6 +25,7 @@ public class ConfigGuiFactory implements IModGuiFactory
         return new ConfigGui(parentScreen);
     }
 
+    @Deprecated
     @Override
     public Class<? extends GuiScreen> mainConfigGuiClass()
     {
