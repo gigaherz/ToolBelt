@@ -1,7 +1,7 @@
 package gigaherz.toolbelt.belt;
 
-//import baubles.api.BaubleType;
-//import baubles.api.IBauble;
+import baubles.api.BaubleType;
+import baubles.api.IBauble;
 
 import gigaherz.common.ItemRegistered;
 import gigaherz.toolbelt.ToolBelt;
@@ -31,8 +31,7 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 @Optional.Interface(modid = "baubles", iface = "baubles.api.IBauble")
-public class ItemToolBelt extends ItemRegistered
-        //implements IBauble
+public class ItemToolBelt extends ItemRegistered implements IBauble
 {
     @CapabilityInject(IItemHandler.class)
     public static Capability<IItemHandler> ITEM_HANDLER;
@@ -70,13 +69,14 @@ public class ItemToolBelt extends ItemRegistered
         tooltip.add(I18n.format("text.toolbelt.tooltip", size - 2, size));
     }
 
-    //@Override
-    //public BaubleType getBaubleType(ItemStack itemStack)
-    //{
-    //    return BaubleType.BELT;
-    //}
+    @Optional.Method(modid = "baubles")
+    @Override
+    public BaubleType getBaubleType(ItemStack itemStack)
+    {
+        return BaubleType.BELT;
+    }
 
-    //@Override
+    @Override
     public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player)
     {
         return true;
