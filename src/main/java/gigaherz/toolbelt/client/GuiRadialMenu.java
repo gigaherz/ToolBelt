@@ -35,9 +35,9 @@ public class GuiRadialMenu extends GuiScreen
     private ToolBeltInventory inventory;
     private List<ItemStack> cachedStacks = null;
 
-    boolean closing;
-    boolean doneClosing;
-    double startAnimation;
+    private boolean closing;
+    private boolean doneClosing;
+    private double startAnimation;
 
     private int selectedItem = -1;
     private boolean keyCycleBeforeL = false;
@@ -70,7 +70,7 @@ public class GuiRadialMenu extends GuiScreen
 
         if (closing)
         {
-            if (doneClosing)
+            if (doneClosing || inventory == null)
             {
                 Minecraft.getMinecraft().displayGuiScreen(null);
 
@@ -210,6 +210,8 @@ public class GuiRadialMenu extends GuiScreen
         if (numItems <= 0)
         {
             drawCenteredString(fontRendererObj, I18n.format("text.toolbelt.empty"), width / 2, (height - fontRendererObj.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+            if (closing)
+                doneClosing = true;
             return;
         }
 
