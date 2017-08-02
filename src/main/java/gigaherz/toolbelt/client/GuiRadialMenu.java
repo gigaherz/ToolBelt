@@ -305,6 +305,7 @@ public class GuiRadialMenu extends GuiScreen
 
         if (!closing)
         {
+            selectedItem = -1;
             for (int i = 0; i < numItems; i++)
             {
                 float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
