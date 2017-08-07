@@ -36,8 +36,9 @@ public class Config
     private static final Set<ItemStack> whiteList = Sets.newHashSet();
 
     public static boolean showBeltOnPlayers = true;
-    public static boolean releaseToSwap = false;
+    public static float beltItemScale = 0.5f;
 
+    public static boolean releaseToSwap = false;
     public static boolean clipMouseToCircle = true;
     public static boolean allowClickOutsideBounds = true;
 
@@ -51,11 +52,14 @@ public class Config
         Property wl = config.get("items", "whitelist", new String[0]);
         wl.setComment("List of items to force-allow placing in the belt. Takes precedence over blacklist.");
 
-        Property releaseToSwapProperty = config.get("input", "releaseToSwap", false);
-        releaseToSwapProperty.setComment("If set to TRUE, releasing the menu key (R) will activate the swap. Requires a click otherwise (default).");
-
         Property showBeltOnPlayersProperty = config.get("display", "showBeltOnPlayers", true);
         showBeltOnPlayersProperty.setComment("If set to FALSE, the belts and tools will NOT draw on players.");
+
+        Property beltItemScaleProperty = config.get("display", "beltItemScale", 0.5);
+        beltItemScaleProperty.setComment("Changes the scale of items on the belt.");
+
+        Property releaseToSwapProperty = config.get("input", "releaseToSwap", false);
+        releaseToSwapProperty.setComment("If set to TRUE, releasing the menu key (R) will activate the swap. Requires a click otherwise (default).");
 
         Property clipMouseToCircleProperty = config.get("input", "clipMouseToCircle", false);
         clipMouseToCircleProperty.setComment("If set to TRUE, the radial menu will try to prevent the mouse from leaving the outer circle.");
@@ -70,9 +74,9 @@ public class Config
         input.setComment("Options for customizing the interaction with the radial menu");
 
         showBeltOnPlayers = showBeltOnPlayersProperty.getBoolean();
+        beltItemScale = (float)beltItemScaleProperty.getDouble();
 
         releaseToSwap = releaseToSwapProperty.getBoolean();
-
         clipMouseToCircle = clipMouseToCircleProperty.getBoolean();
         allowClickOutsideBounds = allowClickOutsideBoundsProperty.getBoolean();
 
@@ -82,6 +86,7 @@ public class Config
                 !wl.wasRead() ||
                 !releaseToSwapProperty.wasRead() ||
                 !showBeltOnPlayersProperty.wasRead() ||
+                !beltItemScaleProperty.wasRead() ||
                 !clipMouseToCircleProperty.wasRead() ||
                 !allowClickOutsideBoundsProperty.wasRead())
         {
@@ -98,7 +103,10 @@ public class Config
     public static void refresh()
     {
         showBeltOnPlayers = display.get("showBeltOnPlayers").getBoolean();
+        beltItemScale = (float)display.get("beltItemScale").getDouble();
         releaseToSwap = input.get("releaseToSwap").getBoolean();
+        clipMouseToCircle = input.get("clipMouseToCircle").getBoolean();
+        allowClickOutsideBounds = input.get("allowClickOutsideBounds").getBoolean();
     }
 
     @SubscribeEvent
