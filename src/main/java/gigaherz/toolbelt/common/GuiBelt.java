@@ -35,6 +35,7 @@ public class GuiBelt extends GuiContainer
     {
         this.drawDefaultBackground();
         super.drawScreen(mouseX, mouseY, partialTicks);
+        this.renderHoveredToolTip(mouseX, mouseY);
     }
 
     @Override

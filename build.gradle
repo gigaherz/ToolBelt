@@ -11,10 +11,6 @@ buildscript {
     }
 }
 
-plugins {
-    id 'com.github.johnrengelman.shadow' version '1.2.3'
-}
-
 repositories {
     maven {
         url "http://dvs1.progwml6.com/files/maven"
@@ -29,15 +25,15 @@ repositories {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.7.0"
+version = "1.7.1"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.12.0"
 
 minecraft {
-    version = "1.12-14.21.1.2430"
+    version = "1.12.1-14.22.0.2444"
     runDir = "run"
 
-    mappings = "snapshot_20170801"
+    mappings = "snapshot_20170804"
 
     replace "@VERSION@", project.version
     replaceIn "ToolBelt.java"
@@ -45,38 +41,29 @@ minecraft {
     useDepAts = true
 }
 
-jar {
-    classifier = 'slim'
-}
-
-shadowJar {
-    classifier = ''
-    dependencies {
-        include(dependency(':Commons-1.12.0:'))
-        exclude '*CraftTweaker*'
-        exclude '*Baubles*'
-    }
-    relocate 'gigaherz.common', "${group}.shadow.common"
-}
-
-reobf {
-    shadowJar { mappingType = 'SEARGE' }
-}
-
-tasks.build.dependsOn reobfShadowJar
-
-artifacts {
-    archives shadowJar
-    archives sourceJar
+configurations {
+    // configuration that holds jars to embed inside the jar
+    embed
 }
 
 dependencies {
-    deobfCompile "gigaherz.commons:Commons-1.12.0:0.6.2"
+    deobfCompile "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
+    embed "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
 
     deobfCompile "mezz.jei:jei_1.12:4.7.4.80:api"
     runtime "mezz.jei:jei_1.12:4.7.4.80"
 
     compile fileTree(dir: 'libs', include: '*.jar')
+}
+
+jar {
+    into('/') {
+        from configurations.embed
+    }
+
+    manifest {
+        attributes("ContainedDeps": configurations.embed.collect { it.getName() }.join(' '))
+    }
 }
 
 sourceCompatibility = 1.8
