@@ -82,12 +82,10 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(ItemStack stack, NBTTagCompound nbt)
+    public ICapabilityProvider initCapabilities(final ItemStack stack, NBTTagCompound nbt)
     {
         return new ICapabilityProvider()
         {
-            final ItemStack itemStack = stack;
-
             @Override
             public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
             {
