@@ -74,7 +74,6 @@ public class VanillaLivingEquipment implements IExtensionContainer
         }
 
         /**
-         *
          * @return The contents of the slot. The stack is *NOT* required to be of an IExtensionSlotItem!
          */
         @Nonnull

@@ -1,4 +1,4 @@
-package gigaherz.toolbelt.customslots.example;
+package gigaherz.toolbelt.slot;
 
 import com.google.common.collect.ImmutableList;
 import gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
@@ -18,7 +18,6 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.items.ItemStackHandler;
@@ -26,31 +25,31 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTagCompound>
+public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<NBTTagCompound>
 {
     ////////////////////////////////////////////////////////////
     // Capability support code
     //
 
-    private static final ResourceLocation CAPABILITY_ID = new ResourceLocation("examplemod", "rpg_inventory");
+    private static final ResourceLocation CAPABILITY_ID = new ResourceLocation("toolbelt", "belt_slot");
 
-    @CapabilityInject(RpgEquipment.class)
-    public static Capability<RpgEquipment> CAPABILITY = null;
+    @CapabilityInject(ExtensionSlotBelt.class)
+    public static Capability<ExtensionSlotBelt> CAPABILITY = null;
 
     public static void register()
     {
         // Internal capability, IStorage and default instances are meaningless.
-        CapabilityManager.INSTANCE.register(RpgEquipment.class, new Capability.IStorage<RpgEquipment>()
+        CapabilityManager.INSTANCE.register(ExtensionSlotBelt.class, new Capability.IStorage<ExtensionSlotBelt>()
         {
             @Nullable
             @Override
-            public NBTBase writeNBT(Capability<RpgEquipment> capability, RpgEquipment instance, EnumFacing side)
+            public NBTBase writeNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, EnumFacing side)
             {
                 return null;
             }
 
             @Override
-            public void readNBT(Capability<RpgEquipment> capability, RpgEquipment instance, EnumFacing side, NBTBase nbt)
+            public void readNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, EnumFacing side, NBTBase nbt)
             {
 
             }
@@ -59,7 +58,7 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
         MinecraftForge.EVENT_BUS.register(new EventHandlers());
     }
 
-    public static RpgEquipment get(EntityPlayer player)
+    public static ExtensionSlotBelt get(EntityLivingBase player)
     {
         return player.getCapability(CAPABILITY, null);
     }
@@ -73,7 +72,7 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
             {
                 event.addCapability(CAPABILITY_ID, new ICapabilitySerializable<NBTTagCompound>()
                 {
-                    final RpgEquipment extensionContainer = new RpgEquipment((EntityPlayer) event.getObject());
+                    final ExtensionSlotBelt extensionContainer = new ExtensionSlotBelt((EntityPlayer) event.getObject());
 
                     @Override
                     public NBTTagCompound serializeNBT()
@@ -111,7 +110,7 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
         @SubscribeEvent
         public void entityTick(TickEvent.PlayerTickEvent event)
         {
-            RpgEquipment instance = get(event.player);
+            ExtensionSlotBelt instance = get(event.player);
             if (instance == null) return;
             instance.tickAllSlots();
         }
@@ -120,30 +119,14 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
     ////////////////////////////////////////////////////////////
     // Equipment container implementation
     //
-
-    public static final ResourceLocation RING = new ResourceLocation("examplemod", "ring");
-    public static final ResourceLocation TRINKET = new ResourceLocation("examplemod", "trinket");
-    public static final ResourceLocation NECK = new ResourceLocation("examplemod", "neck");
     public static final ResourceLocation BELT = new ResourceLocation("examplemod", "belt");
-    public static final ResourceLocation WRISTS = new ResourceLocation("examplemod", "wrists");
-    public static final ResourceLocation ANKLES = new ResourceLocation("examplemod", "ankles");
 
     private final EntityLivingBase owner;
-    private final ItemStackHandler inventory = new ItemStackHandler(8);
-    private final ExtensionSlotItemHandler ring1 = new ExtensionSlotItemHandler(this, RING, inventory, 0);
-    private final ExtensionSlotItemHandler ring2 = new ExtensionSlotItemHandler(this, RING, inventory, 1);
-    private final ExtensionSlotItemHandler trinket1 = new ExtensionSlotItemHandler(this, TRINKET, inventory, 2);
-    private final ExtensionSlotItemHandler trinket2 = new ExtensionSlotItemHandler(this, TRINKET, inventory, 3);
-    private final ExtensionSlotItemHandler neck = new ExtensionSlotItemHandler(this, NECK, inventory, 4);
-    private final ExtensionSlotItemHandler belt = new ExtensionSlotItemHandler(this, BELT, inventory, 5);
-    private final ExtensionSlotItemHandler wrists = new ExtensionSlotItemHandler(this, WRISTS, inventory, 6);
-    private final ExtensionSlotItemHandler ankles = new ExtensionSlotItemHandler(this, ANKLES, inventory, 7);
-    private final ImmutableList<IExtensionSlot> slots = ImmutableList.of(
-            ring1, ring2, trinket1, trinket2,
-            neck, belt, wrists, ankles
-    );
+    private final ItemStackHandler inventory = new ItemStackHandler(1);
+    private final ExtensionSlotItemHandler belt = new ExtensionSlotItemHandler(this, BELT, inventory, 0);
+    private final ImmutableList<IExtensionSlot> slots = ImmutableList.of(belt);
 
-    private RpgEquipment(EntityLivingBase owner)
+    private ExtensionSlotBelt(EntityLivingBase owner)
     {
         this.owner = owner;
     }
@@ -163,51 +146,9 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
     }
 
     @Nonnull
-    public IExtensionSlot getRing1()
-    {
-        return ring1;
-    }
-
-    @Nonnull
-    public IExtensionSlot getRing2()
-    {
-        return ring2;
-    }
-
-    @Nonnull
-    public IExtensionSlot getTrinket1()
-    {
-        return trinket1;
-    }
-
-    @Nonnull
-    public IExtensionSlot getTrinket2()
-    {
-        return trinket2;
-    }
-
-    @Nonnull
-    public IExtensionSlot getNeck()
-    {
-        return neck;
-    }
-
-    @Nonnull
     public IExtensionSlot getBelt()
     {
         return belt;
-    }
-
-    @Nonnull
-    public IExtensionSlot getWrists()
-    {
-        return wrists;
-    }
-
-    @Nonnull
-    public IExtensionSlot getAnkles()
-    {
-        return ankles;
     }
 
     private void tickAllSlots()

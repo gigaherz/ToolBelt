@@ -73,7 +73,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
         if (!Config.showBeltOnPlayers)
             return;
 
-        BeltFinder.BeltGetter getter = BeltFinder.instance.findStack(player);
+        BeltFinder.BeltGetter getter = BeltFinder.findBelt(player);
         if (getter == null)
             return;
 
@@ -141,7 +141,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
             GlStateManager.translate(4.35f / 16.0F, 0.7f, -0.1f);
         GlStateManager.rotate(40.0F, 1.0F, 0.0F, 0.0F);
         float scale = Config.beltItemScale;
-        GlStateManager.scale(scale,scale,scale);
+        GlStateManager.scale(scale, scale, scale);
         Minecraft.getMinecraft().getItemRenderer().renderItemSide(player, stack, cameraTransform, handSide == EnumHandSide.LEFT);
         GlStateManager.popMatrix();
     }

@@ -73,7 +73,7 @@ public class Config
         input.setComment("Options for customizing the interaction with the radial menu");
 
         showBeltOnPlayers = showBeltOnPlayersProperty.getBoolean();
-        beltItemScale = (float)beltItemScaleProperty.getDouble();
+        beltItemScale = (float) beltItemScaleProperty.getDouble();
 
         releaseToSwap = releaseToSwapProperty.getBoolean();
         clipMouseToCircle = clipMouseToCircleProperty.getBoolean();
@@ -102,7 +102,7 @@ public class Config
     public static void refresh()
     {
         showBeltOnPlayers = display.get("showBeltOnPlayers").getBoolean();
-        beltItemScale = (float)display.get("beltItemScale").getDouble();
+        beltItemScale = (float) display.get("beltItemScale").getDouble();
         releaseToSwap = input.get("releaseToSwap").getBoolean();
         clipMouseToCircle = input.get("clipMouseToCircle").getBoolean();
         allowClickOutsideBounds = input.get("allowClickOutsideBounds").getBoolean();

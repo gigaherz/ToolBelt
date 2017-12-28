@@ -88,7 +88,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
     @Override
     public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
     {
-        if (!Config.isItemStackAllowed(stack))
+        if (!canInsertItem(slot, stack))
             return stack;
 
         if (stack.getCount() <= 0)
@@ -127,6 +127,11 @@ public class ToolBeltInventory implements IItemHandlerModifiable
         }
 
         return reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, stack.getCount() - limit) : ItemStack.EMPTY;
+    }
+
+    protected boolean canInsertItem(int slot, ItemStack stack)
+    {
+        return Config.isItemStackAllowed(stack);
     }
 
     @Override

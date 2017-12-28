@@ -2,7 +2,7 @@ package gigaherz.toolbelt.network;
 
 import gigaherz.toolbelt.ToolBelt;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.fml.common.network.ByteBufUtils;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
@@ -15,7 +15,7 @@ public class BeltContentsChange
 
     public enum ContainingInventory
     {
-        MAIN, BAUBLES;
+        MAIN, BAUBLES, BELT_SLOT;
 
         public static final ContainingInventory[] VALUES = values();
     }
@@ -29,7 +29,7 @@ public class BeltContentsChange
     {
     }
 
-    public BeltContentsChange(EntityPlayer player, ContainingInventory where, int slot, ItemStack stack)
+    public BeltContentsChange(EntityLivingBase player, ContainingInventory where, int slot, ItemStack stack)
     {
         this.player = player.getEntityId();
         this.where = where;

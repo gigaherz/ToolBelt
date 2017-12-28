@@ -2,18 +2,18 @@ package gigaherz.toolbelt.customslots;
 
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 
 import javax.annotation.Nonnull;
 
 public class ExtensionSlotItemHandler implements IExtensionSlot
 {
-    private IExtensionContainer owner;
-    private final ResourceLocation slotType;
-    private final int slot;
-    private ItemStackHandler inventory;
+    protected final IExtensionContainer owner;
+    protected final ResourceLocation slotType;
+    protected final int slot;
+    protected final IItemHandlerModifiable inventory;
 
-    public ExtensionSlotItemHandler(IExtensionContainer owner, ResourceLocation slotType, ItemStackHandler inventory, int slot)
+    public ExtensionSlotItemHandler(IExtensionContainer owner, ResourceLocation slotType, IItemHandlerModifiable inventory, int slot)
     {
         this.owner = owner;
         this.slotType = slotType;
@@ -36,7 +36,6 @@ public class ExtensionSlotItemHandler implements IExtensionSlot
     }
 
     /**
-     *
      * @return The contents of the slot. The stack is *NOT* required to be of an IExtensionSlotItem!
      */
     @Nonnull

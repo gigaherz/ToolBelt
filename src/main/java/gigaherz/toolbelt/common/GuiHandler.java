@@ -13,6 +13,7 @@ import javax.annotation.Nullable;
 public class GuiHandler implements IGuiHandler
 {
     public static final int BELT = 0;
+    public static final int BELT_SLOT = 1;
 
     @Nullable
     @Override
@@ -33,6 +34,8 @@ public class GuiHandler implements IGuiHandler
                     return new ContainerBelt(player.inventory, inventory, blockedSlot);
                 }
                 break;
+            case BELT_SLOT:
+                return new ContainerBeltSlot(player.inventory, !player.world.isRemote, player);
         }
         return null;
     }
@@ -56,6 +59,8 @@ public class GuiHandler implements IGuiHandler
                     return new GuiBelt(player.inventory, inventory, blockedSlot, heldItem);
                 }
                 break;
+            case BELT_SLOT:
+                return new GuiBeltSlot(player);
         }
         return null;
     }

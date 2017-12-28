@@ -1,20 +1,30 @@
 package gigaherz.toolbelt;
 
+import baubles.api.BaublesApi;
+import baubles.api.cap.IBaublesItemHandler;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.network.BeltContentsChange;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.NonNullList;
 import net.minecraft.world.WorldServer;
 
 import javax.annotation.Nullable;
+
+import java.util.List;
 
 import static gigaherz.toolbelt.network.BeltContentsChange.ContainingInventory.MAIN;
 
 public class BeltFinder
 {
-    public static BeltFinder instance = new BeltFinder();
+    public static NonNullList<BeltFinder> instances = NonNullList.create();
+
+    static {
+        instances.add(new BeltFinder());
+    }
 
     @Nullable
     public BeltGetter findStack(EntityPlayer player)
@@ -35,18 +45,33 @@ public class BeltFinder
         return null;
     }
 
-    public void setToBaubles(EntityPlayer player, int slot, ItemStack stack)
+    @Nullable
+    public static BeltGetter findBelt(EntityPlayer player)
     {
-
+        for(int i=instances.size()-1;i>=0;i--)
+        {
+            BeltFinder instance = instances.get(i);
+            BeltGetter getter = instance.findStack(player);
+            if (getter != null)
+                return getter;
+        }
+        return null;
     }
 
     public static void sendSync(EntityPlayer player)
     {
-        BeltFinder.BeltGetter stack = instance.findStack(player);
+        BeltFinder.BeltGetter stack = findBelt(player);
         if (stack != null)
         {
             stack.syncToClients();
         }
+    }
+
+    public void setToBaubles(EntityPlayer player, int slot, ItemStack stack)
+    {
+    }
+    public void setToBeltSlot(EntityLivingBase player, ItemStack stack)
+    {
     }
 
     public interface BeltGetter

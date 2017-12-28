@@ -2,21 +2,26 @@ package gigaherz.toolbelt.belt;
 
 import baubles.api.BaubleType;
 import baubles.api.IBauble;
+import com.google.common.collect.ImmutableList;
+import com.google.common.collect.ImmutableSet;
 import gigaherz.common.ItemRegistered;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.common.GuiHandler;
+import gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
+import gigaherz.toolbelt.customslots.IExtensionContainer;
+import gigaherz.toolbelt.customslots.IExtensionSlot;
+import gigaherz.toolbelt.customslots.IExtensionSlotItem;
+import gigaherz.toolbelt.customslots.example.RpgEquipment;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.EnumActionResult;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -26,14 +31,20 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.fml.common.Optional;
 import net.minecraftforge.items.IItemHandler;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
 @Optional.Interface(modid = "baubles", iface = "baubles.api.IBauble")
-public class ItemToolBelt extends ItemRegistered implements IBauble
+public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionSlotItem
 {
     @CapabilityInject(IItemHandler.class)
     public static Capability<IItemHandler> ITEM_HANDLER;
+
+    @CapabilityInject(IExtensionSlotItem.class)
+    public static Capability<IExtensionSlotItem> EXTENSION_SLOT_ITEM;
+
+    public static final ImmutableSet<ResourceLocation> BELT_SLOT_LIST = ImmutableSet.of(RpgEquipment.BELT);
 
     public ItemToolBelt(String name)
     {
@@ -75,10 +86,38 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         return BaubleType.BELT;
     }
 
+    @Nonnull
+    @Override
+    public ImmutableSet<ResourceLocation> getAcceptableSlots(@Nonnull ItemStack stack)
+    {
+        return BELT_SLOT_LIST;
+    }
+
     @Override
     public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player)
     {
         return true;
+    }
+
+    @Override
+    public void onWornTick(ItemStack itemstack, EntityLivingBase player)
+    {
+        tickAllSlots(itemstack, player);
+    }
+
+    @Override
+    public void onWornTick(ItemStack itemstack, IExtensionSlot slot)
+    {
+        tickAllSlots(itemstack, slot.getContainer().getOwner());
+    }
+
+    @Override
+    public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected)
+    {
+        if (entityIn instanceof EntityLivingBase)
+        {
+            tickAllSlots(stack, (EntityLivingBase) entityIn);
+        }
     }
 
     @Override
@@ -91,6 +130,8 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
             {
                 if (capability == ITEM_HANDLER)
                     return true;
+                if (capability == EXTENSION_SLOT_ITEM)
+                    return true;
                 return false;
             }
 
@@ -101,6 +142,8 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
             {
                 if (capability == ITEM_HANDLER)
                     return (T) getItems(stack);
+                if (capability == EXTENSION_SLOT_ITEM)
+                    return (T) ItemToolBelt.this;
                 return null;
             }
         };
@@ -177,5 +220,58 @@ public class ItemToolBelt extends ItemRegistered implements IBauble
         ItemStack stack = new ItemStack(this);
         setSlotsCount(stack, upgradeLevel + 2);
         return stack;
+    }
+
+    private void tickAllSlots(ItemStack source, EntityLivingBase player)
+    {
+        BeltExtensionContainer container = new BeltExtensionContainer(getItems(source), player);
+        for (IExtensionSlot slot : container.getSlots())
+        {
+            ((ExtensionSlotItemHandler) slot).onWornTick();
+        }
+    }
+
+    public static class BeltExtensionContainer implements IExtensionContainer
+    {
+        private static final ResourceLocation SLOT_TYPE = new ResourceLocation("toolbelt", "pocket");
+        private final ToolBeltInventory inventory;
+        private final EntityLivingBase owner;
+        private final ImmutableList<IExtensionSlot> slots;
+
+        public BeltExtensionContainer(ToolBeltInventory inventory, EntityLivingBase owner)
+        {
+            this.inventory = inventory;
+            this.owner = owner;
+
+            ExtensionSlotItemHandler[] slots = new ExtensionSlotItemHandler[inventory.getSlots()];
+
+            for (int i = 0; i < inventory.getSlots(); i++)
+            {
+                slots[i] = new ExtensionSlotItemHandler(this, SLOT_TYPE, inventory, i)
+                {
+                    @Override
+                    public boolean canEquip(@Nonnull ItemStack stack)
+                    {
+                        return BeltExtensionContainer.this.inventory.canInsertItem(this.slot, stack);
+                    }
+                };
+            }
+
+            this.slots = ImmutableList.copyOf(slots);
+        }
+
+        @Nonnull
+        @Override
+        public EntityLivingBase getOwner()
+        {
+            return owner;
+        }
+
+        @Nonnull
+        @Override
+        public ImmutableList<IExtensionSlot> getSlots()
+        {
+            return slots;
+        }
     }
 }

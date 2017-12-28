@@ -3,26 +3,23 @@ package gigaherz.toolbelt;
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
 import gigaherz.toolbelt.belt.ItemToolBelt;
-import gigaherz.toolbelt.network.BeltContentsChange;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 
 import javax.annotation.Nullable;
-
-import static gigaherz.toolbelt.network.BeltContentsChange.ContainingInventory.BAUBLES;
 
 public class BeltFinderBaubles extends BeltFinder
 {
     @CapabilityInject(IBaublesItemHandler.class)
     public static void initBaubles(Capability cap)
     {
-        BeltFinder.instance = new BeltFinderBaubles();
+        BeltFinder.instances.add(new BeltFinderBaubles());
     }
 
+    @Override
     public void setToBaubles(EntityPlayer player, int slot, ItemStack stack)
     {
         IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);

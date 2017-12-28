@@ -4,14 +4,18 @@ import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ISideProxy;
 import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.common.ContainerBeltSlot;
 import gigaherz.toolbelt.network.BeltContentsChange;
+import gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
@@ -30,11 +34,19 @@ public class ClientProxy implements ISideProxy
     public static KeyBinding keyCycleToolMenuL;
     public static KeyBinding keyCycleToolMenuR;
 
+    public static KeyBinding keyOpenBeltSlot;
+
     @SubscribeEvent
     public static void registerModels(ModelRegistryEvent event)
     {
         registerItemModel(ToolBelt.belt);
         registerItemModel(ToolBelt.pouch);
+    }
+
+    @SubscribeEvent
+    public static void textureStitch(TextureStitchEvent.Pre event)
+    {
+        event.getMap().registerSprite(ContainerBeltSlot.EMPTY_SPRITE);
     }
 
     @SubscribeEvent
@@ -49,12 +61,20 @@ public class ClientProxy implements ISideProxy
                 ItemStack inHand = mc.player.getHeldItemMainhand();
                 if (Config.isItemStackAllowed(inHand))
                 {
-                    BeltFinder.BeltGetter getter = BeltFinder.instance.findStack(mc.player);
+                    BeltFinder.BeltGetter getter = BeltFinder.findBelt(mc.player);
                     if (getter == null)
                         return;
 
                     mc.displayGuiScreen(new GuiRadialMenu(getter));
                 }
+            }
+        }
+
+        while (keyOpenBeltSlot.isPressed())
+        {
+            if (mc.currentScreen == null)
+            {
+                ToolBelt.channel.sendToServer(new OpenBeltSlotInventory());
             }
         }
     }
@@ -79,6 +99,9 @@ public class ClientProxy implements ISideProxy
         ClientRegistry.registerKeyBinding(keyCycleToolMenuR =
                 new KeyBinding("key.toolbelt.cycle.right", 0, "key.toolbelt.category"));
 
+        ClientRegistry.registerKeyBinding(keyOpenBeltSlot =
+                new KeyBinding("key.toolbelt.slot", Keyboard.KEY_V, "key.toolbelt.category"));
+
         Map<String, RenderPlayer> skinMap = Minecraft.getMinecraft().getRenderManager().getSkinMap();
 
         RenderPlayer render = skinMap.get("default");
@@ -101,8 +124,11 @@ public class ClientProxy implements ISideProxy
                 case MAIN:
                     player.inventory.setInventorySlotContents(message.slot, message.stack);
                     break;
+                case BELT_SLOT:
+                    BeltFinder.instances.forEach((i) -> i.setToBeltSlot(player, message.stack));
+                    break;
                 case BAUBLES:
-                    BeltFinder.instance.setToBaubles(player, message.slot, message.stack);
+                    BeltFinder.instances.forEach((i) -> i.setToBaubles(player, message.slot, message.stack));
                     break;
             }
         });

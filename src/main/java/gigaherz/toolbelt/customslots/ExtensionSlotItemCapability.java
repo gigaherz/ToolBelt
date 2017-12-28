@@ -20,7 +20,8 @@ public class ExtensionSlotItemCapability
     @CapabilityInject(IExtensionSlotItem.class)
     public static Capability<IExtensionSlotItem> INSTANCE = null;
 
-    public static void register() {
+    public static void register()
+    {
         CapabilityManager.INSTANCE.register(IExtensionSlotItem.class, new Storage(), DefaultImplementation.class);
     }
 

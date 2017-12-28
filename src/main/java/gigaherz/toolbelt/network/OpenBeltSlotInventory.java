@@ -2,8 +2,10 @@ package gigaherz.toolbelt.network;
 
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
+import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.belt.ToolBeltInventory;
+import gigaherz.toolbelt.common.GuiHandler;
 import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -15,41 +17,32 @@ import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
 import net.minecraftforge.items.ItemHandlerHelper;
 
-public class SwapItems
+public class OpenBeltSlotInventory
         implements IMessage
 {
-    public int swapWith;
-
-    public SwapItems()
+    public OpenBeltSlotInventory()
     {
-    }
-
-    public SwapItems(int windowId)
-    {
-        this.swapWith = windowId;
     }
 
     @Override
     public void fromBytes(ByteBuf buf)
     {
-        swapWith = buf.readInt();
     }
 
     @Override
     public void toBytes(ByteBuf buf)
     {
-        buf.writeInt(swapWith);
     }
 
-    public static class Handler implements IMessageHandler<SwapItems, IMessage>
+    public static class Handler implements IMessageHandler<OpenBeltSlotInventory, IMessage>
     {
         @Override
-        public IMessage onMessage(final SwapItems message, MessageContext ctx)
+        public IMessage onMessage(final OpenBeltSlotInventory message, MessageContext ctx)
         {
             final EntityPlayerMP player = ctx.getServerHandler().player;
             final WorldServer world = (WorldServer) player.world;
 
-            world.addScheduledTask(() -> swapItem(message.swapWith, player));
+            world.addScheduledTask(() -> player.openGui(ToolBelt.instance, GuiHandler.BELT_SLOT, world, 0, 0, 0));
 
             return null; // no response in this case
         }

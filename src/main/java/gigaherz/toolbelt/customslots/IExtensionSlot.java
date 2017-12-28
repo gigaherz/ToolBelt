@@ -13,17 +13,21 @@ public interface IExtensionSlot
     // Context
     @Nonnull
     IExtensionContainer getContainer();
+
     @Nonnull
     ResourceLocation getType();
 
     // Access
-    @Nonnull ItemStack getContents();
+    @Nonnull
+    ItemStack getContents();
+
     void setContents(@Nonnull ItemStack stack);
 
     // Permissions
 
     /**
      * Queries wether or not the stack can be placed in this slot.
+     *
      * @param stack The ItemStack in the slot.
      */
     default boolean canEquip(@Nonnull ItemStack stack)
@@ -36,6 +40,7 @@ public interface IExtensionSlot
 
     /**
      * Queries wether or not the stack can be removed from this slot.
+     *
      * @param stack The ItemStack in the slot.
      */
     default boolean canUnequip(@Nonnull ItemStack stack)
