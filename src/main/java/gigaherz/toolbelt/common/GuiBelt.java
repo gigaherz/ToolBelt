@@ -20,9 +20,9 @@ public class GuiBelt extends GuiContainer
     private final IInventory playerInventory;
     private final ItemStack beltStack;
 
-    public GuiBelt(IInventory playerInventory, IItemHandler beltInventory, int blockedSlot, ItemStack beltStack)
+    public GuiBelt(IInventory playerInventory, int blockedSlot, ItemStack beltStack)
     {
-        super(new ContainerBelt(playerInventory, beltInventory, blockedSlot));
+        super(new ContainerBelt(playerInventory, blockedSlot, beltStack));
         this.playerInventory = playerInventory;
         this.beltStack = beltStack;
         this.allowUserInput = false;

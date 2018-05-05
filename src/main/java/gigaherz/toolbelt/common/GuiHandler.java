@@ -25,13 +25,11 @@ public class GuiHandler implements IGuiHandler
                 ItemStack heldItem = player.getHeldItem(EnumHand.values()[x]);
                 if (heldItem.getCount() > 0)
                 {
-                    ToolBeltInventory inventory = ItemToolBelt.getItems(heldItem);
-
                     int blockedSlot = -1;
                     if (player.getHeldItemMainhand() == heldItem)
                         blockedSlot = player.inventory.currentItem;
 
-                    return new ContainerBelt(player.inventory, inventory, blockedSlot);
+                    return new ContainerBelt(player.inventory, blockedSlot, heldItem);
                 }
                 break;
             case BELT_SLOT:
@@ -50,13 +48,11 @@ public class GuiHandler implements IGuiHandler
                 ItemStack heldItem = player.getHeldItem(EnumHand.values()[x]);
                 if (heldItem.getCount() > 0)
                 {
-                    ToolBeltInventory inventory = ItemToolBelt.getItems(heldItem);
-
                     int blockedSlot = -1;
                     if (player.getHeldItemMainhand() == heldItem)
                         blockedSlot = player.inventory.currentItem;
 
-                    return new GuiBelt(player.inventory, inventory, blockedSlot, heldItem);
+                    return new GuiBelt(player.inventory, blockedSlot, heldItem);
                 }
                 break;
             case BELT_SLOT:

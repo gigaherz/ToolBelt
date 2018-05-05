@@ -42,7 +42,7 @@ public class BeltFinderBaubles extends BeltFinder
             }
         }
 
-        return super.findStack(player);
+        return null;
     }
 
     private class BaublesBeltGetter implements BeltGetter

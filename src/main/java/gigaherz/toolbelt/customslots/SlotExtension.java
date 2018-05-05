@@ -3,15 +3,14 @@ package gigaherz.toolbelt.customslots;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
-import net.minecraft.inventory.ItemStackHelper;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
 
+/**
+ * To be used in Containers.
+ */
 public class SlotExtension extends Slot
 {
     private static IInventory emptyInventory = new InventoryBasic("[Null]", true, 0);

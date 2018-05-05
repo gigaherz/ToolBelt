@@ -27,7 +27,7 @@ public interface IExtensionSlotItem
     @Nonnull
     default ImmutableSet<ResourceLocation> getAcceptableSlots(@Nonnull ItemStack stack)
     {
-        return ExtensionSlotItemCapability.ANY_SLOT_LIST;
+        return CapabilityExtensionSlotItem.ANY_SLOT_LIST;
     }
 
     /**

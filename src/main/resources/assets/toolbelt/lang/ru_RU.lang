@@ -1,0 +1,10 @@
+item.toolbelt.belt.name=Пояс с инструментами
+item.toolbelt.pouch.name=Поясная сумка
+key.toolbelt.open=Заменить инструмент
+key.toolbelt.category=Пояс с инструментами
+text.toolbelt.empty=ПУСТО
+text.toolbelt.swap=ЗАМЕНИТЬ
+text.toolbelt.insert=ВСТАВИТЬ
+text.toolbelt.extract=ИЗВЛЕЧЬ
+text.toolbelt.tooltip=Улучшения: %s (%s слотов)
+text.toolbelt.name=Пояс с инструментами

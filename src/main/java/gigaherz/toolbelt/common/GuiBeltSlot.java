@@ -151,7 +151,7 @@ public class GuiBeltSlot extends InventoryEffectRenderer implements IRecipeShown
         RenderManager rendermanager = Minecraft.getMinecraft().getRenderManager();
         rendermanager.setPlayerViewY(180.0F);
         rendermanager.setRenderShadow(false);
-        rendermanager.doRenderEntity(ent, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
+        rendermanager.renderEntity(ent, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, false);
         rendermanager.setRenderShadow(true);
         ent.renderYawOffset = f;
         ent.rotationYaw = f1;

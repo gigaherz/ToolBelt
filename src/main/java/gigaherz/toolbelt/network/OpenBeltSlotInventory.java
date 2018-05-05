@@ -15,6 +15,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 public class OpenBeltSlotInventory
@@ -46,36 +47,5 @@ public class OpenBeltSlotInventory
 
             return null; // no response in this case
         }
-    }
-
-    public static void swapItem(int swapWith, EntityPlayer player)
-    {
-        BeltFinder.BeltGetter getter = BeltFinder.findBelt(player);
-        if (getter == null)
-            return;
-
-        ItemStack stack = getter.getBelt();
-        if (stack.getCount() <= 0)
-            return;
-
-        ToolBeltInventory cap = ItemToolBelt.getItems(stack);
-
-        ItemStack inHand = player.getHeldItemMainhand();
-
-        if (!Config.isItemStackAllowed(inHand))
-            return;
-
-        if (swapWith < 0)
-        {
-            player.setHeldItem(EnumHand.MAIN_HAND, ItemHandlerHelper.insertItem(cap, inHand, false));
-        }
-        else
-        {
-            ItemStack inSlot = cap.getStackInSlot(swapWith);
-            player.setHeldItem(EnumHand.MAIN_HAND, inSlot);
-            cap.setStackInSlot(swapWith, inHand);
-        }
-
-        getter.syncToClients();
     }
 }

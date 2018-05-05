@@ -30,10 +30,10 @@ group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-c
 archivesBaseName = "ToolBelt-1.12.0"
 
 minecraft {
-    version = "1.12.1-14.22.0.2444"
+    version = "1.12.2-14.23.1.2583"
     runDir = "run"
 
-    mappings = "snapshot_20170804"
+    mappings = "snapshot_20180104"
 
     replace "@VERSION@", project.version
     replaceIn "ToolBelt.java"

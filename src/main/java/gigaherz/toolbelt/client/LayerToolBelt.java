@@ -19,6 +19,8 @@ import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.EnumHandSide;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 public class LayerToolBelt implements LayerRenderer<EntityPlayer>
 {
@@ -81,7 +83,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
         if (stack.getCount() <= 0)
             return;
 
-        ToolBeltInventory cap = ItemToolBelt.getItems(stack);
+        IItemHandler cap = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
 
         ItemStack firstItem = cap.getStackInSlot(0);
         ItemStack secondItem = cap.getStackInSlot(1);

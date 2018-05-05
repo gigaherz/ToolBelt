@@ -2,13 +2,14 @@ package gigaherz.toolbelt.common;
 
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.customslots.*;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import gigaherz.toolbelt.customslots.IExtensionSlot;
+import gigaherz.toolbelt.customslots.SlotExtension;
 
 public class ContainerBeltSlot extends ContainerPlayer
 {

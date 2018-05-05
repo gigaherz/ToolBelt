@@ -22,6 +22,8 @@ import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
@@ -32,7 +34,7 @@ public class GuiRadialMenu extends GuiScreen
 {
     private final BeltFinder.BeltGetter getter;
     private ItemStack stackEquipped;
-    private ToolBeltInventory inventory;
+    private IItemHandler inventory;
     private List<ItemStack> cachedStacks = null;
 
     private boolean closing;
@@ -47,7 +49,7 @@ public class GuiRadialMenu extends GuiScreen
     {
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
-        inventory = stackEquipped.getCount() > 0 ? ItemToolBelt.getItems(stackEquipped) : null;
+        inventory = stackEquipped.getCount() > 0 ? stackEquipped.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null) : null;
         startAnimation = Minecraft.getMinecraft().world.getTotalWorldTime() + (double) Minecraft.getMinecraft().getRenderPartialTicks();
     }
 
@@ -97,7 +99,7 @@ public class GuiRadialMenu extends GuiScreen
             else if (stackEquipped != stack)
             {
                 stackEquipped = stack;
-                inventory = ItemToolBelt.getItems(stack);
+                inventory = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
                 cachedStacks = null;
             }
         }

@@ -4,7 +4,6 @@ import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.network.BeltContentsChange;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -39,7 +38,7 @@ public class BeltFinderBeltSlot extends BeltFinder
             }
         }
 
-        return super.findStack(player);
+        return null;
     }
 
     @Override

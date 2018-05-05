@@ -125,6 +125,8 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
     {
         return new ICapabilityProvider()
         {
+            final ToolBeltInventory itemHandler = new ToolBeltInventory(stack);
+
             @Override
             public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
             {
@@ -141,7 +143,7 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
             public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
             {
                 if (capability == ITEM_HANDLER)
-                    return (T) getItems(stack);
+                    return (T) itemHandler;
                 if (capability == EXTENSION_SLOT_ITEM)
                     return (T) ItemToolBelt.this;
                 return null;
@@ -178,11 +180,6 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
 
         nbt.setInteger("Size", newSize);
         stack.setTagCompound(nbt);
-    }
-
-    public static ToolBeltInventory getItems(ItemStack stack)
-    {
-        return new ToolBeltInventory(stack);
     }
 
     public static int[] xpCost = {3, 5, 8, 12, 15, 20, 30};
@@ -224,7 +221,7 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
 
     private void tickAllSlots(ItemStack source, EntityLivingBase player)
     {
-        BeltExtensionContainer container = new BeltExtensionContainer(getItems(source), player);
+        BeltExtensionContainer container = new BeltExtensionContainer(source, player);
         for (IExtensionSlot slot : container.getSlots())
         {
             ((ExtensionSlotItemHandler) slot).onWornTick();
@@ -238,9 +235,9 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
         private final EntityLivingBase owner;
         private final ImmutableList<IExtensionSlot> slots;
 
-        public BeltExtensionContainer(ToolBeltInventory inventory, EntityLivingBase owner)
+        public BeltExtensionContainer(ItemStack source, EntityLivingBase owner)
         {
-            this.inventory = inventory;
+            this.inventory = (ToolBeltInventory) source.getCapability(ITEM_HANDLER, null);
             this.owner = owner;
 
             ExtensionSlotItemHandler[] slots = new ExtensionSlotItemHandler[inventory.getSlots()];

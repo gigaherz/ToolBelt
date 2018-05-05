@@ -28,6 +28,7 @@ public class Config
     private static Configuration config;
     public static ConfigCategory display;
     public static ConfigCategory input;
+    public static ConfigCategory behaviour;
 
     private static final Set<String> blackListString = Sets.newHashSet();
     private static final Set<String> whiteListString = Sets.newHashSet();
@@ -40,6 +41,8 @@ public class Config
     public static boolean releaseToSwap = false;
     public static boolean clipMouseToCircle = true;
     public static boolean allowClickOutsideBounds = true;
+
+    public static boolean disableAnvilUpgrading = false;
 
     static void loadConfig(File configurationFile)
     {
@@ -66,11 +69,17 @@ public class Config
         Property allowClickOutsideBoundsProperty = config.get("input", "allowClickOutsideBounds", false);
         allowClickOutsideBoundsProperty.setComment("If set to TRUE, the radial menu will allow clicking outside the outer circle to activate the items.");
 
+        Property disableAnvilUpgradingProperty = config.get("behaviour", "disableAnvilUpgrading", false);
+        disableAnvilUpgradingProperty.setComment("If set to TRUE, the internal anvil upgrade will not work, and alternative methods for upgrades will have to be provided externally.");
+
         display = config.getCategory("display");
         display.setComment("Options for customizing the display of tools on the player");
 
         input = config.getCategory("input");
         input.setComment("Options for customizing the interaction with the radial menu");
+
+        behaviour = config.getCategory("behaviour");
+        behaviour.setComment("Options for customizing the mechanics of the belt");
 
         showBeltOnPlayers = showBeltOnPlayersProperty.getBoolean();
         beltItemScale = (float) beltItemScaleProperty.getDouble();
@@ -78,6 +87,8 @@ public class Config
         releaseToSwap = releaseToSwapProperty.getBoolean();
         clipMouseToCircle = clipMouseToCircleProperty.getBoolean();
         allowClickOutsideBounds = allowClickOutsideBoundsProperty.getBoolean();
+
+        disableAnvilUpgrading = disableAnvilUpgradingProperty.getBoolean();
 
         blackListString.addAll(Arrays.asList(bl.getStringList()));
         whiteListString.addAll(Arrays.asList(wl.getStringList()));
@@ -106,6 +117,7 @@ public class Config
         releaseToSwap = input.get("releaseToSwap").getBoolean();
         clipMouseToCircle = input.get("clipMouseToCircle").getBoolean();
         allowClickOutsideBounds = input.get("allowClickOutsideBounds").getBoolean();
+        disableAnvilUpgrading = behaviour.get("disableAnvilUpgrading").getBoolean();
     }
 
     @SubscribeEvent

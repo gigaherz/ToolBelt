@@ -1,6 +1,7 @@
 package gigaherz.toolbelt.integration;
 
 import com.google.common.collect.Lists;
+import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
 import mezz.jei.api.*;
 import mezz.jei.api.ingredients.IModIngredientRegistration;
@@ -34,6 +35,8 @@ public class JeiPlugin implements IModPlugin
     @Override
     public void register(IModRegistry registry)
     {
+        if (Config.disableAnvilUpgrading)
+            return;
         IJeiHelpers helpers = registry.getJeiHelpers();
         IVanillaRecipeFactory vanillaFactory = helpers.getVanillaRecipeFactory();
         List<ItemStack> pouch = Collections.singletonList(new ItemStack(ToolBelt.pouch));

@@ -13,6 +13,9 @@ import net.minecraft.world.WorldServer;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
 import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
 import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 public class SwapItems
@@ -65,13 +68,12 @@ public class SwapItems
         if (stack.getCount() <= 0)
             return;
 
-        ToolBeltInventory cap = ItemToolBelt.getItems(stack);
-
         ItemStack inHand = player.getHeldItemMainhand();
 
         if (!Config.isItemStackAllowed(inHand))
             return;
 
+        IItemHandlerModifiable cap = (IItemHandlerModifiable)stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
         if (swapWith < 0)
         {
             player.setHeldItem(EnumHand.MAIN_HAND, ItemHandlerHelper.insertItem(cap, inHand, false));
