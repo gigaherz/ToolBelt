@@ -41,6 +41,7 @@ public class Config
     public static boolean releaseToSwap = false;
     public static boolean clipMouseToCircle = true;
     public static boolean allowClickOutsideBounds = true;
+    public static boolean displayEmptySlots = false;
 
     public static boolean disableAnvilUpgrading = false;
 
@@ -69,6 +70,9 @@ public class Config
         Property allowClickOutsideBoundsProperty = config.get("input", "allowClickOutsideBounds", false);
         allowClickOutsideBoundsProperty.setComment("If set to TRUE, the radial menu will allow clicking outside the outer circle to activate the items.");
 
+        Property displayEmptySlotsProperty = config.get("input", "displayEmptySlots", false);
+        displayEmptySlotsProperty.setComment("If set to TRUE, the radial menu will always display all the slots, even when empty, and will allow choosing which empty slot to insert into.");
+
         Property disableAnvilUpgradingProperty = config.get("behaviour", "disableAnvilUpgrading", false);
         disableAnvilUpgradingProperty.setComment("If set to TRUE, the internal anvil upgrade will not work, and alternative methods for upgrades will have to be provided externally.");
 
@@ -87,6 +91,7 @@ public class Config
         releaseToSwap = releaseToSwapProperty.getBoolean();
         clipMouseToCircle = clipMouseToCircleProperty.getBoolean();
         allowClickOutsideBounds = allowClickOutsideBoundsProperty.getBoolean();
+        displayEmptySlots = displayEmptySlotsProperty.getBoolean();
 
         disableAnvilUpgrading = disableAnvilUpgradingProperty.getBoolean();
 
@@ -98,7 +103,9 @@ public class Config
                 !showBeltOnPlayersProperty.wasRead() ||
                 !beltItemScaleProperty.wasRead() ||
                 !clipMouseToCircleProperty.wasRead() ||
-                !allowClickOutsideBoundsProperty.wasRead())
+                !allowClickOutsideBoundsProperty.wasRead() ||
+                !displayEmptySlotsProperty.wasRead() ||
+                disableAnvilUpgradingProperty.wasRead())
         {
             config.save();
         }
@@ -117,6 +124,7 @@ public class Config
         releaseToSwap = input.get("releaseToSwap").getBoolean();
         clipMouseToCircle = input.get("clipMouseToCircle").getBoolean();
         allowClickOutsideBounds = input.get("allowClickOutsideBounds").getBoolean();
+        displayEmptySlots = input.get("displayEmptySlots").getBoolean();
         disableAnvilUpgrading = behaviour.get("disableAnvilUpgrading").getBoolean();
     }
 

@@ -4,8 +4,6 @@ import com.google.common.collect.Lists;
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.belt.ItemToolBelt;
-import gigaherz.toolbelt.belt.ToolBeltInventory;
 import gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
@@ -114,7 +112,7 @@ public class GuiRadialMenu extends GuiScreen
             {
                 int x = Mouse.getEventX() * this.width / this.mc.displayWidth;
                 int y = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
-                mouseReleased(x, y, -1);
+                mouseReleasedInternal(false);
             }
             else
             {
@@ -127,7 +125,11 @@ public class GuiRadialMenu extends GuiScreen
     protected void mouseReleased(int mouseX, int mouseY, int state)
     {
         super.mouseReleased(mouseX, mouseY, state);
+        mouseReleasedInternal(true);
+    }
 
+    protected void mouseReleasedInternal(boolean mouseActuallyReleased)
+    {
         if (closing)
             return;
 
@@ -142,13 +144,13 @@ public class GuiRadialMenu extends GuiScreen
         for (int i = 0; i < inventory.getSlots(); i++)
         {
             ItemStack inSlot = inventory.getStackInSlot(i);
-            if (inSlot.getCount() > 0)
+            if (inSlot.getCount() > 0 || Config.displayEmptySlots)
                 items.add(i);
         }
 
         boolean hasAddButton = false;
         int numItems = items.size();
-        if (numItems < inventory.getSlots() && inHand.getCount() > 0)
+        if (!Config.displayEmptySlots && (numItems < inventory.getSlots() && inHand.getCount() > 0))
         {
             hasAddButton = true;
             numItems++;
@@ -163,8 +165,20 @@ public class GuiRadialMenu extends GuiScreen
                 swapWith = selectedItem == 0 ? -1 : items.get(selectedItem - 1);
             else
                 swapWith = items.get(selectedItem);
-            SwapItems.swapItem(swapWith, mc.player);
-            ToolBelt.channel.sendToServer(new SwapItems(swapWith));
+
+            if (inHand.getCount() <= 0 && inventory.getStackInSlot(swapWith).getCount() <= 0)
+            {
+                if (mouseActuallyReleased)
+                {
+                    // ignore click
+                    return;
+                }
+            }
+            else
+            {
+                SwapItems.swapItem(swapWith, mc.player);
+                ToolBelt.channel.sendToServer(new SwapItems(swapWith));
+            }
         }
 
         animateClose();
@@ -192,7 +206,7 @@ public class GuiRadialMenu extends GuiScreen
             for (int i = 0; i < inventory.getSlots(); i++)
             {
                 ItemStack inSlot = inventory.getStackInSlot(i);
-                if (inSlot.getCount() > 0)
+                if (inSlot.getCount() > 0 || Config.displayEmptySlots)
                     items.add(inSlot);
             }
             cachedStacks = items;
@@ -204,7 +218,7 @@ public class GuiRadialMenu extends GuiScreen
 
         boolean hasAddButton = false;
         int numItems = items.size();
-        if (numItems < inventory.getSlots() && inHand.getCount() > 0)
+        if (!Config.displayEmptySlots && (numItems < inventory.getSlots() && inHand.getCount() > 0))
         {
             hasAddButton = true;
             numItems++;
@@ -375,14 +389,34 @@ public class GuiRadialMenu extends GuiScreen
         tessellator.draw();
         GlStateManager.enableTexture2D();
 
+        boolean hasItemInHand = inHand.getCount() > 0;
         if (hasMouseOver)
         {
-            if (inHand.getCount() > 0)
-                drawCenteredString(fontRenderer, I18n.format("text.toolbelt.swap"), width / 2, (height - fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
-            else
+            if (hasItemInHand)
+            {
+                if (itemMouseOver.getCount() > 0)
+                    drawCenteredString(fontRenderer, I18n.format("text.toolbelt.swap"), width / 2, (height - fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+                else
+                    drawCenteredString(fontRenderer, I18n.format("text.toolbelt.insert"), width / 2, (height - fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+            }
+            else if (itemMouseOver.getCount() > 0)
                 drawCenteredString(fontRenderer, I18n.format("text.toolbelt.extract"), width / 2, (height - fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
         }
 
+        if (Config.displayEmptySlots)
+        {
+            for (int i = 0; i < inventory.getSlots(); i++)
+            {
+                ItemStack inSlot = inventory.getStackInSlot(i);
+                if (inSlot.getCount() <= 0)
+                {
+                    float angle1 = ((i / (float) numItems) + 0.25f) * 2 * (float) Math.PI;
+                    float posX = x + itemRadius * (float) Math.cos(angle1);
+                    float posY = y + itemRadius * (float) Math.sin(angle1);
+                    drawCenteredString(fontRenderer, I18n.format("text.toolbelt.empty"), (int)posX, (int)posY - fontRenderer.FONT_HEIGHT / 2, 0x7FFFFFFF);
+                }
+            }
+        }
 
         RenderHelper.enableGUIStandardItemLighting();
         for (int i = 0; i < numItems; i++)
