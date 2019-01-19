@@ -158,7 +158,7 @@ public class Config
             return ItemStack.EMPTY;
         }
 
-        String anyString = matcher.group("meta");
+        String anyString = matcher.group("any");
         String metaString = matcher.group("meta");
         int meta = Strings.isNullOrEmpty(anyString)
                 ? (Strings.isNullOrEmpty(metaString) ? 0 : Integer.parseInt(metaString))

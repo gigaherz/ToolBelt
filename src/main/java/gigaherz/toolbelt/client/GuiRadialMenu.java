@@ -25,6 +25,7 @@ import net.minecraftforge.items.IItemHandler;
 import org.lwjgl.input.Mouse;
 import org.lwjgl.opengl.GL11;
 
+import javax.vecmath.Vector4f;
 import java.util.List;
 
 @Mod.EventBusSubscriber(Side.CLIENT)
@@ -110,9 +111,7 @@ public class GuiRadialMenu extends GuiScreen
         {
             if (Config.releaseToSwap)
             {
-                int x = Mouse.getEventX() * this.width / this.mc.displayWidth;
-                int y = this.height - Mouse.getEventY() * this.height / this.mc.displayHeight - 1;
-                mouseReleasedInternal(false);
+                processClick(false);
             }
             else
             {
@@ -125,10 +124,10 @@ public class GuiRadialMenu extends GuiScreen
     protected void mouseReleased(int mouseX, int mouseY, int state)
     {
         super.mouseReleased(mouseX, mouseY, state);
-        mouseReleasedInternal(true);
+        processClick(true);
     }
 
-    protected void mouseReleasedInternal(boolean mouseActuallyReleased)
+    protected void processClick(boolean triggeredByMouse)
     {
         if (closing)
             return;
@@ -168,7 +167,7 @@ public class GuiRadialMenu extends GuiScreen
 
             if (inHand.getCount() <= 0 && inventory.getStackInSlot(swapWith).getCount() <= 0)
             {
-                if (mouseActuallyReleased)
+                if (triggeredByMouse)
                 {
                     // ignore click
                     return;
@@ -305,17 +304,6 @@ public class GuiRadialMenu extends GuiScreen
         float s0 = (((0 - 0.5f) / (float) numItems) + 0.25f) * 360;
         if (a < s0) a += 360;
 
-        GlStateManager.pushMatrix();
-        GlStateManager.disableAlpha();
-        GlStateManager.enableBlend();
-        GlStateManager.disableTexture2D();
-        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
-
-        GlStateManager.translate(0, animTop, 0);
-
-        Tessellator tessellator = Tessellator.getInstance();
-        BufferBuilder buffer = tessellator.getBuffer();
-        buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
         boolean hasMouseOver = false;
         ItemStack itemMouseOver = ItemStack.EMPTY;
 
@@ -337,12 +325,8 @@ public class GuiRadialMenu extends GuiScreen
 
         for (int i = 0; i < numItems; i++)
         {
-            float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
-            float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
             if (selectedItem == i)
             {
-                drawPieArc(buffer, x, y, zLevel, radiusIn, radiusOut, s, e, 255, 255, 255, 64);
-
                 if (i > 0 || !hasAddButton)
                 {
                     hasMouseOver = true;
@@ -363,10 +347,6 @@ public class GuiRadialMenu extends GuiScreen
                     itemMouseOver = inSlot;
                 }
             }
-            else
-            {
-                drawPieArc(buffer, x, y, zLevel, radiusIn, radiusOut, s, e, 0, 0, 0, 64);
-            }
         }
 
         if (Config.clipMouseToCircle)
@@ -385,9 +365,6 @@ public class GuiRadialMenu extends GuiScreen
                 Mouse.setCursorPosition((int) (mc.displayWidth / 2 + fixedX), (int) (mc.displayHeight / 2 + fixedY));
             }
         }
-
-        tessellator.draw();
-        GlStateManager.enableTexture2D();
 
         boolean hasItemInHand = inHand.getCount() > 0;
         if (hasMouseOver)
@@ -458,39 +435,116 @@ public class GuiRadialMenu extends GuiScreen
 
     private static final float PRECISION = 5;
 
-    private void drawPieArc(BufferBuilder buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
-    {
-        float angle = endAngle - startAngle;
-        int sections = Math.max(1, MathHelper.ceil(angle / PRECISION));
-
-        startAngle = (float) Math.toRadians(startAngle);
-        endAngle = (float) Math.toRadians(endAngle);
-        angle = endAngle - startAngle;
-
-        for (int i = 0; i < sections; i++)
-        {
-            float angle1 = startAngle + (i / (float) sections) * angle;
-            float angle2 = startAngle + ((i + 1) / (float) sections) * angle;
-
-            float pos1InX = x + radiusIn * (float) Math.cos(angle1);
-            float pos1InY = y + radiusIn * (float) Math.sin(angle1);
-            float pos1OutX = x + radiusOut * (float) Math.cos(angle1);
-            float pos1OutY = y + radiusOut * (float) Math.sin(angle1);
-            float pos2OutX = x + radiusOut * (float) Math.cos(angle2);
-            float pos2OutY = y + radiusOut * (float) Math.sin(angle2);
-            float pos2InX = x + radiusIn * (float) Math.cos(angle2);
-            float pos2InY = y + radiusIn * (float) Math.sin(angle2);
-
-            buffer.pos(pos1OutX, pos1OutY, z).color(r, g, b, a).endVertex();
-            buffer.pos(pos1InX, pos1InY, z).color(r, g, b, a).endVertex();
-            buffer.pos(pos2InX, pos2InY, z).color(r, g, b, a).endVertex();
-            buffer.pos(pos2OutX, pos2OutY, z).color(r, g, b, a).endVertex();
-        }
-    }
-
     @Override
     public boolean doesGuiPauseGame()
     {
         return false;
+    }
+
+    private static class GenericRadialMenu
+    {
+        public interface IRadialMenuItem
+        {
+            void draw(float x, float y, float z, boolean hover);
+        }
+
+        final List<IRadialMenuItem> items = Lists.newArrayList();
+        int hovered = -1;
+        float openAnimation = 0;
+        Vector4f backgroundColor = new Vector4f(0,0,0,.25f);
+        Vector4f backgroundColorHover = new Vector4f(1,1,1,.25f);
+
+        private void draw(int width, int height)
+        {
+
+            float animProgress = MathHelper.clamp(openAnimation, 0, 1);
+            float radiusIn = Math.max(0.1f, 30 * animProgress);
+            float radiusOut = radiusIn * 2;
+            float itemRadius = (radiusIn + radiusOut) * 0.5f;
+            float animTop = (1 - animProgress) * height / 2.0f;
+
+            int x = width / 2;
+            int y = height / 2;
+            float z = 0;
+
+            GlStateManager.pushMatrix();
+            GlStateManager.translate(0, animTop, 0);
+
+            drawBackground(x,y,z, radiusIn, radiusOut);
+
+            GlStateManager.popMatrix();
+
+            drawItems(x,y,z, itemRadius);
+        }
+
+        private void drawItems(int x, int y, float z, float itemRadius)
+        {
+            int numItems = items.size();
+            for(int i=0;i<numItems;i++)
+            {
+                float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
+                float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
+                float middle = (s+e)*0.5f;
+
+                float posX = x + itemRadius * (float) Math.cos(middle);
+                float posY = y + itemRadius * (float) Math.sin(middle);
+
+                items.get(i).draw(posX, posY, z, i == hovered);
+            }
+        }
+
+        private void drawBackground(float x, float y, float z, float radiusIn, float radiusOut)
+        {
+            GlStateManager.disableAlpha();
+            GlStateManager.enableBlend();
+            GlStateManager.disableTexture2D();
+            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+
+            Tessellator tessellator = Tessellator.getInstance();
+            BufferBuilder buffer = tessellator.getBuffer();
+            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
+            int numItems = items.size();
+            for(int i=0;i<numItems;i++)
+            {
+                float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
+                float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
+                Vector4f color = i == hovered ? backgroundColorHover : backgroundColor;
+                drawPieArc(buffer, x, y, z, radiusIn, radiusOut, s, e, (int)(color.x*255), (int)(color.y*255), (int)(color.z*255), (int)(color.w*255));
+            }
+            tessellator.draw();
+
+            GlStateManager.enableTexture2D();
+        }
+
+        private void drawPieArc(BufferBuilder buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
+        {
+            float angle = endAngle - startAngle;
+            int sections = Math.max(1, MathHelper.ceil(angle / PRECISION));
+
+            startAngle = (float) Math.toRadians(startAngle);
+            endAngle = (float) Math.toRadians(endAngle);
+            angle = endAngle - startAngle;
+
+            for (int i = 0; i < sections; i++)
+            {
+                float angle1 = startAngle + (i / (float) sections) * angle;
+                float angle2 = startAngle + ((i + 1) / (float) sections) * angle;
+
+                float pos1InX = x + radiusIn * (float) Math.cos(angle1);
+                float pos1InY = y + radiusIn * (float) Math.sin(angle1);
+                float pos1OutX = x + radiusOut * (float) Math.cos(angle1);
+                float pos1OutY = y + radiusOut * (float) Math.sin(angle1);
+                float pos2OutX = x + radiusOut * (float) Math.cos(angle2);
+                float pos2OutY = y + radiusOut * (float) Math.sin(angle2);
+                float pos2InX = x + radiusIn * (float) Math.cos(angle2);
+                float pos2InY = y + radiusIn * (float) Math.sin(angle2);
+
+                buffer.pos(pos1OutX, pos1OutY, z).color(r, g, b, a).endVertex();
+                buffer.pos(pos1InX, pos1InY, z).color(r, g, b, a).endVertex();
+                buffer.pos(pos2InX, pos2InY, z).color(r, g, b, a).endVertex();
+                buffer.pos(pos2OutX, pos2OutY, z).color(r, g, b, a).endVertex();
+            }
+        }
+
     }
 }
