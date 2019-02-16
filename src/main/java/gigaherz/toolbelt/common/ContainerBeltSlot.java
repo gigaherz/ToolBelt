@@ -31,12 +31,22 @@ public class ContainerBeltSlot extends ContainerPlayer
         slotBelt.setBackgroundName(EMPTY_SPRITE.toString());
     }
 
+    public void addListener(IContainerListener listener) {
+        super.addListener(listener);
+    }
+
     @Override
     public void onContainerClosed(EntityPlayer playerIn)
     {
         super.onContainerClosed(playerIn);
         if (!playerIn.world.isRemote)
             BeltFinder.sendSync(playerIn);
+    }
+
+    @Override
+    public void detectAndSendChanges()
+    {
+        super.detectAndSendChanges();
     }
 
     @Override

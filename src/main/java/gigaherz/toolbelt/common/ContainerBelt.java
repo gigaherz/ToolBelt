@@ -64,6 +64,12 @@ public class ContainerBelt extends Container
     }
 
     @Override
+    public void detectAndSendChanges()
+    {
+        super.detectAndSendChanges();
+    }
+
+    @Override
     public boolean canInteractWith(EntityPlayer playerIn)
     {
         return true;
