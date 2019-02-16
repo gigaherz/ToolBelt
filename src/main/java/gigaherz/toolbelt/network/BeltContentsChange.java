@@ -1,16 +1,14 @@
 package gigaherz.toolbelt.network;
 
 import gigaherz.toolbelt.ToolBelt;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.item.ItemStack;
-import net.minecraftforge.fml.common.network.ByteBufUtils;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraft.network.PacketBuffer;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 public class BeltContentsChange
-        implements IMessage
 {
 
     public enum ContainingInventory
@@ -37,32 +35,36 @@ public class BeltContentsChange
         this.stack = stack;
     }
 
-    @Override
-    public void fromBytes(ByteBuf buf)
+    public void fromBytes(PacketBuffer buf)
     {
         player = buf.readInt();
         where = ContainingInventory.VALUES[buf.readByte()];
         slot = buf.readByte();
-        stack = ByteBufUtils.readItemStack(buf);
+        stack = buf.readItemStack();
     }
 
-    @Override
-    public void toBytes(ByteBuf buf)
+    public void toBytes(PacketBuffer buf)
     {
         buf.writeInt(player);
         buf.writeByte(where.ordinal());
         buf.writeByte(slot);
-        ByteBufUtils.writeItemStack(buf, stack);
+        buf.writeItemStack(stack);
     }
 
-    public static class Handler implements IMessageHandler<BeltContentsChange, IMessage>
+    public static void encode(BeltContentsChange message, PacketBuffer packet)
     {
-        @Override
-        public IMessage onMessage(final BeltContentsChange message, MessageContext ctx)
-        {
-            ToolBelt.proxy.handleBeltContentsChange(message);
+        message.toBytes(packet);
+    }
 
-            return null; // no response in this case
-        }
+    public static BeltContentsChange decode(PacketBuffer packet)
+    {
+        BeltContentsChange message = new BeltContentsChange();
+        message.fromBytes(packet);
+        return message;
+    }
+
+    public static void onMessage(final BeltContentsChange message, Supplier<NetworkEvent.Context> context)
+    {
+        ToolBelt.proxy.handleBeltContentsChange(message);
     }
 }

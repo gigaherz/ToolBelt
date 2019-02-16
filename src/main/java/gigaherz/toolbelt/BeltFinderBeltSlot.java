@@ -11,6 +11,7 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.fml.network.NetworkDirection;
 
 import javax.annotation.Nullable;
 
@@ -72,7 +73,7 @@ public class BeltFinderBeltSlot extends BeltFinder
             BeltContentsChange message = new BeltContentsChange(thePlayer, BeltContentsChange.ContainingInventory.BELT_SLOT, 0, slot.getContents());
             ((WorldServer) thePlayer.world).getEntityTracker().getTrackingPlayers(thePlayer).forEach((p) -> {
                 if (p instanceof EntityPlayerMP)
-                    ToolBelt.channel.sendTo(message, (EntityPlayerMP) p);
+                    ToolBelt.channel.sendTo(message, ((EntityPlayerMP)p).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
             });
         }
     }

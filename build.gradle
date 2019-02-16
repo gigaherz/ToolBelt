@@ -1,89 +1,79 @@
+import net.minecraftforge.gradle.common.util.RunConfig
+
 buildscript {
     repositories {
+        mavenLocal()
+        maven { url = 'http://files.minecraftforge.net/maven' }
         jcenter()
-        maven {
-            name = "forge"
-            url = "http://files.minecraftforge.net/maven"
-        }
+        mavenCentral()
     }
     dependencies {
-        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
+
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'maven-publish'
 
 repositories {
-    maven {
-        url "http://dvs1.progwml6.com/files/maven"
-    }
-    maven {
-        url 'http://maven.epoxide.xyz'
-    }
-    maven {
-        url 'http://dogforce-games.com/maven'
-    }
+    mavenLocal()
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-
-version = "1.7.1"
+version = "1.8.0"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "ToolBelt-1.12.0"
+archivesBaseName = "ToolBelt-1.13.2"
+
+sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+compileJava {
+    sourceCompatibility = targetCompatibility = '1.8'
+}
 
 minecraft {
-    version = "1.12.2-14.23.4.2760"
-    runDir = "run"
+    mappings channel: 'snapshot', version: '20190215-1.13.1'
 
-    mappings = "stable_39"
+    // default run configurations.
+    // these can be tweaked, removed, or duplicated as needed.
+    runs {
+        client = {
+            // recommended logging data for a userdev environment
+            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+            // recommended logging level for the console
+            properties 'forge.logging.console.level': 'debug'
+            workingDirectory project.file('run').canonicalPath
+            source sourceSets.main
+            ideaModule project.group + "." + project.name + ".main"
+        }
+        server = {
+            // recommended logging data for a userdev environment
+            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
+            // recommended logging level for the console
+            properties 'forge.logging.console.level': 'debug'
+            workingDirectory project.file('run').canonicalPath
+            source sourceSets.main
+            ideaModule project.group + "." + project.name + ".main"
+        }
+    }
 
-    replace "@VERSION@", project.version
-    replaceIn "ToolBelt.java"
-
-    useDepAts = true
-}
-
-configurations {
-    // configuration that holds jars to embed inside the jar
-    embed
 }
 
 dependencies {
-    deobfCompile "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
-    embed "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
-
-    deobfCompile "mezz.jei:jei_1.12:4.7.4.80:api"
-    runtime "mezz.jei:jei_1.12:4.7.4.80"
-
-    compile fileTree(dir: 'libs', include: '*.jar')
-}
-
-jar {
-    into('/') {
-        from configurations.embed
-    }
-
-    manifest {
-        attributes("ContainedDeps": configurations.embed.collect { it.getName() }.join(' '))
-    }
-}
-
-sourceCompatibility = 1.8
-targetCompatibility = 1.8
-compileJava {
-    sourceCompatibility = 1.8
-    targetCompatibility = 1.8
-    options.encoding = 'UTF-8'
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.10'
 }
 
 processResources {
-    inputs.property "version", project.version
-    inputs.property "mcversion", project.minecraft.version
+    // this will ensure that this task is redone when the versions change.
+    inputs.property 'version', project.version
 
+    // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        include 'mcmod.info'
-        expand 'version':project.version, 'mcversion':project.minecraft.version
+        include 'META_INF/mods.toml'
+                
+        // replace version and mcversion
+        expand 'version':project.version
     }
 
+    // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'mcmod.info'
+        exclude 'META_INF/mods.toml'
     }
 }

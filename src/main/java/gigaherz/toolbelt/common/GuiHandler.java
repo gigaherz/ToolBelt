@@ -1,51 +1,146 @@
 package gigaherz.toolbelt.common;
 
+import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.belt.ItemToolBelt;
-import gigaherz.toolbelt.belt.ToolBeltInventory;
+import io.netty.buffer.Unpooled;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
+import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.player.InventoryPlayer;
+import net.minecraft.inventory.Container;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumHand;
-import net.minecraft.world.World;
-import net.minecraftforge.fml.common.network.IGuiHandler;
+import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentString;
+import net.minecraft.world.IInteractionObject;
+import net.minecraftforge.fml.network.FMLPlayMessages;
+import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class GuiHandler implements IGuiHandler
+public class GuiHandler
 {
-    public static final int BELT = 0;
-    public static final int BELT_SLOT = 1;
+    public static final ResourceLocation BELT = ToolBelt.location("belt");
+    public static final ResourceLocation BELT_SLOT = ToolBelt.location("belt_slot");
 
-    @Nullable
-    @Override
-    public Object getServerGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
+    private static class BeltGui implements IInteractionObject
     {
-        switch (id)
-        {
-            case BELT:
-                ItemStack heldItem = player.getHeldItem(EnumHand.values()[x]);
-                if (heldItem.getCount() > 0)
-                {
-                    int blockedSlot = -1;
-                    if (player.getHeldItemMainhand() == heldItem)
-                        blockedSlot = player.inventory.currentItem;
+        private final ResourceLocation id;
+        private final int slot;
 
-                    return new ContainerBelt(player.inventory, blockedSlot, heldItem);
-                }
-                break;
-            case BELT_SLOT:
-                return new ContainerBeltSlot(player.inventory, !player.world.isRemote, player);
+        public BeltGui(ResourceLocation id, int slot)
+        {
+            this.id = id;
+            this.slot = slot;
         }
-        return null;
+
+        @Override
+        public Container createContainer(InventoryPlayer playerInventory, EntityPlayer player)
+        {
+            ItemStack heldItem = player.getHeldItem(EnumHand.values()[slot]);
+
+            int blockedSlot = -1;
+            if (player.getHeldItemMainhand() == heldItem)
+                blockedSlot = player.inventory.currentItem;
+
+            return new ContainerBelt(player.inventory, blockedSlot, heldItem);
+        }
+
+        @Override
+        public String getGuiID()
+        {
+            return id.toString();
+        }
+
+        @Override
+        public ITextComponent getName()
+        {
+            return new TextComponentString(id.toString());
+        }
+
+        @Override
+        public boolean hasCustomName()
+        {
+            return false;
+        }
+
+        @Nullable
+        @Override
+        public ITextComponent getCustomName()
+        {
+            return null;
+        }
     }
 
-    @Nullable
-    @Override
-    public Object getClientGuiElement(int id, EntityPlayer player, World world, int x, int y, int z)
+    private static class SlotGui implements IInteractionObject
     {
-        switch (id)
+        private final ResourceLocation id;
+
+        public SlotGui(ResourceLocation id)
         {
-            case BELT:
-                ItemStack heldItem = player.getHeldItem(EnumHand.values()[x]);
+            this.id = id;
+        }
+
+        @Override
+        public Container createContainer(InventoryPlayer playerInventory, EntityPlayer player)
+        {
+            return new ContainerBeltSlot(player.inventory, !player.world.isRemote, player);
+        }
+
+        @Override
+        public String getGuiID()
+        {
+            return id.toString();
+        }
+
+        @Override
+        public ITextComponent getName()
+        {
+            return new TextComponentString(id.toString());
+        }
+
+        @Override
+        public boolean hasCustomName()
+        {
+            return false;
+        }
+
+        @Nullable
+        @Override
+        public ITextComponent getCustomName()
+        {
+            return null;
+        }
+    }
+
+    public static void openBeltGui(EntityPlayerMP player, int slot)
+    {
+        PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+        data.writeByte(slot);
+
+        ItemStack heldItem = player.getHeldItem(EnumHand.values()[slot]);
+        if (heldItem.getCount() > 0 && heldItem.getItem() instanceof ItemToolBelt)
+            NetworkHooks.openGui(player, new BeltGui(BELT, slot), data);
+    }
+
+    public static void openSlotGui(EntityPlayerMP player)
+    {
+        NetworkHooks.openGui(player, new SlotGui(BELT_SLOT), null);
+    }
+
+    public static class Client
+    {
+        @Nullable
+        public static GuiScreen getClientGuiElement(FMLPlayMessages.OpenContainer message)
+        {
+            EntityPlayerSP player = Minecraft.getInstance().player;
+            if (BELT.equals(message.getId()))
+            {
+                ItemStack heldItem = player.getHeldItem(EnumHand.values()[message.getAdditionalData().readByte()]);
                 if (heldItem.getCount() > 0)
                 {
                     int blockedSlot = -1;
@@ -54,10 +149,12 @@ public class GuiHandler implements IGuiHandler
 
                     return new GuiBelt(player.inventory, blockedSlot, heldItem);
                 }
-                break;
-            case BELT_SLOT:
+            }
+            else if (BELT_SLOT.equals(message.getId()))
+            {
                 return new GuiBeltSlot(player);
+            }
+            return null;
         }
-        return null;
     }
 }

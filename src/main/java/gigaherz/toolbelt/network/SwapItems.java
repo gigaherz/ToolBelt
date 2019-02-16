@@ -2,24 +2,20 @@ package gigaherz.toolbelt.network;
 
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
-import gigaherz.toolbelt.belt.ItemToolBelt;
-import gigaherz.toolbelt.belt.ToolBeltInventory;
-import io.netty.buffer.ByteBuf;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.EnumHand;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
+import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import java.util.function.Supplier;
+
 public class SwapItems
-        implements IMessage
 {
     public int swapWith;
 
@@ -32,30 +28,34 @@ public class SwapItems
         this.swapWith = windowId;
     }
 
-    @Override
-    public void fromBytes(ByteBuf buf)
+    public void fromBytes(PacketBuffer buf)
     {
         swapWith = buf.readInt();
     }
 
-    @Override
-    public void toBytes(ByteBuf buf)
+    public void toBytes(PacketBuffer buf)
     {
         buf.writeInt(swapWith);
     }
 
-    public static class Handler implements IMessageHandler<SwapItems, IMessage>
+    public static void encode(SwapItems message, PacketBuffer packet)
     {
-        @Override
-        public IMessage onMessage(final SwapItems message, MessageContext ctx)
-        {
-            final EntityPlayerMP player = ctx.getServerHandler().player;
-            final WorldServer world = (WorldServer) player.world;
+        message.toBytes(packet);
+    }
 
-            world.addScheduledTask(() -> swapItem(message.swapWith, player));
+    public static SwapItems decode(PacketBuffer packet)
+    {
+        SwapItems message = new SwapItems();
+        message.fromBytes(packet);
+        return message;
+    }
 
-            return null; // no response in this case
-        }
+    public static void onMessage(final SwapItems message, Supplier<NetworkEvent.Context> context)
+    {
+        final EntityPlayerMP player = context.get().getSender();
+        final WorldServer world = (WorldServer) player.world;
+
+        world.addScheduledTask(() -> swapItem(message.swapWith, player));
     }
 
     public static void swapItem(int swapWith, EntityPlayer player)
@@ -73,7 +73,9 @@ public class SwapItems
         if (!Config.isItemStackAllowed(inHand))
             return;
 
-        IItemHandlerModifiable cap = (IItemHandlerModifiable)stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        IItemHandlerModifiable cap = (IItemHandlerModifiable)(
+                stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
+                        .orElseThrow(() -> new RuntimeException("No inventory!")));
         if (swapWith < 0)
         {
             player.setHeldItem(EnumHand.MAIN_HAND, ItemHandlerHelper.insertItem(cap, inHand, false));
@@ -84,7 +86,6 @@ public class SwapItems
             player.setHeldItem(EnumHand.MAIN_HAND, inSlot);
             cap.setStackInSlot(swapWith, inHand);
         }
-
         getter.syncToClients();
     }
 }

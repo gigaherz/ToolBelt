@@ -32,10 +32,8 @@ public interface IExtensionSlot
      */
     default boolean canEquip(@Nonnull ItemStack stack)
     {
-        IExtensionSlotItem extItem = stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null);
-        return extItem != null
-                && IExtensionSlot.isAcceptableSlot(this, stack, extItem)
-                && extItem.canEquip(stack, this);
+        return stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null)
+                .map((extItem) -> IExtensionSlot.isAcceptableSlot(this, stack, extItem) && extItem.canEquip(stack, this)).orElse(false);
     }
 
     /**
@@ -45,9 +43,8 @@ public interface IExtensionSlot
      */
     default boolean canUnequip(@Nonnull ItemStack stack)
     {
-        IExtensionSlotItem extItem = stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null);
-        return (extItem == null || extItem.canUnequip(stack, this))
-                && EnchantmentHelper.getEnchantmentLevel(Enchantments.BINDING_CURSE, stack) <= 0;
+        return stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null)
+                .map((extItem) -> extItem.canUnequip(stack, this) && EnchantmentHelper.getEnchantmentLevel(Enchantments.BINDING_CURSE, stack) <= 0).orElse(true);
     }
 
     static boolean isAcceptableSlot(@Nonnull IExtensionSlot slot, @Nonnull ItemStack stack, @Nonnull IExtensionSlotItem extItem)

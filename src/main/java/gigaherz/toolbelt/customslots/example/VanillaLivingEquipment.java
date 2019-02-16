@@ -92,7 +92,7 @@ public class VanillaLivingEquipment implements IExtensionContainer
         @Override
         public boolean canEquip(@Nonnull ItemStack stack)
         {
-            if (stack.getItem().isValidArmor(stack, slot, owner))
+            if (stack.getItem().canEquip(stack, slot, owner))
                 return true;
             return IExtensionSlot.super.canEquip(stack);
         }

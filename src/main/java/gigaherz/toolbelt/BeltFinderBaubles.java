@@ -1,5 +1,6 @@
 package gigaherz.toolbelt;
 
+/*
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
 import gigaherz.toolbelt.belt.ItemToolBelt;
@@ -67,14 +68,7 @@ public class BeltFinderBaubles extends BeltFinder
         public void syncToClients()
         {
             // No need! Baubles does its own sync.
-            /*if (thePlayer.world.isRemote)
-                return;
-            BeltContentsChange message = new BeltContentsChange(thePlayer, BAUBLES, slotNumber, getBelt());
-            ((WorldServer) thePlayer.world).getEntityTracker().getTrackingPlayers(thePlayer).forEach((p) -> {
-                if (p instanceof EntityPlayerMP)
-                    ToolBelt.channel.sendTo(message, (EntityPlayerMP) p);
-            });
-            */
         }
     }
 }
+*/

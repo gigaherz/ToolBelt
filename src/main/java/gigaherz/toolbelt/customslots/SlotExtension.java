@@ -5,6 +5,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.TextComponentString;
 
 import javax.annotation.Nonnull;
 
@@ -13,7 +14,7 @@ import javax.annotation.Nonnull;
  */
 public class SlotExtension extends Slot
 {
-    private static IInventory emptyInventory = new InventoryBasic("[Null]", true, 0);
+    private static IInventory emptyInventory = new InventoryBasic(new TextComponentString("[Null]"), 0);
     private final IExtensionSlot slot;
 
     public SlotExtension(IExtensionSlot slot, int x, int y)

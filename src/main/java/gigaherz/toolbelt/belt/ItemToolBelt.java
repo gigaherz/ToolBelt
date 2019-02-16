@@ -1,43 +1,39 @@
 package gigaherz.toolbelt.belt;
 
-import baubles.api.BaubleType;
-import baubles.api.IBauble;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import gigaherz.common.ItemRegistered;
-import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.common.GuiHandler;
 import gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import gigaherz.toolbelt.customslots.IExtensionContainer;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.customslots.IExtensionSlotItem;
 import gigaherz.toolbelt.customslots.example.RpgEquipment;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.ItemUseContext;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.*;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.fml.common.Optional;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-@Optional.Interface(modid = "baubles", iface = "baubles.api.IBauble")
-public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionSlotItem
+public class ItemToolBelt extends Item implements IExtensionSlotItem
 {
     @CapabilityInject(IItemHandler.class)
     public static Capability<IItemHandler> ITEM_HANDLER;
@@ -47,44 +43,50 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
 
     public static final ImmutableSet<ResourceLocation> BELT_SLOT_LIST = ImmutableSet.of(RpgEquipment.BELT);
 
-    public ItemToolBelt(String name)
+    public ItemToolBelt(Properties properties)
     {
-        super(name);
-        maxStackSize = 1;
-        setCreativeTab(CreativeTabs.TOOLS);
+        super(properties);
     }
 
-    @Override
-    public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
+    private EnumActionResult openBeltGui(EntityPlayer player, ItemStack stack, World world)
     {
-        player.openGui(ToolBelt.instance, GuiHandler.BELT, worldIn, hand.ordinal(), 0, 0);
+        int slot = player.inventory.getSlotFor(stack);
+        if (slot == -1)
+            return EnumActionResult.FAIL;
+
+        if (!world.isRemote && player instanceof EntityPlayerMP)
+        {
+            GuiHandler.openBeltGui((EntityPlayerMP) player, slot);
+        }
 
         return EnumActionResult.SUCCESS;
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand)
+    public EnumActionResult onItemUse(ItemUseContext context)
     {
-        playerIn.openGui(ToolBelt.instance, GuiHandler.BELT, worldIn, hand.ordinal(), 0, 0);
+        EntityPlayer player = context.getPlayer();
+        ItemStack stack = context.getItem();
+        World world = context.getWorld();
 
-        return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(hand));
+        return openBeltGui(player, stack, world);
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World world, List<String> tooltip, ITooltipFlag advanced)
+    public ActionResult<ItemStack> onItemRightClick(World world, EntityPlayer player, EnumHand hand)
     {
-        super.addInformation(stack, world, tooltip, advanced);
+        ItemStack stack = player.getHeldItem(hand);
+        return new ActionResult<>(openBeltGui(player, stack, world), stack);
+    }
+
+    @Override
+    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+    {
+        super.addInformation(stack, worldIn, tooltip, flagIn);
 
         int size = getSlotsCount(stack);
 
-        tooltip.add(I18n.format("text.toolbelt.tooltip", size - 2, size));
-    }
-
-    @Optional.Method(modid = "baubles")
-    @Override
-    public BaubleType getBaubleType(ItemStack itemStack)
-    {
-        return BaubleType.BELT;
+        tooltip.add(new TextComponentTranslation("text.toolbelt.tooltip", size - 2, size));
     }
 
     @Nonnull
@@ -95,25 +97,13 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
     }
 
     @Override
-    public boolean willAutoSync(ItemStack itemstack, EntityLivingBase player)
-    {
-        return true;
-    }
-
-    @Override
-    public void onWornTick(ItemStack itemstack, EntityLivingBase player)
-    {
-        tickAllSlots(itemstack, player);
-    }
-
-    @Override
     public void onWornTick(ItemStack itemstack, IExtensionSlot slot)
     {
         tickAllSlots(itemstack, slot.getContainer().getOwner());
     }
 
     @Override
-    public void onUpdate(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected)
+    public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected)
     {
         if (entityIn instanceof EntityLivingBase)
         {
@@ -128,26 +118,19 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
         {
             final ToolBeltInventory itemHandler = new ToolBeltInventory(stack);
 
-            @Override
-            public boolean hasCapability(Capability<?> capability, @Nullable EnumFacing facing)
-            {
-                if (capability == ITEM_HANDLER)
-                    return true;
-                if (capability == EXTENSION_SLOT_ITEM)
-                    return true;
-                return false;
-            }
+            final LazyOptional<IItemHandler> itemHandlerInstance = LazyOptional.of(() -> itemHandler);
+            final LazyOptional<IExtensionSlotItem> extensionSlotInstance = LazyOptional.of(() -> ItemToolBelt.this);
 
-            @SuppressWarnings("unchecked")
-            @Nullable
             @Override
-            public <T> T getCapability(Capability<T> capability, @Nullable EnumFacing facing)
+            @Nonnull
+            @SuppressWarnings("unchecked")
+            public <T> LazyOptional<T> getCapability(@Nonnull final Capability<T> cap, final @Nullable EnumFacing side)
             {
-                if (capability == ITEM_HANDLER)
-                    return (T) itemHandler;
-                if (capability == EXTENSION_SLOT_ITEM)
-                    return (T) ItemToolBelt.this;
-                return null;
+                if (cap == ITEM_HANDLER)
+                    return (LazyOptional<T>)itemHandlerInstance;
+                if (cap == EXTENSION_SLOT_ITEM)
+                    return (LazyOptional<T>)extensionSlotInstance;
+                return LazyOptional.empty();
             }
         };
     }
@@ -162,25 +145,25 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
     {
         int size = 2;
 
-        NBTTagCompound nbt = stack.getTagCompound();
+        NBTTagCompound nbt = stack.getTag();
         if (nbt != null)
         {
-            size = MathHelper.clamp(nbt.getInteger("Size"), 2, 9);
+            size = MathHelper.clamp(nbt.getInt("Size"), 2, 9);
         }
         return size;
     }
 
     public static void setSlotsCount(ItemStack stack, int newSize)
     {
-        NBTTagCompound nbt = stack.getTagCompound();
+        NBTTagCompound nbt = stack.getTag();
         if (nbt == null)
         {
             nbt = new NBTTagCompound();
-            nbt.setTag("Items", new NBTTagList());
+            nbt.put("Items", new NBTTagList());
         }
 
-        nbt.setInteger("Size", newSize);
-        stack.setTagCompound(nbt);
+        nbt.putInt("Size", newSize);
+        stack.setTag(nbt);
     }
 
     public static int[] xpCost = {3, 5, 8, 12, 15, 20, 30};
@@ -238,7 +221,7 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
 
         public BeltExtensionContainer(ItemStack source, EntityLivingBase owner)
         {
-            this.inventory = (ToolBeltInventory) source.getCapability(ITEM_HANDLER, null);
+            this.inventory = (ToolBeltInventory) source.getCapability(ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("No inventory!"));
             this.owner = owner;
 
             ExtensionSlotItemHandler[] slots = new ExtensionSlotItemHandler[inventory.getSlots()];
@@ -272,4 +255,5 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
             return slots;
         }
     }
+
 }

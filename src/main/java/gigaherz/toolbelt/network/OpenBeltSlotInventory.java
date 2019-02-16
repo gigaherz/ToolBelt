@@ -1,51 +1,45 @@
 package gigaherz.toolbelt.network;
 
-import gigaherz.toolbelt.BeltFinder;
-import gigaherz.toolbelt.Config;
-import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.belt.ItemToolBelt;
-import gigaherz.toolbelt.belt.ToolBeltInventory;
 import gigaherz.toolbelt.common.GuiHandler;
 import io.netty.buffer.ByteBuf;
-import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHand;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.world.WorldServer;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessage;
-import net.minecraftforge.fml.common.network.simpleimpl.IMessageHandler;
-import net.minecraftforge.fml.common.network.simpleimpl.MessageContext;
-import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.fml.network.NetworkEvent;
+
+import java.util.function.Supplier;
 
 public class OpenBeltSlotInventory
-        implements IMessage
 {
     public OpenBeltSlotInventory()
     {
     }
 
-    @Override
     public void fromBytes(ByteBuf buf)
     {
     }
 
-    @Override
     public void toBytes(ByteBuf buf)
     {
     }
 
-    public static class Handler implements IMessageHandler<OpenBeltSlotInventory, IMessage>
+    public static void encode(OpenBeltSlotInventory message, PacketBuffer packet)
     {
-        @Override
-        public IMessage onMessage(final OpenBeltSlotInventory message, MessageContext ctx)
-        {
-            final EntityPlayerMP player = ctx.getServerHandler().player;
-            final WorldServer world = (WorldServer) player.world;
+        message.toBytes(packet);
+    }
 
-            world.addScheduledTask(() -> player.openGui(ToolBelt.instance, GuiHandler.BELT_SLOT, world, 0, 0, 0));
+    public static OpenBeltSlotInventory decode(PacketBuffer packet)
+    {
+        OpenBeltSlotInventory message = new OpenBeltSlotInventory();
+        message.fromBytes(packet);
+        return message;
+    }
 
-            return null; // no response in this case
-        }
+    public static void onMessage(final OpenBeltSlotInventory message, Supplier<NetworkEvent.Context> context)
+    {
+        final EntityPlayerMP player = context.get().getSender();
+        final WorldServer world = (WorldServer) player.world;
+
+        world.addScheduledTask(() -> GuiHandler.openSlotGui(player));
     }
 }

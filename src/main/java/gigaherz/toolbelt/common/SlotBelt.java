@@ -7,12 +7,14 @@ import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.SlotItemHandler;
 
 import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public class SlotBelt extends Slot
 {
@@ -29,15 +31,18 @@ public class SlotBelt extends Slot
                 if (stack != beltStack)
                 {
                     beltStack = stack;
-                    inventory = (IItemHandlerModifiable)stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+                    inventory = (IItemHandlerModifiable)(
+                            stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
+                            .orElseThrow(() -> new RuntimeException("No inventory!"))
+                    );
                 }
                 return inventory;
             }
 
             @Override
-            public String getName()
+            public ITextComponent getName()
             {
-                return "toolbelt.slot.wrapper";
+                return new TextComponentTranslation("toolbelt.slot.wrapper");
             }
 
             @Override
@@ -48,6 +53,13 @@ public class SlotBelt extends Slot
 
             @Override
             public ITextComponent getDisplayName()
+            {
+                return getName();
+            }
+
+            @Nullable
+            @Override
+            public ITextComponent getCustomName()
             {
                 return null;
             }

@@ -21,9 +21,9 @@ public class ToolBeltInventory implements IItemHandlerModifiable
     private NBTTagCompound getTag()
     {
         NBTTagCompound tag;
-        tag = itemStack.getTagCompound();
+        tag = itemStack.getTag();
         if (tag == null)
-            itemStack.setTagCompound(tag = new NBTTagCompound());
+            itemStack.setTag(tag = new NBTTagCompound());
         return tag;
     }
 
@@ -31,21 +31,21 @@ public class ToolBeltInventory implements IItemHandlerModifiable
     @Override
     public int getSlots()
     {
-        return MathHelper.clamp(getTag().getInteger("Size"), 2, 9);
+        return MathHelper.clamp(getTag().getInt("Size"), 2, 9);
     }
 
     @Override
     public ItemStack getStackInSlot(int slot)
     {
         validateSlotIndex(slot);
-        NBTTagList tagList = getTag().getTagList("Items", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < tagList.tagCount(); i++)
+        NBTTagList tagList = getTag().getList("Items", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < tagList.size(); i++)
         {
-            NBTTagCompound itemTags = tagList.getCompoundTagAt(i);
-            if (itemTags.getInteger("Slot") != slot)
+            NBTTagCompound itemTags = tagList.getCompound(i);
+            if (itemTags.getInt("Slot") != slot)
                 continue;
 
-            return new ItemStack(itemTags);
+            return ItemStack.read(itemTags);
         }
 
         return ItemStack.EMPTY;
@@ -61,15 +61,15 @@ public class ToolBeltInventory implements IItemHandlerModifiable
         if (hasStack)
         {
             itemTag = new NBTTagCompound();
-            itemTag.setInteger("Slot", slot);
-            stack.writeToNBT(itemTag);
+            itemTag.putInt("Slot", slot);
+            stack.write(itemTag);
         }
 
-        NBTTagList tagList = getTag().getTagList("Items", Constants.NBT.TAG_COMPOUND);
-        for (int i = 0; i < tagList.tagCount(); i++)
+        NBTTagList tagList = getTag().getList("Items", Constants.NBT.TAG_COMPOUND);
+        for (int i = 0; i < tagList.size(); i++)
         {
-            NBTTagCompound existing = tagList.getCompoundTagAt(i);
-            if (existing.getInteger("Slot") != slot)
+            NBTTagCompound existing = tagList.getCompound(i);
+            if (existing.getInt("Slot") != slot)
                 continue;
 
             if (hasStack)
@@ -80,9 +80,9 @@ public class ToolBeltInventory implements IItemHandlerModifiable
         }
 
         if (hasStack)
-            tagList.appendTag(itemTag);
+            tagList.add(itemTag);
 
-        getTag().setTag("Items", tagList);
+        getTag().put("Items", tagList);
     }
 
     @Override

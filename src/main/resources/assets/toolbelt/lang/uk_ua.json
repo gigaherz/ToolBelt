@@ -1,0 +1,12 @@
+{
+  "item.toolbelt.belt": "Ремінь з інструментами",
+  "item.toolbelt.pouch": "Поясний чохол",
+  "key.toolbelt.open": "Замінити інструмент",
+  "key.toolbelt.category": "Ремінь з інструментами",
+  "text.toolbelt.empty": "ПОРОЖНЬО",
+  "text.toolbelt.swap": "ЗАМІНИТИ",
+  "text.toolbelt.insert": "ВСТАВИТИ",
+  "text.toolbelt.extract": "ВИЛУЧИТИ",
+  "text.toolbelt.tooltip": "Покращення: %s (%s слотів)",
+  "text.toolbelt": "Ремінь з інструментами"
+}

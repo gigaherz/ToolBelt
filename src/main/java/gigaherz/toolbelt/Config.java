@@ -6,14 +6,11 @@ import gigaherz.toolbelt.belt.ItemToolBelt;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.common.config.ConfigCategory;
-import net.minecraftforge.common.config.Configuration;
-import net.minecraftforge.common.config.Property;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.oredict.OreDictionary;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.io.File;
 import java.util.Arrays;
@@ -25,11 +22,6 @@ import java.util.stream.Collectors;
 @Mod.EventBusSubscriber
 public class Config
 {
-    private static Configuration config;
-    public static ConfigCategory display;
-    public static ConfigCategory input;
-    public static ConfigCategory behaviour;
-
     private static final Set<String> blackListString = Sets.newHashSet();
     private static final Set<String> whiteListString = Sets.newHashSet();
     private static final Set<ItemStack> blackList = Sets.newHashSet();
@@ -47,6 +39,7 @@ public class Config
 
     static void loadConfig(File configurationFile)
     {
+        /*
         config = new Configuration(configurationFile);
 
         Property bl = config.get("items", "blacklist", new String[0]);
@@ -109,6 +102,7 @@ public class Config
         {
             config.save();
         }
+        */
     }
 
     public static void postInit()
@@ -119,6 +113,7 @@ public class Config
 
     public static void refresh()
     {
+        /*
         showBeltOnPlayers = display.get("showBeltOnPlayers").getBoolean();
         beltItemScale = (float) display.get("beltItemScale").getDouble();
         releaseToSwap = input.get("releaseToSwap").getBoolean();
@@ -126,6 +121,7 @@ public class Config
         allowClickOutsideBounds = input.get("allowClickOutsideBounds").getBoolean();
         displayEmptySlots = input.get("displayEmptySlots").getBoolean();
         disableAnvilUpgrading = behaviour.get("disableAnvilUpgrading").getBoolean();
+        */
     }
 
     @SubscribeEvent
@@ -133,8 +129,10 @@ public class Config
     {
         if (ToolBelt.MODID.equals(event.getModID()))
         {
+            /*
             if (config.hasChanged())
                 config.save();
+            */
             refresh();
         }
     }
@@ -158,13 +156,7 @@ public class Config
             return ItemStack.EMPTY;
         }
 
-        String anyString = matcher.group("any");
-        String metaString = matcher.group("meta");
-        int meta = Strings.isNullOrEmpty(anyString)
-                ? (Strings.isNullOrEmpty(metaString) ? 0 : Integer.parseInt(metaString))
-                : OreDictionary.WILDCARD_VALUE;
-
-        return new ItemStack(item, 1, meta);
+        return new ItemStack(item, 1);
     }
 
     public static boolean isItemStackAllowed(final ItemStack stack)
@@ -172,10 +164,10 @@ public class Config
         if (stack.getCount() <= 0)
             return true;
 
-        if (whiteList.stream().anyMatch((s) -> OreDictionary.itemMatches(s, stack, false)))
+        if (whiteList.stream().anyMatch((s) -> ItemStack.areItemsEqual(s, stack)))
             return true;
 
-        if (blackList.stream().anyMatch((s) -> OreDictionary.itemMatches(s, stack, false)))
+        if (blackList.stream().anyMatch((s) -> ItemStack.areItemsEqual(s, stack)))
             return false;
 
         if (stack.getItem() instanceof ItemToolBelt)

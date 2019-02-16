@@ -5,6 +5,7 @@ import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.network.SwapItems;
+import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.BufferBuilder;
@@ -13,22 +14,23 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.client.settings.GameSettings;
+import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import org.lwjgl.input.Mouse;
+import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
+import javax.swing.*;
 import javax.vecmath.Vector4f;
 import java.util.List;
 
-@Mod.EventBusSubscriber(Side.CLIENT)
+@Mod.EventBusSubscriber(Dist.CLIENT)
 public class GuiRadialMenu extends GuiScreen
 {
     private final BeltFinder.BeltGetter getter;
@@ -48,8 +50,8 @@ public class GuiRadialMenu extends GuiScreen
     {
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
-        inventory = stackEquipped.getCount() > 0 ? stackEquipped.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null) : null;
-        startAnimation = Minecraft.getMinecraft().world.getTotalWorldTime() + (double) Minecraft.getMinecraft().getRenderPartialTicks();
+        inventory = stackEquipped.getCount() > 0 ? stackEquipped.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(null) : null;
+        startAnimation = Minecraft.getInstance().world.getGameTime() + (double) Minecraft.getInstance().getRenderPartialTicks();
     }
 
     @SubscribeEvent
@@ -58,22 +60,22 @@ public class GuiRadialMenu extends GuiScreen
         if (event.getType() != RenderGameOverlayEvent.ElementType.CROSSHAIRS)
             return;
 
-        if (Minecraft.getMinecraft().currentScreen instanceof GuiRadialMenu)
+        if (Minecraft.getInstance().currentScreen instanceof GuiRadialMenu)
         {
             event.setCanceled(true);
         }
     }
 
     @Override
-    public void updateScreen()
+    public void tick()
     {
-        super.updateScreen();
+        super.tick();
 
         if (closing)
         {
             if (doneClosing || inventory == null)
             {
-                Minecraft.getMinecraft().displayGuiScreen(null);
+                Minecraft.getInstance().displayGuiScreen(null);
 
                 ClientProxy.wipeOpen();
             }
@@ -98,16 +100,16 @@ public class GuiRadialMenu extends GuiScreen
             else if (stackEquipped != stack)
             {
                 stackEquipped = stack;
-                inventory = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+                inventory = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(() -> new RuntimeException("No inventory?"));
                 cachedStacks = null;
             }
         }
 
         if (inventory == null)
         {
-            Minecraft.getMinecraft().displayGuiScreen(null);
+            Minecraft.getInstance().displayGuiScreen(null);
         }
-        else if (!GameSettings.isKeyDown(ClientProxy.keyOpenToolMenu))
+        else if (!InputMappings.isKeyDown(ClientProxy.keyOpenToolMenu.getKey().getKeyCode()))
         {
             if (Config.releaseToSwap)
             {
@@ -121,10 +123,10 @@ public class GuiRadialMenu extends GuiScreen
     }
 
     @Override
-    protected void mouseReleased(int mouseX, int mouseY, int state)
+    public boolean mouseReleased(double p_mouseReleased_1_, double p_mouseReleased_3_, int p_mouseReleased_5_)
     {
-        super.mouseReleased(mouseX, mouseY, state);
         processClick(true);
+        return super.mouseReleased(p_mouseReleased_1_, p_mouseReleased_3_, p_mouseReleased_5_);
     }
 
     protected void processClick(boolean triggeredByMouse)
@@ -187,13 +189,13 @@ public class GuiRadialMenu extends GuiScreen
     {
         closing = true;
         doneClosing = false;
-        startAnimation = Minecraft.getMinecraft().world.getTotalWorldTime() + (double) Minecraft.getMinecraft().getRenderPartialTicks();
+        startAnimation = Minecraft.getInstance().world.getGameTime() + (double) Minecraft.getInstance().getRenderPartialTicks();
     }
 
     @Override
-    public void drawScreen(int mouseX, int mouseY, float partialTicks)
+    public void render(int mouseX, int mouseY, float partialTicks)
     {
-        super.drawScreen(mouseX, mouseY, partialTicks);
+        super.render(mouseX, mouseY, partialTicks);
 
         if (inventory == null)
             return;
@@ -238,8 +240,8 @@ public class GuiRadialMenu extends GuiScreen
         final float OPEN_ANIMATION_LENGTH = 2.5f;
 
         float openAnimation = closing
-                ? (float) (1 - ((Minecraft.getMinecraft().world.getTotalWorldTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH))
-                : (float) ((Minecraft.getMinecraft().world.getTotalWorldTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH);
+                ? (float) (1 - ((Minecraft.getInstance().world.getGameTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH))
+                : (float) ((Minecraft.getInstance().world.getGameTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH);
 
         if (closing && openAnimation <= 0)
             doneClosing = true;
@@ -255,7 +257,7 @@ public class GuiRadialMenu extends GuiScreen
 
         if (!closing)
         {
-            if (GameSettings.isKeyDown(ClientProxy.keyCycleToolMenuL))
+            if (InputMappings.isKeyDown(ClientProxy.keyCycleToolMenuL.getKey().getKeyCode()))
             {
                 if (!keyCycleBeforeL)
                 {
@@ -274,7 +276,7 @@ public class GuiRadialMenu extends GuiScreen
                 keyCycleBeforeL = false;
             }
 
-            if (GameSettings.isKeyDown(ClientProxy.keyCycleToolMenuR))
+            if (InputMappings.isKeyDown(ClientProxy.keyCycleToolMenuR.getKey().getKeyCode()))
             {
                 if (!keyCycleBeforeR)
                 {
@@ -351,18 +353,21 @@ public class GuiRadialMenu extends GuiScreen
 
         if (Config.clipMouseToCircle)
         {
-            double scaledX = Mouse.getX() - (mc.displayWidth / 2.0f);
-            double scaledY = Mouse.getY() - (mc.displayHeight / 2.0f);
+            double[] xPos = new double[1];
+            double[] yPos = new double[1];
+            GLFW.glfwGetCursorPos(mc.mainWindow.getHandle(), xPos, yPos);
+            double scaledX = xPos[0] - (mc.mainWindow.getWidth() / 2.0f);
+            double scaledY = yPos[0] - (mc.mainWindow.getHeight() / 2.0f);
 
             double distance = Math.sqrt(scaledX * scaledX + scaledY * scaledY);
-            double radius = 60.0 * (mc.displayWidth / width);
+            double radius = 60.0 * (mc.mainWindow.getWidth() / width);
 
             if (distance > radius)
             {
                 double fixedX = scaledX * radius / distance;
                 double fixedY = scaledY * radius / distance;
 
-                Mouse.setCursorPosition((int) (mc.displayWidth / 2 + fixedX), (int) (mc.displayHeight / 2 + fixedY));
+                GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), (int) (mc.mainWindow.getWidth() / 2 + fixedX), (int) (mc.mainWindow.getHeight() / 2 + fixedY));
             }
         }
 
@@ -430,7 +435,7 @@ public class GuiRadialMenu extends GuiScreen
 
     private void setMousePosition(double x, double y)
     {
-        Mouse.setCursorPosition((int) (x * mc.displayWidth / width), (int) (y * mc.displayHeight / height));
+        GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), (int) (x * mc.mainWindow.getWidth() / width), (int) (y * mc.mainWindow.getHeight() / height));
     }
 
     private static final float PRECISION = 5;
@@ -468,7 +473,7 @@ public class GuiRadialMenu extends GuiScreen
             float z = 0;
 
             GlStateManager.pushMatrix();
-            GlStateManager.translate(0, animTop, 0);
+            GlStateManager.translatef(0, animTop, 0);
 
             drawBackground(x,y,z, radiusIn, radiusOut);
 
@@ -495,10 +500,10 @@ public class GuiRadialMenu extends GuiScreen
 
         private void drawBackground(float x, float y, float z, float radiusIn, float radiusOut)
         {
-            GlStateManager.disableAlpha();
+            GlStateManager.disableAlphaTest();
             GlStateManager.enableBlend();
             GlStateManager.disableTexture2D();
-            GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
             Tessellator tessellator = Tessellator.getInstance();
             BufferBuilder buffer = tessellator.getBuffer();

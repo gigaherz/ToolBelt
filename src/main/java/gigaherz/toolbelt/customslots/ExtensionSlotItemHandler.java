@@ -59,18 +59,16 @@ public class ExtensionSlotItemHandler implements IExtensionSlot
 
     private void notifyEquip(ItemStack stack)
     {
-        IExtensionSlotItem extItem = stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null);
-        if (extItem == null)
-            return;
-        extItem.onEquipped(stack, this);
+        stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null).ifPresent((extItem) -> {
+            extItem.onEquipped(stack, this);
+        });
     }
 
     private void notifyUnequip(ItemStack stack)
     {
-        IExtensionSlotItem extItem = stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null);
-        if (extItem == null)
-            return;
-        extItem.onUnequipped(stack, this);
+        stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null).ifPresent((extItem) -> {
+            extItem.onUnequipped(stack, this);
+        });
     }
 
     public void onWornTick()
@@ -78,9 +76,8 @@ public class ExtensionSlotItemHandler implements IExtensionSlot
         ItemStack stack = getContents();
         if (stack.isEmpty())
             return;
-        IExtensionSlotItem extItem = stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null);
-        if (extItem == null)
-            return;
-        extItem.onWornTick(stack, this);
+        stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null).ifPresent((extItem) -> {
+            extItem.onWornTick(stack, this);
+        });
     }
 }

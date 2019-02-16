@@ -1,5 +1,6 @@
 package gigaherz.toolbelt.client.config;
 
+/*
 import com.google.common.collect.Lists;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
@@ -36,3 +37,4 @@ public class ConfigGui extends GuiConfig
         return configElements;
     }
 }
+*/

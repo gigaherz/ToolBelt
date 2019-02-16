@@ -22,11 +22,12 @@ public class ContainerBeltSlot extends ContainerPlayer
     {
         super(playerInventory, localWorld, playerIn);
 
-        ExtensionSlotBelt container = playerIn.getCapability(ExtensionSlotBelt.CAPABILITY, null);
+        ExtensionSlotBelt container = playerIn.getCapability(ExtensionSlotBelt.CAPABILITY)
+                .orElseThrow(() -> new RuntimeException("Item handler not present."));
 
         extensionSlot = container.getBelt();
 
-        this.addSlotToContainer(slotBelt = new SlotExtension(extensionSlot, 77, 44));
+        this.addSlot(slotBelt = new SlotExtension(extensionSlot, 77, 44));
         slotBelt.setBackgroundName(EMPTY_SPRITE.toString());
     }
 

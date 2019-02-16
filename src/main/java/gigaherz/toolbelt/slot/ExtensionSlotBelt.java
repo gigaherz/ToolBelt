@@ -7,7 +7,7 @@ import gigaherz.toolbelt.customslots.IExtensionSlot;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.NBTBase;
+import net.minecraft.nbt.INBTBase;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -17,8 +17,9 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.items.ItemStackHandler;
 
@@ -30,7 +31,6 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
     ////////////////////////////////////////////////////////////
     // Capability support code
     //
-
     private static final ResourceLocation CAPABILITY_ID = new ResourceLocation("toolbelt", "belt_slot");
 
     @CapabilityInject(ExtensionSlotBelt.class)
@@ -43,13 +43,13 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         {
             @Nullable
             @Override
-            public NBTBase writeNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, EnumFacing side)
+            public INBTBase writeNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, EnumFacing side)
             {
                 return null;
             }
 
             @Override
-            public void readNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, EnumFacing side, NBTBase nbt)
+            public void readNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, EnumFacing side, INBTBase nbt)
             {
 
             }
@@ -60,7 +60,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
 
     public static ExtensionSlotBelt get(EntityLivingBase player)
     {
-        return player.getCapability(CAPABILITY, null);
+        return player.getCapability(CAPABILITY, null).orElseThrow(() -> new RuntimeException("Capability not attached!"));
     }
 
     static class EventHandlers
@@ -74,6 +74,8 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
                 {
                     final ExtensionSlotBelt extensionContainer = new ExtensionSlotBelt((EntityPlayer) event.getObject());
 
+                    final LazyOptional<ExtensionSlotBelt> extensionContainerInstance = LazyOptional.of(() -> extensionContainer);
+
                     @Override
                     public NBTTagCompound serializeNBT()
                     {
@@ -86,22 +88,14 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
                         extensionContainer.deserializeNBT(nbt);
                     }
 
-                    @Override
-                    public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing)
-                    {
-                        if (capability == CAPABILITY)
-                            return true;
-                        return false;
-                    }
-
                     @Nullable
                     @SuppressWarnings("unchecked")
                     @Override
-                    public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
+                    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
                     {
                         if (capability == CAPABILITY)
-                            return (T) extensionContainer;
-                        return null;
+                            return (LazyOptional<T>) extensionContainerInstance;
+                        return LazyOptional.empty();
                     }
                 });
             }

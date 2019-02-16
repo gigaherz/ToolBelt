@@ -17,13 +17,14 @@ public class ContainerBelt extends Container
 
     public ContainerBelt(IInventory playerInventory, int blockedSlot, ItemStack heldItem)
     {
-        ToolBeltInventory beltInventory = (ToolBeltInventory) heldItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        ToolBeltInventory beltInventory = (ToolBeltInventory) heldItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .orElseThrow(() -> new RuntimeException("Item handler not present."));
 
         beltSlots = beltInventory.getSlots();
         int xoff = ((9 - beltSlots) * 18) / 2;
         for (int k = 0; k < beltSlots; ++k)
         {
-            this.addSlotToContainer(new SlotBelt(playerInventory, blockedSlot, k, 8 + xoff + k * 18, 20));
+            this.addSlot(new SlotBelt(playerInventory, blockedSlot, k, 8 + xoff + k * 18, 20));
         }
 
         bindPlayerInventory(playerInventory, blockedSlot);
@@ -36,7 +37,7 @@ public class ContainerBelt extends Container
             for (int j1 = 0; j1 < 9; ++j1)
             {
                 int index = j1 + l * 9 + 9;
-                this.addSlotToContainer(
+                this.addSlot(
                         blockedSlot == index
                                 ? new SlotLocked(playerInventory, index, 8 + j1 * 18, l * 18 + 51)
                                 : new Slot(playerInventory, index, 8 + j1 * 18, l * 18 + 51)
@@ -46,7 +47,7 @@ public class ContainerBelt extends Container
 
         for (int i1 = 0; i1 < 9; ++i1)
         {
-            this.addSlotToContainer(
+            this.addSlot(
                     blockedSlot == i1
                             ? new SlotLocked(playerInventory, i1, 8 + i1 * 18, 109)
                             : new Slot(playerInventory, i1, 8 + i1 * 18, 109)

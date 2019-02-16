@@ -3,16 +3,14 @@ package gigaherz.toolbelt.client;
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.belt.ItemToolBelt;
-import gigaherz.toolbelt.belt.ToolBeltInventory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ModelBase;
-import net.minecraft.client.model.ModelBiped;
-import net.minecraft.client.model.ModelRenderer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.block.model.ItemCameraTransforms;
 import net.minecraft.client.renderer.entity.RenderLivingBase;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.entity.model.ModelBase;
+import net.minecraft.client.renderer.entity.model.ModelBiped;
+import net.minecraft.client.renderer.entity.model.ModelRenderer;
+import net.minecraft.client.renderer.model.ItemCameraTransforms;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
@@ -56,7 +54,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
             pocketR.render(scale);
 
             GlStateManager.pushMatrix();
-            GlStateManager.scale(0.8f, 1, 1);
+            GlStateManager.scalef(0.8f, 1, 1);
             buckle.render(scale);
             GlStateManager.popMatrix();
         }
@@ -68,7 +66,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
     }
 
     @Override
-    public void doRenderLayer(EntityPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
+    public void render(EntityPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
         boolean flag = player.getPrimaryHand() == EnumHandSide.RIGHT;
 
@@ -83,46 +81,47 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
         if (stack.getCount() <= 0)
             return;
 
-        IItemHandler cap = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
+        stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent((cap) -> {
 
-        ItemStack firstItem = cap.getStackInSlot(0);
-        ItemStack secondItem = cap.getStackInSlot(1);
+            ItemStack firstItem = cap.getStackInSlot(0);
+            ItemStack secondItem = cap.getStackInSlot(1);
 
-        ItemStack leftItem = flag ? firstItem : secondItem;
-        ItemStack rightItem = flag ? secondItem : firstItem;
+            ItemStack leftItem = flag ? firstItem : secondItem;
+            ItemStack rightItem = flag ? secondItem : firstItem;
 
-        GlStateManager.pushMatrix();
-
-        if (player.isSneaking())
-        {
-            GlStateManager.translate(0.0F, 0.2F, 0.0F);
-        }
-
-        this.translateToBody();
-
-        if (!leftItem.isEmpty() || !rightItem.isEmpty())
-        {
             GlStateManager.pushMatrix();
 
-            if (this.livingEntityRenderer.getMainModel().isChild)
+            if (player.isSneaking())
             {
-                GlStateManager.translate(0.0F, 0.75F, 0.0F);
-                GlStateManager.scale(0.5F, 0.5F, 0.5F);
+                GlStateManager.translatef(0.0F, 0.2F, 0.0F);
             }
 
-            this.renderHeldItem(player, rightItem, ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND, EnumHandSide.RIGHT);
-            this.renderHeldItem(player, leftItem, ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND, EnumHandSide.LEFT);
+            this.translateToBody();
+
+            if (!leftItem.isEmpty() || !rightItem.isEmpty())
+            {
+                GlStateManager.pushMatrix();
+
+                if (this.livingEntityRenderer.getMainModel().isChild)
+                {
+                    GlStateManager.translatef(0.0F, 0.75F, 0.0F);
+                    GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+                }
+
+                this.renderHeldItem(player, rightItem, ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND, EnumHandSide.RIGHT);
+                this.renderHeldItem(player, leftItem, ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND, EnumHandSide.LEFT);
+
+                GlStateManager.popMatrix();
+            }
+
+            GlStateManager.translatef(0.0F, 0.19F, 0.0F);
+            GlStateManager.scalef(0.85f, 0.6f, 0.78f);
+
+            this.livingEntityRenderer.bindTexture(TEXTURE_BELT);
+            this.beltModel.render(player, 0, 0, 0, 0, 0, scale);
 
             GlStateManager.popMatrix();
-        }
-
-        GlStateManager.translate(0.0F, 0.19F, 0.0F);
-        GlStateManager.scale(0.85f, 0.6f, 0.78f);
-
-        this.livingEntityRenderer.bindTexture(TEXTURE_BELT);
-        this.beltModel.render(player, 0, 0, 0, 0, 0, scale);
-
-        GlStateManager.popMatrix();
+        });
     }
 
     private void translateToBody()
@@ -138,13 +137,13 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
         GlStateManager.pushMatrix();
 
         if (handSide == EnumHandSide.LEFT)
-            GlStateManager.translate(-4.35f / 16.0F, 0.7f, -0.1f);
+            GlStateManager.translatef(-4.35f / 16.0F, 0.7f, -0.1f);
         else
-            GlStateManager.translate(4.35f / 16.0F, 0.7f, -0.1f);
-        GlStateManager.rotate(40.0F, 1.0F, 0.0F, 0.0F);
+            GlStateManager.translatef(4.35f / 16.0F, 0.7f, -0.1f);
+        GlStateManager.rotatef(40.0F, 1.0F, 0.0F, 0.0F);
         float scale = Config.beltItemScale;
-        GlStateManager.scale(scale, scale, scale);
-        Minecraft.getMinecraft().getItemRenderer().renderItemSide(player, stack, cameraTransform, handSide == EnumHandSide.LEFT);
+        GlStateManager.scalef(scale, scale, scale);
+        Minecraft.getInstance().getItemRenderer().renderItem(stack, player, cameraTransform, handSide == EnumHandSide.LEFT);
         GlStateManager.popMatrix();
     }
 

@@ -1,0 +1,14 @@
+{
+  "": "/Translated by: Dorzar / VeryHardChamp",
+  "": "/Última actualización: 23/07/2017",
+  "item.toolbelt.belt": "Cinturón para herramientas",
+  "item.toolbelt.pouch": "Bolsa para cinturón",
+  "key.toolbelt.open": "Swap Tool",
+  "key.toolbelt.category": "Tool Belt",
+  "text.toolbelt.empty": "VACIO",
+  "text.toolbelt.swap": "CAMBIAR",
+  "text.toolbelt.insert": "INSERTAR",
+  "text.toolbelt.extract": "EXTRAER",
+  "text.toolbelt.tooltip": "Mejoras: %s (%s espacios)",
+  "text.toolbelt": "Cinturón para herramientas"
+}

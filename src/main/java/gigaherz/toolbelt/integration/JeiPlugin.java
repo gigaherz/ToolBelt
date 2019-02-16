@@ -1,5 +1,6 @@
 package gigaherz.toolbelt.integration;
 
+/*
 import com.google.common.collect.Lists;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
@@ -56,3 +57,4 @@ public class JeiPlugin implements IModPlugin
     {
     }
 }
+*/
