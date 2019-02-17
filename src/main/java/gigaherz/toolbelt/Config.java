@@ -33,7 +33,7 @@ public class Config
     public static boolean releaseToSwap = false;
     public static boolean clipMouseToCircle = true;
     public static boolean allowClickOutsideBounds = true;
-    public static boolean displayEmptySlots = false;
+    public static boolean displayEmptySlots = true;
 
     public static boolean disableAnvilUpgrading = false;
 

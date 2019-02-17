@@ -1,6 +1,7 @@
 package gigaherz.toolbelt.common;
 
 import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.network.ContainerSlotsHack;
 import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.gui.IGuiEventListener;
 import net.minecraft.client.gui.inventory.GuiInventory;
@@ -10,10 +11,12 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.InventoryEffectRenderer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.ContainerRecipeBook;
 import net.minecraft.inventory.Slot;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkDirection;
 
 import javax.annotation.Nullable;
 

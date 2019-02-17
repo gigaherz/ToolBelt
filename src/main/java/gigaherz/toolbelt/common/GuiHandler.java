@@ -41,7 +41,7 @@ public class GuiHandler
         @Override
         public Container createContainer(InventoryPlayer playerInventory, EntityPlayer player)
         {
-            ItemStack heldItem = player.getHeldItem(EnumHand.values()[slot]);
+            ItemStack heldItem = player.inventory.getStackInSlot(slot);
 
             int blockedSlot = -1;
             if (player.getHeldItemMainhand() == heldItem)
@@ -122,14 +122,15 @@ public class GuiHandler
         PacketBuffer data = new PacketBuffer(Unpooled.buffer());
         data.writeByte(slot);
 
-        ItemStack heldItem = player.getHeldItem(EnumHand.values()[slot]);
+        ItemStack heldItem = player.inventory.getStackInSlot(slot);
         if (heldItem.getCount() > 0 && heldItem.getItem() instanceof ItemToolBelt)
             NetworkHooks.openGui(player, new BeltGui(BELT, slot), data);
     }
 
     public static void openSlotGui(EntityPlayerMP player)
     {
-        NetworkHooks.openGui(player, new SlotGui(BELT_SLOT), null);
+        PacketBuffer data = new PacketBuffer(Unpooled.buffer());
+        NetworkHooks.openGui(player, new SlotGui(BELT_SLOT), data);
     }
 
     public static class Client
@@ -140,7 +141,7 @@ public class GuiHandler
             EntityPlayerSP player = Minecraft.getInstance().player;
             if (BELT.equals(message.getId()))
             {
-                ItemStack heldItem = player.getHeldItem(EnumHand.values()[message.getAdditionalData().readByte()]);
+                ItemStack heldItem = player.inventory.getStackInSlot(message.getAdditionalData().readByte());
                 if (heldItem.getCount() > 0)
                 {
                     int blockedSlot = -1;

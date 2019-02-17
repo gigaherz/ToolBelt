@@ -2,14 +2,18 @@ package gigaherz.toolbelt.common;
 
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.network.ContainerSlotsHack;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.entity.player.InventoryPlayer;
 import net.minecraft.inventory.*;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.NetworkManager;
 import net.minecraft.util.ResourceLocation;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.customslots.SlotExtension;
+import net.minecraftforge.fml.network.NetworkDirection;
 
 public class ContainerBeltSlot extends ContainerPlayer
 {
@@ -29,10 +33,11 @@ public class ContainerBeltSlot extends ContainerPlayer
 
         this.addSlot(slotBelt = new SlotExtension(extensionSlot, 77, 44));
         slotBelt.setBackgroundName(EMPTY_SPRITE.toString());
-    }
 
-    public void addListener(IContainerListener listener) {
-        super.addListener(listener);
+        if (!localWorld)
+        {
+            ToolBelt.channel.sendToServer(new ContainerSlotsHack(this.windowId, inventoryItemStacks));
+        }
     }
 
     @Override

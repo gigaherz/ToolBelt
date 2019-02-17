@@ -1,6 +1,7 @@
 package gigaherz.toolbelt;
 
 import gigaherz.toolbelt.network.BeltContentsChange;
+import gigaherz.toolbelt.network.ContainerSlotsHack;
 
 public interface ISideProxy
 {
@@ -10,6 +11,9 @@ public interface ISideProxy
 
     default void handleBeltContentsChange(BeltContentsChange message)
     {
+    }
 
+    default void handleContainerSlots(ContainerSlotsHack message)
+    {
     }
 }

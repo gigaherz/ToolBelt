@@ -4,6 +4,7 @@ import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.client.ClientProxy;
 import gigaherz.toolbelt.common.GuiHandler;
 import gigaherz.toolbelt.network.BeltContentsChange;
+import gigaherz.toolbelt.network.ContainerSlotsHack;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import gigaherz.toolbelt.network.SwapItems;
 import gigaherz.toolbelt.server.ServerProxy;
@@ -12,21 +13,17 @@ import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.tileentity.TileEntityType;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ObjectHolder;
@@ -50,8 +47,6 @@ public class ToolBelt
 
     public static final Logger logger = LogManager.getLogger(MODID);
 
-    public static GuiHandler guiHandler;
-
     public static final String CHANNEL = MODID;
     private static final String PROTOCOL_VERSION = "1.0";
     public static SimpleChannel channel = NetworkRegistry.ChannelBuilder
@@ -65,7 +60,6 @@ public class ToolBelt
     {
         instance = this;
 
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Block.class, this::registerBlocks);
         FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, this::registerItems);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::preInit);
         FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientInit);
@@ -73,10 +67,6 @@ public class ToolBelt
         MinecraftForge.EVENT_BUS.addListener(this::anvilChange);
 
         ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiHandler.Client::getClientGuiElement);
-    }
-
-    public void registerBlocks(RegistryEvent.Register<Block> event)
-    {
     }
 
     public void registerItems(RegistryEvent.Register<Item> event)
@@ -93,6 +83,7 @@ public class ToolBelt
         channel.registerMessage(messageNumber++, SwapItems.class, SwapItems::encode, SwapItems::decode, SwapItems::onMessage);
         channel.registerMessage(messageNumber++, BeltContentsChange.class, BeltContentsChange::encode, BeltContentsChange::decode, BeltContentsChange::onMessage);
         channel.registerMessage(messageNumber++, OpenBeltSlotInventory.class, OpenBeltSlotInventory::encode, OpenBeltSlotInventory::decode, OpenBeltSlotInventory::onMessage);
+        channel.registerMessage(messageNumber++, ContainerSlotsHack.class, ContainerSlotsHack::encode, ContainerSlotsHack::decode, ContainerSlotsHack::onMessage);
         logger.debug("Final message number: " + messageNumber);
 
         //TODO File configurationFile = event.getSuggestedConfigurationFile();
@@ -106,7 +97,6 @@ public class ToolBelt
         proxy.init();
     }
 
-    @SubscribeEvent
     public void anvilChange(AnvilUpdateEvent ev)
     {
         if (Config.disableAnvilUpgrading)

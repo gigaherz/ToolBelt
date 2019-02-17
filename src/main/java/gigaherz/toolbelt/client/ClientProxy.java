@@ -2,8 +2,11 @@ package gigaherz.toolbelt.client;
 
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ISideProxy;
+import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.network.BeltContentsChange;
+import gigaherz.toolbelt.network.ContainerSlotsHack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
@@ -73,5 +76,19 @@ public class ClientProxy implements ISideProxy
                     break;
             }
         });
+    }
+
+    @Override
+    public void handleContainerSlots(ContainerSlotsHack message)
+    {
+        EntityPlayerSP player = Minecraft.getInstance().player;
+        if (player.openContainer.windowId == message.windowId)
+        {
+            player.openContainer.setAll(message.stacks);
+        }
+        else
+        {
+            ToolBelt.logger.warn("Incorrect open container! Expected {} got {}", message.windowId, player.openContainer.windowId);
+        }
     }
 }

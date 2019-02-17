@@ -33,7 +33,7 @@ Adds a simple means to carry thigns with you
 '''
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
-[[dependencies.examplemod]] #optional
+[[dependencies.toolbelt]] #optional
     # the modid of the dependency
     modId="forge" #mandatory
     # Does this dependency have to exist - if not, ordering below must be specified
@@ -45,7 +45,7 @@ Adds a simple means to carry thigns with you
     # Side this dependency is applied on - BOTH, CLIENT or SERVER
     side="BOTH"
 # Here's another dependency
-[[dependencies.examplemod]]
+[[dependencies.toolbelt]]
     modId="minecraft"
     mandatory=true
     versionRange="[1.13,1.14)"

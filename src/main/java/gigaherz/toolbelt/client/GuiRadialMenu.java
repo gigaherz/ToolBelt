@@ -4,19 +4,17 @@ import com.google.common.collect.Lists;
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.client.radial.GenericRadialMenu;
+import gigaherz.toolbelt.client.radial.ItemStackRadialMenuItem;
+import gigaherz.toolbelt.client.radial.RadialMenuItem;
+import gigaherz.toolbelt.client.radial.TextRadialMenuItem;
 import gigaherz.toolbelt.network.SwapItems;
-import net.minecraft.client.GameSettings;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.client.resources.I18n;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -24,10 +22,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
-import javax.swing.*;
-import javax.vecmath.Vector4f;
 import java.util.List;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
@@ -36,15 +31,18 @@ public class GuiRadialMenu extends GuiScreen
     private final BeltFinder.BeltGetter getter;
     private ItemStack stackEquipped;
     private IItemHandler inventory;
-    private List<ItemStack> cachedStacks = null;
 
     private boolean closing;
     private boolean doneClosing;
     private double startAnimation;
 
-    private int selectedItem = -1;
     private boolean keyCycleBeforeL = false;
     private boolean keyCycleBeforeR = false;
+
+    private boolean needsRecheckStacks = true;
+    private final List<ItemStackRadialMenuItem> cachedMenuItems = Lists.newArrayList();
+    private final TextRadialMenuItem insertMenuItem = new TextRadialMenuItem(new TextComponentTranslation("text.toolbelt.radial_menu.insert"));
+    private final GenericRadialMenu menu = new GenericRadialMenu();
 
     GuiRadialMenu(BeltFinder.BeltGetter getter)
     {
@@ -101,7 +99,7 @@ public class GuiRadialMenu extends GuiScreen
             {
                 stackEquipped = stack;
                 inventory = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(() -> new RuntimeException("No inventory?"));
-                cachedStacks = null;
+                needsRecheckStacks = true;
             }
         }
 
@@ -141,45 +139,31 @@ public class GuiRadialMenu extends GuiScreen
         if (!Config.isItemStackAllowed(inHand))
             return;
 
-        List<Integer> items = Lists.newArrayList();
-        for (int i = 0; i < inventory.getSlots(); i++)
+        if (menu.hovered >= 0)
         {
-            ItemStack inSlot = inventory.getStackInSlot(i);
-            if (inSlot.getCount() > 0 || Config.displayEmptySlots)
-                items.add(i);
-        }
+            RadialMenuItem item = menu.items.get(menu.hovered);
 
-        boolean hasAddButton = false;
-        int numItems = items.size();
-        if (!Config.displayEmptySlots && (numItems < inventory.getSlots() && inHand.getCount() > 0))
-        {
-            hasAddButton = true;
-            numItems++;
-        }
-        if (numItems <= 0)
-            return;
-
-        if (selectedItem >= 0)
-        {
-            int swapWith;
-            if (hasAddButton)
-                swapWith = selectedItem == 0 ? -1 : items.get(selectedItem - 1);
-            else
-                swapWith = items.get(selectedItem);
-
-            if (inHand.getCount() <= 0 && inventory.getStackInSlot(swapWith).getCount() <= 0)
+            if (item instanceof ItemStackRadialMenuItem)
             {
-                if (triggeredByMouse)
+                ItemStackRadialMenuItem stackItem = ((ItemStackRadialMenuItem) item);
+                int slotNumber = stackItem.getSlot();
+                ItemStack itemMouseOver = stackItem.getStack();
+
+                if (inHand.getCount() <= 0 && itemMouseOver.getCount() <= 0)
                 {
-                    // ignore click
-                    return;
+                    if (triggeredByMouse)
+                    {
+                        // ignore click
+                        return;
+                    }
+                }
+                else
+                {
+                    SwapItems.swapItem(slotNumber, mc.player);
+                    ToolBelt.channel.sendToServer(new SwapItems(slotNumber));
                 }
             }
-            else
-            {
-                SwapItems.swapItem(swapWith, mc.player);
-                ToolBelt.channel.sendToServer(new SwapItems(swapWith));
-            }
+
         }
 
         animateClose();
@@ -200,118 +184,117 @@ public class GuiRadialMenu extends GuiScreen
         if (inventory == null)
             return;
 
-        List<ItemStack> items = cachedStacks;
-        if (items == null)
-        {
-            items = Lists.newArrayList();
-            for (int i = 0; i < inventory.getSlots(); i++)
-            {
-                ItemStack inSlot = inventory.getStackInSlot(i);
-                if (inSlot.getCount() > 0 || Config.displayEmptySlots)
-                    items.add(inSlot);
-            }
-            cachedStacks = items;
-        }
-
         ItemStack inHand = mc.player.getHeldItemMainhand();
         if (!Config.isItemStackAllowed(inHand))
             return;
 
+        if (needsRecheckStacks)
+        {
+
+            cachedMenuItems.clear();
+            for (int i = 0; i < inventory.getSlots(); i++)
+            {
+                ItemStack inSlot = inventory.getStackInSlot(i);
+                ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(i, inSlot, new TextComponentTranslation("text.toolbelt.empty"));
+                item.setVisible(inSlot.getCount() > 0 || Config.displayEmptySlots);
+                if (inHand.getCount() > 0)
+                {
+                    if (inSlot.getCount() > 0)
+                        item.setCentralText(new TextComponentTranslation("text.toolbelt.swap"));
+                    else
+                        item.setCentralText(new TextComponentTranslation("text.toolbelt.insert"));
+                }
+                else
+                {
+                    if (inSlot.getCount() > 0)
+                        item.setCentralText(new TextComponentTranslation("text.toolbelt.extract"));
+                    else
+                        item.setCentralText(new TextComponentTranslation("text.toolbelt.empty"));
+                }
+                cachedMenuItems.add(item);
+            }
+
+            menu.items.clear();
+            menu.items.addAll(cachedMenuItems);
+            menu.items.add(insertMenuItem);
+
+            needsRecheckStacks = false;
+        }
+
         boolean hasAddButton = false;
-        int numItems = items.size();
-        if (!Config.displayEmptySlots && (numItems < inventory.getSlots() && inHand.getCount() > 0))
+        if (!Config.displayEmptySlots && (cachedMenuItems.stream().allMatch(RadialMenuItem::isVisible) && inHand.getCount() > 0))
         {
             hasAddButton = true;
-            numItems++;
         }
-        if (numItems <= 0)
+        insertMenuItem.setVisible(hasAddButton);
+
+        if (cachedMenuItems.stream().noneMatch(RadialMenuItem::isVisible))
         {
-            drawCenteredString(fontRenderer, I18n.format("text.toolbelt.empty"), width / 2, (height - fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+            menu.setCentralText(new TextComponentTranslation("text.toolbelt.empty"));
             if (closing)
                 doneClosing = true;
             return;
         }
 
-        if (hasAddButton)
-        {
-            drawCenteredString(fontRenderer, I18n.format("text.toolbelt.insert"), width / 2, height / 2 + 45 - fontRenderer.FONT_HEIGHT / 2, 0xFFFFFFFF);
-        }
-
         final float OPEN_ANIMATION_LENGTH = 2.5f;
 
-        float openAnimation = closing
+        menu.openAnimation = closing
                 ? (float) (1 - ((Minecraft.getInstance().world.getGameTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH))
                 : (float) ((Minecraft.getInstance().world.getGameTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH);
 
-        if (closing && openAnimation <= 0)
+        if (closing && menu.openAnimation <= 0)
             doneClosing = true;
 
-        float animProgress = MathHelper.clamp(openAnimation, 0, 1);
-        float radiusIn = Math.max(0.1f, 30 * animProgress);
-        float radiusOut = radiusIn * 2;
-        float itemRadius = (radiusIn + radiusOut) * 0.5f;
-        float animTop = (1 - animProgress) * height / 2.0f;
-
-        int x = width / 2;
-        int y = height / 2;
+        menu.draw(width, height, fontRenderer, itemRender);
 
         if (!closing)
         {
-            if (InputMappings.isKeyDown(ClientProxy.keyCycleToolMenuL.getKey().getKeyCode()))
-            {
-                if (!keyCycleBeforeL)
-                {
-                    selectedItem--;
-                    if (selectedItem < 0)
-                        selectedItem = numItems - 1;
-                    setMousePosition(
-                            x + itemRadius * Math.cos(-0.5 * Math.PI - selectedItem * 2 * Math.PI / numItems),
-                            y + itemRadius * Math.sin(-0.5 * Math.PI + selectedItem * 2 * Math.PI / numItems)
-                    );
-                }
-                keyCycleBeforeL = true;
-            }
-            else
-            {
-                keyCycleBeforeL = false;
-            }
+            checkCycleKeybinds();
+        }
 
-            if (InputMappings.isKeyDown(ClientProxy.keyCycleToolMenuR.getKey().getKeyCode()))
+        checkMouseOver(inHand, mouseX, mouseY);
+
+        menu.drawTooltips(mouseX, mouseY, width, height, fontRenderer, itemRender);
+
+        if (Config.clipMouseToCircle)
+        {
+            double[] xPos = new double[1];
+            double[] yPos = new double[1];
+            GLFW.glfwGetCursorPos(mc.mainWindow.getHandle(), xPos, yPos);
+            double scaledX = xPos[0] - (mc.mainWindow.getWidth() / 2.0f);
+            double scaledY = yPos[0] - (mc.mainWindow.getHeight() / 2.0f);
+
+            double distance = Math.sqrt(scaledX * scaledX + scaledY * scaledY);
+            double radius = 60.0 * (mc.mainWindow.getWidth() / (float)width);
+
+            if (distance > radius)
             {
-                if (!keyCycleBeforeR)
-                {
-                    if (selectedItem < 0)
-                        selectedItem = 0;
-                    else
-                    {
-                        selectedItem++;
-                        if (selectedItem >= numItems)
-                            selectedItem = 0;
-                    }
-                    setMousePosition(
-                            x + itemRadius * Math.cos(-0.5 * Math.PI - selectedItem * 2 * Math.PI / numItems),
-                            y + itemRadius * Math.sin(-0.5 * Math.PI + selectedItem * 2 * Math.PI / numItems)
-                    );
-                }
-                keyCycleBeforeR = true;
-            }
-            else
-            {
-                keyCycleBeforeR = false;
+                double fixedX = scaledX * radius / distance;
+                double fixedY = scaledY * radius / distance;
+
+                GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), (int) (mc.mainWindow.getWidth() / 2 + fixedX), (int) (mc.mainWindow.getHeight() / 2 + fixedY));
             }
         }
+    }
+
+    private void checkMouseOver(ItemStack inHand, int mouseX, int mouseY)
+    {
+        float radiusIn = menu.radiusIn;
+        float radiusOut = menu.radiusOut;
+
+        int numItems = (int) menu.items.stream().filter(RadialMenuItem::isVisible).count();
+
+        int x = width / 2;
+        int y = height / 2;
 
         double a = Math.toDegrees(Math.atan2(mouseY - y, mouseX - x));
         double d = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
         float s0 = (((0 - 0.5f) / (float) numItems) + 0.25f) * 360;
         if (a < s0) a += 360;
 
-        boolean hasMouseOver = false;
-        ItemStack itemMouseOver = ItemStack.EMPTY;
-
         if (!closing)
         {
-            selectedItem = -1;
+            menu.hovered = -1;
             for (int i = 0; i < numItems; i++)
             {
                 float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
@@ -319,12 +302,13 @@ public class GuiRadialMenu extends GuiScreen
                 if (a >= s && a < e && d >= radiusIn && d < radiusOut)
                     if (a >= s && a < e && d >= radiusIn && (d < radiusOut || Config.clipMouseToCircle || Config.allowClickOutsideBounds))
                     {
-                        selectedItem = i;
+                        menu.hovered = i;
                         break;
                     }
             }
         }
 
+        /*
         for (int i = 0; i < numItems; i++)
         {
             if (selectedItem == i)
@@ -350,87 +334,61 @@ public class GuiRadialMenu extends GuiScreen
                 }
             }
         }
+        */
 
-        if (Config.clipMouseToCircle)
+    }
+
+    private void checkCycleKeybinds()
+    {
+        float itemRadius = menu.itemRadius;
+
+        int x = width / 2;
+        int y = height / 2;
+
+        int numItems = (int) menu.items.stream().filter(RadialMenuItem::isVisible).count();
+
+        if (InputMappings.isKeyDown(ClientProxy.keyCycleToolMenuL.getKey().getKeyCode()))
         {
-            double[] xPos = new double[1];
-            double[] yPos = new double[1];
-            GLFW.glfwGetCursorPos(mc.mainWindow.getHandle(), xPos, yPos);
-            double scaledX = xPos[0] - (mc.mainWindow.getWidth() / 2.0f);
-            double scaledY = yPos[0] - (mc.mainWindow.getHeight() / 2.0f);
-
-            double distance = Math.sqrt(scaledX * scaledX + scaledY * scaledY);
-            double radius = 60.0 * (mc.mainWindow.getWidth() / width);
-
-            if (distance > radius)
+            if (!keyCycleBeforeL)
             {
-                double fixedX = scaledX * radius / distance;
-                double fixedY = scaledY * radius / distance;
-
-                GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), (int) (mc.mainWindow.getWidth() / 2 + fixedX), (int) (mc.mainWindow.getHeight() / 2 + fixedY));
+                menu.hovered--;
+                if (menu.hovered < 0)
+                    menu.hovered = numItems - 1;
+                setMousePosition(
+                        x + itemRadius * Math.cos(-0.5 * Math.PI - menu.hovered * 2 * Math.PI / numItems),
+                        y + itemRadius * Math.sin(-0.5 * Math.PI + menu.hovered * 2 * Math.PI / numItems)
+                );
             }
+            keyCycleBeforeL = true;
+        }
+        else
+        {
+            keyCycleBeforeL = false;
         }
 
-        boolean hasItemInHand = inHand.getCount() > 0;
-        if (hasMouseOver)
+        if (InputMappings.isKeyDown(ClientProxy.keyCycleToolMenuR.getKey().getKeyCode()))
         {
-            if (hasItemInHand)
+            if (!keyCycleBeforeR)
             {
-                if (itemMouseOver.getCount() > 0)
-                    drawCenteredString(fontRenderer, I18n.format("text.toolbelt.swap"), width / 2, (height - fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
+                if (menu.hovered < 0)
+                    menu.hovered = 0;
                 else
-                    drawCenteredString(fontRenderer, I18n.format("text.toolbelt.insert"), width / 2, (height - fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
-            }
-            else if (itemMouseOver.getCount() > 0)
-                drawCenteredString(fontRenderer, I18n.format("text.toolbelt.extract"), width / 2, (height - fontRenderer.FONT_HEIGHT) / 2, 0xFFFFFFFF);
-        }
-
-        if (Config.displayEmptySlots)
-        {
-            for (int i = 0; i < inventory.getSlots(); i++)
-            {
-                ItemStack inSlot = inventory.getStackInSlot(i);
-                if (inSlot.getCount() <= 0)
                 {
-                    float angle1 = ((i / (float) numItems) + 0.25f) * 2 * (float) Math.PI;
-                    float posX = x + itemRadius * (float) Math.cos(angle1);
-                    float posY = y + itemRadius * (float) Math.sin(angle1);
-                    drawCenteredString(fontRenderer, I18n.format("text.toolbelt.empty"), (int)posX, (int)posY - fontRenderer.FONT_HEIGHT / 2, 0x7FFFFFFF);
+                    menu.hovered++;
+                    if (menu.hovered >= numItems)
+                        menu.hovered = 0;
                 }
+                setMousePosition(
+                        x + itemRadius * Math.cos(-0.5 * Math.PI - menu.hovered * 2 * Math.PI / numItems),
+                        y + itemRadius * Math.sin(-0.5 * Math.PI + menu.hovered * 2 * Math.PI / numItems)
+                );
             }
+            keyCycleBeforeR = true;
         }
-
-        RenderHelper.enableGUIStandardItemLighting();
-        for (int i = 0; i < numItems; i++)
+        else
         {
-            float angle1 = ((i / (float) numItems) + 0.25f) * 2 * (float) Math.PI;
-            float posX = x - 8 + itemRadius * (float) Math.cos(angle1);
-            float posY = y - 8 + itemRadius * (float) Math.sin(angle1);
-            ItemStack inSlot = ItemStack.EMPTY;
-            if (hasAddButton)
-            {
-                if (i > 0)
-                {
-                    inSlot = items.get(i - 1);
-                }
-            }
-            else
-            {
-                inSlot = items.get(i);
-            }
-
-            if (inSlot.getCount() > 0)
-            {
-                this.itemRender.renderItemAndEffectIntoGUI(inSlot, (int) posX, (int) posY);
-                this.itemRender.renderItemOverlayIntoGUI(this.fontRenderer, inSlot, (int) posX, (int) posY, "");
-            }
+            keyCycleBeforeR = false;
         }
-        RenderHelper.disableStandardItemLighting();
-
-        GlStateManager.popMatrix();
-
-        if (itemMouseOver.getCount() > 0)
-            renderToolTip(itemMouseOver, mouseX, mouseY);
     }
 
     private void setMousePosition(double x, double y)
@@ -438,118 +396,9 @@ public class GuiRadialMenu extends GuiScreen
         GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), (int) (x * mc.mainWindow.getWidth() / width), (int) (y * mc.mainWindow.getHeight() / height));
     }
 
-    private static final float PRECISION = 5;
-
     @Override
     public boolean doesGuiPauseGame()
     {
         return false;
-    }
-
-    private static class GenericRadialMenu
-    {
-        public interface IRadialMenuItem
-        {
-            void draw(float x, float y, float z, boolean hover);
-        }
-
-        final List<IRadialMenuItem> items = Lists.newArrayList();
-        int hovered = -1;
-        float openAnimation = 0;
-        Vector4f backgroundColor = new Vector4f(0,0,0,.25f);
-        Vector4f backgroundColorHover = new Vector4f(1,1,1,.25f);
-
-        private void draw(int width, int height)
-        {
-
-            float animProgress = MathHelper.clamp(openAnimation, 0, 1);
-            float radiusIn = Math.max(0.1f, 30 * animProgress);
-            float radiusOut = radiusIn * 2;
-            float itemRadius = (radiusIn + radiusOut) * 0.5f;
-            float animTop = (1 - animProgress) * height / 2.0f;
-
-            int x = width / 2;
-            int y = height / 2;
-            float z = 0;
-
-            GlStateManager.pushMatrix();
-            GlStateManager.translatef(0, animTop, 0);
-
-            drawBackground(x,y,z, radiusIn, radiusOut);
-
-            GlStateManager.popMatrix();
-
-            drawItems(x,y,z, itemRadius);
-        }
-
-        private void drawItems(int x, int y, float z, float itemRadius)
-        {
-            int numItems = items.size();
-            for(int i=0;i<numItems;i++)
-            {
-                float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
-                float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
-                float middle = (s+e)*0.5f;
-
-                float posX = x + itemRadius * (float) Math.cos(middle);
-                float posY = y + itemRadius * (float) Math.sin(middle);
-
-                items.get(i).draw(posX, posY, z, i == hovered);
-            }
-        }
-
-        private void drawBackground(float x, float y, float z, float radiusIn, float radiusOut)
-        {
-            GlStateManager.disableAlphaTest();
-            GlStateManager.enableBlend();
-            GlStateManager.disableTexture2D();
-            GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-
-            Tessellator tessellator = Tessellator.getInstance();
-            BufferBuilder buffer = tessellator.getBuffer();
-            buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
-            int numItems = items.size();
-            for(int i=0;i<numItems;i++)
-            {
-                float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
-                float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
-                Vector4f color = i == hovered ? backgroundColorHover : backgroundColor;
-                drawPieArc(buffer, x, y, z, radiusIn, radiusOut, s, e, (int)(color.x*255), (int)(color.y*255), (int)(color.z*255), (int)(color.w*255));
-            }
-            tessellator.draw();
-
-            GlStateManager.enableTexture2D();
-        }
-
-        private void drawPieArc(BufferBuilder buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
-        {
-            float angle = endAngle - startAngle;
-            int sections = Math.max(1, MathHelper.ceil(angle / PRECISION));
-
-            startAngle = (float) Math.toRadians(startAngle);
-            endAngle = (float) Math.toRadians(endAngle);
-            angle = endAngle - startAngle;
-
-            for (int i = 0; i < sections; i++)
-            {
-                float angle1 = startAngle + (i / (float) sections) * angle;
-                float angle2 = startAngle + ((i + 1) / (float) sections) * angle;
-
-                float pos1InX = x + radiusIn * (float) Math.cos(angle1);
-                float pos1InY = y + radiusIn * (float) Math.sin(angle1);
-                float pos1OutX = x + radiusOut * (float) Math.cos(angle1);
-                float pos1OutY = y + radiusOut * (float) Math.sin(angle1);
-                float pos2OutX = x + radiusOut * (float) Math.cos(angle2);
-                float pos2OutY = y + radiusOut * (float) Math.sin(angle2);
-                float pos2InX = x + radiusIn * (float) Math.cos(angle2);
-                float pos2InY = y + radiusIn * (float) Math.sin(angle2);
-
-                buffer.pos(pos1OutX, pos1OutY, z).color(r, g, b, a).endVertex();
-                buffer.pos(pos1InX, pos1InY, z).color(r, g, b, a).endVertex();
-                buffer.pos(pos2InX, pos2InY, z).color(r, g, b, a).endVertex();
-                buffer.pos(pos2OutX, pos2OutY, z).color(r, g, b, a).endVertex();
-            }
-        }
-
     }
 }
