@@ -72,7 +72,7 @@ public class ToolBelt
     public void registerItems(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().registerAll(
-                new ItemToolBelt(new Item.Properties().group(ItemGroup.TOOLS)).setRegistryName("belt"),
+                new ItemToolBelt(new Item.Properties().maxStackSize(1).group(ItemGroup.TOOLS)).setRegistryName("belt"),
                 new Item(new Item.Properties().group(ItemGroup.TOOLS)).setRegistryName("pouch")
         );
     }

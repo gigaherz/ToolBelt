@@ -1,11 +1,8 @@
 package gigaherz.toolbelt.client.radial;
 
 import com.google.common.collect.Lists;
-import gigaherz.toolbelt.client.GuiRadialMenu;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
@@ -29,44 +26,44 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
         return stack;
     }
 
-    public ItemStackRadialMenuItem(int slot, ItemStack stack, ITextComponent altText)
+    public ItemStackRadialMenuItem(GenericRadialMenu owner, int slot, ItemStack stack, ITextComponent altText)
     {
-        super(altText);
+        super(owner, altText);
         this.slot = slot;
         this.stack = stack;
     }
 
     @Override
-    public void draw(float x, float y, float z, boolean hover, FontRenderer font, ItemRenderer itemRenderer)
+    public void draw(DrawingContext context)
     {
         if (stack.getCount() > 0)
         {
             RenderHelper.enableGUIStandardItemLighting();
             GlStateManager.pushMatrix();
-            GlStateManager.translatef(0, 0, z);
-            itemRenderer.renderItemAndEffectIntoGUI(stack, (int) x, (int) y);
-            itemRenderer.renderItemOverlayIntoGUI(font, stack, (int) x, (int) y, "");
+            GlStateManager.translatef(-8, -8, context.z);
+            context.itemRenderer.renderItemAndEffectIntoGUI(stack, (int) context.x, (int) context.y);
+            context.itemRenderer.renderItemOverlayIntoGUI(context.fontRenderer, stack, (int) context.x, (int) context.y, "");
             GlStateManager.popMatrix();
             RenderHelper.disableStandardItemLighting();
         }
         else
         {
-            super.draw(x,y,z,hover,font,itemRenderer);
+            super.draw(context);
         }
     }
 
     @Override
-    public void drawTooltips(float mouseX, float mouseY, float screenWidth, float screenHeight, FontRenderer font, ItemRenderer itemRenderer)
+    public void drawTooltips(DrawingContext context)
     {
         if (stack.getCount() > 0)
         {
             net.minecraftforge.fml.client.config.GuiUtils.preItemToolTip(stack);
-            GuiUtils.drawHoveringText(stack, getItemToolTip(stack), (int) mouseX, (int) mouseY, (int)screenWidth, (int)screenHeight, -1, font);
+            GuiUtils.drawHoveringText(stack, getItemToolTip(stack), (int) context.x, (int) context.y, (int)context.width, (int)context.height, -1, context.fontRenderer);
             GuiUtils.postItemToolTip();
         }
         else
         {
-            super.drawTooltips(mouseX, mouseY, screenWidth, screenHeight, font, itemRenderer);
+            super.drawTooltips(context);
         }
     }
 

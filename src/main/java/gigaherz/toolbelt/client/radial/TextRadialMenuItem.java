@@ -1,8 +1,5 @@
 package gigaherz.toolbelt.client.radial;
 
-import gigaherz.toolbelt.client.GuiRadialMenu;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.util.text.ITextComponent;
 
 public class TextRadialMenuItem extends RadialMenuItem
@@ -20,29 +17,31 @@ public class TextRadialMenuItem extends RadialMenuItem
         return color;
     }
 
-    public TextRadialMenuItem(ITextComponent text)
+    public TextRadialMenuItem(GenericRadialMenu owner, ITextComponent text)
     {
+        super(owner);
         this.text = text;
         this.color = 0xFFFFFFFF;
     }
 
-    private TextRadialMenuItem(ITextComponent text, int color)
+    private TextRadialMenuItem(GenericRadialMenu owner, ITextComponent text, int color)
     {
+        super(owner);
         this.text = text;
         this.color = color;
     }
 
     @Override
-    public void draw(float x, float y, float z, boolean hover, FontRenderer font, ItemRenderer itemRenderer)
+    public void draw(DrawingContext context)
     {
         String textString = text.getFormattedText();
-        y -= font.FONT_HEIGHT;
-        x -= font.getStringWidth(textString);
-        font.drawStringWithShadow(textString, x, y, color);
+        float x = context.x - context.fontRenderer.getStringWidth(textString)/2.0f;
+        float y = context.y - context.fontRenderer.FONT_HEIGHT/2.0f;
+        context.fontRenderer.drawStringWithShadow(textString, x, y, color);
     }
 
     @Override
-    public void drawTooltips(float mouseX, float mouseY, float screenWidth, float screenHeight, FontRenderer font, ItemRenderer itemRenderer)
+    public void drawTooltips(DrawingContext context)
     {
         // nothing to do (yet)
     }

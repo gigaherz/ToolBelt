@@ -4,14 +4,12 @@ import com.google.common.collect.Lists;
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.client.radial.GenericRadialMenu;
-import gigaherz.toolbelt.client.radial.ItemStackRadialMenuItem;
-import gigaherz.toolbelt.client.radial.RadialMenuItem;
-import gigaherz.toolbelt.client.radial.TextRadialMenuItem;
+import gigaherz.toolbelt.client.radial.*;
 import gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.TextComponentTranslation;
@@ -21,7 +19,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
@@ -32,24 +29,54 @@ public class GuiRadialMenu extends GuiScreen
     private ItemStack stackEquipped;
     private IItemHandler inventory;
 
-    private boolean closing;
-    private boolean doneClosing;
-    private double startAnimation;
-
     private boolean keyCycleBeforeL = false;
     private boolean keyCycleBeforeR = false;
 
     private boolean needsRecheckStacks = true;
     private final List<ItemStackRadialMenuItem> cachedMenuItems = Lists.newArrayList();
-    private final TextRadialMenuItem insertMenuItem = new TextRadialMenuItem(new TextComponentTranslation("text.toolbelt.radial_menu.insert"));
-    private final GenericRadialMenu menu = new GenericRadialMenu();
+    private final TextRadialMenuItem insertMenuItem;
+    private final GenericRadialMenu menu;
 
     GuiRadialMenu(BeltFinder.BeltGetter getter)
     {
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
         inventory = stackEquipped.getCount() > 0 ? stackEquipped.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(null) : null;
-        startAnimation = Minecraft.getInstance().world.getGameTime() + (double) Minecraft.getInstance().getRenderPartialTicks();
+        menu = new GenericRadialMenu(new IRadialMenuHost()
+        {
+            @Override
+            public GuiScreen getScreen()
+            {
+                return GuiRadialMenu.this;
+            }
+
+            @Override
+            public FontRenderer getFontRenderer()
+            {
+                return fontRenderer;
+            }
+
+            @Override
+            public ItemRenderer getItemRenderer()
+            {
+                return itemRender;
+            }
+        })
+        {
+            @Override
+            public void onClickOutside()
+            {
+                close();
+            }
+        };
+        insertMenuItem = new TextRadialMenuItem(menu, new TextComponentTranslation("text.toolbelt.radial_menu.insert"))
+        {
+            @Override
+            public boolean onClick()
+            {
+                return GuiRadialMenu.this.trySwap(-1, ItemStack.EMPTY);
+            }
+        };
     }
 
     @SubscribeEvent
@@ -69,15 +96,15 @@ public class GuiRadialMenu extends GuiScreen
     {
         super.tick();
 
-        if (closing)
+        menu.tick();
+
+        if (menu.isClosed())
         {
-            if (doneClosing || inventory == null)
-            {
-                Minecraft.getInstance().displayGuiScreen(null);
-
-                ClientProxy.wipeOpen();
-            }
-
+            Minecraft.getInstance().displayGuiScreen(null);
+            ClientProxy.wipeOpen();
+        }
+        if (!menu.isReady() || inventory == null)
+        {
             return;
         }
 
@@ -115,7 +142,7 @@ public class GuiRadialMenu extends GuiScreen
             }
             else
             {
-                animateClose();
+                menu.close();
             }
         }
     }
@@ -129,51 +156,7 @@ public class GuiRadialMenu extends GuiScreen
 
     protected void processClick(boolean triggeredByMouse)
     {
-        if (closing)
-            return;
-
-        if (inventory == null)
-            return;
-
-        ItemStack inHand = mc.player.getHeldItemMainhand();
-        if (!Config.isItemStackAllowed(inHand))
-            return;
-
-        if (menu.hovered >= 0)
-        {
-            RadialMenuItem item = menu.items.get(menu.hovered);
-
-            if (item instanceof ItemStackRadialMenuItem)
-            {
-                ItemStackRadialMenuItem stackItem = ((ItemStackRadialMenuItem) item);
-                int slotNumber = stackItem.getSlot();
-                ItemStack itemMouseOver = stackItem.getStack();
-
-                if (inHand.getCount() <= 0 && itemMouseOver.getCount() <= 0)
-                {
-                    if (triggeredByMouse)
-                    {
-                        // ignore click
-                        return;
-                    }
-                }
-                else
-                {
-                    SwapItems.swapItem(slotNumber, mc.player);
-                    ToolBelt.channel.sendToServer(new SwapItems(slotNumber));
-                }
-            }
-
-        }
-
-        animateClose();
-    }
-
-    private void animateClose()
-    {
-        closing = true;
-        doneClosing = false;
-        startAnimation = Minecraft.getInstance().world.getGameTime() + (double) Minecraft.getInstance().getRenderPartialTicks();
+        menu.clickItem();
     }
 
     @Override
@@ -190,12 +173,18 @@ public class GuiRadialMenu extends GuiScreen
 
         if (needsRecheckStacks)
         {
-
             cachedMenuItems.clear();
             for (int i = 0; i < inventory.getSlots(); i++)
             {
                 ItemStack inSlot = inventory.getStackInSlot(i);
-                ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(i, inSlot, new TextComponentTranslation("text.toolbelt.empty"));
+                ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(menu, i, inSlot, new TextComponentTranslation("text.toolbelt.empty"))
+                {
+                    @Override
+                    public boolean onClick()
+                    {
+                        return GuiRadialMenu.this.trySwap(getSlot(), getStack());
+                    }
+                };
                 item.setVisible(inSlot.getCount() > 0 || Config.displayEmptySlots);
                 if (inHand.getCount() > 0)
                 {
@@ -214,15 +203,15 @@ public class GuiRadialMenu extends GuiScreen
                 cachedMenuItems.add(item);
             }
 
-            menu.items.clear();
-            menu.items.addAll(cachedMenuItems);
-            menu.items.add(insertMenuItem);
+            menu.clear();
+            menu.addAll(cachedMenuItems);
+            menu.add(insertMenuItem);
 
             needsRecheckStacks = false;
         }
 
         boolean hasAddButton = false;
-        if (!Config.displayEmptySlots && (cachedMenuItems.stream().allMatch(RadialMenuItem::isVisible) && inHand.getCount() > 0))
+        if (!Config.displayEmptySlots && !cachedMenuItems.stream().allMatch(RadialMenuItem::isVisible) && inHand.getCount() > 0)
         {
             hasAddButton = true;
         }
@@ -231,133 +220,41 @@ public class GuiRadialMenu extends GuiScreen
         if (cachedMenuItems.stream().noneMatch(RadialMenuItem::isVisible))
         {
             menu.setCentralText(new TextComponentTranslation("text.toolbelt.empty"));
-            if (closing)
-                doneClosing = true;
-            return;
         }
-
-        final float OPEN_ANIMATION_LENGTH = 2.5f;
-
-        menu.openAnimation = closing
-                ? (float) (1 - ((Minecraft.getInstance().world.getGameTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH))
-                : (float) ((Minecraft.getInstance().world.getGameTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH);
-
-        if (closing && menu.openAnimation <= 0)
-            doneClosing = true;
-
-        menu.draw(width, height, fontRenderer, itemRender);
-
-        if (!closing)
+        else
         {
-            checkCycleKeybinds();
+            menu.setCentralText(null);
         }
 
-        checkMouseOver(inHand, mouseX, mouseY);
+        checkCycleKeybinds();
 
-        menu.drawTooltips(mouseX, mouseY, width, height, fontRenderer, itemRender);
-
-        if (Config.clipMouseToCircle)
-        {
-            double[] xPos = new double[1];
-            double[] yPos = new double[1];
-            GLFW.glfwGetCursorPos(mc.mainWindow.getHandle(), xPos, yPos);
-            double scaledX = xPos[0] - (mc.mainWindow.getWidth() / 2.0f);
-            double scaledY = yPos[0] - (mc.mainWindow.getHeight() / 2.0f);
-
-            double distance = Math.sqrt(scaledX * scaledX + scaledY * scaledY);
-            double radius = 60.0 * (mc.mainWindow.getWidth() / (float)width);
-
-            if (distance > radius)
-            {
-                double fixedX = scaledX * radius / distance;
-                double fixedY = scaledY * radius / distance;
-
-                GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), (int) (mc.mainWindow.getWidth() / 2 + fixedX), (int) (mc.mainWindow.getHeight() / 2 + fixedY));
-            }
-        }
+        menu.draw(partialTicks, mouseX, mouseY);
     }
 
-    private void checkMouseOver(ItemStack inHand, int mouseX, int mouseY)
+    private boolean trySwap(int slotNumber, ItemStack itemMouseOver)
     {
-        float radiusIn = menu.radiusIn;
-        float radiusOut = menu.radiusOut;
+        ItemStack inHand = mc.player.getHeldItemMainhand();
+        if (!Config.isItemStackAllowed(inHand))
+            return false;
 
-        int numItems = (int) menu.items.stream().filter(RadialMenuItem::isVisible).count();
-
-        int x = width / 2;
-        int y = height / 2;
-
-        double a = Math.toDegrees(Math.atan2(mouseY - y, mouseX - x));
-        double d = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
-        float s0 = (((0 - 0.5f) / (float) numItems) + 0.25f) * 360;
-        if (a < s0) a += 360;
-
-        if (!closing)
+        if (inHand.getCount() > 0 || itemMouseOver.getCount() > 0)
         {
-            menu.hovered = -1;
-            for (int i = 0; i < numItems; i++)
-            {
-                float s = (((i - 0.5f) / (float) numItems) + 0.25f) * 360;
-                float e = (((i + 0.5f) / (float) numItems) + 0.25f) * 360;
-                if (a >= s && a < e && d >= radiusIn && d < radiusOut)
-                    if (a >= s && a < e && d >= radiusIn && (d < radiusOut || Config.clipMouseToCircle || Config.allowClickOutsideBounds))
-                    {
-                        menu.hovered = i;
-                        break;
-                    }
-            }
+            SwapItems.swapItem(slotNumber, mc.player);
+            ToolBelt.channel.sendToServer(new SwapItems(slotNumber));
         }
 
-        /*
-        for (int i = 0; i < numItems; i++)
-        {
-            if (selectedItem == i)
-            {
-                if (i > 0 || !hasAddButton)
-                {
-                    hasMouseOver = true;
-
-                    ItemStack inSlot = ItemStack.EMPTY;
-                    if (hasAddButton)
-                    {
-                        if (i > 0)
-                        {
-                            inSlot = items.get(i - 1);
-                        }
-                    }
-                    else
-                    {
-                        inSlot = items.get(i);
-                    }
-
-                    itemMouseOver = inSlot;
-                }
-            }
-        }
-        */
-
+        menu.close();
+        return true;
     }
 
     private void checkCycleKeybinds()
     {
-        float itemRadius = menu.itemRadius;
-
-        int x = width / 2;
-        int y = height / 2;
-
-        int numItems = (int) menu.items.stream().filter(RadialMenuItem::isVisible).count();
-
+        /*
         if (InputMappings.isKeyDown(ClientProxy.keyCycleToolMenuL.getKey().getKeyCode()))
         {
             if (!keyCycleBeforeL)
             {
-                menu.hovered--;
-                if (menu.hovered < 0)
-                    menu.hovered = numItems - 1;
-                setMousePosition(
-                        x + itemRadius * Math.cos(-0.5 * Math.PI - menu.hovered * 2 * Math.PI / numItems),
-                        y + itemRadius * Math.sin(-0.5 * Math.PI + menu.hovered * 2 * Math.PI / numItems)
-                );
+                menu.cyclePrevious();
             }
             keyCycleBeforeL = true;
         }
@@ -370,18 +267,7 @@ public class GuiRadialMenu extends GuiScreen
         {
             if (!keyCycleBeforeR)
             {
-                if (menu.hovered < 0)
-                    menu.hovered = 0;
-                else
-                {
-                    menu.hovered++;
-                    if (menu.hovered >= numItems)
-                        menu.hovered = 0;
-                }
-                setMousePosition(
-                        x + itemRadius * Math.cos(-0.5 * Math.PI - menu.hovered * 2 * Math.PI / numItems),
-                        y + itemRadius * Math.sin(-0.5 * Math.PI + menu.hovered * 2 * Math.PI / numItems)
-                );
+                menu.cycleNext();
             }
             keyCycleBeforeR = true;
         }
@@ -389,11 +275,7 @@ public class GuiRadialMenu extends GuiScreen
         {
             keyCycleBeforeR = false;
         }
-    }
-
-    private void setMousePosition(double x, double y)
-    {
-        GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), (int) (x * mc.mainWindow.getWidth() / width), (int) (y * mc.mainWindow.getHeight() / height));
+        */
     }
 
     @Override

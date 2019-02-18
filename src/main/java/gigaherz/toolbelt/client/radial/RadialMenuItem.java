@@ -1,15 +1,20 @@
 package gigaherz.toolbelt.client.radial;
 
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.util.text.ITextComponent;
 
 import javax.annotation.Nullable;
 
 public abstract class RadialMenuItem
 {
+    private final GenericRadialMenu owner;
     private ITextComponent centralText;
     private boolean visible;
+    private boolean hovered;
+
+    protected RadialMenuItem(GenericRadialMenu owner)
+    {
+        this.owner = owner;
+    }
 
     public boolean isVisible()
     {
@@ -19,6 +24,7 @@ public abstract class RadialMenuItem
     public void setVisible(boolean newVisible)
     {
         visible = newVisible;
+        owner.visibilityChanged(this);
     }
 
     @Nullable
@@ -32,6 +38,22 @@ public abstract class RadialMenuItem
         this.centralText = centralText;
     }
 
-    public abstract void draw(float x, float y, float z, boolean hover, FontRenderer font, ItemRenderer itemRenderer);
-    public abstract void drawTooltips(float mouseX, float mouseY, float screenWidth, float screenHeight, FontRenderer font, ItemRenderer itemRenderer);
+    public boolean isHovered()
+    {
+        return hovered;
+    }
+
+    public void setHovered(boolean hovered)
+    {
+        this.hovered = hovered;
+    }
+
+    public abstract void draw(DrawingContext context);
+    public abstract void drawTooltips(DrawingContext context);
+
+    public boolean onClick()
+    {
+        // to be implemented by users
+        return false;
+    }
 }
