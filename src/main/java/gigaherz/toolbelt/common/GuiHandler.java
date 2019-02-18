@@ -119,18 +119,19 @@ public class GuiHandler
 
     public static void openBeltGui(EntityPlayerMP player, int slot)
     {
-        PacketBuffer data = new PacketBuffer(Unpooled.buffer());
-        data.writeByte(slot);
-
         ItemStack heldItem = player.inventory.getStackInSlot(slot);
         if (heldItem.getCount() > 0 && heldItem.getItem() instanceof ItemToolBelt)
-            NetworkHooks.openGui(player, new BeltGui(BELT, slot), data);
+        {
+            NetworkHooks.openGui(player, new BeltGui(BELT, slot), (data) -> {
+                data.writeByte(slot);
+            });
+        }
     }
 
     public static void openSlotGui(EntityPlayerMP player)
     {
-        PacketBuffer data = new PacketBuffer(Unpooled.buffer());
-        NetworkHooks.openGui(player, new SlotGui(BELT_SLOT), data);
+        NetworkHooks.openGui(player, new SlotGui(BELT_SLOT), (data) -> {
+        });
     }
 
     public static class Client
