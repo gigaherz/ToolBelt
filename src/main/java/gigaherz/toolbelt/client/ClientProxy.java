@@ -5,11 +5,14 @@ import gigaherz.toolbelt.ISideProxy;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.network.BeltContentsChange;
 import gigaherz.toolbelt.network.ContainerSlotsHack;
+import gigaherz.toolbelt.network.SyncBeltSlotContents;
+import gigaherz.toolbelt.slot.ExtensionSlotBelt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.EntityPlayerSP;
 import net.minecraft.client.renderer.entity.RenderPlayer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
+import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
@@ -79,16 +82,14 @@ public class ClientProxy implements ISideProxy
     }
 
     @Override
-    public void handleContainerSlots(ContainerSlotsHack message)
+    public void handleBeltSlotContents(SyncBeltSlotContents message)
     {
-        EntityPlayerSP player = Minecraft.getInstance().player;
-        if (player.openContainer.windowId == message.windowId)
-        {
-            player.openContainer.setAll(message.stacks);
-        }
-        else
-        {
-            ToolBelt.logger.warn("Incorrect open container! Expected {} got {}", message.windowId, player.openContainer.windowId);
-        }
+        Minecraft.getInstance().addScheduledTask(() -> {
+            Entity entity = Minecraft.getInstance().world.getEntityByID(message.entityId);
+            if (entity instanceof EntityPlayer)
+            {
+                ExtensionSlotBelt.get((EntityLivingBase) entity).setAll(message.stacks);
+            }
+        });
     }
 }

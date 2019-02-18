@@ -156,6 +156,12 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
         return slots;
     }
 
+    @Override
+    public void onContentsChanged(IExtensionSlot slot)
+    {
+
+    }
+
     @Nonnull
     public IExtensionSlot getRing1()
     {

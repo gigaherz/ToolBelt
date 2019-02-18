@@ -3,10 +3,7 @@ package gigaherz.toolbelt;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.client.ClientProxy;
 import gigaherz.toolbelt.common.GuiHandler;
-import gigaherz.toolbelt.network.BeltContentsChange;
-import gigaherz.toolbelt.network.ContainerSlotsHack;
-import gigaherz.toolbelt.network.OpenBeltSlotInventory;
-import gigaherz.toolbelt.network.SwapItems;
+import gigaherz.toolbelt.network.*;
 import gigaherz.toolbelt.server.ServerProxy;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
 import net.minecraft.block.Block;
@@ -84,6 +81,7 @@ public class ToolBelt
         channel.registerMessage(messageNumber++, BeltContentsChange.class, BeltContentsChange::encode, BeltContentsChange::decode, BeltContentsChange::onMessage);
         channel.registerMessage(messageNumber++, OpenBeltSlotInventory.class, OpenBeltSlotInventory::encode, OpenBeltSlotInventory::decode, OpenBeltSlotInventory::onMessage);
         channel.registerMessage(messageNumber++, ContainerSlotsHack.class, ContainerSlotsHack::encode, ContainerSlotsHack::decode, ContainerSlotsHack::onMessage);
+        channel.registerMessage(messageNumber++, SyncBeltSlotContents.class, SyncBeltSlotContents::encode, SyncBeltSlotContents::decode, SyncBeltSlotContents::onMessage);
         logger.debug("Final message number: " + messageNumber);
 
         //TODO File configurationFile = event.getSuggestedConfigurationFile();

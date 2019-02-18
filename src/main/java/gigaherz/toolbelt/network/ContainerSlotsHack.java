@@ -11,17 +11,8 @@ import java.util.function.Supplier;
 
 public class ContainerSlotsHack
 {
-    public final NonNullList<ItemStack> stacks = NonNullList.create();
-    public int windowId;
-
     public ContainerSlotsHack()
     {
-    }
-
-    public ContainerSlotsHack(int windowId, NonNullList<ItemStack> stacks)
-    {
-        this.windowId = windowId;
-        this.stacks.addAll(stacks);
     }
 
     public void fromBytes(PacketBuffer buf)

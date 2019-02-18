@@ -36,7 +36,7 @@ public class ContainerBeltSlot extends ContainerPlayer
 
         if (!localWorld)
         {
-            ToolBelt.channel.sendToServer(new ContainerSlotsHack(this.windowId, inventoryItemStacks));
+            ToolBelt.channel.sendToServer(new ContainerSlotsHack());
         }
     }
 

@@ -254,6 +254,12 @@ public class ItemToolBelt extends Item implements IExtensionSlotItem
         {
             return slots;
         }
+
+        @Override
+        public void onContentsChanged(IExtensionSlot slot)
+        {
+
+        }
     }
 
 }
