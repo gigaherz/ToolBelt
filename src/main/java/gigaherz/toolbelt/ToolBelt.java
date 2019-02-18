@@ -6,7 +6,6 @@ import gigaherz.toolbelt.common.GuiHandler;
 import gigaherz.toolbelt.network.*;
 import gigaherz.toolbelt.server.ServerProxy;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
-import net.minecraft.block.Block;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -14,10 +13,12 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -57,13 +58,31 @@ public class ToolBelt
     {
         instance = this;
 
-        FMLJavaModLoadingContext.get().getModEventBus().addGenericListener(Item.class, this::registerItems);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::preInit);
-        FMLJavaModLoadingContext.get().getModEventBus().addListener(this::clientInit);
+        ModLoadingContext modLoadingContext = ModLoadingContext.get();
+        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+
+        modEventBus.addGenericListener(Item.class, this::registerItems);
+        modEventBus.addListener(this::preInit);
+        modEventBus.addListener(this::clientInit);
+        modEventBus.addListener(this::modConfig);
 
         MinecraftForge.EVENT_BUS.addListener(this::anvilChange);
 
-        ModLoadingContext.get().registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiHandler.Client::getClientGuiElement);
+        modLoadingContext.registerConfig(ModConfig.Type.SERVER, Config.SERVER_SPEC);
+        modLoadingContext.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_SPEC);
+
+        modLoadingContext.registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiHandler.Client::getClientGuiElement);
+    }
+
+    public void modConfig(ModConfig.ModConfigEvent event)
+    {
+        ModConfig config = event.getConfig();
+        if (!MODID.equals(config.getModId()))
+            return;
+        if (config.getSpec() == Config.CLIENT_SPEC)
+            Config.refreshClient();
+        else if (config.getSpec() == Config.SERVER_SPEC)
+            Config.refreshServer();
     }
 
     public void registerItems(RegistryEvent.Register<Item> event)

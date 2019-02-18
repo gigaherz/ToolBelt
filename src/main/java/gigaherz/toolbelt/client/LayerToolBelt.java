@@ -141,8 +141,8 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
         else
             GlStateManager.translatef(4.35f / 16.0F, 0.7f, -0.1f);
         GlStateManager.rotatef(40.0F, 1.0F, 0.0F, 0.0F);
-        float scale = Config.beltItemScale;
-        GlStateManager.scalef(scale, scale, scale);
+        double scale = Config.beltItemScale;
+        GlStateManager.scaled(scale, scale, scale);
         Minecraft.getInstance().getItemRenderer().renderItem(stack, player, cameraTransform, handSide == EnumHandSide.LEFT);
         GlStateManager.popMatrix();
     }

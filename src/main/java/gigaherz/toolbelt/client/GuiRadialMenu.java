@@ -69,7 +69,7 @@ public class GuiRadialMenu extends GuiScreen
                 close();
             }
         };
-        insertMenuItem = new TextRadialMenuItem(menu, new TextComponentTranslation("text.toolbelt.radial_menu.insert"))
+        insertMenuItem = new TextRadialMenuItem(menu, new TextComponentTranslation("text.toolbelt.insert"))
         {
             @Override
             public boolean onClick()

@@ -12,7 +12,6 @@ import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
@@ -21,8 +20,6 @@ import javax.annotation.Nullable;
 import javax.vecmath.Vector4f;
 import java.util.Collection;
 import java.util.List;
-import java.util.function.BiConsumer;
-import java.util.stream.Collectors;
 
 public class GenericRadialMenu
 {
@@ -31,8 +28,8 @@ public class GenericRadialMenu
     public final IRadialMenuHost host;
     private final List<RadialMenuItem> items = Lists.newArrayList();
     private final List<RadialMenuItem> visibleItems = Lists.newArrayList();
-    public Vector4f backgroundColor = new Vector4f(0,0,0,.25f);
-    public Vector4f backgroundColorHover = new Vector4f(1,1,1,.25f);
+    public Vector4f backgroundColor = new Vector4f(0, 0, 0, .25f);
+    public Vector4f backgroundColorHover = new Vector4f(1, 1, 1, .25f);
 
     public enum State
     {
@@ -70,7 +67,7 @@ public class GenericRadialMenu
 
     public int getHovered()
     {
-        for(int i=0;i<visibleItems.size();i++)
+        for (int i = 0; i < visibleItems.size(); i++)
         {
             if (visibleItems.get(i).isHovered())
                 return i;
@@ -91,7 +88,7 @@ public class GenericRadialMenu
 
     public void setHovered(int which)
     {
-        for(int i=0;i<visibleItems.size();i++)
+        for (int i = 0; i < visibleItems.size(); i++)
         {
             visibleItems.get(i).setHovered(i == which);
         }
@@ -104,7 +101,7 @@ public class GenericRadialMenu
 
     public void clickItem()
     {
-        switch(state)
+        switch (state)
         {
             case NORMAL:
                 RadialMenuItem item = getHoveredItem();
@@ -224,7 +221,7 @@ public class GenericRadialMenu
         GlStateManager.pushMatrix();
         GlStateManager.translatef(0, animTop, 0);
 
-        drawBackground(x,y,z, radiusIn, radiusOut);
+        drawBackground(x, y, z, radiusIn, radiusOut);
 
         GlStateManager.popMatrix();
 
@@ -252,7 +249,6 @@ public class GenericRadialMenu
 
             drawTooltips(mouseX, mouseY);
         }
-
     }
 
     private void updateAnimationState(float partialTicks)
@@ -277,7 +273,6 @@ public class GenericRadialMenu
                     state = State.CLOSED;
                 }
                 break;
-
         }
         animProgress = openAnimation; // MathHelper.clamp(openAnimation, 0, 1);
     }
@@ -287,7 +282,7 @@ public class GenericRadialMenu
         GuiScreen owner = host.getScreen();
         FontRenderer fontRenderer = host.getFontRenderer();
         ItemRenderer itemRenderer = host.getItemRenderer();
-        for (int i=0;i<visibleItems.size();i++)
+        for (int i = 0; i < visibleItems.size(); i++)
         {
             RadialMenuItem item = visibleItems.get(i);
             if (item.isHovered())
@@ -301,9 +296,9 @@ public class GenericRadialMenu
     private void drawItems(int x, int y, float z, int width, int height, FontRenderer font, ItemRenderer itemRenderer)
     {
         iterateVisible((item, s, e) -> {
-            float middle = (s+e)*0.5f;
-            float posX = x+itemRadius * (float) Math.cos(middle);
-            float posY = y+itemRadius * (float) Math.sin(middle);
+            float middle = (s + e) * 0.5f;
+            float posX = x + itemRadius * (float) Math.cos(middle);
+            float posY = y + itemRadius * (float) Math.sin(middle);
 
             DrawingContext context = new DrawingContext(width, height, posX, posY, z, font, itemRenderer);
             item.draw(context);
@@ -313,13 +308,10 @@ public class GenericRadialMenu
     private void iterateVisible(TriConsumer<RadialMenuItem, Float, Float> consumer)
     {
         int numItems = visibleItems.size();
-        for(int i=0;i<numItems;i++)
+        for (int i = 0; i < numItems; i++)
         {
-            float s = (float)((((i - 0.5) / (double) numItems) + 0.25) * 2 * Math.PI);
-            float e = (float)((((i + 0.5) / (double) numItems) + 0.25) * 2 * Math.PI);
-
-            s += Math.PI;
-            e += Math.PI;
+            float s = (float) getAngleFor(i - 0.5, numItems);
+            float e = (float) getAngleFor(i + 0.5, numItems);
 
             RadialMenuItem item = visibleItems.get(i);
             consumer.accept(item, s, e);
@@ -339,7 +331,7 @@ public class GenericRadialMenu
 
         iterateVisible((item, s, e) -> {
             Vector4f color = item.isHovered() ? backgroundColorHover : backgroundColor;
-            drawPieArc(buffer, x, y, z, radiusIn, radiusOut, s, e, (int)(color.x*255), (int)(color.y*255), (int)(color.z*255), (int)(color.w*255));
+            drawPieArc(buffer, x, y, z, radiusIn, radiusOut, s, e, (int) (color.x * 255), (int) (color.y * 255), (int) (color.z * 255), (int) (color.w * 255));
         });
 
         tessellator.draw();
@@ -347,7 +339,7 @@ public class GenericRadialMenu
         GlStateManager.enableTexture2D();
     }
 
-    private static final float PRECISION = 2.5f/360.0f;
+    private static final float PRECISION = 2.5f / 360.0f;
 
     private void drawPieArc(BufferBuilder buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
     {
@@ -410,7 +402,7 @@ public class GenericRadialMenu
         GuiScreen owner = host.getScreen();
         int x = owner.width / 2;
         int y = owner.height / 2;
-        float angle = (float)(((which / (double) numItems) + 0.25) * 2 * Math.PI);
+        float angle = (float) getAngleFor(which, numItems);
         setMousePosition(
                 x + itemRadius * Math.cos(angle),
                 y + itemRadius * Math.sin(angle)
@@ -423,6 +415,8 @@ public class GenericRadialMenu
         GLFW.glfwSetCursorPos(owner.mc.mainWindow.getHandle(), (int) (x * owner.mc.mainWindow.getWidth() / owner.width), (int) (y * owner.mc.mainWindow.getHeight() / owner.height));
     }
 
+    private static final double TWO_PI = 2.0 * Math.PI;
+
     private void processMouse(int mouseX, int mouseY)
     {
         if (!isReady())
@@ -434,29 +428,25 @@ public class GenericRadialMenu
         int x = owner.width / 2;
         int y = owner.height / 2;
 
-        double twoPi = 2.0 * Math.PI;
         double a = Math.atan2(mouseY - y, mouseX - x);
         double d = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
-        double s0 = (((0 - 0.5f) / (float) numItems) + 0.25f) * twoPi;
-        if (a < s0)
-            a += twoPi;
+        double s0 = getAngleFor(0 - 0.5, numItems);
+        double s1 = getAngleFor(numItems - 0.5, numItems);
+        while (a < s0)
+            a += TWO_PI;
+        while (a >= s1)
+            a -= TWO_PI;
 
         int hovered = -1;
         for (int i = 0; i < numItems; i++)
         {
-            float s = (float)((((i - 0.5) / (double) numItems) + 0.25) * 2 * Math.PI);
-            float e = (float)((((i + 0.5) / (double) numItems) + 0.25) * 2 * Math.PI);
+            float s = (float) getAngleFor(i - 0.5, numItems);
+            float e = (float) getAngleFor(i + 0.5, numItems);
 
-            s += Math.PI;
-            e += Math.PI;
-
-            if (a >= s && a < e && d >= radiusIn && d < radiusOut)
+            if (a >= s && a < e && d >= radiusIn && (d < radiusOut || Config.clipMouseToCircle || Config.allowClickOutsideBounds))
             {
-                if (a >= s && a < e && d >= radiusIn && (d < radiusOut || Config.clipMouseToCircle || Config.allowClickOutsideBounds))
-                {
-                    hovered = i;
-                    break;
-                }
+                hovered = i;
+                break;
             }
         }
         setHovered(hovered);
@@ -486,5 +476,11 @@ public class GenericRadialMenu
                 GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), (int) (windowWidth / 2 + fixedX), (int) (windowHeight / 2 + fixedY));
             }
         }
+    }
+
+    private double getAngleFor(double i, int numItems)
+    {
+        double angle = ((i / numItems) + 0.25) * TWO_PI + Math.PI;
+        return angle;
     }
 }

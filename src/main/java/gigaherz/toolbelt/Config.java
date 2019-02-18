@@ -1,19 +1,23 @@
 package gigaherz.toolbelt;
 
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
+import org.apache.commons.lang3.tuple.Pair;
 
 import java.io.File;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -22,13 +26,27 @@ import java.util.stream.Collectors;
 @Mod.EventBusSubscriber
 public class Config
 {
-    private static final Set<String> blackListString = Sets.newHashSet();
-    private static final Set<String> whiteListString = Sets.newHashSet();
+    public static final ServerConfig SERVER;
+    public static final ForgeConfigSpec SERVER_SPEC;
+    static {
+        final Pair<ServerConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+        SERVER_SPEC = specPair.getRight();
+        SERVER = specPair.getLeft();
+    }
+
+    public static final ClientConfig CLIENT;
+    public static final ForgeConfigSpec CLIENT_SPEC;
+    static {
+        final Pair<ClientConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ClientConfig::new);
+        CLIENT_SPEC = specPair.getRight();
+        CLIENT = specPair.getLeft();
+    }
+
     private static final Set<ItemStack> blackList = Sets.newHashSet();
     private static final Set<ItemStack> whiteList = Sets.newHashSet();
 
     public static boolean showBeltOnPlayers = true;
-    public static float beltItemScale = 0.5f;
+    public static double beltItemScale = 0.5;
 
     public static boolean releaseToSwap = false;
     public static boolean clipMouseToCircle = true;
@@ -37,91 +55,88 @@ public class Config
 
     public static boolean disableAnvilUpgrading = false;
 
-    static void loadConfig(File configurationFile)
+    public static class ServerConfig
     {
-        /*
-        config = new Configuration(configurationFile);
+        public ForgeConfigSpec.ConfigValue<List<? extends String>> whitelist;
+        public ForgeConfigSpec.ConfigValue<List<? extends String>> blacklist;
+        public ForgeConfigSpec.BooleanValue disableAnvilUpgrading;
 
-        Property bl = config.get("items", "blacklist", new String[0]);
-        bl.setComment("List of items to disallow from placing in the belt.");
-
-        Property wl = config.get("items", "whitelist", new String[0]);
-        wl.setComment("List of items to force-allow placing in the belt. Takes precedence over blacklist.");
-
-        Property showBeltOnPlayersProperty = config.get("display", "showBeltOnPlayers", true);
-        showBeltOnPlayersProperty.setComment("If set to FALSE, the belts and tools will NOT draw on players.");
-
-        Property beltItemScaleProperty = config.get("display", "beltItemScale", 0.5);
-        beltItemScaleProperty.setComment("Changes the scale of items on the belt.");
-
-        Property releaseToSwapProperty = config.get("input", "releaseToSwap", false);
-        releaseToSwapProperty.setComment("If set to TRUE, releasing the menu key (R) will activate the swap. Requires a click otherwise (default).");
-
-        Property clipMouseToCircleProperty = config.get("input", "clipMouseToCircle", false);
-        clipMouseToCircleProperty.setComment("If set to TRUE, the radial menu will try to prevent the mouse from leaving the outer circle.");
-
-        Property allowClickOutsideBoundsProperty = config.get("input", "allowClickOutsideBounds", false);
-        allowClickOutsideBoundsProperty.setComment("If set to TRUE, the radial menu will allow clicking outside the outer circle to activate the items.");
-
-        Property displayEmptySlotsProperty = config.get("input", "displayEmptySlots", false);
-        displayEmptySlotsProperty.setComment("If set to TRUE, the radial menu will always display all the slots, even when empty, and will allow choosing which empty slot to insert into.");
-
-        Property disableAnvilUpgradingProperty = config.get("behaviour", "disableAnvilUpgrading", false);
-        disableAnvilUpgradingProperty.setComment("If set to TRUE, the internal anvil upgrade will not work, and alternative methods for upgrades will have to be provided externally.");
-
-        display = config.getCategory("display");
-        display.setComment("Options for customizing the display of tools on the player");
-
-        input = config.getCategory("input");
-        input.setComment("Options for customizing the interaction with the radial menu");
-
-        behaviour = config.getCategory("behaviour");
-        behaviour.setComment("Options for customizing the mechanics of the belt");
-
-        showBeltOnPlayers = showBeltOnPlayersProperty.getBoolean();
-        beltItemScale = (float) beltItemScaleProperty.getDouble();
-
-        releaseToSwap = releaseToSwapProperty.getBoolean();
-        clipMouseToCircle = clipMouseToCircleProperty.getBoolean();
-        allowClickOutsideBounds = allowClickOutsideBoundsProperty.getBoolean();
-        displayEmptySlots = displayEmptySlotsProperty.getBoolean();
-
-        disableAnvilUpgrading = disableAnvilUpgradingProperty.getBoolean();
-
-        blackListString.addAll(Arrays.asList(bl.getStringList()));
-        whiteListString.addAll(Arrays.asList(wl.getStringList()));
-        if (!bl.wasRead() ||
-                !wl.wasRead() ||
-                !releaseToSwapProperty.wasRead() ||
-                !showBeltOnPlayersProperty.wasRead() ||
-                !beltItemScaleProperty.wasRead() ||
-                !clipMouseToCircleProperty.wasRead() ||
-                !allowClickOutsideBoundsProperty.wasRead() ||
-                !displayEmptySlotsProperty.wasRead() ||
-                disableAnvilUpgradingProperty.wasRead())
-        {
-            config.save();
+        ServerConfig(ForgeConfigSpec.Builder builder) {
+            builder.push("general");
+            whitelist = builder
+                    .comment("List of items to force-allow placing in the belt. Takes precedence over blacklist.")
+                    .translation("text.toolbelt.config.whitelist")
+                    .defineList("whitelist", Lists.newArrayList(), o -> o instanceof String);
+            blacklist = builder
+                    .comment("List of items to disallow from placing in the belt. (whitelist takes precedence)")
+                    .translation("text.toolbelt.config.blacklist")
+                    .defineList("whitelist", Lists.newArrayList(), o -> o instanceof String);
+            disableAnvilUpgrading = builder
+                    .comment("If set to TRUE, the internal anvil upgrade will not work, and alternative methods for upgrades will have to be provided externally.")
+                    .translation("text.toolbelt.config.disable_anvil_update")
+                    .define("disableAnvilUpgrading", false);
+            builder.pop();
         }
-        */
     }
 
-    public static void postInit()
+    public static class ClientConfig
     {
-        blackList.addAll(blackListString.stream().map(Config::parseItemStack).collect(Collectors.toList()));
-        whiteList.addAll(whiteListString.stream().map(Config::parseItemStack).collect(Collectors.toList()));
+        public ForgeConfigSpec.BooleanValue showBeltOnPlayers;
+        public ForgeConfigSpec.DoubleValue beltItemScale;
+        public ForgeConfigSpec.BooleanValue releaseToSwap;
+        public ForgeConfigSpec.BooleanValue clipMouseToCircle;
+        public ForgeConfigSpec.BooleanValue allowClickOutsideBounds;
+        public ForgeConfigSpec.BooleanValue displayEmptySlots;
+
+        ClientConfig(ForgeConfigSpec.Builder builder) {
+            builder.comment("Options for customizing the display of tools on the player")
+                    .push("display");
+            showBeltOnPlayers = builder
+                    .comment("If set to FALSE, the belts and tools will NOT draw on players.")
+                    .translation("text.toolbelt.config.show_belt_on_players")
+                    .define("showBeltOnPlayers", true);
+            beltItemScale = builder
+                    .comment("Changes the scale of items on the belt.")
+                    .translation("text.toolbelt.config.belt_item_scale")
+                    .defineInRange("beltItemScale", 0.5, 0.1, 2.0);
+            builder.pop();
+            builder.comment("Options for customizing the display of tools on the player")
+                    .push("display");
+            releaseToSwap = builder
+                    .comment("If set to TRUE, releasing the menu key (R) will activate the swap. Requires a click otherwise (default).")
+                    .translation("text.toolbelt.config.release_to_swap")
+                    .define("releaseToSwap", false);
+            clipMouseToCircle = builder
+                    .comment("If set to TRUE, the radial menu will try to prevent the mouse from leaving the outer circle.")
+                    .translation("text.toolbelt.config.clip_mouse_to_circle")
+                    .define("clipMouseToCircle", false);
+            allowClickOutsideBounds = builder
+                    .comment("If set to TRUE, the radial menu will allow clicking outside the outer circle to activate the items.")
+                    .translation("text.toolbelt.config.click_outside_bounds")
+                    .define("allowClickOutsideBounds", false);
+            displayEmptySlots = builder
+                    .comment("If set to TRUE, the radial menu will always display all the slots, even when empty, and will allow choosing which empty slot to insert into.")
+                    .translation("text.toolbelt.config.display_empty_slots")
+                    .define("displayEmptySlots", false);
+            builder.pop();
+        }
     }
 
-    public static void refresh()
+    public static void refreshClient()
     {
-        /*
-        showBeltOnPlayers = display.get("showBeltOnPlayers").getBoolean();
-        beltItemScale = (float) display.get("beltItemScale").getDouble();
-        releaseToSwap = input.get("releaseToSwap").getBoolean();
-        clipMouseToCircle = input.get("clipMouseToCircle").getBoolean();
-        allowClickOutsideBounds = input.get("allowClickOutsideBounds").getBoolean();
-        displayEmptySlots = input.get("displayEmptySlots").getBoolean();
-        disableAnvilUpgrading = behaviour.get("disableAnvilUpgrading").getBoolean();
-        */
+        showBeltOnPlayers = CLIENT.showBeltOnPlayers.get();
+        beltItemScale = CLIENT.beltItemScale.get();
+        releaseToSwap = CLIENT.releaseToSwap.get();
+        clipMouseToCircle = CLIENT.clipMouseToCircle.get();
+        allowClickOutsideBounds = CLIENT.allowClickOutsideBounds.get();
+        displayEmptySlots = CLIENT.displayEmptySlots.get();
+    }
+
+    public static void refreshServer()
+    {
+        disableAnvilUpgrading = SERVER.disableAnvilUpgrading.get();
+        SERVER.blacklist.get().stream().map(Config::parseItemStack).forEach(blackList::add);
+        SERVER.whitelist.get().stream().map(Config::parseItemStack).forEach(whiteList::add);
     }
 
     @SubscribeEvent
@@ -133,7 +148,8 @@ public class Config
             if (config.hasChanged())
                 config.save();
             */
-            refresh();
+            refreshClient();
+            refreshServer();
         }
     }
 
