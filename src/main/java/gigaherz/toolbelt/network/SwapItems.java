@@ -19,43 +19,27 @@ public class SwapItems
 {
     public int swapWith;
 
-    public SwapItems()
-    {
-    }
-
     public SwapItems(int windowId)
     {
         this.swapWith = windowId;
     }
 
-    public void fromBytes(PacketBuffer buf)
+    public SwapItems(PacketBuffer buf)
     {
         swapWith = buf.readInt();
     }
 
-    public void toBytes(PacketBuffer buf)
+    public void encode(PacketBuffer buf)
     {
         buf.writeInt(swapWith);
     }
 
-    public static void encode(SwapItems message, PacketBuffer packet)
-    {
-        message.toBytes(packet);
-    }
-
-    public static SwapItems decode(PacketBuffer packet)
-    {
-        SwapItems message = new SwapItems();
-        message.fromBytes(packet);
-        return message;
-    }
-
-    public static void onMessage(final SwapItems message, Supplier<NetworkEvent.Context> context)
+    public void handle(Supplier<NetworkEvent.Context> context)
     {
         final EntityPlayerMP player = context.get().getSender();
         final WorldServer world = (WorldServer) player.world;
 
-        world.addScheduledTask(() -> swapItem(message.swapWith, player));
+        world.addScheduledTask(() -> swapItem(swapWith, player));
     }
 
     public static void swapItem(int swapWith, EntityPlayer player)

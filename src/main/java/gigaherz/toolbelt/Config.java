@@ -11,7 +11,6 @@ import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.oredict.OreDictionary;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -57,9 +56,9 @@ public class Config
 
     public static class ServerConfig
     {
-        public ForgeConfigSpec.ConfigValue<List<? extends String>> whitelist;
-        public ForgeConfigSpec.ConfigValue<List<? extends String>> blacklist;
-        public ForgeConfigSpec.BooleanValue disableAnvilUpgrading;
+        public final ForgeConfigSpec.ConfigValue<List<? extends String>> whitelist;
+        public final ForgeConfigSpec.ConfigValue<List<? extends String>> blacklist;
+        public final ForgeConfigSpec.BooleanValue disableAnvilUpgrading;
 
         ServerConfig(ForgeConfigSpec.Builder builder) {
             builder.push("general");
@@ -81,12 +80,12 @@ public class Config
 
     public static class ClientConfig
     {
-        public ForgeConfigSpec.BooleanValue showBeltOnPlayers;
-        public ForgeConfigSpec.DoubleValue beltItemScale;
-        public ForgeConfigSpec.BooleanValue releaseToSwap;
-        public ForgeConfigSpec.BooleanValue clipMouseToCircle;
-        public ForgeConfigSpec.BooleanValue allowClickOutsideBounds;
-        public ForgeConfigSpec.BooleanValue displayEmptySlots;
+        public final ForgeConfigSpec.BooleanValue showBeltOnPlayers;
+        public final ForgeConfigSpec.DoubleValue beltItemScale;
+        public final ForgeConfigSpec.BooleanValue releaseToSwap;
+        public final ForgeConfigSpec.BooleanValue clipMouseToCircle;
+        public final ForgeConfigSpec.BooleanValue allowClickOutsideBounds;
+        public final ForgeConfigSpec.BooleanValue displayEmptySlots;
 
         ClientConfig(ForgeConfigSpec.Builder builder) {
             builder.comment("Options for customizing the display of tools on the player")
@@ -100,8 +99,8 @@ public class Config
                     .translation("text.toolbelt.config.belt_item_scale")
                     .defineInRange("beltItemScale", 0.5, 0.1, 2.0);
             builder.pop();
-            builder.comment("Options for customizing the display of tools on the player")
-                    .push("display");
+            builder.comment("Options for customizing the radial menu")
+                    .push("menu");
             releaseToSwap = builder
                     .comment("If set to TRUE, releasing the menu key (R) will activate the swap. Requires a click otherwise (default).")
                     .translation("text.toolbelt.config.release_to_swap")
@@ -137,20 +136,6 @@ public class Config
         disableAnvilUpgrading = SERVER.disableAnvilUpgrading.get();
         SERVER.blacklist.get().stream().map(Config::parseItemStack).forEach(blackList::add);
         SERVER.whitelist.get().stream().map(Config::parseItemStack).forEach(whiteList::add);
-    }
-
-    @SubscribeEvent
-    public static void onConfigChange(ConfigChangedEvent.OnConfigChangedEvent event)
-    {
-        if (ToolBelt.MODID.equals(event.getModID()))
-        {
-            /*
-            if (config.hasChanged())
-                config.save();
-            */
-            refreshClient();
-            refreshServer();
-        }
     }
 
     private static final Pattern itemRegex = Pattern.compile("^(?<item>([a-zA-Z-0-9_]+:)?[a-zA-Z-0-9_]+)(?:@((?<meta>[0-9]+)|(?<any>any)))?$");

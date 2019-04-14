@@ -71,14 +71,12 @@ public class ToolBelt
         modLoadingContext.registerConfig(ModConfig.Type.SERVER, Config.SERVER_SPEC);
         modLoadingContext.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_SPEC);
 
-        modLoadingContext.registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> GuiHandler.Client::getClientGuiElement);
+        modLoadingContext.registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> message -> GuiHandler.Client.getClientGuiElement(message));
     }
 
     public void modConfig(ModConfig.ModConfigEvent event)
     {
         ModConfig config = event.getConfig();
-        if (!MODID.equals(config.getModId()))
-            return;
         if (config.getSpec() == Config.CLIENT_SPEC)
             Config.refreshClient();
         else if (config.getSpec() == Config.SERVER_SPEC)
@@ -96,11 +94,11 @@ public class ToolBelt
     public void preInit(FMLCommonSetupEvent event)
     {
         int messageNumber = 0;
-        channel.registerMessage(messageNumber++, SwapItems.class, SwapItems::encode, SwapItems::decode, SwapItems::onMessage);
-        channel.registerMessage(messageNumber++, BeltContentsChange.class, BeltContentsChange::encode, BeltContentsChange::decode, BeltContentsChange::onMessage);
-        channel.registerMessage(messageNumber++, OpenBeltSlotInventory.class, OpenBeltSlotInventory::encode, OpenBeltSlotInventory::decode, OpenBeltSlotInventory::onMessage);
-        channel.registerMessage(messageNumber++, ContainerSlotsHack.class, ContainerSlotsHack::encode, ContainerSlotsHack::decode, ContainerSlotsHack::onMessage);
-        channel.registerMessage(messageNumber++, SyncBeltSlotContents.class, SyncBeltSlotContents::encode, SyncBeltSlotContents::decode, SyncBeltSlotContents::onMessage);
+        channel.registerMessage(messageNumber++, SwapItems.class, SwapItems::encode, SwapItems::new, SwapItems::handle);
+        channel.registerMessage(messageNumber++, BeltContentsChange.class, BeltContentsChange::encode, BeltContentsChange::new, BeltContentsChange::handle);
+        channel.registerMessage(messageNumber++, OpenBeltSlotInventory.class, OpenBeltSlotInventory::encode, OpenBeltSlotInventory::new, OpenBeltSlotInventory::handle);
+        channel.registerMessage(messageNumber++, ContainerSlotsHack.class, ContainerSlotsHack::encode, ContainerSlotsHack::new, ContainerSlotsHack::handle);
+        channel.registerMessage(messageNumber++, SyncBeltSlotContents.class, SyncBeltSlotContents::encode, SyncBeltSlotContents::new, SyncBeltSlotContents::handle);
         logger.debug("Final message number: " + messageNumber);
 
         //TODO File configurationFile = event.getSuggestedConfigurationFile();

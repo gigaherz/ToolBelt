@@ -9,6 +9,8 @@ import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
+import javax.annotation.Nonnull;
+
 public class ToolBeltInventory implements IItemHandlerModifiable
 {
     private final ItemStack itemStack;
@@ -171,6 +173,12 @@ public class ToolBeltInventory implements IItemHandlerModifiable
     public int getSlotLimit(int slot)
     {
         return 64;
+    }
+
+    @Override
+    public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+    {
+        return false;
     }
 
     private void validateSlotIndex(int slot)

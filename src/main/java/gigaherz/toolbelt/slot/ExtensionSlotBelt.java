@@ -111,20 +111,17 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
                     }
 
                     @Nullable
-                    @SuppressWarnings("unchecked")
                     @Override
                     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
                     {
-                        if (capability == CAPABILITY)
-                            return (LazyOptional<T>) extensionContainerInstance;
-                        return LazyOptional.empty();
+                        return CAPABILITY.orEmpty(capability, extensionContainerInstance);
                     }
                 });
             }
         }
 
         @SubscribeEvent
-        public void track(EntityJoinWorldEvent event)
+        public void joinWorld(EntityJoinWorldEvent event)
         {
             Entity target = event.getEntity();
             if (target.world.isRemote)

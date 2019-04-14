@@ -8,7 +8,7 @@ buildscript {
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.0.108.1-SNAPSHOT', changing: true
     }
 }
 
@@ -31,33 +31,33 @@ compileJava {
 minecraft {
     mappings channel: 'snapshot', version: '20190215-1.13.1'
 
-    // default run configurations.
-    // these can be tweaked, removed, or duplicated as needed.
     runs {
-        client = {
-            // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-            // recommended logging level for the console
-            properties 'forge.logging.console.level': 'debug'
-            workingDirectory project.file('run').canonicalPath
-            source sourceSets.main
-            ideaModule project.group + "." + project.name + ".main"
+        client {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+
+            ideaModule "${project.name}_main"
+
+            environment 'MOD_CLASSES', "${project.file("out/production/resources").canonicalPath};${project.file("out/production/classes").canonicalPath}"
         }
-        server = {
-            // recommended logging data for a userdev environment
-            properties 'forge.logging.markers': 'SCAN,REGISTRIES,REGISTRYDUMP'
-            // recommended logging level for the console
-            properties 'forge.logging.console.level': 'debug'
-            workingDirectory project.file('run').canonicalPath
-            source sourceSets.main
-            ideaModule project.group + "." + project.name + ".main"
+
+        server {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'SCAN,REGISTRIES,REGISTRYDUMP'
+            property 'forge.logging.console.level', 'debug'
+
+            ideaModule "${project.name}_main"
+
+            environment 'MOD_CLASSES', "${project.file("out/production/resources").canonicalPath};${project.file("out/production/classes").canonicalPath}"
         }
     }
-
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.13.2-25.0.26'
+    minecraft 'net.minecraftforge:forge:1.13.2-25.0.110'
 }
 
 processResources {
@@ -66,7 +66,7 @@ processResources {
 
     // replace stuff in mcmod.info, nothing else
     from(sourceSets.main.resources.srcDirs) {
-        include 'META_INF/mods.toml'
+        include 'META-INF/mods.toml'
                 
         // replace version and mcversion
         expand 'version':project.version
@@ -74,6 +74,6 @@ processResources {
 
     // copy everything else except the mcmod.info
     from(sourceSets.main.resources.srcDirs) {
-        exclude 'META_INF/mods.toml'
+        exclude 'META-INF/mods.toml'
     }
 }

@@ -23,10 +23,6 @@ public class BeltContentsChange
     public int slot;
     public ItemStack stack;
 
-    public BeltContentsChange()
-    {
-    }
-
     public BeltContentsChange(EntityLivingBase player, ContainingInventory where, int slot, ItemStack stack)
     {
         this.player = player.getEntityId();
@@ -35,7 +31,7 @@ public class BeltContentsChange
         this.stack = stack;
     }
 
-    public void fromBytes(PacketBuffer buf)
+    public BeltContentsChange(PacketBuffer buf)
     {
         player = buf.readInt();
         where = ContainingInventory.VALUES[buf.readByte()];
@@ -43,7 +39,7 @@ public class BeltContentsChange
         stack = buf.readItemStack();
     }
 
-    public void toBytes(PacketBuffer buf)
+    public void encode(PacketBuffer buf)
     {
         buf.writeInt(player);
         buf.writeByte(where.ordinal());
@@ -51,20 +47,8 @@ public class BeltContentsChange
         buf.writeItemStack(stack);
     }
 
-    public static void encode(BeltContentsChange message, PacketBuffer packet)
+    public void handle(Supplier<NetworkEvent.Context> context)
     {
-        message.toBytes(packet);
-    }
-
-    public static BeltContentsChange decode(PacketBuffer packet)
-    {
-        BeltContentsChange message = new BeltContentsChange();
-        message.fromBytes(packet);
-        return message;
-    }
-
-    public static void onMessage(final BeltContentsChange message, Supplier<NetworkEvent.Context> context)
-    {
-        ToolBelt.proxy.handleBeltContentsChange(message);
+        ToolBelt.proxy.handleBeltContentsChange(this);
     }
 }
