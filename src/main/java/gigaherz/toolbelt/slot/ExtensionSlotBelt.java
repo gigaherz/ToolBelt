@@ -7,17 +7,15 @@ import gigaherz.toolbelt.customslots.IExtensionContainer;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.network.SyncBeltSlotContents;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.EntityTracker;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.world.WorldServer;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -31,13 +29,14 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<NBTTagCompound>
+public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<CompoundNBT>
 {
     ////////////////////////////////////////////////////////////
     // Capability support code
@@ -54,13 +53,13 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         {
             @Nullable
             @Override
-            public INBTBase writeNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, EnumFacing side)
+            public INBT writeNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, Direction side)
             {
                 return null;
             }
 
             @Override
-            public void readNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, EnumFacing side, INBTBase nbt)
+            public void readNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, Direction side, INBT nbt)
             {
 
             }
@@ -69,7 +68,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         MinecraftForge.EVENT_BUS.register(new EventHandlers());
     }
 
-    public static ExtensionSlotBelt get(EntityLivingBase player)
+    public static ExtensionSlotBelt get(LivingEntity player)
     {
         return player.getCapability(CAPABILITY, null).orElseThrow(() -> new RuntimeException("Capability not attached!"));
     }
@@ -79,40 +78,36 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         @SubscribeEvent
         public void attachCapabilities(AttachCapabilitiesEvent<Entity> event)
         {
-            if (event.getObject() instanceof EntityPlayer)
+            if (event.getObject() instanceof PlayerEntity)
             {
-                event.addCapability(CAPABILITY_ID, new ICapabilitySerializable<NBTTagCompound>()
+                event.addCapability(CAPABILITY_ID, new ICapabilitySerializable<CompoundNBT>()
                 {
-                    final ExtensionSlotBelt extensionContainer = new ExtensionSlotBelt((EntityPlayer) event.getObject()) {
+                    final ExtensionSlotBelt extensionContainer = new ExtensionSlotBelt((PlayerEntity) event.getObject()) {
                         @Override
                         public void onContentsChanged(IExtensionSlot slot)
                         {
-                            Entity owner = getOwner();
-                            if(owner.world instanceof WorldServer)
-                            {
-                                WorldServer svr = (WorldServer)owner.world;
-                                svr.getEntityTracker().getTrackingPlayers(owner).forEach(this::syncTo);
-                            }
+                            if (!getOwner().world.isRemote)
+                                syncTo(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getOwner));
                         }
                     };
 
                     final LazyOptional<ExtensionSlotBelt> extensionContainerInstance = LazyOptional.of(() -> extensionContainer);
 
                     @Override
-                    public NBTTagCompound serializeNBT()
+                    public CompoundNBT serializeNBT()
                     {
                         return extensionContainer.serializeNBT();
                     }
 
                     @Override
-                    public void deserializeNBT(NBTTagCompound nbt)
+                    public void deserializeNBT(CompoundNBT nbt)
                     {
                         extensionContainer.deserializeNBT(nbt);
                     }
 
                     @Nullable
                     @Override
-                    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
+                    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing)
                     {
                         return CAPABILITY.orEmpty(capability, extensionContainerInstance);
                     }
@@ -126,9 +121,9 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             Entity target = event.getEntity();
             if (target.world.isRemote)
                 return;
-            if (target instanceof EntityPlayer)
+            if (target instanceof PlayerEntity)
             {
-                ExtensionSlotBelt instance = get((EntityLivingBase) target);
+                ExtensionSlotBelt instance = get((LivingEntity) target);
                 instance.syncToSelf();
             }
         }
@@ -139,9 +134,9 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             Entity target = event.getTarget();
             if (target.world.isRemote)
                 return;
-            if (target instanceof EntityPlayer)
+            if (target instanceof PlayerEntity)
             {
-                ExtensionSlotBelt instance = get((EntityLivingBase) target);
+                ExtensionSlotBelt instance = get((LivingEntity) target);
                 instance.syncTo(event.getEntityPlayer());
             }
         }
@@ -156,13 +151,19 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
 
     private void syncToSelf()
     {
-        syncTo((EntityPlayer) owner);
+        syncTo((PlayerEntity) owner);
     }
 
-    protected void syncTo(EntityPlayer p)
+    protected void syncTo(PlayerEntity p)
     {
-        SyncBeltSlotContents message = new SyncBeltSlotContents(p, this);
-        ToolBelt.channel.sendTo(message, ((EntityPlayerMP)p).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+        SyncBeltSlotContents message = new SyncBeltSlotContents((PlayerEntity) owner, this);
+        ToolBelt.channel.sendTo(message, ((ServerPlayerEntity)p).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+    }
+
+    protected void syncTo(PacketDistributor.PacketTarget target)
+    {
+        SyncBeltSlotContents message = new SyncBeltSlotContents((PlayerEntity) owner, this);
+        ToolBelt.channel.send(target, message);
     }
 
     ////////////////////////////////////////////////////////////
@@ -170,7 +171,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
     //
     public static final ResourceLocation BELT = new ResourceLocation("examplemod", "belt");
 
-    private final EntityLivingBase owner;
+    private final LivingEntity owner;
     private final ItemStackHandler inventory = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot)
@@ -184,14 +185,14 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
     };
     private final ImmutableList<IExtensionSlot> slots = ImmutableList.of(belt);
 
-    private ExtensionSlotBelt(EntityLivingBase owner)
+    private ExtensionSlotBelt(LivingEntity owner)
     {
         this.owner = owner;
     }
 
     @Nonnull
     @Override
-    public EntityLivingBase getOwner()
+    public LivingEntity getOwner()
     {
         return owner;
     }
@@ -233,13 +234,13 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
     }
 
     @Override
-    public NBTTagCompound serializeNBT()
+    public CompoundNBT serializeNBT()
     {
         return inventory.serializeNBT();
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt)
+    public void deserializeNBT(CompoundNBT nbt)
     {
         inventory.deserializeNBT(nbt);
     }

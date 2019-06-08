@@ -1,76 +1,43 @@
 package gigaherz.toolbelt.client;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import gigaherz.toolbelt.BeltFinder;
-import gigaherz.toolbelt.Config;
+import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.entity.RenderLivingBase;
+import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
-import net.minecraft.client.renderer.entity.model.ModelBase;
-import net.minecraft.client.renderer.entity.model.ModelBiped;
-import net.minecraft.client.renderer.entity.model.ModelRenderer;
-import net.minecraft.client.renderer.model.ItemCameraTransforms;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.client.renderer.entity.model.EntityModel;
+import net.minecraft.client.renderer.entity.model.PlayerModel;
+import net.minecraft.client.renderer.entity.model.RendererModel;
+import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.EnumHandSide;
+import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
-public class LayerToolBelt implements LayerRenderer<EntityPlayer>
+public class LayerToolBelt<T extends PlayerEntity, M extends PlayerModel<T>> extends LayerRenderer<T, M>
 {
     private static final ResourceLocation TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
 
-    private final RenderLivingBase<?> livingEntityRenderer;
+    private final LivingRenderer<T,M> owner;
 
-    private final ModelBase beltModel = new ModelBase()
+    private final ModelBelt beltModel = new ModelBelt();
+
+    public LayerToolBelt(LivingRenderer<T,M> owner)
     {
-        final ModelRenderer belt = new ModelRenderer(this);
-        final ModelRenderer buckle = new ModelRenderer(this, 10, 10);
-        final ModelRenderer pocketL = new ModelRenderer(this, 0, 10);
-        final ModelRenderer pocketR = new ModelRenderer(this, 0, 10);
-
-        {
-            belt.addBox(-5, 10, -3, 10, 4, 6);
-
-            buckle.addBox(-2.5f, 9.5f, -3.5f, 5, 5, 1);
-
-            pocketL.addBox(-2, 12, 5, 4, 4, 1);
-            pocketL.rotateAngleY = (float) Math.toRadians(-90);
-            pocketR.addBox(-2, 12, 5, 4, 4, 1);
-            pocketR.rotateAngleY = (float) Math.toRadians(90);
-        }
-
-        @Override
-        public void render(Entity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
-        {
-            GlStateManager.disableRescaleNormal();
-            GlStateManager.disableCull();
-            belt.render(scale);
-            pocketL.render(scale);
-            pocketR.render(scale);
-
-            GlStateManager.pushMatrix();
-            GlStateManager.scalef(0.8f, 1, 1);
-            buckle.render(scale);
-            GlStateManager.popMatrix();
-        }
-    };
-
-    public LayerToolBelt(RenderLivingBase<?> livingEntityRendererIn)
-    {
-        this.livingEntityRenderer = livingEntityRendererIn;
+        super(owner);
+        this.owner = owner;
     }
 
     @Override
-    public void render(EntityPlayer player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
+    public void func_212842_a_(T player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
-        boolean flag = player.getPrimaryHand() == EnumHandSide.RIGHT;
+        boolean flag = player.getPrimaryHand() == HandSide.RIGHT;
 
-        if (!Config.showBeltOnPlayers)
+        if (!ConfigData.showBeltOnPlayers)
             return;
 
         BeltFinder.BeltGetter getter = BeltFinder.findBelt(player);
@@ -102,14 +69,14 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
             {
                 GlStateManager.pushMatrix();
 
-                if (this.livingEntityRenderer.getMainModel().isChild)
+                if (this.func_215332_c().field_217113_d) // FIXME: maybe wrong field, can't tell
                 {
                     GlStateManager.translatef(0.0F, 0.75F, 0.0F);
                     GlStateManager.scalef(0.5F, 0.5F, 0.5F);
                 }
 
-                this.renderHeldItem(player, rightItem, ItemCameraTransforms.TransformType.THIRD_PERSON_RIGHT_HAND, EnumHandSide.RIGHT);
-                this.renderHeldItem(player, leftItem, ItemCameraTransforms.TransformType.THIRD_PERSON_LEFT_HAND, EnumHandSide.LEFT);
+                this.renderHeldItem(player, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HandSide.RIGHT);
+                this.renderHeldItem(player, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HandSide.LEFT);
 
                 GlStateManager.popMatrix();
             }
@@ -117,7 +84,7 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
             GlStateManager.translatef(0.0F, 0.19F, 0.0F);
             GlStateManager.scalef(0.85f, 0.6f, 0.78f);
 
-            this.livingEntityRenderer.bindTexture(TEXTURE_BELT);
+            this.owner.bindTexture(TEXTURE_BELT);
             this.beltModel.render(player, 0, 0, 0, 0, 0, scale);
 
             GlStateManager.popMatrix();
@@ -126,24 +93,24 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
 
     private void translateToBody()
     {
-        ((ModelBiped) this.livingEntityRenderer.getMainModel()).bipedBody.postRender(0.0625F);
+        func_215332_c().field_78115_e.postRender(0.0625F);
     }
 
-    private void renderHeldItem(EntityLivingBase player, ItemStack stack, ItemCameraTransforms.TransformType cameraTransform, EnumHandSide handSide)
+    private void renderHeldItem(LivingEntity player, ItemStack stack, TransformType cameraTransform, HandSide handSide)
     {
         if (stack.isEmpty())
             return;
 
         GlStateManager.pushMatrix();
 
-        if (handSide == EnumHandSide.LEFT)
+        if (handSide == HandSide.LEFT)
             GlStateManager.translatef(-4.35f / 16.0F, 0.7f, -0.1f);
         else
             GlStateManager.translatef(4.35f / 16.0F, 0.7f, -0.1f);
         GlStateManager.rotatef(40.0F, 1.0F, 0.0F, 0.0F);
-        double scale = Config.beltItemScale;
+        double scale = ConfigData.beltItemScale;
         GlStateManager.scaled(scale, scale, scale);
-        Minecraft.getInstance().getItemRenderer().renderItem(stack, player, cameraTransform, handSide == EnumHandSide.LEFT);
+        Minecraft.getInstance().getItemRenderer().renderItem(stack, player, cameraTransform, handSide == HandSide.LEFT);
         GlStateManager.popMatrix();
     }
 
@@ -151,5 +118,39 @@ public class LayerToolBelt implements LayerRenderer<EntityPlayer>
     public boolean shouldCombineTextures()
     {
         return false;
+    }
+
+    private static class ModelBelt extends EntityModel<PlayerEntity>
+    {
+        final RendererModel belt = new RendererModel(this);
+        final RendererModel buckle = new RendererModel(this, 10, 10);
+        final RendererModel pocketL = new RendererModel(this, 0, 10);
+        final RendererModel pocketR = new RendererModel(this, 0, 10);
+
+        {
+            belt.addBox(-5, 10, -3, 10, 4, 6);
+
+            buckle.addBox(-2.5f, 9.5f, -3.5f, 5, 5, 1);
+
+            pocketL.addBox(-2, 12, 5, 4, 4, 1);
+            pocketL.rotateAngleY = (float) Math.toRadians(-90);
+            pocketR.addBox(-2, 12, 5, 4, 4, 1);
+            pocketR.rotateAngleY = (float) Math.toRadians(90);
+        }
+
+        @Override
+        public void render(PlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
+        {
+            GlStateManager.disableRescaleNormal();
+            GlStateManager.disableCull();
+            belt.render(scale);
+            pocketL.render(scale);
+            pocketR.render(scale);
+
+            GlStateManager.pushMatrix();
+            GlStateManager.scalef(0.8f, 1, 1);
+            buckle.render(scale);
+            GlStateManager.popMatrix();
+        }
     }
 }

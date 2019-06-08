@@ -1,20 +1,12 @@
 package gigaherz.toolbelt.common;
 
-import gigaherz.toolbelt.Config;
-import net.minecraft.entity.player.EntityPlayer;
+import gigaherz.toolbelt.ConfigData;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryBasic;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.SlotItemHandler;
-
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class SlotBelt extends Slot
 {
@@ -37,31 +29,6 @@ public class SlotBelt extends Slot
                     );
                 }
                 return inventory;
-            }
-
-            @Override
-            public ITextComponent getName()
-            {
-                return new TextComponentTranslation("toolbelt.slot.wrapper");
-            }
-
-            @Override
-            public boolean hasCustomName()
-            {
-                return false;
-            }
-
-            @Override
-            public ITextComponent getDisplayName()
-            {
-                return getName();
-            }
-
-            @Nullable
-            @Override
-            public ITextComponent getCustomName()
-            {
-                return null;
             }
 
             @Override
@@ -91,7 +58,9 @@ public class SlotBelt extends Slot
             @Override
             public ItemStack removeStackFromSlot(int n)
             {
-                return null;
+                ItemStack existing = getStackInSlot(0);
+                setInventorySlotContents(n, ItemStack.EMPTY);
+                return existing;
             }
 
             @Override
@@ -113,19 +82,19 @@ public class SlotBelt extends Slot
             }
 
             @Override
-            public boolean isUsableByPlayer(EntityPlayer player)
+            public boolean isUsableByPlayer(PlayerEntity player)
             {
                 return false;
             }
 
             @Override
-            public void openInventory(EntityPlayer player)
+            public void openInventory(PlayerEntity player)
             {
 
             }
 
             @Override
-            public void closeInventory(EntityPlayer player)
+            public void closeInventory(PlayerEntity player)
             {
 
             }
@@ -133,25 +102,7 @@ public class SlotBelt extends Slot
             @Override
             public boolean isItemValidForSlot(int index, ItemStack stack)
             {
-                return Config.isItemStackAllowed(stack);
-            }
-
-            @Override
-            public int getField(int id)
-            {
-                return 0;
-            }
-
-            @Override
-            public void setField(int id, int value)
-            {
-
-            }
-
-            @Override
-            public int getFieldCount()
-            {
-                return 0;
+                return ConfigData.isItemStackAllowed(stack);
             }
 
             @Override
@@ -165,7 +116,7 @@ public class SlotBelt extends Slot
     @Override
     public boolean isItemValid(ItemStack stack)
     {
-        return Config.isItemStackAllowed(stack);
+        return ConfigData.isItemStackAllowed(stack);
     }
 
 }

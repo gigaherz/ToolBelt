@@ -1,18 +1,16 @@
 package gigaherz.toolbelt.client;
 
 import gigaherz.toolbelt.BeltFinder;
-import gigaherz.toolbelt.Config;
+import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.common.ContainerBeltSlot;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 
 import static gigaherz.toolbelt.client.ClientProxy.keyOpenBeltSlot;
@@ -28,11 +26,11 @@ public class ClientEvents
         //registerItemModel(ToolBelt.pouch);
     }
 
-    @SubscribeEvent
+    /*@SubscribeEvent
     public static void textureStitch(TextureStitchEvent.Pre event)
     {
         event.getMap().registerSprite(Minecraft.getInstance().getResourceManager(), ContainerBeltSlot.EMPTY_SPRITE);
-    }
+    }*/
 
     @SubscribeEvent
     public static void clientTick(TickEvent.ClientTickEvent event)
@@ -59,10 +57,10 @@ public class ClientEvents
 
         while (keyOpenToolMenu.isPressed())
         {
-            if (mc.currentScreen == null)
+            if (mc.field_71462_r == null)
             {
                 ItemStack inHand = mc.player.getHeldItemMainhand();
-                if (Config.isItemStackAllowed(inHand))
+                if (ConfigData.isItemStackAllowed(inHand))
                 {
                     BeltFinder.BeltGetter getter = BeltFinder.findBelt(mc.player);
                     if (getter == null)
@@ -75,7 +73,7 @@ public class ClientEvents
 
         while (keyOpenBeltSlot.isPressed())
         {
-            if (mc.currentScreen == null)
+            if (mc.field_71462_r == null)
             {
                 ToolBelt.channel.sendToServer(new OpenBeltSlotInventory());
             }

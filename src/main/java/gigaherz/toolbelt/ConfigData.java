@@ -1,6 +1,5 @@
 package gigaherz.toolbelt;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import gigaherz.toolbelt.belt.ItemToolBelt;
@@ -8,22 +7,15 @@ import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.client.event.ConfigChangedEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 
-@Mod.EventBusSubscriber
-public class Config
+public class ConfigData
 {
     public static final ServerConfig SERVER;
     public static final ForgeConfigSpec SERVER_SPEC;
@@ -134,8 +126,8 @@ public class Config
     public static void refreshServer()
     {
         disableAnvilUpgrading = SERVER.disableAnvilUpgrading.get();
-        SERVER.blacklist.get().stream().map(Config::parseItemStack).forEach(blackList::add);
-        SERVER.whitelist.get().stream().map(Config::parseItemStack).forEach(whiteList::add);
+        SERVER.blacklist.get().stream().map(ConfigData::parseItemStack).forEach(blackList::add);
+        SERVER.whitelist.get().stream().map(ConfigData::parseItemStack).forEach(whiteList::add);
     }
 
     private static final Pattern itemRegex = Pattern.compile("^(?<item>([a-zA-Z-0-9_]+:)?[a-zA-Z-0-9_]+)(?:@((?<meta>[0-9]+)|(?<any>any)))?$");

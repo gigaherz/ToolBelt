@@ -4,7 +4,7 @@ package gigaherz.toolbelt.client.config;
 import com.google.common.collect.Lists;
 import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.Screen;
 import net.minecraft.client.resources.I18n;
 import net.minecraftforge.common.config.ConfigElement;
 import net.minecraftforge.fml.client.config.GuiConfig;
@@ -14,7 +14,7 @@ import java.util.List;
 
 public class ConfigGui extends GuiConfig
 {
-    public ConfigGui(GuiScreen parent)
+    public ConfigGui(Screen parent)
     {
         super(parent, getConfigElements(), ToolBelt.MODID, false, false, getTitle());
     }

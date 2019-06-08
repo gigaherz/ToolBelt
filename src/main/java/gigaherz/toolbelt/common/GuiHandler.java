@@ -2,161 +2,90 @@ package gigaherz.toolbelt.common;
 
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.belt.ItemToolBelt;
-import io.netty.buffer.Unpooled;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.gui.GuiScreen;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.entity.player.ServerPlayerEntity;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.IContainerProvider;
+import net.minecraft.inventory.container.INamedContainerProvider;
 import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.EnumHand;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TextComponentString;
-import net.minecraft.world.IInteractionObject;
-import net.minecraftforge.fml.network.FMLPlayMessages;
+import net.minecraft.util.text.StringTextComponent;
 import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
 public class GuiHandler
 {
-    public static final ResourceLocation BELT = ToolBelt.location("belt");
-    public static final ResourceLocation BELT_SLOT = ToolBelt.location("belt_slot");
+    private static final ResourceLocation BELT = ToolBelt.location("belt");
+    private static final ResourceLocation BELT_SLOT = ToolBelt.location("belt_slot");
 
-    private static class BeltGui implements IInteractionObject
+    private static class BeltGui implements INamedContainerProvider
     {
         private final ResourceLocation id;
         private final int slot;
 
-        public BeltGui(ResourceLocation id, int slot)
+        private BeltGui(ResourceLocation id, int slot)
         {
             this.id = id;
             this.slot = slot;
         }
 
+        @Nullable
         @Override
-        public Container createContainer(InventoryPlayer playerInventory, EntityPlayer player)
+        public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity player)
         {
-            ItemStack heldItem = player.inventory.getStackInSlot(slot);
+            ItemStack heldItem = playerInventory.getStackInSlot(slot);
 
             int blockedSlot = -1;
             if (player.getHeldItemMainhand() == heldItem)
-                blockedSlot = player.inventory.currentItem;
+                blockedSlot = playerInventory.currentItem;
 
-            return new ContainerBelt(player.inventory, blockedSlot, heldItem);
+            return new BeltContainer(i, playerInventory, blockedSlot, heldItem);
         }
 
         @Override
-        public String getGuiID()
+        public ITextComponent getDisplayName()
         {
-            return id.toString();
-        }
-
-        @Override
-        public ITextComponent getName()
-        {
-            return new TextComponentString(id.toString());
-        }
-
-        @Override
-        public boolean hasCustomName()
-        {
-            return false;
-        }
-
-        @Nullable
-        @Override
-        public ITextComponent getCustomName()
-        {
-            return null;
+            return new StringTextComponent(id.toString());
         }
     }
 
-    private static class SlotGui implements IInteractionObject
+    private static class SlotGui implements INamedContainerProvider
     {
         private final ResourceLocation id;
 
-        public SlotGui(ResourceLocation id)
+        private SlotGui(ResourceLocation id)
         {
             this.id = id;
         }
 
-        @Override
-        public Container createContainer(InventoryPlayer playerInventory, EntityPlayer player)
-        {
-            return new ContainerBeltSlot(player.inventory, !player.world.isRemote, player);
-        }
-
-        @Override
-        public String getGuiID()
-        {
-            return id.toString();
-        }
-
-        @Override
-        public ITextComponent getName()
-        {
-            return new TextComponentString(id.toString());
-        }
-
-        @Override
-        public boolean hasCustomName()
-        {
-            return false;
-        }
-
         @Nullable
         @Override
-        public ITextComponent getCustomName()
+        public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity player)
         {
-            return null;
+            return new BeltSlotContainer(i, playerInventory, !player.world.isRemote, player);
+        }
+
+        @Override
+        public ITextComponent getDisplayName()
+        {
+            return new StringTextComponent(id.toString());
         }
     }
 
-    public static void openBeltGui(EntityPlayerMP player, int slot)
+    public static void openBeltGui(ServerPlayerEntity player, int slot)
     {
         ItemStack heldItem = player.inventory.getStackInSlot(slot);
         if (heldItem.getCount() > 0 && heldItem.getItem() instanceof ItemToolBelt)
         {
-            NetworkHooks.openGui(player, new BeltGui(BELT, slot), (data) -> {
-                data.writeByte(slot);
-            });
+            NetworkHooks.openGui(player, new BeltGui(BELT, slot), (data) -> data.writeByte(slot));
         }
     }
 
-    public static void openSlotGui(EntityPlayerMP player)
+    public static void openSlotGui(ServerPlayerEntity player)
     {
-        NetworkHooks.openGui(player, new SlotGui(BELT_SLOT), (data) -> {
-        });
-    }
-
-    public static class Client
-    {
-        @Nullable
-        public static GuiScreen getClientGuiElement(FMLPlayMessages.OpenContainer message)
-        {
-            EntityPlayerSP player = Minecraft.getInstance().player;
-            if (BELT.equals(message.getId()))
-            {
-                ItemStack heldItem = player.inventory.getStackInSlot(message.getAdditionalData().readByte());
-                if (heldItem.getCount() > 0)
-                {
-                    int blockedSlot = -1;
-                    if (player.getHeldItemMainhand() == heldItem)
-                        blockedSlot = player.inventory.currentItem;
-
-                    return new GuiBelt(player.inventory, blockedSlot, heldItem);
-                }
-            }
-            else if (BELT_SLOT.equals(message.getId()))
-            {
-                return new GuiBeltSlot(player);
-            }
-            return null;
-        }
+        NetworkHooks.openGui(player, new SlotGui(BELT_SLOT));
     }
 }

@@ -4,8 +4,8 @@ package gigaherz.toolbelt;
 import baubles.api.BaublesApi;
 import baubles.api.cap.IBaublesItemHandler;
 import gigaherz.toolbelt.belt.ItemToolBelt;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -21,14 +21,14 @@ public class BeltFinderBaubles extends BeltFinder
     }
 
     @Override
-    public void setToBaubles(EntityPlayer player, int slot, ItemStack stack)
+    public void setToBaubles(PlayerEntity player, int slot, ItemStack stack)
     {
         IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
         baubles.setStackInSlot(slot, stack);
     }
 
     @Nullable
-    public BeltGetter findStack(EntityPlayer player)
+    public BeltGetter findStack(PlayerEntity player)
     {
         IBaublesItemHandler baubles = BaublesApi.getBaublesHandler(player);
         for (int i = 0; i < baubles.getSlots(); i++)
@@ -48,10 +48,10 @@ public class BeltFinderBaubles extends BeltFinder
 
     private class BaublesBeltGetter implements BeltGetter
     {
-        private final EntityPlayer thePlayer;
+        private final PlayerEntity thePlayer;
         private final int slotNumber;
 
-        private BaublesBeltGetter(EntityPlayer thePlayer, int slotNumber)
+        private BaublesBeltGetter(PlayerEntity thePlayer, int slotNumber)
         {
             this.thePlayer = thePlayer;
             this.slotNumber = slotNumber;

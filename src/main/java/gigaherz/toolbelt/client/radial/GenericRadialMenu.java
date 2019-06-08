@@ -1,12 +1,12 @@
 package gigaherz.toolbelt.client.radial;
 
 import com.google.common.collect.Lists;
-import gigaherz.toolbelt.Config;
+import com.mojang.blaze3d.platform.GlStateManager;
+import gigaherz.toolbelt.ConfigData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.GuiScreen;
+import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -28,6 +28,7 @@ public class GenericRadialMenu
     public final IRadialMenuHost host;
     private final List<RadialMenuItem> items = Lists.newArrayList();
     private final List<RadialMenuItem> visibleItems = Lists.newArrayList();
+    private final Minecraft minecraft;
     public Vector4f backgroundColor = new Vector4f(0, 0, 0, .25f);
     public Vector4f backgroundColorHover = new Vector4f(1, 1, 1, .25f);
 
@@ -50,8 +51,9 @@ public class GenericRadialMenu
 
     private ITextComponent centralText;
 
-    public GenericRadialMenu(IRadialMenuHost host)
+    public GenericRadialMenu(Minecraft minecraft, IRadialMenuHost host)
     {
+        this.minecraft = minecraft;
         this.host = host;
     }
 
@@ -173,25 +175,25 @@ public class GenericRadialMenu
 
     public void close()
     {
-        GuiScreen owner = host.getScreen();
+        Screen owner = host.getScreen();
         state = State.CLOSING;
-        startAnimation = owner.mc.world.getGameTime() + (double) owner.mc.getRenderPartialTicks();
+        startAnimation = minecraft.world.getGameTime() + (double) minecraft.getRenderPartialTicks();
         animProgress = 1.0f;
         setHovered(-1);
     }
 
     public void tick()
     {
-        GuiScreen owner = host.getScreen();
+        Screen owner = host.getScreen();
 
         if (state == State.INITIALIZING)
         {
-            startAnimation = owner.mc.world.getGameTime() + (double) owner.mc.getRenderPartialTicks();
+            startAnimation = minecraft.world.getGameTime() + (double) minecraft.getRenderPartialTicks();
             state = State.OPENING;
             animProgress = 0;
         }
 
-        //updateAnimationState(owner.mc.getRenderPartialTicks());
+        //updateAnimationState(minecraft.getRenderPartialTicks());
     }
 
     public void draw(float partialTicks, int mouseX, int mouseY)
@@ -204,7 +206,7 @@ public class GenericRadialMenu
         if (isReady())
             processMouse(mouseX, mouseY);
 
-        GuiScreen owner = host.getScreen();
+        Screen owner = host.getScreen();
         FontRenderer fontRenderer = host.getFontRenderer();
         ItemRenderer itemRenderer = host.getItemRenderer();
 
@@ -254,11 +256,11 @@ public class GenericRadialMenu
     private void updateAnimationState(float partialTicks)
     {
         float openAnimation = 0;
-        GuiScreen owner = host.getScreen();
+        Screen owner = host.getScreen();
         switch (state)
         {
             case OPENING:
-                openAnimation = (float) ((owner.mc.world.getGameTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH);
+                openAnimation = (float) ((minecraft.world.getGameTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH);
                 if (openAnimation >= 1.0 || getVisibleItemCount() == 0)
                 {
                     openAnimation = 1;
@@ -266,7 +268,7 @@ public class GenericRadialMenu
                 }
                 break;
             case CLOSING:
-                openAnimation = 1 - (float) ((owner.mc.world.getGameTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH);
+                openAnimation = 1 - (float) ((minecraft.world.getGameTime() + partialTicks - startAnimation) / OPEN_ANIMATION_LENGTH);
                 if (openAnimation <= 0 || getVisibleItemCount() == 0)
                 {
                     openAnimation = 0;
@@ -279,7 +281,7 @@ public class GenericRadialMenu
 
     private void drawTooltips(int mouseX, int mouseY)
     {
-        GuiScreen owner = host.getScreen();
+        Screen owner = host.getScreen();
         FontRenderer fontRenderer = host.getFontRenderer();
         ItemRenderer itemRenderer = host.getItemRenderer();
         for (int i = 0; i < visibleItems.size(); i++)
@@ -322,7 +324,7 @@ public class GenericRadialMenu
     {
         GlStateManager.disableAlphaTest();
         GlStateManager.enableBlend();
-        GlStateManager.disableTexture2D();
+        GlStateManager.disableTexture();
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         Tessellator tessellator = Tessellator.getInstance();
@@ -336,7 +338,7 @@ public class GenericRadialMenu
 
         tessellator.draw();
 
-        GlStateManager.enableTexture2D();
+        GlStateManager.enableTexture();
     }
 
     private static final float PRECISION = 2.5f / 360.0f;
@@ -399,7 +401,7 @@ public class GenericRadialMenu
 
     private void moveMouseToItem(int which, int numItems)
     {
-        GuiScreen owner = host.getScreen();
+        Screen owner = host.getScreen();
         int x = owner.width / 2;
         int y = owner.height / 2;
         float angle = (float) getAngleFor(which, numItems);
@@ -411,8 +413,8 @@ public class GenericRadialMenu
 
     private void setMousePosition(double x, double y)
     {
-        GuiScreen owner = host.getScreen();
-        GLFW.glfwSetCursorPos(owner.mc.mainWindow.getHandle(), (int) (x * owner.mc.mainWindow.getWidth() / owner.width), (int) (y * owner.mc.mainWindow.getHeight() / owner.height));
+        Screen owner = host.getScreen();
+        GLFW.glfwSetCursorPos(minecraft.mainWindow.getHandle(), (int) (x * minecraft.mainWindow.getWidth() / owner.width), (int) (y * minecraft.mainWindow.getHeight() / owner.height));
     }
 
     private static final double TWO_PI = 2.0 * Math.PI;
@@ -424,7 +426,7 @@ public class GenericRadialMenu
 
         int numItems = getVisibleItemCount();
 
-        GuiScreen owner = host.getScreen();
+        Screen owner = host.getScreen();
         int x = owner.width / 2;
         int y = owner.height / 2;
 
@@ -443,7 +445,7 @@ public class GenericRadialMenu
             float s = (float) getAngleFor(i - 0.5, numItems);
             float e = (float) getAngleFor(i + 0.5, numItems);
 
-            if (a >= s && a < e && d >= radiusIn && (d < radiusOut || Config.clipMouseToCircle || Config.allowClickOutsideBounds))
+            if (a >= s && a < e && d >= radiusIn && (d < radiusOut || ConfigData.clipMouseToCircle || ConfigData.allowClickOutsideBounds))
             {
                 hovered = i;
                 break;
@@ -452,15 +454,14 @@ public class GenericRadialMenu
         setHovered(hovered);
 
 
-        if (Config.clipMouseToCircle)
+        if (ConfigData.clipMouseToCircle)
         {
-            Minecraft mc = owner.mc;
-            int windowWidth = mc.mainWindow.getWidth();
-            int windowHeight = mc.mainWindow.getHeight();
+            int windowWidth = minecraft.mainWindow.getWidth();
+            int windowHeight = minecraft.mainWindow.getHeight();
 
             double[] xPos = new double[1];
             double[] yPos = new double[1];
-            GLFW.glfwGetCursorPos(mc.mainWindow.getHandle(), xPos, yPos);
+            GLFW.glfwGetCursorPos(minecraft.mainWindow.getHandle(), xPos, yPos);
 
             double scaledX = xPos[0] - (windowWidth / 2.0f);
             double scaledY = yPos[0] - (windowHeight / 2.0f);
@@ -473,7 +474,7 @@ public class GenericRadialMenu
                 double fixedX = scaledX * radius / distance;
                 double fixedY = scaledY * radius / distance;
 
-                GLFW.glfwSetCursorPos(mc.mainWindow.getHandle(), (int) (windowWidth / 2 + fixedX), (int) (windowHeight / 2 + fixedY));
+                GLFW.glfwSetCursorPos(minecraft.mainWindow.getHandle(), (int) (windowWidth / 2 + fixedX), (int) (windowHeight / 2 + fixedY));
             }
         }
     }

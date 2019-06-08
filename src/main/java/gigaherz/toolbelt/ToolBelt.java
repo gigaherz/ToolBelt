@@ -2,10 +2,11 @@ package gigaherz.toolbelt;
 
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.client.ClientProxy;
-import gigaherz.toolbelt.common.GuiHandler;
+import gigaherz.toolbelt.common.*;
 import gigaherz.toolbelt.network.*;
 import gigaherz.toolbelt.server.ServerProxy;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
+import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
@@ -15,10 +16,10 @@ import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.ExtensionPoint;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
@@ -62,25 +63,24 @@ public class ToolBelt
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modEventBus.addGenericListener(Item.class, this::registerItems);
-        modEventBus.addListener(this::preInit);
-        modEventBus.addListener(this::clientInit);
+        modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::clientSetup);
+        modEventBus.addListener(this::loadComplete);
         modEventBus.addListener(this::modConfig);
 
         MinecraftForge.EVENT_BUS.addListener(this::anvilChange);
 
-        modLoadingContext.registerConfig(ModConfig.Type.SERVER, Config.SERVER_SPEC);
-        modLoadingContext.registerConfig(ModConfig.Type.CLIENT, Config.CLIENT_SPEC);
-
-        modLoadingContext.registerExtensionPoint(ExtensionPoint.GUIFACTORY, () -> message -> GuiHandler.Client.getClientGuiElement(message));
+        modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigData.SERVER_SPEC);
+        modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
     }
 
     public void modConfig(ModConfig.ModConfigEvent event)
     {
         ModConfig config = event.getConfig();
-        if (config.getSpec() == Config.CLIENT_SPEC)
-            Config.refreshClient();
-        else if (config.getSpec() == Config.SERVER_SPEC)
-            Config.refreshServer();
+        if (config.getSpec() == ConfigData.CLIENT_SPEC)
+            ConfigData.refreshClient();
+        else if (config.getSpec() == ConfigData.SERVER_SPEC)
+            ConfigData.refreshServer();
     }
 
     public void registerItems(RegistryEvent.Register<Item> event)
@@ -91,7 +91,7 @@ public class ToolBelt
         );
     }
 
-    public void preInit(FMLCommonSetupEvent event)
+    public void commonSetup(FMLCommonSetupEvent event)
     {
         int messageNumber = 0;
         channel.registerMessage(messageNumber++, SwapItems.class, SwapItems::encode, SwapItems::new, SwapItems::handle);
@@ -107,14 +107,20 @@ public class ToolBelt
         ExtensionSlotBelt.register();
     }
 
-    public void clientInit(FMLLoadCompleteEvent event)
+    public void clientSetup(FMLClientSetupEvent event)
+    {
+        ScreenManager.registerFactory(BeltContainer.TYPE, BeltScreen::new);
+        ScreenManager.registerFactory(BeltSlotContainer.TYPE, BeltSlotScreen::new);
+    }
+
+    public void loadComplete(FMLLoadCompleteEvent event)
     {
         proxy.init();
     }
 
     public void anvilChange(AnvilUpdateEvent ev)
     {
-        if (Config.disableAnvilUpgrading)
+        if (ConfigData.disableAnvilUpgrading)
             return;
 
         ItemStack left = ev.getLeft();

@@ -2,21 +2,32 @@ package gigaherz.toolbelt.common;
 
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.belt.ToolBeltInventory;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.InventoryPlayer;
-import net.minecraft.inventory.Container;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Container;
+import net.minecraft.inventory.container.ContainerType;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
-public class ContainerBelt extends Container
+public class BeltContainer extends Container
 {
-    public final int beltSlots;
+    public static final ContainerType<BeltContainer> TYPE = ContainerType.func_221505_a("anvil", BeltContainer::new);
 
-    public ContainerBelt(IInventory playerInventory, int blockedSlot, ItemStack heldItem)
+    public final int beltSlots;
+    private final ItemStack heldItem;
+
+    public BeltContainer(int id, PlayerInventory inventory)
     {
+        this(id, inventory, inventory.currentItem, inventory.getCurrentItem());
+    }
+
+    public BeltContainer(int id, IInventory playerInventory, int blockedSlot, ItemStack heldItem)
+    {
+        super(TYPE, id);
+        this.heldItem = heldItem;
         ToolBeltInventory beltInventory = (ToolBeltInventory) heldItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .orElseThrow(() -> new RuntimeException("Item handler not present."));
 
@@ -56,7 +67,7 @@ public class ContainerBelt extends Container
     }
 
     @Override
-    public void onContainerClosed(EntityPlayer playerIn)
+    public void onContainerClosed(PlayerEntity playerIn)
     {
         super.onContainerClosed(playerIn);
         if (!playerIn.world.isRemote)
@@ -70,13 +81,13 @@ public class ContainerBelt extends Container
     }
 
     @Override
-    public boolean canInteractWith(EntityPlayer playerIn)
+    public boolean canInteractWith(PlayerEntity playerIn)
     {
         return true;
     }
 
     @Override
-    public ItemStack transferStackInSlot(EntityPlayer playerIn, int index)
+    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index)
     {
         ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
@@ -109,5 +120,10 @@ public class ContainerBelt extends Container
         }
 
         return itemstack;
+    }
+
+    public ITextComponent getDisplayName()
+    {
+        return heldItem.getDisplayName();
     }
 }

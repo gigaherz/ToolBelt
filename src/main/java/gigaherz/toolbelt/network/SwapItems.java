@@ -1,13 +1,11 @@
 package gigaherz.toolbelt.network;
 
 import gigaherz.toolbelt.BeltFinder;
-import gigaherz.toolbelt.Config;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
+import gigaherz.toolbelt.ConfigData;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.EnumHand;
-import net.minecraft.world.WorldServer;
+import net.minecraft.util.Hand;
 import net.minecraftforge.fml.network.NetworkEvent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -36,13 +34,10 @@ public class SwapItems
 
     public void handle(Supplier<NetworkEvent.Context> context)
     {
-        final EntityPlayerMP player = context.get().getSender();
-        final WorldServer world = (WorldServer) player.world;
-
-        world.addScheduledTask(() -> swapItem(swapWith, player));
+        context.get().enqueueWork(() -> swapItem(swapWith, context.get().getSender()));
     }
 
-    public static void swapItem(int swapWith, EntityPlayer player)
+    public static void swapItem(int swapWith, PlayerEntity player)
     {
         BeltFinder.BeltGetter getter = BeltFinder.findBelt(player);
         if (getter == null)
@@ -54,7 +49,7 @@ public class SwapItems
 
         ItemStack inHand = player.getHeldItemMainhand();
 
-        if (!Config.isItemStackAllowed(inHand))
+        if (!ConfigData.isItemStackAllowed(inHand))
             return;
 
         IItemHandlerModifiable cap = (IItemHandlerModifiable)(
@@ -62,12 +57,12 @@ public class SwapItems
                         .orElseThrow(() -> new RuntimeException("No inventory!")));
         if (swapWith < 0)
         {
-            player.setHeldItem(EnumHand.MAIN_HAND, ItemHandlerHelper.insertItem(cap, inHand, false));
+            player.setHeldItem(Hand.MAIN_HAND, ItemHandlerHelper.insertItem(cap, inHand, false));
         }
         else
         {
             ItemStack inSlot = cap.getStackInSlot(swapWith);
-            player.setHeldItem(EnumHand.MAIN_HAND, inSlot);
+            player.setHeldItem(Hand.MAIN_HAND, inSlot);
             cap.setStackInSlot(swapWith, inHand);
         }
         getter.syncToClients();

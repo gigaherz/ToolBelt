@@ -8,12 +8,11 @@ import gigaherz.toolbelt.network.ContainerSlotsHack;
 import gigaherz.toolbelt.network.SyncBeltSlotContents;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.EntityPlayerSP;
-import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
 
@@ -49,9 +48,9 @@ public class ClientProxy implements ISideProxy
         ClientRegistry.registerKeyBinding(keyOpenBeltSlot =
                 new KeyBinding("key.toolbelt.slot", GLFW.GLFW_KEY_V, "key.toolbelt.category"));
 
-        Map<String, RenderPlayer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
+        Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
 
-        RenderPlayer render = skinMap.get("default");
+        PlayerRenderer render = skinMap.get("default");
         render.addLayer(new LayerToolBelt(render));
 
         render = skinMap.get("slim");
@@ -61,11 +60,11 @@ public class ClientProxy implements ISideProxy
     @Override
     public void handleBeltContentsChange(final BeltContentsChange message)
     {
-        Minecraft.getInstance().addScheduledTask(() -> {
+        Minecraft.getInstance().execute(() -> {
             Entity entity = Minecraft.getInstance().world.getEntityByID(message.player);
-            if (!(entity instanceof EntityPlayer))
+            if (!(entity instanceof PlayerEntity))
                 return;
-            EntityPlayer player = (EntityPlayer) entity;
+            PlayerEntity player = (PlayerEntity) entity;
             switch (message.where)
             {
                 case MAIN:
@@ -84,11 +83,11 @@ public class ClientProxy implements ISideProxy
     @Override
     public void handleBeltSlotContents(SyncBeltSlotContents message)
     {
-        Minecraft.getInstance().addScheduledTask(() -> {
+        Minecraft.getInstance().execute(() -> {
             Entity entity = Minecraft.getInstance().world.getEntityByID(message.entityId);
-            if (entity instanceof EntityPlayer)
+            if (entity instanceof PlayerEntity)
             {
-                ExtensionSlotBelt.get((EntityLivingBase) entity).setAll(message.stacks);
+                ExtensionSlotBelt.get((LivingEntity) entity).setAll(message.stacks);
             }
         });
     }

@@ -1,8 +1,8 @@
 package gigaherz.toolbelt.common;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.container.Slot;
 
 class SlotLocked extends Slot
 {
@@ -12,7 +12,7 @@ class SlotLocked extends Slot
     }
 
     @Override
-    public boolean canTakeStack(EntityPlayer playerIn)
+    public boolean canTakeStack(PlayerEntity playerIn)
     {
         return false;
     }

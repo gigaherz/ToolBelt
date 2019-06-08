@@ -1,7 +1,7 @@
 package gigaherz.toolbelt.network;
 
 import gigaherz.toolbelt.ToolBelt;
-import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -23,7 +23,7 @@ public class BeltContentsChange
     public int slot;
     public ItemStack stack;
 
-    public BeltContentsChange(EntityLivingBase player, ContainingInventory where, int slot, ItemStack stack)
+    public BeltContentsChange(LivingEntity player, ContainingInventory where, int slot, ItemStack stack)
     {
         this.player = player.getEntityId();
         this.where = where;

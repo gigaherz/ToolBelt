@@ -1,9 +1,9 @@
 package gigaherz.toolbelt.belt;
 
-import gigaherz.toolbelt.Config;
+import gigaherz.toolbelt.ConfigData;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.nbt.NBTTagList;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.ListNBT;
 import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -20,12 +20,12 @@ public class ToolBeltInventory implements IItemHandlerModifiable
         this.itemStack = itemStack;
     }
 
-    private NBTTagCompound getTag()
+    private CompoundNBT getTag()
     {
-        NBTTagCompound tag;
+        CompoundNBT tag;
         tag = itemStack.getTag();
         if (tag == null)
-            itemStack.setTag(tag = new NBTTagCompound());
+            itemStack.setTag(tag = new CompoundNBT());
         return tag;
     }
 
@@ -40,10 +40,10 @@ public class ToolBeltInventory implements IItemHandlerModifiable
     public ItemStack getStackInSlot(int slot)
     {
         validateSlotIndex(slot);
-        NBTTagList tagList = getTag().getList("Items", Constants.NBT.TAG_COMPOUND);
+        ListNBT tagList = getTag().getList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++)
         {
-            NBTTagCompound itemTags = tagList.getCompound(i);
+            CompoundNBT itemTags = tagList.getCompound(i);
             if (itemTags.getInt("Slot") != slot)
                 continue;
 
@@ -58,26 +58,26 @@ public class ToolBeltInventory implements IItemHandlerModifiable
     {
         validateSlotIndex(slot);
 
-        NBTTagCompound itemTag = null;
+        CompoundNBT itemTag = null;
         boolean hasStack = stack.getCount() > 0;
         if (hasStack)
         {
-            itemTag = new NBTTagCompound();
+            itemTag = new CompoundNBT();
             itemTag.putInt("Slot", slot);
             stack.write(itemTag);
         }
 
-        NBTTagList tagList = getTag().getList("Items", Constants.NBT.TAG_COMPOUND);
+        ListNBT tagList = getTag().getList("Items", Constants.NBT.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++)
         {
-            NBTTagCompound existing = tagList.getCompound(i);
+            CompoundNBT existing = tagList.getCompound(i);
             if (existing.getInt("Slot") != slot)
                 continue;
 
             if (hasStack)
                 tagList.set(i, itemTag);
             else
-                tagList.removeTag(i);
+                tagList.remove(i);
             return;
         }
 
@@ -133,7 +133,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
 
     protected boolean canInsertItem(int slot, ItemStack stack)
     {
-        return Config.isItemStackAllowed(stack);
+        return ConfigData.isItemStackAllowed(stack);
     }
 
     @Override

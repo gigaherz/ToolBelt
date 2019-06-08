@@ -5,11 +5,11 @@ import gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import gigaherz.toolbelt.customslots.IExtensionContainer;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.nbt.NBTTagCompound;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.INBT;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -26,7 +26,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTagCompound>
+public class RpgEquipment implements IExtensionContainer, INBTSerializable<CompoundNBT>
 {
     ////////////////////////////////////////////////////////////
     // Capability support code
@@ -44,13 +44,13 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
         {
             @Nullable
             @Override
-            public INBTBase writeNBT(Capability<RpgEquipment> capability, RpgEquipment instance, EnumFacing side)
+            public INBT writeNBT(Capability<RpgEquipment> capability, RpgEquipment instance, Direction side)
             {
                 return null;
             }
 
             @Override
-            public void readNBT(Capability<RpgEquipment> capability, RpgEquipment instance, EnumFacing side, INBTBase nbt)
+            public void readNBT(Capability<RpgEquipment> capability, RpgEquipment instance, Direction side, INBT nbt)
             {
 
             }
@@ -59,7 +59,7 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
         MinecraftForge.EVENT_BUS.register(new EventHandlers());
     }
 
-    public static RpgEquipment get(EntityPlayer player)
+    public static RpgEquipment get(PlayerEntity player)
     {
         return player.getCapability(CAPABILITY, null).orElseThrow(() -> new RuntimeException("Capability not attached!"));
     }
@@ -69,22 +69,22 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
         @SubscribeEvent
         public void attachCapabilities(AttachCapabilitiesEvent<Entity> event)
         {
-            if (event.getObject() instanceof EntityPlayer)
+            if (event.getObject() instanceof PlayerEntity)
             {
-                event.addCapability(CAPABILITY_ID, new ICapabilitySerializable<NBTTagCompound>()
+                event.addCapability(CAPABILITY_ID, new ICapabilitySerializable<CompoundNBT>()
                 {
-                    final RpgEquipment extensionContainer = new RpgEquipment((EntityPlayer) event.getObject());
+                    final RpgEquipment extensionContainer = new RpgEquipment((PlayerEntity) event.getObject());
 
                     final LazyOptional<RpgEquipment> extensionContainerInstance = LazyOptional.of(() -> extensionContainer);
 
                     @Override
-                    public NBTTagCompound serializeNBT()
+                    public CompoundNBT serializeNBT()
                     {
                         return extensionContainer.serializeNBT();
                     }
 
                     @Override
-                    public void deserializeNBT(NBTTagCompound nbt)
+                    public void deserializeNBT(CompoundNBT nbt)
                     {
                         extensionContainer.deserializeNBT(nbt);
                     }
@@ -92,7 +92,7 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
                     @Nullable
                     @SuppressWarnings("unchecked")
                     @Override
-                    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
+                    public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing)
                     {
                         if (capability == CAPABILITY)
                             return (LazyOptional<T>) extensionContainerInstance;
@@ -122,7 +122,7 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
     public static final ResourceLocation WRISTS = new ResourceLocation("examplemod", "wrists");
     public static final ResourceLocation ANKLES = new ResourceLocation("examplemod", "ankles");
 
-    private final EntityLivingBase owner;
+    private final LivingEntity owner;
     private final ItemStackHandler inventory = new ItemStackHandler(8);
     private final ExtensionSlotItemHandler ring1 = new ExtensionSlotItemHandler(this, RING, inventory, 0);
     private final ExtensionSlotItemHandler ring2 = new ExtensionSlotItemHandler(this, RING, inventory, 1);
@@ -137,14 +137,14 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
             neck, belt, wrists, ankles
     );
 
-    private RpgEquipment(EntityLivingBase owner)
+    private RpgEquipment(LivingEntity owner)
     {
         this.owner = owner;
     }
 
     @Nonnull
     @Override
-    public EntityLivingBase getOwner()
+    public LivingEntity getOwner()
     {
         return owner;
     }
@@ -219,13 +219,13 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<NBTTa
     }
 
     @Override
-    public NBTTagCompound serializeNBT()
+    public CompoundNBT serializeNBT()
     {
         return inventory.serializeNBT();
     }
 
     @Override
-    public void deserializeNBT(NBTTagCompound nbt)
+    public void deserializeNBT(CompoundNBT nbt)
     {
         inventory.deserializeNBT(nbt);
     }

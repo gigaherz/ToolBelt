@@ -2,7 +2,7 @@ package gigaherz.toolbelt.customslots;
 
 import com.google.common.collect.ImmutableSet;
 import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.init.Enchantments;
+import net.minecraft.enchantment.Enchantments;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 

@@ -1,8 +1,8 @@
 package gigaherz.toolbelt.customslots;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.nbt.INBTBase;
-import net.minecraft.util.EnumFacing;
+import net.minecraft.nbt.INBT;
+import net.minecraft.util.Direction;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -30,13 +30,13 @@ public class CapabilityExtensionSlotItem
 
         @Nullable
         @Override
-        public INBTBase writeNBT(Capability<IExtensionSlotItem> capability, IExtensionSlotItem instance, EnumFacing side)
+        public INBT writeNBT(Capability<IExtensionSlotItem> capability, IExtensionSlotItem instance, Direction side)
         {
             return null;
         }
 
         @Override
-        public void readNBT(Capability<IExtensionSlotItem> capability, IExtensionSlotItem instance, EnumFacing side, INBTBase nbt)
+        public void readNBT(Capability<IExtensionSlotItem> capability, IExtensionSlotItem instance, Direction side, INBT nbt)
         {
 
         }

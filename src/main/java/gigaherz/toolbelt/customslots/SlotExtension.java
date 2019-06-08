@@ -1,11 +1,10 @@
 package gigaherz.toolbelt.customslots;
 
-import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryBasic;
-import net.minecraft.inventory.Slot;
+import net.minecraft.inventory.Inventory;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TextComponentString;
 
 import javax.annotation.Nonnull;
 
@@ -14,7 +13,7 @@ import javax.annotation.Nonnull;
  */
 public class SlotExtension extends Slot
 {
-    private static IInventory emptyInventory = new InventoryBasic(new TextComponentString("[Null]"), 0);
+    private static IInventory emptyInventory = new Inventory(0);
     private final IExtensionSlot slot;
 
     public SlotExtension(IExtensionSlot slot, int x, int y)
@@ -85,7 +84,7 @@ public class SlotExtension extends Slot
      * Return whether this slot's stack can be taken from this slot.
      */
     @Override
-    public boolean canTakeStack(EntityPlayer playerIn)
+    public boolean canTakeStack(PlayerEntity playerIn)
     {
         return slot.canUnequip(slot.getContents());
     }

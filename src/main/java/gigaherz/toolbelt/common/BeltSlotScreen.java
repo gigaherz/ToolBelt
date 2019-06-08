@@ -1,26 +1,26 @@
 package gigaherz.toolbelt.common;
 
+import com.mojang.blaze3d.platform.GlStateManager;
 import gigaherz.toolbelt.ToolBelt;
-import gigaherz.toolbelt.network.ContainerSlotsHack;
-import net.minecraft.client.gui.GuiButtonImage;
 import net.minecraft.client.gui.IGuiEventListener;
-import net.minecraft.client.gui.inventory.GuiInventory;
-import net.minecraft.client.gui.recipebook.GuiRecipeBook;
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
-import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.InventoryEffectRenderer;
+import net.minecraft.client.gui.recipebook.RecipeBookGui;
+import net.minecraft.client.gui.screen.inventory.ContainerScreen;
+import net.minecraft.client.gui.screen.inventory.InventoryScreen;
+import net.minecraft.client.gui.widget.button.Button;
+import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.client.resources.I18n;
-import net.minecraft.entity.player.EntityPlayer;
-import net.minecraft.entity.player.EntityPlayerMP;
-import net.minecraft.inventory.ClickType;
-import net.minecraft.inventory.ContainerRecipeBook;
-import net.minecraft.inventory.Slot;
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.ClickType;
+import net.minecraft.inventory.container.RecipeBookContainer;
+import net.minecraft.inventory.container.Slot;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.network.NetworkDirection;
+import net.minecraft.util.text.ITextComponent;
 
 import javax.annotation.Nullable;
 
-public class GuiBeltSlot extends InventoryEffectRenderer implements IRecipeShownListener
+public class BeltSlotScreen extends ContainerScreen<BeltSlotContainer> implements IRecipeShownListener
 {
 
     /** The old x position of the mouse pointer */
@@ -28,16 +28,15 @@ public class GuiBeltSlot extends InventoryEffectRenderer implements IRecipeShown
     /** The old y position of the mouse pointer */
     private float oldMouseY;
 
-    private final GuiRecipeBook recipeBookGui = new GuiRecipeBook();
+    private final RecipeBookGui recipeBookGui = new RecipeBookGui();
     private boolean widthTooNarrow;
     private boolean buttonClicked;
 
     private static final ResourceLocation GUI_TEXTURE = ToolBelt.location("textures/gui/belt_slot.png");
 
-    public GuiBeltSlot(EntityPlayer player)
+    public BeltSlotScreen(BeltSlotContainer container, PlayerInventory playerInventory, ITextComponent title)
     {
-        super(new ContainerBeltSlot(player.inventory, !player.world.isRemote, player));
-        this.allowUserInput = true;
+        super(container, playerInventory, title);
     }
 
     @Override
@@ -46,26 +45,24 @@ public class GuiBeltSlot extends InventoryEffectRenderer implements IRecipeShown
         this.recipeBookGui.tick();
     }
 
+    private ImageButton recipeBookButton;
+
     @Override
-    public void initGui()
+    public void init()
     {
-        super.initGui();
+        super.init();
 
         this.widthTooNarrow = this.width < 379;
-        this.recipeBookGui.func_201520_a(this.width, this.height, this.mc, this.widthTooNarrow, (ContainerRecipeBook)this.inventorySlots);
+        this.recipeBookGui.func_201520_a(this.width, this.height, minecraft, this.widthTooNarrow, this.getContainer());
         this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
         this.children.add(this.recipeBookGui);
-        this.addButton(new GuiButtonImage(10, this.guiLeft + 104, this.height / 2 - 22,
-                20, 18, 178, 0, 19, INVENTORY_BACKGROUND) {
-            @Override
-            public void onClick(double mouseX, double mouseY)
-            {
-                GuiBeltSlot.this.recipeBookGui.func_201518_a(GuiBeltSlot.this.widthTooNarrow);
-                GuiBeltSlot.this.recipeBookGui.toggleVisibility();
-                GuiBeltSlot.this.guiLeft = GuiBeltSlot.this.recipeBookGui.updateScreenPosition(GuiBeltSlot.this.widthTooNarrow, GuiBeltSlot.this.width, GuiBeltSlot.this.xSize);
-                this.setPosition(GuiBeltSlot.this.guiLeft + 5, GuiBeltSlot.this.height / 2 - 49);
-            }
+        recipeBookButton = new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 178, 0, 19, INVENTORY_BACKGROUND, btn -> {
+            BeltSlotScreen.this.recipeBookGui.func_201518_a(BeltSlotScreen.this.widthTooNarrow);
+            BeltSlotScreen.this.recipeBookGui.toggleVisibility();
+            BeltSlotScreen.this.guiLeft = BeltSlotScreen.this.recipeBookGui.updateScreenPosition(BeltSlotScreen.this.widthTooNarrow, BeltSlotScreen.this.width, BeltSlotScreen.this.xSize);
+            recipeBookButton.setPosition(BeltSlotScreen.this.guiLeft + 5, BeltSlotScreen.this.height / 2 - 49);
         });
+        this.addButton(recipeBookButton);
     }
 
     @Override
@@ -77,14 +74,14 @@ public class GuiBeltSlot extends InventoryEffectRenderer implements IRecipeShown
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        this.fontRenderer.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
+        this.font.drawString(I18n.format("container.crafting"), 97, 8, 4210752);
     }
 
     @Override
     public void render(int mouseX, int mouseY, float partialTicks)
     {
-        this.drawDefaultBackground();
-        this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
+        this.renderBackground();
+        //TODO this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
 
         if (this.recipeBookGui.isVisible() && this.widthTooNarrow)
         {
@@ -108,11 +105,11 @@ public class GuiBeltSlot extends InventoryEffectRenderer implements IRecipeShown
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.mc.getTextureManager().bindTexture(GUI_TEXTURE);
+        minecraft.getTextureManager().bindTexture(GUI_TEXTURE);
         int i = this.guiLeft;
         int j = this.guiTop;
-        this.drawTexturedModalRect(i, j, 0, 0, this.xSize, this.ySize);
-        GuiInventory.drawEntityOnScreen(i + 51, j + 75, 30, (float)(i + 51) - this.oldMouseX, (float)(j + 75 - 50) - this.oldMouseY, this.mc.player);
+        this.blit(i, j, 0, 0, this.xSize, this.ySize);
+        InventoryScreen.drawEntityOnScreen(i + 51, j + 75, 30, (float)(i + 51) - this.oldMouseX, (float)(j + 75 - 50) - this.oldMouseY, minecraft.player);
     }
 
     @Override
@@ -157,13 +154,14 @@ public class GuiBeltSlot extends InventoryEffectRenderer implements IRecipeShown
     }
 
     @Override
-    public void onGuiClosed() {
+    public void onClose()
+    {
         this.recipeBookGui.removed();
-        super.onGuiClosed();
+        super.onClose();
     }
 
     @Override
-    public GuiRecipeBook func_194310_f() {
+    public RecipeBookGui func_194310_f() {
         return this.recipeBookGui;
     }
 }
