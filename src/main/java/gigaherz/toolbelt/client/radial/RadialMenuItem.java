@@ -49,6 +49,7 @@ public abstract class RadialMenuItem
     }
 
     public abstract void draw(DrawingContext context);
+
     public abstract void drawTooltips(DrawingContext context);
 
     public boolean onClick()

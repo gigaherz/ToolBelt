@@ -11,8 +11,8 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.INBT;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
@@ -26,11 +26,12 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -82,7 +83,8 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             {
                 event.addCapability(CAPABILITY_ID, new ICapabilitySerializable<CompoundNBT>()
                 {
-                    final ExtensionSlotBelt extensionContainer = new ExtensionSlotBelt((PlayerEntity) event.getObject()) {
+                    final ExtensionSlotBelt extensionContainer = new ExtensionSlotBelt((PlayerEntity) event.getObject())
+                    {
                         @Override
                         public void onContentsChanged(IExtensionSlot slot)
                         {
@@ -164,7 +166,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
     protected void syncTo(PlayerEntity p)
     {
         SyncBeltSlotContents message = new SyncBeltSlotContents((PlayerEntity) owner, this);
-        ToolBelt.channel.sendTo(message, ((ServerPlayerEntity)p).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+        ToolBelt.channel.sendTo(message, ((ServerPlayerEntity) p).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     protected void syncTo(PacketDistributor.PacketTarget target)
@@ -179,7 +181,8 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
     public static final ResourceLocation BELT = new ResourceLocation("examplemod", "belt");
 
     private final LivingEntity owner;
-    private final ItemStackHandler inventory = new ItemStackHandler(1) {
+    private final ItemStackHandler inventory = new ItemStackHandler(1)
+    {
         @Override
         protected void onContentsChanged(int slot)
         {
@@ -187,7 +190,8 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             belt.onContentsChanged();
         }
     };
-    private final ExtensionSlotItemHandler belt = new ExtensionSlotItemHandler(this, BELT, inventory, 0){
+    private final ExtensionSlotItemHandler belt = new ExtensionSlotItemHandler(this, BELT, inventory, 0)
+    {
 
     };
     private final ImmutableList<IExtensionSlot> slots = ImmutableList.of(belt);
@@ -234,7 +238,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
     public void setAll(NonNullList<ItemStack> stacks)
     {
         List<IExtensionSlot> slots = getSlots();
-        for(int i=0;i<slots.size();i++)
+        for (int i = 0; i < slots.size(); i++)
         {
             slots.get(i).setContents(stacks.get(i));
         }

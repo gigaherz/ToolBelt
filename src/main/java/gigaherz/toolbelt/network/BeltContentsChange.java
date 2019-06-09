@@ -1,6 +1,6 @@
 package gigaherz.toolbelt.network;
 
-import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.client.ClientPacketHandlers;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -49,6 +49,6 @@ public class BeltContentsChange
 
     public void handle(Supplier<NetworkEvent.Context> context)
     {
-        ToolBelt.proxy.handleBeltContentsChange(this);
+        ClientPacketHandlers.handleBeltContentsChange(this);
     }
 }

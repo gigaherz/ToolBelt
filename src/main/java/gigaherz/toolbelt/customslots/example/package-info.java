@@ -1,6 +1,6 @@
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-package gigaherz.toolbelt.server;
+package gigaherz.toolbelt.customslots.example;
 
 import mcp.MethodsReturnNonnullByDefault;
 

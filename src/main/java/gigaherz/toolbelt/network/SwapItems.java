@@ -52,7 +52,7 @@ public class SwapItems
         if (!ConfigData.isItemStackAllowed(inHand))
             return;
 
-        IItemHandlerModifiable cap = (IItemHandlerModifiable)(
+        IItemHandlerModifiable cap = (IItemHandlerModifiable) (
                 stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
                         .orElseThrow(() -> new RuntimeException("No inventory!")));
         if (swapWith < 0)

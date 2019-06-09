@@ -19,7 +19,9 @@ public class ConfigData
 {
     public static final ServerConfig SERVER;
     public static final ForgeConfigSpec SERVER_SPEC;
-    static {
+
+    static
+    {
         final Pair<ServerConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
         SERVER_SPEC = specPair.getRight();
         SERVER = specPair.getLeft();
@@ -27,7 +29,9 @@ public class ConfigData
 
     public static final ClientConfig CLIENT;
     public static final ForgeConfigSpec CLIENT_SPEC;
-    static {
+
+    static
+    {
         final Pair<ClientConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ClientConfig::new);
         CLIENT_SPEC = specPair.getRight();
         CLIENT = specPair.getLeft();
@@ -52,7 +56,8 @@ public class ConfigData
         public final ForgeConfigSpec.ConfigValue<List<? extends String>> blacklist;
         public final ForgeConfigSpec.BooleanValue disableAnvilUpgrading;
 
-        ServerConfig(ForgeConfigSpec.Builder builder) {
+        ServerConfig(ForgeConfigSpec.Builder builder)
+        {
             builder.push("general");
             whitelist = builder
                     .comment("List of items to force-allow placing in the belt. Takes precedence over blacklist.")
@@ -79,7 +84,8 @@ public class ConfigData
         public final ForgeConfigSpec.BooleanValue allowClickOutsideBounds;
         public final ForgeConfigSpec.BooleanValue displayEmptySlots;
 
-        ClientConfig(ForgeConfigSpec.Builder builder) {
+        ClientConfig(ForgeConfigSpec.Builder builder)
+        {
             builder.comment("Options for customizing the display of tools on the player")
                     .push("display");
             showBeltOnPlayers = builder

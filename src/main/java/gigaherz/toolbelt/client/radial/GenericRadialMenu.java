@@ -435,9 +435,9 @@ public class GenericRadialMenu
         double s0 = getAngleFor(0 - 0.5, numItems);
         double s1 = getAngleFor(numItems - 0.5, numItems);
         while (a < s0)
-            a += TWO_PI;
+        { a += TWO_PI; }
         while (a >= s1)
-            a -= TWO_PI;
+        { a -= TWO_PI; }
 
         int hovered = -1;
         for (int i = 0; i < numItems; i++)

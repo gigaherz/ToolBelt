@@ -127,9 +127,9 @@ public class ItemToolBelt extends Item implements IExtensionSlotItem
             public <T> LazyOptional<T> getCapability(@Nonnull final Capability<T> cap, final @Nullable Direction side)
             {
                 if (cap == ITEM_HANDLER)
-                    return (LazyOptional<T>)itemHandlerInstance;
+                    return (LazyOptional<T>) itemHandlerInstance;
                 if (cap == EXTENSION_SLOT_ITEM)
-                    return (LazyOptional<T>)extensionSlotInstance;
+                    return (LazyOptional<T>) extensionSlotInstance;
                 return LazyOptional.empty();
             }
         };
@@ -261,5 +261,4 @@ public class ItemToolBelt extends Item implements IExtensionSlotItem
 
         }
     }
-
 }

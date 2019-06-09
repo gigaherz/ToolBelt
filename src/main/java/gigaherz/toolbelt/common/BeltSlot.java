@@ -12,7 +12,8 @@ public class BeltSlot extends Slot
 {
     public BeltSlot(IInventory playerInventory, int blockedSlot, int index, int xPosition, int yPosition)
     {
-        super(new IInventory(){
+        super(new IInventory()
+        {
 
             ItemStack beltStack = null;
             IItemHandlerModifiable inventory = null;
@@ -23,9 +24,9 @@ public class BeltSlot extends Slot
                 if (stack != beltStack)
                 {
                     beltStack = stack;
-                    inventory = (IItemHandlerModifiable)(
+                    inventory = (IItemHandlerModifiable) (
                             stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
-                            .orElseThrow(() -> new RuntimeException("No inventory!"))
+                                    .orElseThrow(() -> new RuntimeException("No inventory!"))
                     );
                 }
                 return inventory;
@@ -118,5 +119,4 @@ public class BeltSlot extends Slot
     {
         return ConfigData.isItemStackAllowed(stack);
     }
-
 }

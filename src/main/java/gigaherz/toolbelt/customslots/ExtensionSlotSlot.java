@@ -45,6 +45,7 @@ public class ExtensionSlotSlot extends Slot
     }
 
     // Override if your IItemHandler does not implement IItemHandlerModifiable
+
     /**
      * Helper method to put a stack in the slot.
      */

@@ -11,6 +11,7 @@ public class OpenBeltSlotInventory
     public OpenBeltSlotInventory()
     {
     }
+
     public OpenBeltSlotInventory(PacketBuffer buf)
     {
     }

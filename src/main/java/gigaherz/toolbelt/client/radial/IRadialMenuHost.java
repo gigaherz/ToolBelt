@@ -7,6 +7,8 @@ import net.minecraft.client.renderer.ItemRenderer;
 public interface IRadialMenuHost
 {
     Screen getScreen();
+
     FontRenderer getFontRenderer();
+
     ItemRenderer getItemRenderer();
 }

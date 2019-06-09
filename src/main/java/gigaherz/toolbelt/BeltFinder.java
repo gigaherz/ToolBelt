@@ -17,7 +17,7 @@ public abstract class BeltFinder
     @Nullable
     public static BeltGetter findBelt(PlayerEntity player)
     {
-        for(int i=instances.size()-1;i>=0;i--)
+        for (int i = instances.size() - 1; i >= 0; i--)
         {
             BeltFinder instance = instances.get(i);
             BeltGetter getter = instance.findStack(player);
@@ -39,6 +39,7 @@ public abstract class BeltFinder
     public void setToBaubles(PlayerEntity player, int slot, ItemStack stack)
     {
     }
+
     public void setToBeltSlot(LivingEntity player, ItemStack stack)
     {
     }

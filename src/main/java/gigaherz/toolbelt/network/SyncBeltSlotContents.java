@@ -1,6 +1,6 @@
 package gigaherz.toolbelt.network;
 
-import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.client.ClientPacketHandlers;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
 import net.minecraft.entity.player.PlayerEntity;
@@ -26,7 +26,7 @@ public class SyncBeltSlotContents
     {
         entityId = buf.readVarInt();
         int numStacks = buf.readVarInt();
-        for(int i=0;i<numStacks;i++)
+        for (int i = 0; i < numStacks; i++)
         {
             stacks.add(buf.readItemStack());
         }
@@ -36,7 +36,7 @@ public class SyncBeltSlotContents
     {
         buf.writeVarInt(entityId);
         buf.writeVarInt(stacks.size());
-        for(ItemStack stack : stacks)
+        for (ItemStack stack : stacks)
         {
             buf.writeItemStack(stack);
         }
@@ -44,6 +44,6 @@ public class SyncBeltSlotContents
 
     public void handle(Supplier<NetworkEvent.Context> context)
     {
-        ToolBelt.proxy.handleBeltSlotContents(this);
+        ClientPacketHandlers.handleBeltSlotContents(this);
     }
 }

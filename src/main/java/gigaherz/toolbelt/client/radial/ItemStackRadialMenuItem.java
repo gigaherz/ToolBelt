@@ -58,7 +58,7 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
         if (stack.getCount() > 0)
         {
             net.minecraftforge.fml.client.config.GuiUtils.preItemToolTip(stack);
-            GuiUtils.drawHoveringText(stack, getItemToolTip(stack), (int) context.x, (int) context.y, (int)context.width, (int)context.height, -1, context.fontRenderer);
+            GuiUtils.drawHoveringText(stack, getItemToolTip(stack), (int) context.x, (int) context.y, (int) context.width, (int) context.height, -1, context.fontRenderer);
             GuiUtils.postItemToolTip();
         }
         else
@@ -73,7 +73,8 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
         List<ITextComponent> list = stack.getTooltip(mc.player, mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
         List<String> list1 = Lists.newArrayList();
 
-        for(ITextComponent itextcomponent : list) {
+        for (ITextComponent itextcomponent : list)
+        {
             list1.add(itextcomponent.getFormattedText());
         }
 

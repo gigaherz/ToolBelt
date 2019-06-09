@@ -11,10 +11,12 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.registries.ObjectHolder;
 
 public class BeltContainer extends Container
 {
-    public static final ContainerType<BeltContainer> TYPE = ContainerType.func_221505_a("anvil", BeltContainer::new);
+    @ObjectHolder("toolbelt:belt_container")
+    public static ContainerType<BeltContainer> TYPE;
 
     public final int beltSlots;
     private final ItemStack heldItem;

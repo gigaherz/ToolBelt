@@ -22,11 +22,11 @@ public class LayerToolBelt<T extends PlayerEntity, M extends PlayerModel<T>> ext
 {
     private static final ResourceLocation TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
 
-    private final LivingRenderer<T,M> owner;
+    private final LivingRenderer<T, M> owner;
 
     private final ModelBelt beltModel = new ModelBelt();
 
-    public LayerToolBelt(LivingRenderer<T,M> owner)
+    public LayerToolBelt(LivingRenderer<T, M> owner)
     {
         super(owner);
         this.owner = owner;

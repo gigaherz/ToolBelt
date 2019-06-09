@@ -1,19 +1,20 @@
 package gigaherz.toolbelt;
 
 import gigaherz.toolbelt.belt.ItemToolBelt;
-import gigaherz.toolbelt.client.ClientProxy;
-import gigaherz.toolbelt.common.*;
+import gigaherz.toolbelt.client.ClientEvents;
+import gigaherz.toolbelt.common.BeltContainer;
+import gigaherz.toolbelt.common.BeltScreen;
+import gigaherz.toolbelt.common.BeltSlotContainer;
+import gigaherz.toolbelt.common.BeltSlotScreen;
 import gigaherz.toolbelt.network.*;
-import gigaherz.toolbelt.server.ServerProxy;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
-import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.entity.merchant.villager.VillagerProfession;
-import net.minecraft.entity.merchant.villager.VillagerTrades;
+import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
@@ -29,7 +30,6 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ObjectHolder;
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -45,8 +45,6 @@ public class ToolBelt
     public static Item pouch;
 
     public static ToolBelt instance;
-
-    public static final ISideProxy proxy = DistExecutor.runForDist(() -> () -> new ClientProxy(), () -> () -> new ServerProxy());
 
     public static final Logger logger = LogManager.getLogger(MODID);
 
@@ -67,6 +65,7 @@ public class ToolBelt
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         modEventBus.addGenericListener(Item.class, this::registerItems);
+        modEventBus.addGenericListener(ContainerType.class, this::registerContainers);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::loadComplete);
@@ -95,6 +94,14 @@ public class ToolBelt
         );
     }
 
+    public void registerContainers(RegistryEvent.Register<ContainerType<?>> event)
+    {
+        event.getRegistry().registerAll(
+                new ContainerType<>(BeltSlotContainer::new).setRegistryName("belt_slot_container"),
+                new ContainerType<>(BeltContainer::new).setRegistryName("belt_container")
+        );
+    }
+
     public void commonSetup(FMLCommonSetupEvent event)
     {
         int messageNumber = 0;
@@ -119,7 +126,7 @@ public class ToolBelt
 
     public void loadComplete(FMLLoadCompleteEvent event)
     {
-        proxy.init();
+        DistExecutor.runWhenOn(Dist.CLIENT, () -> ClientEvents::initKeybinds);
     }
 
     public void anvilChange(AnvilUpdateEvent ev)

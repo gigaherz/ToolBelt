@@ -5,7 +5,6 @@ import gigaherz.toolbelt.customslots.IExtensionContainer;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.EquipmentSlotType;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 
