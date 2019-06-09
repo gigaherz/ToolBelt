@@ -23,7 +23,7 @@ public class OpenBeltSlotInventory
     public void handle(Supplier<NetworkEvent.Context> context)
     {
         context.get().enqueueWork(() -> {
-            Screens.openSlotGui(context.get().getSender());
+            Screens.openSlotScreen(context.get().getSender());
         });
     }
 }

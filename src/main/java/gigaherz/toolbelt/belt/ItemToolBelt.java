@@ -48,7 +48,7 @@ public class ItemToolBelt extends Item implements IExtensionSlotItem
         super(properties);
     }
 
-    private ActionResultType openBeltGui(PlayerEntity player, ItemStack stack, World world)
+    private ActionResultType openBeltScreen(PlayerEntity player, ItemStack stack, World world)
     {
         int slot = player.inventory.getSlotFor(stack);
         if (slot == -1)
@@ -56,7 +56,7 @@ public class ItemToolBelt extends Item implements IExtensionSlotItem
 
         if (!world.isRemote && player instanceof ServerPlayerEntity)
         {
-            Screens.openBeltGui((ServerPlayerEntity) player, slot);
+            Screens.openBeltScreen((ServerPlayerEntity) player, slot);
         }
 
         return ActionResultType.SUCCESS;
@@ -69,14 +69,14 @@ public class ItemToolBelt extends Item implements IExtensionSlotItem
         ItemStack stack = context.getItem();
         World world = context.getWorld();
 
-        return openBeltGui(player, stack, world);
+        return openBeltScreen(player, stack, world);
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
     {
         ItemStack stack = player.getHeldItem(hand);
-        return new ActionResult<>(openBeltGui(player, stack, world), stack);
+        return new ActionResult<>(openBeltScreen(player, stack, world), stack);
     }
 
     @Override
