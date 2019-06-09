@@ -29,7 +29,7 @@ compileJava {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190608-1.14.2'
+    mappings channel: 'snapshot', version: '20190609-1.14.2'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 

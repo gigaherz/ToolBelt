@@ -142,7 +142,7 @@ public class RadialMenuScreen extends Screen
         {
             Minecraft.getInstance().displayGuiScreen(null);
         }
-        else if (!InputMappings.func_216506_a(minecraft.mainWindow.getHandle(), ClientEvents.OPEN_TOOL_MENU_KEYBIND.getKey().getKeyCode()))
+        else if (!InputMappings.isKeyDown(minecraft.mainWindow.getHandle(), ClientEvents.OPEN_TOOL_MENU_KEYBIND.getKey().getKeyCode()))
         {
             if (ConfigData.releaseToSwap)
             {

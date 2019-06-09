@@ -90,6 +90,6 @@ public class ClientEvents
 
     public static boolean isKeyDown(KeyBinding keybind)
     {
-        return InputMappings.func_216506_a(Minecraft.getInstance().mainWindow.getHandle(), keybind.getKey().getKeyCode());
+        return InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), keybind.getKey().getKeyCode());
     }
 }

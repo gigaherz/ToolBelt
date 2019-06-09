@@ -63,7 +63,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
 
         for (int k = 0; k < 4; ++k)
         {
-            final EquipmentSlotType equipmentslottype = PlayerContainer.field_185003_h[k];
+            final EquipmentSlotType equipmentslottype = PlayerContainer.VALID_EQUIPMENT_SLOTS[k];
             this.addSlot(new Slot(playerInventory, 39 - k, 8, 8 + k * 18)
             {
                 /**
