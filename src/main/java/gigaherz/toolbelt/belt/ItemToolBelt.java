@@ -2,7 +2,7 @@ package gigaherz.toolbelt.belt;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import gigaherz.toolbelt.common.GuiHandler;
+import gigaherz.toolbelt.common.Screens;
 import gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import gigaherz.toolbelt.customslots.IExtensionContainer;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
@@ -56,7 +56,7 @@ public class ItemToolBelt extends Item implements IExtensionSlotItem
 
         if (!world.isRemote && player instanceof ServerPlayerEntity)
         {
-            GuiHandler.openBeltGui((ServerPlayerEntity) player, slot);
+            Screens.openBeltGui((ServerPlayerEntity) player, slot);
         }
 
         return ActionResultType.SUCCESS;

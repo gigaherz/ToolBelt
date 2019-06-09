@@ -1,6 +1,6 @@
 package gigaherz.toolbelt.network;
 
-import gigaherz.toolbelt.common.GuiHandler;
+import gigaherz.toolbelt.common.Screens;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 
@@ -22,7 +22,7 @@ public class OpenBeltSlotInventory
     public void handle(Supplier<NetworkEvent.Context> context)
     {
         context.get().enqueueWork(() -> {
-            GuiHandler.openSlotGui(context.get().getSender());
+            Screens.openSlotGui(context.get().getSender());
         });
     }
 }

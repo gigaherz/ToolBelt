@@ -24,13 +24,13 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.fml.common.gameevent.PlayerEvent.*;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -116,16 +116,23 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         }
 
         @SubscribeEvent
-        public void joinWorld(EntityJoinWorldEvent event)
+        public void joinWorld(PlayerLoggedInEvent event)
         {
-            Entity target = event.getEntity();
+            PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
                 return;
-            if (target instanceof PlayerEntity)
-            {
-                ExtensionSlotBelt instance = get((LivingEntity) target);
-                instance.syncToSelf();
-            }
+            ExtensionSlotBelt instance = get(target);
+            instance.syncToSelf();
+        }
+
+        @SubscribeEvent
+        public void joinWorld(PlayerChangedDimensionEvent event)
+        {
+            PlayerEntity target = event.getPlayer();
+            if (target.world.isRemote)
+                return;
+            ExtensionSlotBelt instance = get(target);
+            instance.syncToSelf();
         }
 
         @SubscribeEvent

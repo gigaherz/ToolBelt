@@ -3,15 +3,19 @@ package gigaherz.toolbelt.client;
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.common.BeltSlotContainer;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+
+import java.util.Collections;
 
 import static gigaherz.toolbelt.client.ClientProxy.keyOpenBeltSlot;
 import static gigaherz.toolbelt.client.ClientProxy.keyOpenToolMenu;
@@ -24,19 +28,6 @@ public class ClientEvents
     {
         //registerItemModel(ToolBelt.belt);
         //registerItemModel(ToolBelt.pouch);
-    }
-
-    /*@SubscribeEvent
-    public static void textureStitch(TextureStitchEvent.Pre event)
-    {
-        event.getMap().registerSprite(Minecraft.getInstance().getResourceManager(), ContainerBeltSlot.EMPTY_SPRITE);
-    }*/
-
-    @SubscribeEvent
-    public static void clientTick(TickEvent.ClientTickEvent event)
-    {
-        if (Minecraft.getInstance().world != null)
-            handleKeys();
     }
 
     @SubscribeEvent
@@ -66,7 +57,7 @@ public class ClientEvents
                     if (getter == null)
                         return;
 
-                    mc.displayGuiScreen(new GuiRadialMenu(getter));
+                    mc.displayGuiScreen(new RadialMenuScreen(getter));
                 }
             }
         }

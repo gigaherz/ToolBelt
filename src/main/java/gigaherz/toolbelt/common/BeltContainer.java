@@ -35,7 +35,7 @@ public class BeltContainer extends Container
         int xoff = ((9 - beltSlots) * 18) / 2;
         for (int k = 0; k < beltSlots; ++k)
         {
-            this.addSlot(new SlotBelt(playerInventory, blockedSlot, k, 8 + xoff + k * 18, 20));
+            this.addSlot(new BeltSlot(playerInventory, blockedSlot, k, 8 + xoff + k * 18, 20));
         }
 
         bindPlayerInventory(playerInventory, blockedSlot);
@@ -50,7 +50,7 @@ public class BeltContainer extends Container
                 int index = j1 + l * 9 + 9;
                 this.addSlot(
                         blockedSlot == index
-                                ? new SlotLocked(playerInventory, index, 8 + j1 * 18, l * 18 + 51)
+                                ? new LockedSlot(playerInventory, index, 8 + j1 * 18, l * 18 + 51)
                                 : new Slot(playerInventory, index, 8 + j1 * 18, l * 18 + 51)
                 );
             }
@@ -60,7 +60,7 @@ public class BeltContainer extends Container
         {
             this.addSlot(
                     blockedSlot == i1
-                            ? new SlotLocked(playerInventory, i1, 8 + i1 * 18, 109)
+                            ? new LockedSlot(playerInventory, i1, 8 + i1 * 18, 109)
                             : new Slot(playerInventory, i1, 8 + i1 * 18, 109)
             );
         }

@@ -24,7 +24,7 @@ import net.minecraftforge.items.IItemHandler;
 import java.util.List;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
-public class GuiRadialMenu extends Screen
+public class RadialMenuScreen extends Screen
 {
     private final BeltFinder.BeltGetter getter;
     private ItemStack stackEquipped;
@@ -43,7 +43,7 @@ public class GuiRadialMenu extends Screen
         return itemRenderer;
     }
 
-    public GuiRadialMenu(BeltFinder.BeltGetter getter)
+    public RadialMenuScreen(BeltFinder.BeltGetter getter)
     {
         super(new StringTextComponent("RADIAL MENU"));
 
@@ -55,7 +55,7 @@ public class GuiRadialMenu extends Screen
             @Override
             public Screen getScreen()
             {
-                return GuiRadialMenu.this;
+                return RadialMenuScreen.this;
             }
 
             @Override
@@ -67,7 +67,7 @@ public class GuiRadialMenu extends Screen
             @Override
             public ItemRenderer getItemRenderer()
             {
-                return GuiRadialMenu.this.getItemRenderer();
+                return RadialMenuScreen.this.getItemRenderer();
             }
         })
         {
@@ -82,7 +82,7 @@ public class GuiRadialMenu extends Screen
             @Override
             public boolean onClick()
             {
-                return GuiRadialMenu.this.trySwap(-1, ItemStack.EMPTY);
+                return RadialMenuScreen.this.trySwap(-1, ItemStack.EMPTY);
             }
         };
     }
@@ -93,7 +93,7 @@ public class GuiRadialMenu extends Screen
         if (event.getType() != RenderGameOverlayEvent.ElementType.CROSSHAIRS)
             return;
 
-        if (Minecraft.getInstance().field_71462_r instanceof GuiRadialMenu)
+        if (Minecraft.getInstance().field_71462_r instanceof RadialMenuScreen)
         {
             event.setCanceled(true);
         }
@@ -190,7 +190,7 @@ public class GuiRadialMenu extends Screen
                     @Override
                     public boolean onClick()
                     {
-                        return GuiRadialMenu.this.trySwap(getSlot(), getStack());
+                        return RadialMenuScreen.this.trySwap(getSlot(), getStack());
                     }
                 };
                 item.setVisible(inSlot.getCount() > 0 || ConfigData.displayEmptySlots);

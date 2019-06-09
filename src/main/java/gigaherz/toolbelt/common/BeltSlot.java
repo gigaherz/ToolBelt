@@ -8,9 +8,9 @@ import net.minecraft.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
-public class SlotBelt extends Slot
+public class BeltSlot extends Slot
 {
-    public SlotBelt(IInventory playerInventory, int blockedSlot, int index, int xPosition, int yPosition)
+    public BeltSlot(IInventory playerInventory, int blockedSlot, int index, int xPosition, int yPosition)
     {
         super(new IInventory(){
 

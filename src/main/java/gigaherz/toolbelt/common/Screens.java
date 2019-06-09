@@ -16,7 +16,7 @@ import net.minecraftforge.fml.network.NetworkHooks;
 
 import javax.annotation.Nullable;
 
-public class GuiHandler
+public class Screens
 {
     private static final ResourceLocation BELT = ToolBelt.location("belt");
     private static final ResourceLocation BELT_SLOT = ToolBelt.location("belt_slot");

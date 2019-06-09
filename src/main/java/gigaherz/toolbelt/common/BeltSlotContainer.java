@@ -4,6 +4,7 @@ import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.network.ContainerSlotsHack;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -18,7 +19,7 @@ import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.RecipeItemHelper;
 import net.minecraft.util.ResourceLocation;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
-import gigaherz.toolbelt.customslots.SlotExtension;
+import gigaherz.toolbelt.customslots.ExtensionSlotSlot;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
@@ -28,9 +29,9 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
 {
     public static final ContainerType<BeltSlotContainer> TYPE = ContainerType.func_221505_a("anvil", BeltSlotContainer::new);
 
-    public static final ResourceLocation EMPTY_SPRITE = ToolBelt.location("gui/empty_belt_slot_background");
+    public static final ResourceLocation SLOT_BACKGROUND = ToolBelt.location("textures/gui/empty_belt_slot_background.png");
 
-    private final SlotExtension slotBelt;
+    private final ExtensionSlotSlot slotBelt;
     private final IExtensionSlot extensionSlot;
 
     private final CraftingInventory field_75181_e = new CraftingInventory(this, 2, 2);
@@ -113,8 +114,23 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
 
         extensionSlot = container.getBelt();
 
-        this.addSlot(slotBelt = new SlotExtension(extensionSlot, 77, 44));
-        slotBelt.setBackgroundName(EMPTY_SPRITE.toString());
+        this.addSlot(slotBelt = new ExtensionSlotSlot(extensionSlot, 77, 44){
+            {
+                setBackgroundLocation(SLOT_BACKGROUND);
+            }
+
+            @Nullable
+            @Override
+            public TextureAtlasSprite getBackgroundSprite()
+            {
+                return new TextureAtlasSprite(SLOT_BACKGROUND,16,16)
+                {
+                    {
+                        func_217789_a(16,16,0,0);
+                    }
+                };
+            }
+        });
 
         if (!localWorld)
         {

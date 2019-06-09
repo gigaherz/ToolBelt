@@ -11,12 +11,12 @@ import javax.annotation.Nonnull;
 /**
  * To be used in Containers.
  */
-public class SlotExtension extends Slot
+public class ExtensionSlotSlot extends Slot
 {
     private static IInventory emptyInventory = new Inventory(0);
     private final IExtensionSlot slot;
 
-    public SlotExtension(IExtensionSlot slot, int x, int y)
+    public ExtensionSlotSlot(IExtensionSlot slot, int x, int y)
     {
         super(emptyInventory, 0, x, y);
         this.slot = slot;
@@ -122,6 +122,6 @@ public class SlotExtension extends Slot
     @Override
     public boolean isSameInventory(Slot other)
     {
-        return other instanceof SlotExtension && ((SlotExtension) other).getExtensionSlot() == this.slot;
+        return other instanceof ExtensionSlotSlot && ((ExtensionSlotSlot) other).getExtensionSlot() == this.slot;
     }
 }

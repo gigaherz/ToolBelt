@@ -61,7 +61,7 @@ public class ConfigData
             blacklist = builder
                     .comment("List of items to disallow from placing in the belt. (whitelist takes precedence)")
                     .translation("text.toolbelt.config.blacklist")
-                    .defineList("whitelist", Lists.newArrayList(), o -> o instanceof String);
+                    .defineList("blacklist", Lists.newArrayList(), o -> o instanceof String);
             disableAnvilUpgrading = builder
                     .comment("If set to TRUE, the internal anvil upgrade will not work, and alternative methods for upgrades will have to be provided externally.")
                     .translation("text.toolbelt.config.disable_anvil_update")
