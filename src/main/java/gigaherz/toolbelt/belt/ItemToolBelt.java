@@ -271,5 +271,12 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
         {
             return slots;
         }
+
+        @Override
+        public void onContentsChanged(IExtensionSlot slot)
+        {
+
+        }
     }
+
 }

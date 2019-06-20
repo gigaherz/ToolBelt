@@ -23,6 +23,8 @@ public interface IExtensionSlot
 
     void setContents(@Nonnull ItemStack stack);
 
+    void onContentsChanged();
+
     // Permissions
 
     /**

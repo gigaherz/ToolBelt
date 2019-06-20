@@ -12,4 +12,6 @@ public interface IExtensionContainer
 
     @Nonnull
     ImmutableList<IExtensionSlot> getSlots();
+
+    void onContentsChanged(IExtensionSlot slot);
 }

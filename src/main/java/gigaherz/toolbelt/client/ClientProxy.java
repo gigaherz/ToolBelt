@@ -7,8 +7,11 @@ import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.common.ContainerBeltSlot;
 import gigaherz.toolbelt.network.BeltContentsChange;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
+import gigaherz.toolbelt.network.SyncBeltSlotContents;
+import gigaherz.toolbelt.slot.ExtensionSlotBelt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderPlayer;
+import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
@@ -130,6 +133,18 @@ public class ClientProxy implements ISideProxy
                 case BAUBLES:
                     BeltFinder.instances.forEach((i) -> i.setToBaubles(player, message.slot, message.stack));
                     break;
+            }
+        });
+    }
+
+    @Override
+    public void handleBeltSlotContents(SyncBeltSlotContents message)
+    {
+        Minecraft.getMinecraft().addScheduledTask(() -> {
+            Entity entity = Minecraft.getMinecraft().world.getEntityByID(message.entityId);
+            if (entity instanceof EntityPlayer)
+            {
+                ExtensionSlotBelt.get((EntityPlayer) entity).setAll(message.stacks);
             }
         });
     }

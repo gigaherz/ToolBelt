@@ -41,6 +41,12 @@ public class VanillaLivingEquipment implements IExtensionContainer
         return slots;
     }
 
+    @Override
+    public void onContentsChanged(IExtensionSlot slot)
+    {
+
+    }
+
     @Nonnull
     @Override
     public EntityLivingBase getOwner()
@@ -87,6 +93,12 @@ public class VanillaLivingEquipment implements IExtensionContainer
         public void setContents(@Nonnull ItemStack stack)
         {
             owner.setItemStackToSlot(slot, stack);
+        }
+
+        @Override
+        public void onContentsChanged()
+        {
+            VanillaLivingEquipment.this.onContentsChanged(this);
         }
 
         @Override

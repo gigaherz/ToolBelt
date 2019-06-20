@@ -57,6 +57,12 @@ public class ExtensionSlotItemHandler implements IExtensionSlot
             notifyEquip(stack);
     }
 
+    @Override
+    public void onContentsChanged()
+    {
+        owner.onContentsChanged(this);
+    }
+
     private void notifyEquip(ItemStack stack)
     {
         IExtensionSlotItem extItem = stack.getCapability(CapabilityExtensionSlotItem.INSTANCE, null);

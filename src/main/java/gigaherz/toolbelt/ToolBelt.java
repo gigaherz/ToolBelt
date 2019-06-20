@@ -6,10 +6,15 @@ import gigaherz.toolbelt.common.GuiHandler;
 import gigaherz.toolbelt.network.BeltContentsChange;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import gigaherz.toolbelt.network.SwapItems;
+import gigaherz.toolbelt.network.SyncBeltSlotContents;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
 import net.minecraft.block.Block;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.entity.Entity;
+import net.minecraft.init.Blocks;
+import net.minecraft.inventory.EntityEquipmentSlot;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.AnvilUpdateEvent;
@@ -80,6 +85,7 @@ public class ToolBelt
         channel.registerMessage(SwapItems.Handler.class, SwapItems.class, messageNumber++, Side.SERVER);
         channel.registerMessage(BeltContentsChange.Handler.class, BeltContentsChange.class, messageNumber++, Side.CLIENT);
         channel.registerMessage(OpenBeltSlotInventory.Handler.class, OpenBeltSlotInventory.class, messageNumber++, Side.SERVER);
+        channel.registerMessage(SyncBeltSlotContents.Handler.class, SyncBeltSlotContents.class, messageNumber++, Side.CLIENT);
         logger.debug("Final message number: " + messageNumber);
 
         File configurationFile = event.getSuggestedConfigurationFile();
@@ -94,6 +100,7 @@ public class ToolBelt
         proxy.init();
 
         NetworkRegistry.INSTANCE.registerGuiHandler(this, guiHandler = new GuiHandler());
+
     }
 
     @EventHandler
