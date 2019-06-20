@@ -9,6 +9,7 @@ import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.registries.ObjectHolder;
@@ -21,9 +22,9 @@ public class BeltContainer extends Container
     public final int beltSlots;
     private final ItemStack heldItem;
 
-    public BeltContainer(int id, PlayerInventory inventory)
+    public BeltContainer(int id, PlayerInventory inventory, PacketBuffer extraData)
     {
-        this(id, inventory, inventory.currentItem, inventory.getCurrentItem());
+        this(id, inventory, extraData.readVarInt(), extraData.readItemStack());
     }
 
     public BeltContainer(int id, IInventory playerInventory, int blockedSlot, ItemStack heldItem)

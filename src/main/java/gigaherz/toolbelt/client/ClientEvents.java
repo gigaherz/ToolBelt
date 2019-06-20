@@ -65,7 +65,7 @@ public class ClientEvents
 
         while (OPEN_TOOL_MENU_KEYBIND.isPressed())
         {
-            if (mc.field_71462_r == null)
+            if (mc.currentScreen == null)
             {
                 ItemStack inHand = mc.player.getHeldItemMainhand();
                 if (ConfigData.isItemStackAllowed(inHand))
@@ -81,7 +81,7 @@ public class ClientEvents
 
         while (OPEN_BELT_SLOT_KEYBIND.isPressed())
         {
-            if (mc.field_71462_r == null)
+            if (mc.currentScreen == null)
             {
                 ToolBelt.channel.sendToServer(new OpenBeltSlotInventory());
             }

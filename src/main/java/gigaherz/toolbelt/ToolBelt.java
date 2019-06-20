@@ -1,21 +1,25 @@
 package gigaherz.toolbelt;
 
-import gigaherz.toolbelt.belt.ItemToolBelt;
+import gigaherz.toolbelt.belt.ToolBeltItem;
 import gigaherz.toolbelt.client.ClientEvents;
 import gigaherz.toolbelt.common.BeltContainer;
 import gigaherz.toolbelt.common.BeltScreen;
 import gigaherz.toolbelt.common.BeltSlotContainer;
 import gigaherz.toolbelt.common.BeltSlotScreen;
 import gigaherz.toolbelt.network.*;
-import gigaherz.toolbelt.slot.ExtensionSlotBelt;
+import gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.entity.player.PlayerInventory;
+import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -89,7 +93,7 @@ public class ToolBelt
     public void registerItems(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().registerAll(
-                new ItemToolBelt(new Item.Properties().maxStackSize(1).group(ItemGroup.TOOLS)).setRegistryName("belt"),
+                new ToolBeltItem(new Item.Properties().maxStackSize(1).group(ItemGroup.TOOLS)).setRegistryName("belt"),
                 new Item(new Item.Properties().group(ItemGroup.TOOLS)).setRegistryName("pouch")
         );
     }
@@ -97,8 +101,8 @@ public class ToolBelt
     public void registerContainers(RegistryEvent.Register<ContainerType<?>> event)
     {
         event.getRegistry().registerAll(
-                new ContainerType<>(BeltSlotContainer::new).setRegistryName("belt_slot_container"),
-                new ContainerType<>(BeltContainer::new).setRegistryName("belt_container")
+                IForgeContainerType.create(BeltSlotContainer::new).setRegistryName("belt_slot_container"),
+                IForgeContainerType.create(BeltContainer::new).setRegistryName("belt_container")
         );
     }
 
@@ -115,7 +119,7 @@ public class ToolBelt
         //TODO File configurationFile = event.getSuggestedConfigurationFile();
         //Config.loadConfig(configurationFile);
 
-        ExtensionSlotBelt.register();
+        BeltExtensionSlot.register();
     }
 
     public void clientSetup(FMLClientSetupEvent event)
@@ -140,7 +144,7 @@ public class ToolBelt
             return;
         if (right.getCount() <= 0 || right.getItem() != pouch)
             return;
-        int cost = ItemToolBelt.getUpgradeXP(left);
+        int cost = ToolBeltItem.getUpgradeXP(left);
         if (cost < 0)
         {
             ev.setCanceled(true);
@@ -149,7 +153,7 @@ public class ToolBelt
         ev.setCost(cost);
         ev.setMaterialCost(1);
 
-        ev.setOutput(ItemToolBelt.upgrade(left));
+        ev.setOutput(ToolBeltItem.upgrade(left));
     }
 
     public static ResourceLocation location(String path)

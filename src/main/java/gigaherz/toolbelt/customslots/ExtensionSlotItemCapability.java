@@ -10,7 +10,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 
 import javax.annotation.Nullable;
 
-public class CapabilityExtensionSlotItem
+public class ExtensionSlotItemCapability
 {
     // Special slot IDs
     public static final ResourceLocation ANY_SLOT = new ResourceLocation("forge:any");

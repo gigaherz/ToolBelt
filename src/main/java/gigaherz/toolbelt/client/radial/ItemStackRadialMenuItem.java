@@ -28,7 +28,7 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
 
     public ItemStackRadialMenuItem(GenericRadialMenu owner, int slot, ItemStack stack, ITextComponent altText)
     {
-        super(owner, altText);
+        super(owner, altText, 0x7FFFFFFF);
         this.slot = slot;
         this.stack = stack;
     }

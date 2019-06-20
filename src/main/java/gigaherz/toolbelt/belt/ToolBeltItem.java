@@ -33,7 +33,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ItemToolBelt extends Item implements IExtensionSlotItem
+public class ToolBeltItem extends Item implements IExtensionSlotItem
 {
     @CapabilityInject(IItemHandler.class)
     public static Capability<IItemHandler> ITEM_HANDLER;
@@ -43,7 +43,7 @@ public class ItemToolBelt extends Item implements IExtensionSlotItem
 
     public static final ImmutableSet<ResourceLocation> BELT_SLOT_LIST = ImmutableSet.of(RpgEquipment.BELT);
 
-    public ItemToolBelt(Properties properties)
+    public ToolBeltItem(Properties properties)
     {
         super(properties);
     }
@@ -119,7 +119,7 @@ public class ItemToolBelt extends Item implements IExtensionSlotItem
             final ToolBeltInventory itemHandler = new ToolBeltInventory(stack);
 
             final LazyOptional<IItemHandler> itemHandlerInstance = LazyOptional.of(() -> itemHandler);
-            final LazyOptional<IExtensionSlotItem> extensionSlotInstance = LazyOptional.of(() -> ItemToolBelt.this);
+            final LazyOptional<IExtensionSlotItem> extensionSlotInstance = LazyOptional.of(() -> ToolBeltItem.this);
 
             @Override
             @Nonnull

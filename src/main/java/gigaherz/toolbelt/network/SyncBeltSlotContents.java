@@ -2,7 +2,7 @@ package gigaherz.toolbelt.network;
 
 import gigaherz.toolbelt.client.ClientPacketHandlers;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
-import gigaherz.toolbelt.slot.ExtensionSlotBelt;
+import gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.network.PacketBuffer;
@@ -16,7 +16,7 @@ public class SyncBeltSlotContents
     public final NonNullList<ItemStack> stacks = NonNullList.create();
     public int entityId;
 
-    public SyncBeltSlotContents(PlayerEntity player, ExtensionSlotBelt extension)
+    public SyncBeltSlotContents(PlayerEntity player, BeltExtensionSlot extension)
     {
         this.entityId = player.getEntityId();
         extension.getSlots().stream().map(IExtensionSlot::getContents).forEach(stacks::add);

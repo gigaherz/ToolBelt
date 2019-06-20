@@ -98,7 +98,7 @@ public class VanillaLivingEquipment implements IExtensionContainer
         @Override
         public void onContentsChanged()
         {
-
+            VanillaLivingEquipment.this.onContentsChanged(this);
         }
 
         @Override

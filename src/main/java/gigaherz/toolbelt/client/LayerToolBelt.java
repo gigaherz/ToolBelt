@@ -33,7 +33,7 @@ public class LayerToolBelt<T extends PlayerEntity, M extends PlayerModel<T>> ext
     }
 
     @Override
-    public void func_212842_a_(T player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
+    public void render(T player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
         boolean flag = player.getPrimaryHand() == HandSide.RIGHT;
 
@@ -69,7 +69,7 @@ public class LayerToolBelt<T extends PlayerEntity, M extends PlayerModel<T>> ext
             {
                 GlStateManager.pushMatrix();
 
-                if (this.func_215332_c().field_217113_d) // FIXME: maybe wrong field, can't tell
+                if (this.getEntityModel().isSitting) // FIXME: maybe wrong field, can't tell
                 {
                     GlStateManager.translatef(0.0F, 0.75F, 0.0F);
                     GlStateManager.scalef(0.5F, 0.5F, 0.5F);
@@ -93,7 +93,7 @@ public class LayerToolBelt<T extends PlayerEntity, M extends PlayerModel<T>> ext
 
     private void translateToBody()
     {
-        func_215332_c().field_78115_e.postRender(0.0625F);
+        getEntityModel().field_78115_e.postRender(0.0625F);
     }
 
     private void renderHeldItem(LivingEntity player, ItemStack stack, TransformType cameraTransform, HandSide handSide)

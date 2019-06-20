@@ -2,7 +2,7 @@ package gigaherz.toolbelt;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
-import gigaherz.toolbelt.belt.ItemToolBelt;
+import gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
@@ -169,7 +169,7 @@ public class ConfigData
         if (blackList.stream().anyMatch((s) -> ItemStack.areItemsEqual(s, stack)))
             return false;
 
-        if (stack.getItem() instanceof ItemToolBelt)
+        if (stack.getItem() instanceof ToolBeltItem)
             return false;
 
         if (stack.getMaxStackSize() != 1)

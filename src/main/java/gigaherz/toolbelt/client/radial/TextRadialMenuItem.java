@@ -24,7 +24,7 @@ public class TextRadialMenuItem extends RadialMenuItem
         this.color = 0xFFFFFFFF;
     }
 
-    private TextRadialMenuItem(GenericRadialMenu owner, ITextComponent text, int color)
+    public TextRadialMenuItem(GenericRadialMenu owner, ITextComponent text, int color)
     {
         super(owner);
         this.text = text;

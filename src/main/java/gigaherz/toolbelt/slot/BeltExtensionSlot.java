@@ -37,30 +37,30 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<CompoundNBT>
+public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<CompoundNBT>
 {
     ////////////////////////////////////////////////////////////
     // Capability support code
     //
     private static final ResourceLocation CAPABILITY_ID = new ResourceLocation("toolbelt", "belt_slot");
 
-    @CapabilityInject(ExtensionSlotBelt.class)
-    public static Capability<ExtensionSlotBelt> CAPABILITY = null;
+    @CapabilityInject(BeltExtensionSlot.class)
+    public static Capability<BeltExtensionSlot> CAPABILITY = null;
 
     public static void register()
     {
         // Internal capability, IStorage and default instances are meaningless.
-        CapabilityManager.INSTANCE.register(ExtensionSlotBelt.class, new Capability.IStorage<ExtensionSlotBelt>()
+        CapabilityManager.INSTANCE.register(BeltExtensionSlot.class, new Capability.IStorage<BeltExtensionSlot>()
         {
             @Nullable
             @Override
-            public INBT writeNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, Direction side)
+            public INBT writeNBT(Capability<BeltExtensionSlot> capability, BeltExtensionSlot instance, Direction side)
             {
                 return null;
             }
 
             @Override
-            public void readNBT(Capability<ExtensionSlotBelt> capability, ExtensionSlotBelt instance, Direction side, INBT nbt)
+            public void readNBT(Capability<BeltExtensionSlot> capability, BeltExtensionSlot instance, Direction side, INBT nbt)
             {
 
             }
@@ -69,7 +69,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         MinecraftForge.EVENT_BUS.register(new EventHandlers());
     }
 
-    public static ExtensionSlotBelt get(LivingEntity player)
+    public static BeltExtensionSlot get(LivingEntity player)
     {
         return player.getCapability(CAPABILITY, null).orElseThrow(() -> new RuntimeException("Capability not attached!"));
     }
@@ -83,7 +83,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             {
                 event.addCapability(CAPABILITY_ID, new ICapabilitySerializable<CompoundNBT>()
                 {
-                    final ExtensionSlotBelt extensionContainer = new ExtensionSlotBelt((PlayerEntity) event.getObject())
+                    final BeltExtensionSlot extensionContainer = new BeltExtensionSlot((PlayerEntity) event.getObject())
                     {
                         @Override
                         public void onContentsChanged(IExtensionSlot slot)
@@ -93,7 +93,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
                         }
                     };
 
-                    final LazyOptional<ExtensionSlotBelt> extensionContainerInstance = LazyOptional.of(() -> extensionContainer);
+                    final LazyOptional<BeltExtensionSlot> extensionContainerInstance = LazyOptional.of(() -> extensionContainer);
 
                     @Override
                     public CompoundNBT serializeNBT()
@@ -123,7 +123,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
                 return;
-            ExtensionSlotBelt instance = get(target);
+            BeltExtensionSlot instance = get(target);
             instance.syncToSelf();
         }
 
@@ -133,7 +133,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
                 return;
-            ExtensionSlotBelt instance = get(target);
+            BeltExtensionSlot instance = get(target);
             instance.syncToSelf();
         }
 
@@ -145,7 +145,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
                 return;
             if (target instanceof PlayerEntity)
             {
-                ExtensionSlotBelt instance = get((LivingEntity) target);
+                BeltExtensionSlot instance = get((LivingEntity) target);
                 instance.syncTo(event.getEntityPlayer());
             }
         }
@@ -153,7 +153,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         @SubscribeEvent
         public void entityTick(TickEvent.PlayerTickEvent event)
         {
-            ExtensionSlotBelt instance = get(event.player);
+            BeltExtensionSlot instance = get(event.player);
             instance.tickAllSlots();
         }
     }
@@ -163,10 +163,10 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         syncTo((PlayerEntity) owner);
     }
 
-    protected void syncTo(PlayerEntity p)
+    protected void syncTo(PlayerEntity target)
     {
         SyncBeltSlotContents message = new SyncBeltSlotContents((PlayerEntity) owner, this);
-        ToolBelt.channel.sendTo(message, ((ServerPlayerEntity) p).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+        ToolBelt.channel.sendTo(message, ((ServerPlayerEntity) target).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     protected void syncTo(PacketDistributor.PacketTarget target)
@@ -190,13 +190,10 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             belt.onContentsChanged();
         }
     };
-    private final ExtensionSlotItemHandler belt = new ExtensionSlotItemHandler(this, BELT, inventory, 0)
-    {
-
-    };
+    private final ExtensionSlotItemHandler belt = new ExtensionSlotItemHandler(this, BELT, inventory, 0);
     private final ImmutableList<IExtensionSlot> slots = ImmutableList.of(belt);
 
-    private ExtensionSlotBelt(LivingEntity owner)
+    private BeltExtensionSlot(LivingEntity owner)
     {
         this.owner = owner;
     }

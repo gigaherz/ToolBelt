@@ -1,6 +1,6 @@
 package gigaherz.toolbelt.common;
 
-import gigaherz.toolbelt.belt.ItemToolBelt;
+import gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -50,7 +50,7 @@ public class Screens
         @Override
         public Container createMenu(int i, PlayerInventory playerInventory, PlayerEntity player)
         {
-            return new BeltSlotContainer(i, playerInventory, !player.world.isRemote, player);
+            return new BeltSlotContainer(i, playerInventory, !player.world.isRemote);
         }
 
         @Override
@@ -63,9 +63,12 @@ public class Screens
     public static void openBeltScreen(ServerPlayerEntity player, int slot)
     {
         ItemStack heldItem = player.inventory.getStackInSlot(slot);
-        if (heldItem.getCount() > 0 && heldItem.getItem() instanceof ItemToolBelt)
+        if (heldItem.getCount() > 0 && heldItem.getItem() instanceof ToolBeltItem)
         {
-            NetworkHooks.openGui(player, new BeltContainerProvider(slot), (data) -> data.writeByte(slot));
+            NetworkHooks.openGui(player, new BeltContainerProvider(slot), (data) -> {
+                data.writeVarInt(slot);
+                data.writeItemStack(heldItem);
+            });
         }
     }
 

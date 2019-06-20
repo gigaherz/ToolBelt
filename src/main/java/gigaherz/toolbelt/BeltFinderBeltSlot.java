@@ -1,9 +1,9 @@
 package gigaherz.toolbelt;
 
-import gigaherz.toolbelt.belt.ItemToolBelt;
+import gigaherz.toolbelt.belt.ToolBeltItem;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.network.BeltContentsChange;
-import gigaherz.toolbelt.slot.ExtensionSlotBelt;
+import gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -15,7 +15,7 @@ import javax.annotation.Nullable;
 
 public class BeltFinderBeltSlot extends BeltFinder
 {
-    @CapabilityInject(ExtensionSlotBelt.class)
+    @CapabilityInject(BeltExtensionSlot.class)
     public static void initBaubles(Capability cap)
     {
         BeltFinder.instances.add(new BeltFinderBeltSlot());
@@ -24,13 +24,13 @@ public class BeltFinderBeltSlot extends BeltFinder
     @Nullable
     public BeltGetter findStack(PlayerEntity player)
     {
-        ExtensionSlotBelt baubles = ExtensionSlotBelt.get(player);
+        BeltExtensionSlot baubles = BeltExtensionSlot.get(player);
         for (IExtensionSlot slot : baubles.getSlots())
         {
             ItemStack inSlot = slot.getContents();
             if (inSlot.getCount() > 0)
             {
-                if (inSlot.getItem() instanceof ItemToolBelt)
+                if (inSlot.getItem() instanceof ToolBeltItem)
                 {
                     return new ExtensionSlotBeltGetter(slot);
                 }
@@ -43,7 +43,7 @@ public class BeltFinderBeltSlot extends BeltFinder
     @Override
     public void setToBeltSlot(LivingEntity player, ItemStack stack)
     {
-        ExtensionSlotBelt baubles = ExtensionSlotBelt.get(player);
+        BeltExtensionSlot baubles = BeltExtensionSlot.get(player);
         baubles.getBelt().setContents(stack);
     }
 

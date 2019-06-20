@@ -32,8 +32,9 @@ public class BeltScreen extends ContainerScreen<BeltContainer>
     @Override
     protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
     {
-        this.font.drawString(this.getContainer().getDisplayName().getFormattedText(), 8, 6, 4210752);
-        this.font.drawString(this.title.getFormattedText(), 8, this.ySize - 96 + 2, 4210752);
+        String text = this.getContainer().getDisplayName().getFormattedText();
+        this.font.drawString(text, (this.xSize - font.getStringWidth(text))/2, 6, 4210752);
+        this.font.drawString(this.playerInventory.getName().getFormattedText(), 8, this.ySize - 96 + 2, 4210752);
     }
 
     @Override

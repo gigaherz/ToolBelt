@@ -93,7 +93,7 @@ public class RadialMenuScreen extends Screen
         if (event.getType() != RenderGameOverlayEvent.ElementType.CROSSHAIRS)
             return;
 
-        if (Minecraft.getInstance().field_71462_r instanceof RadialMenuScreen)
+        if (Minecraft.getInstance().currentScreen instanceof RadialMenuScreen)
         {
             event.setCanceled(true);
         }

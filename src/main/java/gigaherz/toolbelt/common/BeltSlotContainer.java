@@ -5,7 +5,7 @@ import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.customslots.ExtensionSlotSlot;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.network.ContainerSlotsHack;
-import gigaherz.toolbelt.slot.ExtensionSlotBelt;
+import gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.MobEntity;
@@ -19,6 +19,7 @@ import net.minecraft.inventory.container.*;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.RecipeItemHelper;
+import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -41,16 +42,16 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     public final boolean isLocalWorld;
     private final PlayerEntity field_82862_h;
 
-    public BeltSlotContainer(int id, PlayerInventory inventory)
+    public BeltSlotContainer(int id, PlayerInventory playerInventory, PacketBuffer packetBuffer)
     {
-        this(id, inventory, false, inventory.player);
+        this(id, playerInventory, true);
     }
 
-    public BeltSlotContainer(int id, PlayerInventory playerInventory, boolean localWorld, PlayerEntity playerIn)
+    public BeltSlotContainer(int id, PlayerInventory playerInventory, boolean localWorld)
     {
         super(TYPE, id);
         this.isLocalWorld = localWorld;
-        this.field_82862_h = playerIn;
+        this.field_82862_h = playerInventory.player;
         this.addSlot(new CraftingResultSlot(playerInventory.player, this.field_75181_e, this.field_75179_f, 0, 154, 28));
 
         for (int i = 0; i < 2; ++i)
@@ -124,7 +125,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
             }
         });
 
-        ExtensionSlotBelt container = playerIn.getCapability(ExtensionSlotBelt.CAPABILITY)
+        BeltExtensionSlot container = playerInventory.player.getCapability(BeltExtensionSlot.CAPABILITY)
                 .orElseThrow(() -> new RuntimeException("Item handler not present."));
 
         extensionSlot = container.getBelt();
@@ -153,6 +154,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
             ToolBelt.channel.sendToServer(new ContainerSlotsHack());
         }
     }
+
 
     @Override
     public void func_201771_a(RecipeItemHelper p_201771_1_)
