@@ -24,27 +24,29 @@ public class BeltFinderBeltSlot extends BeltFinder
     @Nullable
     public BeltGetter findStack(PlayerEntity player)
     {
-        BeltExtensionSlot baubles = BeltExtensionSlot.get(player);
-        for (IExtensionSlot slot : baubles.getSlots())
+        BeltExtensionSlot beltSlot = BeltExtensionSlot.getNullable(player);
+        if(beltSlot != null)
         {
-            ItemStack inSlot = slot.getContents();
-            if (inSlot.getCount() > 0)
+            for (IExtensionSlot slot : beltSlot.getSlots())
             {
-                if (inSlot.getItem() instanceof ToolBeltItem)
+                ItemStack inSlot = slot.getContents();
+                if (inSlot.getCount() > 0)
                 {
-                    return new ExtensionSlotBeltGetter(slot);
+                    if (inSlot.getItem() instanceof ToolBeltItem)
+                    {
+                        return new ExtensionSlotBeltGetter(slot);
+                    }
                 }
             }
         }
-
         return null;
     }
 
     @Override
     public void setToBeltSlot(LivingEntity player, ItemStack stack)
     {
-        BeltExtensionSlot baubles = BeltExtensionSlot.get(player);
-        baubles.getBelt().setContents(stack);
+        BeltExtensionSlot slot = BeltExtensionSlot.get(player).orElseThrow(() -> new RuntimeException("Capability not attached!"));
+        slot.getBelt().setContents(stack);
     }
 
     private class ExtensionSlotBeltGetter implements BeltGetter

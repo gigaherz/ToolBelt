@@ -69,9 +69,15 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         MinecraftForge.EVENT_BUS.register(new EventHandlers());
     }
 
-    public static BeltExtensionSlot get(LivingEntity player)
+    public static LazyOptional<BeltExtensionSlot> get(LivingEntity player)
     {
-        return player.getCapability(CAPABILITY, null).orElseThrow(() -> new RuntimeException("Capability not attached!"));
+        return player.getCapability(CAPABILITY, null);
+    }
+
+    @Nullable
+    public static BeltExtensionSlot getNullable(LivingEntity player)
+    {
+        return player.getCapability(CAPABILITY, null).orElse(null);
     }
 
     static class EventHandlers
@@ -123,7 +129,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
                 return;
-            BeltExtensionSlot instance = get(target);
+            BeltExtensionSlot instance = get(target).orElseThrow(() -> new RuntimeException("Capability not attached!"));
             instance.syncToSelf();
         }
 
@@ -133,7 +139,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
                 return;
-            BeltExtensionSlot instance = get(target);
+            BeltExtensionSlot instance = get(target).orElseThrow(() -> new RuntimeException("Capability not attached!"));
             instance.syncToSelf();
         }
 
@@ -145,7 +151,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                 return;
             if (target instanceof PlayerEntity)
             {
-                BeltExtensionSlot instance = get((LivingEntity) target);
+                BeltExtensionSlot instance = get((LivingEntity) target).orElseThrow(() -> new RuntimeException("Capability not attached!"));
                 instance.syncTo(event.getEntityPlayer());
             }
         }
@@ -153,8 +159,9 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         @SubscribeEvent
         public void entityTick(TickEvent.PlayerTickEvent event)
         {
-            BeltExtensionSlot instance = get(event.player);
-            instance.tickAllSlots();
+            BeltExtensionSlot instance = getNullable(event.player);
+            if (instance != null)
+                instance.tickAllSlots();
         }
     }
 

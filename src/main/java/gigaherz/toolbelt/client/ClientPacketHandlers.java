@@ -41,7 +41,11 @@ public class ClientPacketHandlers
             Entity entity = minecraft.world.getEntityByID(message.entityId);
             if (entity instanceof PlayerEntity)
             {
-                BeltExtensionSlot.get((LivingEntity) entity).setAll(message.stacks);
+                BeltExtensionSlot slot = BeltExtensionSlot.getNullable((LivingEntity) entity);
+                if (slot != null)
+                {
+                    slot.setAll(message.stacks);
+                }
             }
         });
     }
