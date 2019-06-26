@@ -19,7 +19,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.9.2"
+version = "1.9.3"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.14.2"
 
@@ -29,7 +29,7 @@ compileJava {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190615-1.14.2'
+    mappings channel: 'snapshot', version: '20190626-1.14.3'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -59,7 +59,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.2-26.0.25'
+    minecraft 'net.minecraftforge:forge:1.14.3-27.0.12'
 }
 
 processResources {

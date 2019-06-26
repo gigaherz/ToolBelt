@@ -39,32 +39,30 @@ public class SwapItems
 
     public static void swapItem(int swapWith, PlayerEntity player)
     {
-        BeltFinder.BeltGetter getter = BeltFinder.findBelt(player);
-        if (getter == null)
-            return;
+        BeltFinder.findBelt(player).ifPresent((getter) -> {
+            ItemStack stack = getter.getBelt();
+            if (stack.getCount() <= 0)
+                return;
 
-        ItemStack stack = getter.getBelt();
-        if (stack.getCount() <= 0)
-            return;
+            ItemStack inHand = player.getHeldItemMainhand();
 
-        ItemStack inHand = player.getHeldItemMainhand();
+            if (!ConfigData.isItemStackAllowed(inHand))
+                return;
 
-        if (!ConfigData.isItemStackAllowed(inHand))
-            return;
-
-        IItemHandlerModifiable cap = (IItemHandlerModifiable) (
-                stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
-                        .orElseThrow(() -> new RuntimeException("No inventory!")));
-        if (swapWith < 0)
-        {
-            player.setHeldItem(Hand.MAIN_HAND, ItemHandlerHelper.insertItem(cap, inHand, false));
-        }
-        else
-        {
-            ItemStack inSlot = cap.getStackInSlot(swapWith);
-            player.setHeldItem(Hand.MAIN_HAND, inSlot);
-            cap.setStackInSlot(swapWith, inHand);
-        }
-        getter.syncToClients();
+            IItemHandlerModifiable cap = (IItemHandlerModifiable) (
+                    stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
+                            .orElseThrow(() -> new RuntimeException("No inventory!")));
+            if (swapWith < 0)
+            {
+                player.setHeldItem(Hand.MAIN_HAND, ItemHandlerHelper.insertItem(cap, inHand, false));
+            }
+            else
+            {
+                ItemStack inSlot = cap.getStackInSlot(swapWith);
+                player.setHeldItem(Hand.MAIN_HAND, inSlot);
+                cap.setStackInSlot(swapWith, inHand);
+            }
+            getter.syncToClients();
+        });
     }
 }

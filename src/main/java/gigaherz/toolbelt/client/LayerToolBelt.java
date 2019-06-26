@@ -40,60 +40,54 @@ public class LayerToolBelt<T extends PlayerEntity, M extends PlayerModel<T>> ext
         if (!ConfigData.showBeltOnPlayers)
             return;
 
-        BeltFinder.BeltGetter getter = BeltFinder.findBelt(player);
-        if (getter == null)
-            return;
+        BeltFinder.findBelt(player).ifPresent((getter) -> {
+            getter.getBelt().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent((cap) -> {
 
-        ItemStack stack = getter.getBelt();
-        if (stack.getCount() <= 0)
-            return;
+                ItemStack firstItem = cap.getStackInSlot(0);
+                ItemStack secondItem = cap.getStackInSlot(1);
 
-        stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent((cap) -> {
+                ItemStack leftItem = flag ? firstItem : secondItem;
+                ItemStack rightItem = flag ? secondItem : firstItem;
 
-            ItemStack firstItem = cap.getStackInSlot(0);
-            ItemStack secondItem = cap.getStackInSlot(1);
-
-            ItemStack leftItem = flag ? firstItem : secondItem;
-            ItemStack rightItem = flag ? secondItem : firstItem;
-
-            GlStateManager.pushMatrix();
-
-            if (player.isSneaking())
-            {
-                GlStateManager.translatef(0.0F, 0.2F, 0.0F);
-            }
-
-            this.translateToBody();
-
-            if (!leftItem.isEmpty() || !rightItem.isEmpty())
-            {
                 GlStateManager.pushMatrix();
 
-                if (this.getEntityModel().isSitting) // FIXME: maybe wrong field, can't tell
+                if (player.isSneaking())
                 {
-                    GlStateManager.translatef(0.0F, 0.75F, 0.0F);
-                    GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+                    GlStateManager.translatef(0.0F, 0.2F, 0.0F);
                 }
 
-                this.renderHeldItem(player, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HandSide.RIGHT);
-                this.renderHeldItem(player, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HandSide.LEFT);
+                this.translateToBody();
+
+                if (!leftItem.isEmpty() || !rightItem.isEmpty())
+                {
+                    GlStateManager.pushMatrix();
+
+                    if (this.getEntityModel().isSitting) // FIXME: maybe wrong field, can't tell
+                    {
+                        GlStateManager.translatef(0.0F, 0.75F, 0.0F);
+                        GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+                    }
+
+                    this.renderHeldItem(player, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HandSide.RIGHT);
+                    this.renderHeldItem(player, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HandSide.LEFT);
+
+                    GlStateManager.popMatrix();
+                }
+
+                GlStateManager.translatef(0.0F, 0.19F, 0.0F);
+                GlStateManager.scalef(0.85f, 0.6f, 0.78f);
+
+                this.owner.bindTexture(TEXTURE_BELT);
+                this.beltModel.render(player, 0, 0, 0, 0, 0, scale);
 
                 GlStateManager.popMatrix();
-            }
-
-            GlStateManager.translatef(0.0F, 0.19F, 0.0F);
-            GlStateManager.scalef(0.85f, 0.6f, 0.78f);
-
-            this.owner.bindTexture(TEXTURE_BELT);
-            this.beltModel.render(player, 0, 0, 0, 0, 0, scale);
-
-            GlStateManager.popMatrix();
+            });
         });
     }
 
     private void translateToBody()
     {
-        getEntityModel().field_78115_e.postRender(0.0625F);
+        getEntityModel().bipedBody.postRender(0.0625F);
     }
 
     private void renderHeldItem(LivingEntity player, ItemStack stack, TransformType cameraTransform, HandSide handSide)

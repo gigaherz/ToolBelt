@@ -70,11 +70,7 @@ public class ClientEvents
                 ItemStack inHand = mc.player.getHeldItemMainhand();
                 if (ConfigData.isItemStackAllowed(inHand))
                 {
-                    BeltFinder.BeltGetter getter = BeltFinder.findBelt(mc.player);
-                    if (getter == null)
-                        return;
-
-                    mc.displayGuiScreen(new RadialMenuScreen(getter));
+                    BeltFinder.findBelt(mc.player).ifPresent((getter) -> mc.displayGuiScreen(new RadialMenuScreen(getter)));
                 }
             }
         }

@@ -25,10 +25,10 @@ public class ClientPacketHandlers
                     player.inventory.setInventorySlotContents(message.slot, message.stack);
                     break;
                 case BELT_SLOT:
-                    BeltFinder.instances.forEach((i) -> i.setToBeltSlot(player, message.stack));
+                    BeltFinder.setToAnyBeltSlot(player, message.slot, message.stack);
                     break;
                 case BAUBLES:
-                    BeltFinder.instances.forEach((i) -> i.setToBaubles(player, message.slot, message.stack));
+                    BeltFinder.setToAnyBaubles(player, message.slot, message.stack);
                     break;
             }
         });
@@ -41,11 +41,7 @@ public class ClientPacketHandlers
             Entity entity = minecraft.world.getEntityByID(message.entityId);
             if (entity instanceof PlayerEntity)
             {
-                BeltExtensionSlot slot = BeltExtensionSlot.getNullable((LivingEntity) entity);
-                if (slot != null)
-                {
-                    slot.setAll(message.stacks);
-                }
+                BeltExtensionSlot.get((LivingEntity) entity).ifPresent((slot) -> slot.setAll(message.stacks));
             }
         });
     }

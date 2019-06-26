@@ -16,6 +16,7 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.GameRules;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -24,6 +25,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
@@ -72,12 +74,6 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
     public static LazyOptional<BeltExtensionSlot> get(LivingEntity player)
     {
         return player.getCapability(CAPABILITY, null);
-    }
-
-    @Nullable
-    public static BeltExtensionSlot getNullable(LivingEntity player)
-    {
-        return player.getCapability(CAPABILITY, null).orElse(null);
     }
 
     static class EventHandlers
@@ -129,8 +125,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
                 return;
-            BeltExtensionSlot instance = get(target).orElseThrow(() -> new RuntimeException("Capability not attached!"));
-            instance.syncToSelf();
+            get(target).ifPresent(BeltExtensionSlot::syncToSelf);
         }
 
         @SubscribeEvent
@@ -139,8 +134,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
                 return;
-            BeltExtensionSlot instance = get(target).orElseThrow(() -> new RuntimeException("Capability not attached!"));
-            instance.syncToSelf();
+            get(target).ifPresent(BeltExtensionSlot::syncToSelf);
         }
 
         @SubscribeEvent
@@ -151,17 +145,48 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                 return;
             if (target instanceof PlayerEntity)
             {
-                BeltExtensionSlot instance = get((LivingEntity) target).orElseThrow(() -> new RuntimeException("Capability not attached!"));
-                instance.syncTo(event.getEntityPlayer());
+                get((LivingEntity) target).ifPresent(BeltExtensionSlot::syncToSelf);
             }
         }
 
         @SubscribeEvent
         public void entityTick(TickEvent.PlayerTickEvent event)
         {
-            BeltExtensionSlot instance = getNullable(event.player);
-            if (instance != null)
-                instance.tickAllSlots();
+            get(event.player).ifPresent(BeltExtensionSlot::tickAllSlots);
+        }
+
+        @SubscribeEvent
+        public void playerDeath(LivingDropsEvent event)
+        {
+            if (event.getEntityLiving() instanceof PlayerEntity)
+            {
+                PlayerEntity player = (PlayerEntity) event.getEntityLiving();
+                get(player).ifPresent((instance) -> {
+                    if (!player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) && !player.isSpectator())
+                    {
+                        event.getDrops().add(player.dropItem(instance.getBelt().getContents(), true, false));
+                    }
+                });
+            }
+        }
+
+        @SubscribeEvent
+        public void playerClone(PlayerEvent.Clone event)
+        {
+            PlayerEntity oldPlayer = event.getOriginal();
+            PlayerEntity newPlayer = event.getEntityPlayer();
+            get(oldPlayer).ifPresent((oldBelt)-> {
+                BeltExtensionSlot newBelt = get(newPlayer).orElse(null);
+                ItemStack item = oldBelt.getBelt().getContents();
+                if (newBelt == null) {
+                    newPlayer.world.addEntity(oldPlayer.dropItem(item, true, false));
+                    return;
+                }
+                if (!event.isWasDeath() || newPlayer.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || oldPlayer.isSpectator())
+                {
+                    newBelt.getBelt().setContents(oldBelt.getBelt().getContents());
+                }
+            });
         }
     }
 

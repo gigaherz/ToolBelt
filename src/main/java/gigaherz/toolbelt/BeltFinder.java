@@ -4,36 +4,43 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
+import net.minecraftforge.common.util.LazyOptional;
 
 import javax.annotation.Nullable;
 
 public abstract class BeltFinder
 {
-    public static NonNullList<BeltFinder> instances = NonNullList.create();
+    private static NonNullList<BeltFinder> instances = NonNullList.create();
 
-    @Nullable
-    public abstract BeltGetter findStack(PlayerEntity player);
-
-    @Nullable
-    public static BeltGetter findBelt(PlayerEntity player)
+    public static void addFinder(BeltFinderBeltSlot finder)
     {
-        for (int i = instances.size() - 1; i >= 0; i--)
-        {
-            BeltFinder instance = instances.get(i);
-            BeltGetter getter = instance.findStack(player);
-            if (getter != null)
-                return getter;
-        }
-        return null;
+        instances.add(0, finder);
+    }
+
+    public static void setToAnyBeltSlot(PlayerEntity player, int slot, ItemStack stack)
+    {
+        instances.forEach((i) -> i.setToBeltSlot(player, stack));
+    }
+
+    public static void setToAnyBaubles(PlayerEntity player, int slot, ItemStack stack)
+    {
+        instances.forEach((i) -> i.setToBaubles(player, slot, stack));
+    }
+
+    public abstract LazyOptional<BeltGetter> findStack(PlayerEntity player);
+
+    public static LazyOptional<BeltGetter> findBelt(PlayerEntity player)
+    {
+        return instances.stream()
+                .map(f -> f.findStack(player))
+                .filter(LazyOptional::isPresent)
+                .findFirst()
+                .orElseGet(LazyOptional::empty);
     }
 
     public static void sendSync(PlayerEntity player)
     {
-        BeltFinder.BeltGetter stack = findBelt(player);
-        if (stack != null)
-        {
-            stack.syncToClients();
-        }
+        findBelt(player).ifPresent(BeltGetter::syncToClients);
     }
 
     public void setToBaubles(PlayerEntity player, int slot, ItemStack stack)

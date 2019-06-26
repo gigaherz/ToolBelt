@@ -429,15 +429,21 @@ public class GenericRadialMenu
         Screen owner = host.getScreen();
         int x = owner.width / 2;
         int y = owner.height / 2;
-
         double a = Math.atan2(mouseY - y, mouseX - x);
         double d = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
-        double s0 = getAngleFor(0 - 0.5, numItems);
-        double s1 = getAngleFor(numItems - 0.5, numItems);
-        while (a < s0)
-        { a += TWO_PI; }
-        while (a >= s1)
-        { a -= TWO_PI; }
+        if(numItems > 0)
+        {
+            double s0 = getAngleFor(0 - 0.5, numItems);
+            double s1 = getAngleFor(numItems - 0.5, numItems);
+            while (a < s0)
+            {
+                a += TWO_PI;
+            }
+            while (a >= s1)
+            {
+                a -= TWO_PI;
+            }
+        }
 
         int hovered = -1;
         for (int i = 0; i < numItems; i++)
@@ -481,6 +487,8 @@ public class GenericRadialMenu
 
     private double getAngleFor(double i, int numItems)
     {
+        if(numItems == 0)
+            return 0;
         double angle = ((i / numItems) + 0.25) * TWO_PI + Math.PI;
         return angle;
     }

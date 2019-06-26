@@ -9,6 +9,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
 
 import javax.annotation.Nullable;
@@ -18,35 +19,22 @@ public class BeltFinderBeltSlot extends BeltFinder
     @CapabilityInject(BeltExtensionSlot.class)
     public static void initBaubles(Capability cap)
     {
-        BeltFinder.instances.add(new BeltFinderBeltSlot());
+        BeltFinder.addFinder(new BeltFinderBeltSlot());
     }
 
-    @Nullable
-    public BeltGetter findStack(PlayerEntity player)
+    public LazyOptional<BeltGetter> findStack(PlayerEntity player)
     {
-        BeltExtensionSlot beltSlot = BeltExtensionSlot.getNullable(player);
-        if(beltSlot != null)
-        {
-            for (IExtensionSlot slot : beltSlot.getSlots())
-            {
-                ItemStack inSlot = slot.getContents();
-                if (inSlot.getCount() > 0)
-                {
-                    if (inSlot.getItem() instanceof ToolBeltItem)
-                    {
-                        return new ExtensionSlotBeltGetter(slot);
-                    }
-                }
-            }
-        }
-        return null;
+        return BeltExtensionSlot.get(player).map((beltSlot) -> beltSlot.getSlots().stream().
+                filter(slot -> slot.getContents().getItem() instanceof ToolBeltItem)
+                .map(ExtensionSlotBeltGetter::new)
+                .findFirst()
+                .orElse(null));
     }
 
     @Override
     public void setToBeltSlot(LivingEntity player, ItemStack stack)
     {
-        BeltExtensionSlot slot = BeltExtensionSlot.get(player).orElseThrow(() -> new RuntimeException("Capability not attached!"));
-        slot.getBelt().setContents(stack);
+        BeltExtensionSlot.get(player).ifPresent(slot -> slot.getBelt().setContents(stack));
     }
 
     private class ExtensionSlotBeltGetter implements BeltGetter
