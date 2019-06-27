@@ -6,6 +6,7 @@ import gigaherz.toolbelt.common.BeltContainer;
 import gigaherz.toolbelt.common.BeltScreen;
 import gigaherz.toolbelt.common.BeltSlotContainer;
 import gigaherz.toolbelt.common.BeltSlotScreen;
+import gigaherz.toolbelt.customslots.ExtensionSlotItemCapability;
 import gigaherz.toolbelt.network.*;
 import gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.client.gui.ScreenManager;
@@ -119,6 +120,7 @@ public class ToolBelt
         //TODO File configurationFile = event.getSuggestedConfigurationFile();
         //Config.loadConfig(configurationFile);
 
+        ExtensionSlotItemCapability.register();
         BeltExtensionSlot.register();
     }
 

@@ -1,6 +1,7 @@
 package gigaherz.toolbelt.slot;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Maps;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import gigaherz.toolbelt.customslots.IExtensionContainer;
@@ -25,6 +26,7 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.living.LivingDeathEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -38,6 +40,8 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<CompoundNBT>
 {
@@ -174,8 +178,10 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         public void playerClone(PlayerEvent.Clone event)
         {
             PlayerEntity oldPlayer = event.getOriginal();
+            //oldPlayer.revive();
+
             PlayerEntity newPlayer = event.getEntityPlayer();
-            get(oldPlayer).ifPresent((oldBelt)-> {
+            get(oldPlayer).ifPresent((oldBelt) -> {
                 BeltExtensionSlot newBelt = get(newPlayer).orElse(null);
                 ItemStack item = oldBelt.getBelt().getContents();
                 if (newBelt == null) {
@@ -187,6 +193,8 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     newBelt.getBelt().setContents(oldBelt.getBelt().getContents());
                 }
             });
+
+            //oldPlayer.remove();
         }
     }
 
