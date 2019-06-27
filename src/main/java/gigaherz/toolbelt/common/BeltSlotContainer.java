@@ -37,10 +37,10 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     private final ExtensionSlotSlot slotBelt;
     private final IExtensionSlot extensionSlot;
 
-    private final CraftingInventory field_75181_e = new CraftingInventory(this, 2, 2);
-    private final CraftResultInventory field_75179_f = new CraftResultInventory();
+    private final CraftingInventory craftingInventory = new CraftingInventory(this, 2, 2);
+    private final CraftResultInventory craftResultInventory = new CraftResultInventory();
     public final boolean isLocalWorld;
-    private final PlayerEntity field_82862_h;
+    private final PlayerEntity player;
 
     public BeltSlotContainer(int id, PlayerInventory playerInventory, PacketBuffer packetBuffer)
     {
@@ -51,14 +51,14 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     {
         super(TYPE, id);
         this.isLocalWorld = localWorld;
-        this.field_82862_h = playerInventory.player;
-        this.addSlot(new CraftingResultSlot(playerInventory.player, this.field_75181_e, this.field_75179_f, 0, 154, 28));
+        this.player = playerInventory.player;
+        this.addSlot(new CraftingResultSlot(playerInventory.player, this.craftingInventory, this.craftResultInventory, 0, 154, 28));
 
         for (int i = 0; i < 2; ++i)
         {
             for (int j = 0; j < 2; ++j)
             {
-                this.addSlot(new Slot(this.field_75181_e, j + i * 2, 98 + j * 18, 18 + i * 18));
+                this.addSlot(new Slot(this.craftingInventory, j + i * 2, 98 + j * 18, 18 + i * 18));
             }
         }
 
@@ -81,7 +81,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
                  */
                 public boolean isItemValid(ItemStack stack)
                 {
-                    return stack.canEquip(equipmentslottype, field_82862_h);
+                    return stack.canEquip(equipmentslottype, player);
                 }
 
                 /**
@@ -159,36 +159,36 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     @Override
     public void func_201771_a(RecipeItemHelper p_201771_1_)
     {
-        this.field_75181_e.fillStackedContents(p_201771_1_);
+        this.craftingInventory.fillStackedContents(p_201771_1_);
     }
 
     @Override
     public void clear()
     {
-        this.field_75179_f.clear();
-        this.field_75181_e.clear();
+        this.craftResultInventory.clear();
+        this.craftingInventory.clear();
     }
 
     @Override
     public boolean matches(IRecipe<? super CraftingInventory> p_201769_1_)
     {
-        return p_201769_1_.matches(this.field_75181_e, this.field_82862_h.world);
+        return p_201769_1_.matches(this.craftingInventory, this.player.world);
     }
 
     @Override
     public void onCraftMatrixChanged(IInventory inventoryIn)
     {
-        WorkbenchContainer.func_217066_a(this.windowId, this.field_82862_h.world, this.field_82862_h, this.field_75181_e, this.field_75179_f);
+        WorkbenchContainer.func_217066_a(this.windowId, this.player.world, this.player, this.craftingInventory, this.craftResultInventory);
     }
 
     @Override
     public void onContainerClosed(PlayerEntity playerIn)
     {
         super.onContainerClosed(playerIn);
-        this.field_75179_f.clear();
+        this.craftResultInventory.clear();
         if (!playerIn.world.isRemote)
         {
-            this.clearContainer(playerIn, playerIn.world, this.field_75181_e);
+            this.clearContainer(playerIn, playerIn.world, this.craftingInventory);
         }
         if (!playerIn.world.isRemote)
             BeltFinder.sendSync(playerIn);
@@ -204,7 +204,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     @Override
     public boolean canMergeSlot(ItemStack stack, Slot slotIn)
     {
-        return slotIn.inventory != this.field_75179_f && super.canMergeSlot(stack, slotIn);
+        return slotIn.inventory != this.craftResultInventory && super.canMergeSlot(stack, slotIn);
     }
 
     @Override
@@ -216,13 +216,13 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     @Override
     public int getWidth()
     {
-        return this.field_75181_e.getWidth();
+        return this.craftingInventory.getWidth();
     }
 
     @Override
     public int getHeight()
     {
-        return this.field_75181_e.getHeight();
+        return this.craftingInventory.getHeight();
     }
 
     @Override

@@ -1,5 +1,3 @@
-import net.minecraftforge.gradle.common.util.RunConfig
-
 buildscript {
     repositories {
         mavenLocal()
@@ -19,7 +17,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.9.3"
+version = "1.9.6"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.14.2"
 
@@ -62,20 +60,16 @@ dependencies {
     minecraft 'net.minecraftforge:forge:1.14.3-27.0.12'
 }
 
-processResources {
-    // this will ensure that this task is redone when the versions change.
-    inputs.property 'version', project.version
-
-    // replace stuff in mcmod.info, nothing else
-    from(sourceSets.main.resources.srcDirs) {
-        include 'META-INF/mods.toml'
-                
-        // replace version and mcversion
-        expand 'version':project.version
-    }
-
-    // copy everything else except the mcmod.info
-    from(sourceSets.main.resources.srcDirs) {
-        exclude 'META-INF/mods.toml'
+jar {
+    manifest {
+        attributes([
+                "Specification-Title": "toolbelt",
+                "Specification-Vendor": "gigaherz",
+                "Specification-Version": "1", // We are version 1 of ourselves
+                "Implementation-Title": project.name,
+                "Implementation-Version": "${version}",
+                "Implementation-Vendor" :"gigaherz",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
     }
 }

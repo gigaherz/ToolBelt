@@ -178,7 +178,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         public void playerClone(PlayerEvent.Clone event)
         {
             PlayerEntity oldPlayer = event.getOriginal();
-            //oldPlayer.revive();
+            oldPlayer.revive();
 
             PlayerEntity newPlayer = event.getEntityPlayer();
             get(oldPlayer).ifPresent((oldBelt) -> {
@@ -193,8 +193,6 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     newBelt.getBelt().setContents(oldBelt.getBelt().getContents());
                 }
             });
-
-            //oldPlayer.remove();
         }
     }
 

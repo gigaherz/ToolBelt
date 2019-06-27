@@ -2,10 +2,9 @@ package gigaherz.toolbelt.common;
 
 import com.mojang.blaze3d.platform.GlStateManager;
 import gigaherz.toolbelt.ToolBelt;
-import net.minecraft.client.gui.IGuiEventListener;
+import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
-import net.minecraft.client.gui.screen.inventory.ContainerScreen;
 import net.minecraft.client.gui.screen.inventory.InventoryScreen;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.client.resources.I18n;
@@ -15,29 +14,21 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-import javax.annotation.Nullable;
-
-public class BeltSlotScreen extends ContainerScreen<BeltSlotContainer> implements IRecipeShownListener
+public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> implements IRecipeShownListener
 {
-
-    /**
-     * The old x position of the mouse pointer
-     */
+    private static final ResourceLocation SCREEN_BACKGROUND = ToolBelt.location("textures/gui/belt_slot.png");
+    private static final ResourceLocation RECIPE_BUTTON_TEXTURE = new ResourceLocation("textures/gui/recipe_button.png");
     private float oldMouseX;
-    /**
-     * The old y position of the mouse pointer
-     */
     private float oldMouseY;
-
     private final RecipeBookGui recipeBookGui = new RecipeBookGui();
+    private boolean hasRecipeBook;
     private boolean widthTooNarrow;
     private boolean buttonClicked;
-
-    private static final ResourceLocation GUI_TEXTURE = ToolBelt.location("textures/gui/belt_slot.png");
 
     public BeltSlotScreen(BeltSlotContainer container, PlayerInventory playerInventory, ITextComponent title)
     {
         super(container, playerInventory, title);
+        this.passEvents = true;
     }
 
     @Override
@@ -47,31 +38,29 @@ public class BeltSlotScreen extends ContainerScreen<BeltSlotContainer> implement
         this.recipeBookGui.tick();
     }
 
-    private ImageButton recipeBookButton;
-
     @Override
     public void init()
     {
         super.init();
 
         this.widthTooNarrow = this.width < 379;
-        this.recipeBookGui.func_201520_a(this.width, this.height, minecraft, this.widthTooNarrow, this.getContainer());
+        this.recipeBookGui.func_201520_a(this.width, this.height, this.minecraft, this.widthTooNarrow, this.container);
+        this.hasRecipeBook = true;
         this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
         this.children.add(this.recipeBookGui);
-        recipeBookButton = new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 178, 0, 19, INVENTORY_BACKGROUND, btn -> {
-            BeltSlotScreen.this.recipeBookGui.func_201518_a(BeltSlotScreen.this.widthTooNarrow);
-            BeltSlotScreen.this.recipeBookGui.toggleVisibility();
-            BeltSlotScreen.this.guiLeft = BeltSlotScreen.this.recipeBookGui.updateScreenPosition(BeltSlotScreen.this.widthTooNarrow, BeltSlotScreen.this.width, BeltSlotScreen.this.xSize);
-            recipeBookButton.setPosition(BeltSlotScreen.this.guiLeft + 5, BeltSlotScreen.this.height / 2 - 49);
-        });
-        this.addButton(recipeBookButton);
-    }
+        this.func_212928_a(this.recipeBookGui);
+        ImageButton recipebutton;
+        this.addButton(recipebutton=new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214086_1_) -> {
+            this.recipeBookGui.func_201518_a(this.widthTooNarrow);
+            this.recipeBookGui.toggleVisibility();
+            this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
+            ((ImageButton) p_214086_1_).setPosition(this.guiLeft + 104, this.height / 2 - 22);
+            this.buttonClicked = true;
+        }));
 
-    @Override
-    @Nullable
-    public IGuiEventListener getFocused()
-    {
-        return this.recipeBookGui;
+        // FIXME: Remove once the button doesn't crash.
+        recipebutton.active = false;
+        recipebutton.visible = false;
     }
 
     @Override
@@ -84,8 +73,7 @@ public class BeltSlotScreen extends ContainerScreen<BeltSlotContainer> implement
     public void render(int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground();
-        //TODO this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
-
+        this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
         if (this.recipeBookGui.isVisible() && this.widthTooNarrow)
         {
             this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
@@ -102,13 +90,14 @@ public class BeltSlotScreen extends ContainerScreen<BeltSlotContainer> implement
         this.recipeBookGui.renderTooltip(this.guiLeft, this.guiTop, mouseX, mouseY);
         this.oldMouseX = (float) mouseX;
         this.oldMouseY = (float) mouseY;
+        this.func_212932_b(this.recipeBookGui);
     }
 
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        minecraft.getTextureManager().bindTexture(GUI_TEXTURE);
+        minecraft.getTextureManager().bindTexture(SCREEN_BACKGROUND);
         int i = this.guiLeft;
         int j = this.guiTop;
         this.blit(i, j, 0, 0, this.xSize, this.ySize);
@@ -118,20 +107,22 @@ public class BeltSlotScreen extends ContainerScreen<BeltSlotContainer> implement
     @Override
     protected boolean isPointInRegion(int p_195359_1_, int p_195359_2_, int p_195359_3_, int p_195359_4_, double p_195359_5_, double p_195359_7_)
     {
-        return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super.isPointInRegion(p_195359_1_, p_195359_2_, p_195359_3_, p_195359_4_, p_195359_5_, p_195359_7_);
+        if (this.widthTooNarrow && this.recipeBookGui.isVisible())
+            return false;
+
+        return super.isPointInRegion(p_195359_1_, p_195359_2_, p_195359_3_, p_195359_4_, p_195359_5_, p_195359_7_);
     }
 
     @Override
     public boolean mouseClicked(double p_mouseClicked_1_, double p_mouseClicked_3_, int p_mouseClicked_5_)
     {
         if (this.recipeBookGui.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_))
-        {
             return true;
-        }
-        else
-        {
-            return this.widthTooNarrow && this.recipeBookGui.isVisible() ? false : super.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_);
-        }
+
+        if (this.widthTooNarrow && this.recipeBookGui.isVisible())
+            return false;
+
+        return super.mouseClicked(p_mouseClicked_1_, p_mouseClicked_3_, p_mouseClicked_5_);
     }
 
     @Override
@@ -169,10 +160,14 @@ public class BeltSlotScreen extends ContainerScreen<BeltSlotContainer> implement
     }
 
     @Override
-    public void onClose()
+    public void removed()
     {
-        this.recipeBookGui.removed();
-        super.onClose();
+        if (this.hasRecipeBook)
+        {
+            this.recipeBookGui.removed();
+        }
+
+        super.removed();
     }
 
     @Override
