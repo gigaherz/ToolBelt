@@ -3,6 +3,7 @@ package gigaherz.toolbelt;
 import gigaherz.common.ItemRegistered;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import gigaherz.toolbelt.common.GuiHandler;
+import gigaherz.toolbelt.customslots.CapabilityExtensionSlotItem;
 import gigaherz.toolbelt.network.BeltContentsChange;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import gigaherz.toolbelt.network.SwapItems;
@@ -91,6 +92,7 @@ public class ToolBelt
         File configurationFile = event.getSuggestedConfigurationFile();
         Config.loadConfig(configurationFile);
 
+        CapabilityExtensionSlotItem.register();
         ExtensionSlotBelt.register();
     }
 

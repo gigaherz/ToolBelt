@@ -8,6 +8,7 @@ import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.network.SyncBeltSlotContents;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
+import net.minecraft.entity.item.EntityItem;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
@@ -23,6 +24,7 @@ import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
@@ -161,6 +163,37 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             ExtensionSlotBelt instance = get(event.player);
             if (instance == null) return;
             instance.tickAllSlots();
+        }
+
+        @SubscribeEvent
+        public void playerDeath(PlayerDropsEvent event)
+        {
+            EntityPlayer player = event.getEntityPlayer();
+            ExtensionSlotBelt instance = get(player);
+            if (instance == null) return;
+            if (!player.world.getGameRules().getBoolean("keepInventory") && !player.isSpectator())
+            {
+                event.getDrops().add(player.dropItem(instance.getBelt().getContents(), true, false));
+            }
+        }
+
+        @SubscribeEvent
+        public void playerClone(PlayerEvent.Clone event)
+        {
+            EntityPlayer oldPlayer = event.getOriginal();
+            EntityPlayer newPlayer = event.getEntityPlayer();
+            ExtensionSlotBelt oldBelt = get(oldPlayer);
+            ExtensionSlotBelt newBelt = get(newPlayer);
+            if (oldBelt == null) return;
+            ItemStack item = oldBelt.getBelt().getContents();
+            if (newBelt == null) {
+                newPlayer.world.spawnEntity(oldPlayer.dropItem(item, true, false));
+                return;
+            }
+            if (!event.isWasDeath() || newPlayer.world.getGameRules().getBoolean("keepInventory") || oldPlayer.isSpectator())
+            {
+                newBelt.getBelt().setContents(oldBelt.getBelt().getContents());
+            }
         }
     }
 
