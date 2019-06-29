@@ -173,10 +173,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             if (instance == null) return;
             if (!player.world.getGameRules().getBoolean("keepInventory") && !player.isSpectator())
             {
-                ItemStack belt = instance.getBelt().getContents();
-                if (belt != null) {
-                    event.getDrops().add(player.dropItem(belt, true, false));
-                }
+                event.getDrops().add(player.dropItem(instance.getBelt().getContents(), true, false));
             }
         }
 
@@ -188,9 +185,8 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             ExtensionSlotBelt oldBelt = get(oldPlayer);
             ExtensionSlotBelt newBelt = get(newPlayer);
             if (oldBelt == null) return;
-            ItemStack item = oldBelt.getBelt().getContents();
-            if (newBelt == null && item != null) {
-                newPlayer.world.spawnEntity(oldPlayer.dropItem(item, true, false));
+            if (newBelt == null) {
+                newPlayer.world.spawnEntity(oldPlayer.dropItem(oldBelt.getBelt().getContents(), true, false));
                 return;
             }
             if (!event.isWasDeath() || newPlayer.world.getGameRules().getBoolean("keepInventory") || oldPlayer.isSpectator())

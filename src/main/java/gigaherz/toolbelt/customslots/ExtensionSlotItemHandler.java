@@ -42,7 +42,8 @@ public class ExtensionSlotItemHandler implements IExtensionSlot
     @Override
     public ItemStack getContents()
     {
-        return inventory.getStackInSlot(slot);
+        ItemStack result = inventory.getStackInSlot(slot);
+        return result == null ? ItemStack.EMPTY : result;
     }
 
     @Override
