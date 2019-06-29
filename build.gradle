@@ -21,6 +21,9 @@ repositories {
     maven {
         url 'http://dogforce-games.com/maven'
     }
+    maven {
+        url 'https://maven.mcmoddev.com'
+    }
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
@@ -51,6 +54,8 @@ dependencies {
 
     deobfCompile "mezz.jei:jei_1.12.2:4.15.0.281:api"
     runtime "mezz.jei:jei_1.12.2:4.15.0.281"
+
+    deobfCompile "com.azanor:Baubles:1.12-1.5.2"
 
     compile fileTree(dir: 'libs', include: '*.jar')
 }
