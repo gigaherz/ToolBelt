@@ -100,6 +100,13 @@ public class RadialMenuScreen extends Screen
     }
 
     @Override
+    public void removed()
+    {
+        super.removed();
+        ClientEvents.wipeOpen();
+    }
+
+    @Override
     public void tick()
     {
         super.tick();

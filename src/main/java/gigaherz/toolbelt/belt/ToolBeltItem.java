@@ -12,6 +12,7 @@ import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -48,9 +49,23 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
         super(properties);
     }
 
+    // because PlayerInventory#getSlotFot is client-only
+    private static boolean stackEqualExact(ItemStack stack1, ItemStack stack2) {
+        return stack1.getItem() == stack2.getItem() && ItemStack.areItemStackTagsEqual(stack1, stack2);
+    }
+    private static int getSlotFor(PlayerInventory inv, ItemStack stack) {
+        for(int i = 0; i < inv.mainInventory.size(); ++i) {
+            if (!inv.mainInventory.get(i).isEmpty() && stackEqualExact(stack, inv.mainInventory.get(i))) {
+                return i;
+            }
+        }
+
+        return -1;
+    }
+
     private ActionResultType openBeltScreen(PlayerEntity player, ItemStack stack, World world)
     {
-        int slot = player.inventory.getSlotFor(stack);
+        int slot = getSlotFor(player.inventory, stack);
         if (slot == -1)
             return ActionResultType.FAIL;
 

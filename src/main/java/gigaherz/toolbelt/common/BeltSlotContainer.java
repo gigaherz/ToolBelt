@@ -23,9 +23,11 @@ import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
+import java.util.function.Supplier;
 
 public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
 {
@@ -41,6 +43,15 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     private final CraftResultInventory craftResultInventory = new CraftResultInventory();
     public final boolean isLocalWorld;
     private final PlayerEntity player;
+
+    private interface SlotFactory<T extends Slot>
+    {
+        T create(IExtensionSlot slot, int x, int y);
+    }
+    private SlotFactory<ExtensionSlotSlot> slotFactory = DistExecutor.runForDist(
+            () -> () -> ExtensionSlotSlotClient::new,
+            () -> () -> ExtensionSlotSlot::new
+    );
 
     public BeltSlotContainer(int id, PlayerInventory playerInventory, PacketBuffer packetBuffer)
     {
@@ -130,24 +141,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
 
         extensionSlot = container.getBelt();
 
-        this.addSlot(slotBelt = new ExtensionSlotSlot(extensionSlot, 77, 44)
-        {
-            {
-                setBackgroundLocation(SLOT_BACKGROUND);
-            }
-
-            @Nullable
-            @Override
-            public TextureAtlasSprite getBackgroundSprite()
-            {
-                return new TextureAtlasSprite(SLOT_BACKGROUND, 16, 16)
-                {
-                    {
-                        func_217789_a(16, 16, 0, 0);
-                    }
-                };
-            }
-        });
+        this.addSlot(slotBelt = slotFactory.create(BeltSlotContainer.this.extensionSlot, 77, 44));
 
         if (!localWorld)
         {
@@ -351,5 +345,30 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
         }
 
         return itemstack;
+    }
+
+    private class ExtensionSlotSlotClient extends ExtensionSlotSlot
+    {
+        {
+            setBackgroundLocation(SLOT_BACKGROUND);
+        }
+
+        public ExtensionSlotSlotClient(IExtensionSlot slot, int x, int y)
+        {
+            super(slot, x, y);
+        }
+
+        @OnlyIn(Dist.CLIENT)
+        @Nullable
+        @Override
+        public TextureAtlasSprite getBackgroundSprite()
+        {
+            return new TextureAtlasSprite(SLOT_BACKGROUND, 16, 16)
+            {
+                {
+                    func_217789_a(16, 16, 0, 0);
+                }
+            };
+        }
     }
 }

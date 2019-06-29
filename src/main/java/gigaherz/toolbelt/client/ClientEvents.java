@@ -4,12 +4,14 @@ import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
+import net.minecraft.client.KeyboardListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
@@ -30,6 +32,7 @@ public class ClientEvents
 
     public static void wipeOpen()
     {
+        Minecraft.getInstance().keyboardListener.enableRepeatEvents(false);
         while (OPEN_TOOL_MENU_KEYBIND.isPressed())
         {
         }
@@ -58,6 +61,25 @@ public class ClientEvents
         render.addLayer(new LayerToolBelt(render));
     }
 
+    private static boolean toolMenuKeyWasDown = false;
+
+    @SubscribeEvent
+    public static void handleKeys(InputEvent.KeyInputEvent ev)
+    {
+        if (ev.getKey() == OPEN_TOOL_MENU_KEYBIND.getKey().getKeyCode())
+        {
+            ToolBelt.logger.warn("MENU -> {}", ev.getAction());
+            if(ev.getAction() == 0)
+            {
+                toolMenuKeyWasDown = false;
+            }
+            if(ev.getAction() == 0)
+            {
+                toolMenuKeyWasDown = false;
+            }
+        }
+    }
+
     @SubscribeEvent
     public static void handleKeys(TickEvent.ClientTickEvent ev)
     {
@@ -67,12 +89,16 @@ public class ClientEvents
         {
             if (mc.currentScreen == null)
             {
-                ItemStack inHand = mc.player.getHeldItemMainhand();
-                if (ConfigData.isItemStackAllowed(inHand))
+                //if (!toolMenuKeyWasDown)
                 {
-                    BeltFinder.findBelt(mc.player).ifPresent((getter) -> mc.displayGuiScreen(new RadialMenuScreen(getter)));
+                    ItemStack inHand = mc.player.getHeldItemMainhand();
+                    if (ConfigData.isItemStackAllowed(inHand))
+                    {
+                        BeltFinder.findBelt(mc.player).ifPresent((getter) -> mc.displayGuiScreen(new RadialMenuScreen(getter)));
+                    }
                 }
             }
+            toolMenuKeyWasDown = true;
         }
 
         while (OPEN_BELT_SLOT_KEYBIND.isPressed())
