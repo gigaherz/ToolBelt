@@ -57,10 +57,6 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
             ((ImageButton) p_214086_1_).setPosition(this.guiLeft + 104, this.height / 2 - 22);
             this.buttonClicked = true;
         }));
-
-        // FIXME: Remove once the button doesn't crash.
-        recipebutton.active = false;
-        recipebutton.visible = false;
     }
 
     @Override

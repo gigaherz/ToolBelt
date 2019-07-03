@@ -18,7 +18,7 @@ Declutter your inventory of tools
 [[dependencies.toolbelt]]
    modId="forge"
    mandatory=true
-   versionRange="[27.0.12,)"
+   versionRange="[27.0.21,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]

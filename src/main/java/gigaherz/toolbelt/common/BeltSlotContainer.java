@@ -1,5 +1,6 @@
 package gigaherz.toolbelt.common;
 
+import com.google.common.collect.Lists;
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.customslots.ExtensionSlotSlot;
@@ -7,6 +8,7 @@ import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.network.ContainerSlotsHack;
 import gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.util.RecipeBookCategories;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.MobEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -27,6 +29,7 @@ import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
+import java.util.List;
 import java.util.function.Supplier;
 
 public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
@@ -149,6 +152,11 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
         }
     }
 
+    @Override
+    public List<RecipeBookCategories> getRecipeBookCategories()
+    {
+        return Lists.newArrayList(RecipeBookCategories.SEARCH, RecipeBookCategories.EQUIPMENT, RecipeBookCategories.BUILDING_BLOCKS, RecipeBookCategories.MISC, RecipeBookCategories.REDSTONE);
+    }
 
     @Override
     public void func_201771_a(RecipeItemHelper p_201771_1_)
