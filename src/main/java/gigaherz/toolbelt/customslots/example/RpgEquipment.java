@@ -105,9 +105,12 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<Compo
         @SubscribeEvent
         public void entityTick(TickEvent.PlayerTickEvent event)
         {
-            RpgEquipment instance = get(event.player);
-            if (instance == null) return;
-            instance.tickAllSlots();
+            if (event.phase == TickEvent.Phase.END)
+            {
+                RpgEquipment instance = get(event.player);
+                if (instance == null) return;
+                instance.tickAllSlots();
+            }
         }
     }
 
