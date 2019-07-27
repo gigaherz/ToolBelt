@@ -6,8 +6,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.LazyOptional;
 
-import javax.annotation.Nullable;
-
 public abstract class BeltFinder
 {
     private static NonNullList<BeltFinder> instances = NonNullList.create();

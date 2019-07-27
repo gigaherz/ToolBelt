@@ -50,7 +50,7 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
         this.children.add(this.recipeBookGui);
         this.func_212928_a(this.recipeBookGui);
         ImageButton recipebutton;
-        this.addButton(recipebutton=new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214086_1_) -> {
+        this.addButton(recipebutton = new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214086_1_) -> {
             this.recipeBookGui.func_201518_a(this.widthTooNarrow);
             this.recipeBookGui.toggleVisibility();
             this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);

@@ -50,12 +50,17 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
     }
 
     // because PlayerInventory#getSlotFot is client-only
-    private static boolean stackEqualExact(ItemStack stack1, ItemStack stack2) {
+    private static boolean stackEqualExact(ItemStack stack1, ItemStack stack2)
+    {
         return stack1.getItem() == stack2.getItem() && ItemStack.areItemStackTagsEqual(stack1, stack2);
     }
-    private static int getSlotFor(PlayerInventory inv, ItemStack stack) {
-        for(int i = 0; i < inv.mainInventory.size(); ++i) {
-            if (!inv.mainInventory.get(i).isEmpty() && stackEqualExact(stack, inv.mainInventory.get(i))) {
+
+    private static int getSlotFor(PlayerInventory inv, ItemStack stack)
+    {
+        for (int i = 0; i < inv.mainInventory.size(); ++i)
+        {
+            if (!inv.mainInventory.get(i).isEmpty() && stackEqualExact(stack, inv.mainInventory.get(i)))
+            {
                 return i;
             }
         }

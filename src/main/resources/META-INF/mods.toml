@@ -9,7 +9,7 @@ authors="gigaherz"
 
 [[mods]]
 modId="toolbelt"
-version="${version}"
+version="${file.jarVersion}"
 displayName="Tool Belt"
 description='''
 Declutter your inventory of tools

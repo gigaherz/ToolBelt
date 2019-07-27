@@ -30,7 +30,6 @@ import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
 {
@@ -51,6 +50,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     {
         T create(IExtensionSlot slot, int x, int y);
     }
+
     private SlotFactory<ExtensionSlotSlot> slotFactory = DistExecutor.runForDist(
             () -> () -> ExtensionSlotSlotClient::new,
             () -> () -> ExtensionSlotSlot::new

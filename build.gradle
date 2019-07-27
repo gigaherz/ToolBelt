@@ -27,7 +27,7 @@ compileJava {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20190703-1.14.3'
+    mappings channel: 'snapshot', version: '20190720-1.14.3'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -41,6 +41,11 @@ minecraft {
             ideaModule "${project.name}.main"
 
             environment 'MOD_CLASSES', "${project.file("out/production/resources").canonicalPath};${project.file("out/production/classes").canonicalPath}"
+            /*mods {
+                main {
+                    sources sourceSets.main
+                }
+            }*/
         }
 
         server {
@@ -52,12 +57,17 @@ minecraft {
             ideaModule "${project.name}.main"
 
             environment 'MOD_CLASSES', "${project.file("out/production/resources").canonicalPath};${project.file("out/production/classes").canonicalPath}"
+            /*mods {
+                main {
+                    sources sourceSets.main
+                }
+            }*/
         }
     }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.3-27.0.22'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.0.12'
 }
 
 jar {

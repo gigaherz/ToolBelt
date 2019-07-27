@@ -12,8 +12,6 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
 
-import javax.annotation.Nullable;
-
 public class BeltFinderBeltSlot extends BeltFinder
 {
     @CapabilityInject(BeltExtensionSlot.class)

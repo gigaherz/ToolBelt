@@ -4,7 +4,6 @@ import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
-import net.minecraft.client.KeyboardListener;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.settings.KeyBinding;
@@ -69,11 +68,11 @@ public class ClientEvents
         if (ev.getKey() == OPEN_TOOL_MENU_KEYBIND.getKey().getKeyCode())
         {
             ToolBelt.logger.warn("MENU -> {}", ev.getAction());
-            if(ev.getAction() == 0)
+            if (ev.getAction() == 0)
             {
                 toolMenuKeyWasDown = false;
             }
-            if(ev.getAction() == 0)
+            if (ev.getAction() == 0)
             {
                 toolMenuKeyWasDown = false;
             }
