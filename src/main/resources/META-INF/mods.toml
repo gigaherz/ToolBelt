@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[27,)"
+loaderVersion="[28,)"
 #updateJSONURL="http://myurl.me/"
 issueTrackerURL="https://github.com/gigaherz/ToolBelt/issues"
 displayURL="https://github.com/gigaherz/ToolBelt"
@@ -18,12 +18,12 @@ Declutter your inventory of tools
 [[dependencies.toolbelt]]
    modId="forge"
    mandatory=true
-   versionRange="[27.0.21,)"
+   versionRange="[28.0.45,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
    modId="minecraft"
    mandatory=true
-   versionRange="[1.14.3,1.15)"
+   versionRange="[1.14.4,1.15)"
    ordering="NONE"
    side="BOTH"

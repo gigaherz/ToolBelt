@@ -17,7 +17,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.9.10"
+version = "1.10.0"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.14.4"
 
@@ -67,7 +67,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.0.20'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.0.45'
 }
 
 jar {

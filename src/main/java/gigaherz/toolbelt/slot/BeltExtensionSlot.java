@@ -25,12 +25,10 @@ import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerChangedDimensionEvent;
-import net.minecraftforge.fml.common.gameevent.PlayerEvent.PlayerLoggedInEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.items.ItemStackHandler;
@@ -124,7 +122,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         }
 
         @SubscribeEvent
-        public void joinWorld(PlayerLoggedInEvent event)
+        public void joinWorld(PlayerEvent.PlayerLoggedInEvent event)
         {
             PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
@@ -133,7 +131,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         }
 
         @SubscribeEvent
-        public void joinWorld(PlayerChangedDimensionEvent event)
+        public void joinWorld(PlayerEvent.PlayerChangedDimensionEvent event)
         {
             PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
