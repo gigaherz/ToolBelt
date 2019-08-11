@@ -6,8 +6,10 @@ import gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import gigaherz.toolbelt.customslots.IExtensionContainer;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.network.SyncBeltSlotContents;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -35,6 +37,7 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.Collection;
 import java.util.List;
 
 public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<CompoundNBT>
@@ -165,12 +168,20 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             {
                 PlayerEntity player = (PlayerEntity) event.getEntityLiving();
                 get(player).ifPresent((instance) -> {
+                    IExtensionSlot belt = instance.getBelt();
+                    ItemStack stack = belt.getContents();
+                    if (EnchantmentHelper.hasVanishingCurse(stack)) {
+                        stack = ItemStack.EMPTY;
+                        belt.setContents(stack);
+                    }
                     if (!player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) && !player.isSpectator())
                     {
-                        ItemStack stack = instance.getBelt().getContents();
                         if (stack.getCount() > 0)
                         {
-                            event.getDrops().add(player.dropItem(stack, true, false));
+                            Collection<ItemEntity> old = player.captureDrops(event.getDrops());
+                            player.dropItem(stack, true, false);
+                            player.captureDrops(old);
+                            belt.setContents(ItemStack.EMPTY);
                         }
                     }
                 });
@@ -181,20 +192,25 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         public void playerClone(PlayerEvent.Clone event)
         {
             PlayerEntity oldPlayer = event.getOriginal();
-            //oldPlayer.revive();
-
-            PlayerEntity newPlayer = event.getEntityPlayer();
+            // FIXME: workaround for a forge issue that seems to be reappearing too often
+            // at this time it's only needed when returning from the end alive
+            oldPlayer.revive();
+            PlayerEntity newPlayer = event.getPlayer();
             get(oldPlayer).ifPresent((oldBelt) -> {
                 BeltExtensionSlot newBelt = get(newPlayer).orElse(null);
                 ItemStack stack = oldBelt.getBelt().getContents();
-                if (newBelt == null && stack.getCount() > 0)
+                if (newBelt == null)
                 {
-                    newPlayer.world.addEntity(oldPlayer.dropItem(stack, true, false));
-                    return;
+                    if (stack.getCount() > 0)
+                    {
+                        oldPlayer.dropItem(stack, true, false);
+                    }
                 }
-                if (!event.isWasDeath() || newPlayer.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) || oldPlayer.isSpectator())
+                else
                 {
-                    newBelt.getBelt().setContents(oldBelt.getBelt().getContents());
+                    // Transfer any remaining item. If it was death and keepInventory was off,
+                    // it will have been removed in LivingDropsEvent.
+                    newBelt.getBelt().setContents(stack);
                 }
             });
         }
