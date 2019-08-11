@@ -6,6 +6,7 @@ import gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import gigaherz.toolbelt.customslots.IExtensionContainer;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.network.SyncBeltSlotContents;
+import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.item.EntityItem;
@@ -14,9 +15,11 @@ import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.NBTBase;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.stats.StatList;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.MathHelper;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -32,7 +35,10 @@ import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Random;
 
 public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<NBTTagCompound>
 {
@@ -171,12 +177,18 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             EntityPlayer player = event.getEntityPlayer();
             ExtensionSlotBelt instance = get(player);
             if (instance == null) return;
+            IExtensionSlot belt = instance.getBelt();
+            ItemStack stack = belt.getContents();
+            if (EnchantmentHelper.hasVanishingCurse(stack)) {
+                stack = ItemStack.EMPTY;
+                belt.setContents(stack);
+            }
             if (!player.world.getGameRules().getBoolean("keepInventory") && !player.isSpectator())
             {
-                ItemStack stack = instance.getBelt().getContents();
                 if (stack.getCount() > 0)
                 {
-                    event.getDrops().add(player.dropItem(stack, true, false));
+                    event.getDrops().add(prepareDrop(player, stack, true));
+                    belt.setContents(ItemStack.EMPTY);
                 }
             }
         }
@@ -190,13 +202,57 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             ExtensionSlotBelt newBelt = get(newPlayer);
             if (oldBelt == null) return;
             ItemStack stack = oldBelt.getBelt().getContents();
-            if (newBelt == null && stack.getCount() > 0) {
-                newPlayer.world.spawnEntity(oldPlayer.dropItem(stack, true, false));
-                return;
-            }
-            if (!event.isWasDeath() || newPlayer.world.getGameRules().getBoolean("keepInventory") || oldPlayer.isSpectator())
+            if (newBelt == null)
             {
-                newBelt.getBelt().setContents(oldBelt.getBelt().getContents());
+                if (stack.getCount() > 0)
+                {
+                    oldPlayer.dropItem(stack, true, false);
+                }
+            }
+            else
+            {
+                // Transfer any remaining item. If it was death and keepInventory was off,
+                // it will have been removed in LivingDropsEvent.
+                newBelt.getBelt().setContents(stack);
+            }
+        }
+
+        private Random rand = new Random();
+        @Nullable
+        private EntityItem prepareDrop(EntityPlayer player, ItemStack droppedItem, boolean dropAround)
+        {
+            if (droppedItem.isEmpty())
+            {
+                return null;
+            }
+            else
+            {
+                double d0 = player.posY - 0.30000001192092896D + (double)player.getEyeHeight();
+                EntityItem entityitem = new EntityItem(player.world, player.posX, d0, player.posZ, droppedItem);
+                entityitem.setPickupDelay(40);
+
+                if (dropAround)
+                {
+                    float f = rand.nextFloat() * 0.5F;
+                    float f1 = rand.nextFloat() * ((float)Math.PI * 2F);
+                    entityitem.motionX = -MathHelper.sin(f1) * f;
+                    entityitem.motionZ = MathHelper.cos(f1) * f;
+                    entityitem.motionY = 0.20000000298023224D;
+                }
+                else
+                {
+                    float f2 = 0.3F;
+                    entityitem.motionX = -MathHelper.sin(player.rotationYaw * 0.017453292F) * MathHelper.cos(player.rotationPitch * 0.017453292F) * f2;
+                    entityitem.motionZ = MathHelper.cos(player.rotationYaw * 0.017453292F) * MathHelper.cos(player.rotationPitch * 0.017453292F) * f2;
+                    entityitem.motionY = -MathHelper.sin(player.rotationPitch * 0.017453292F) * f2 + 0.1F;
+                    float f3 = rand.nextFloat() * ((float)Math.PI * 2F);
+                    f2 = 0.02F * rand.nextFloat();
+                    entityitem.motionX += Math.cos((double)f3) * (double)f2;
+                    entityitem.motionY += (rand.nextFloat() - rand.nextFloat()) * 0.1F;
+                    entityitem.motionZ += Math.sin((double)f3) * (double)f2;
+                }
+
+                return entityitem;
             }
         }
     }
