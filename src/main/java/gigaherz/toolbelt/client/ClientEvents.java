@@ -10,7 +10,6 @@ import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -63,40 +62,29 @@ public class ClientEvents
     private static boolean toolMenuKeyWasDown = false;
 
     @SubscribeEvent
-    public static void handleKeys(InputEvent.KeyInputEvent ev)
-    {
-        if (ev.getKey() == OPEN_TOOL_MENU_KEYBIND.getKey().getKeyCode())
-        {
-            ToolBelt.logger.warn("MENU -> {}", ev.getAction());
-            if (ev.getAction() == 0)
-            {
-                toolMenuKeyWasDown = false;
-            }
-            if (ev.getAction() == 0)
-            {
-                toolMenuKeyWasDown = false;
-            }
-        }
-    }
-
-    @SubscribeEvent
     public static void handleKeys(TickEvent.ClientTickEvent ev)
     {
         Minecraft mc = Minecraft.getInstance();
 
-        while (OPEN_TOOL_MENU_KEYBIND.isPressed())
+        if (mc.currentScreen == null)
         {
-            if (mc.currentScreen == null)
+            boolean toolMenuKeyIsDown = isKeyDown(OPEN_TOOL_MENU_KEYBIND);
+            if (toolMenuKeyIsDown && !toolMenuKeyWasDown)
             {
-                //if (!toolMenuKeyWasDown)
+                while (OPEN_TOOL_MENU_KEYBIND.isPressed())
                 {
-                    ItemStack inHand = mc.player.getHeldItemMainhand();
-                    if (ConfigData.isItemStackAllowed(inHand))
+                    if (mc.currentScreen == null)
                     {
-                        BeltFinder.findBelt(mc.player).ifPresent((getter) -> mc.displayGuiScreen(new RadialMenuScreen(getter)));
+                        ItemStack inHand = mc.player.getHeldItemMainhand();
+                        if (ConfigData.isItemStackAllowed(inHand))
+                        {
+                            BeltFinder.findBelt(mc.player).ifPresent((getter) -> mc.displayGuiScreen(new RadialMenuScreen(getter)));
+                        }
                     }
                 }
             }
+            toolMenuKeyWasDown = toolMenuKeyIsDown;
+        } else {
             toolMenuKeyWasDown = true;
         }
 
