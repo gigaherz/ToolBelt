@@ -44,14 +44,14 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
         super.init();
 
         this.widthTooNarrow = this.width < 379;
-        this.recipeBookGui.func_201520_a(this.width, this.height, this.minecraft, this.widthTooNarrow, this.container);
+        this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.container);
         this.hasRecipeBook = true;
         this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
         this.children.add(this.recipeBookGui);
-        this.func_212928_a(this.recipeBookGui);
+        this.setFocusedDefault(this.recipeBookGui);
         ImageButton recipebutton;
         this.addButton(recipebutton = new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214086_1_) -> {
-            this.recipeBookGui.func_201518_a(this.widthTooNarrow);
+            this.recipeBookGui.initSearchBar(this.widthTooNarrow);
             this.recipeBookGui.toggleVisibility();
             this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
             ((ImageButton) p_214086_1_).setPosition(this.guiLeft + 104, this.height / 2 - 22);
@@ -167,7 +167,7 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     }
 
     @Override
-    public RecipeBookGui func_194310_f()
+    public RecipeBookGui getRecipeGui()
     {
         return this.recipeBookGui;
     }

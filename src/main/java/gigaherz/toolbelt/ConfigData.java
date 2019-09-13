@@ -14,6 +14,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
 
 public class ConfigData
 {
@@ -37,8 +38,8 @@ public class ConfigData
         CLIENT = specPair.getLeft();
     }
 
-    private static final Set<ItemStack> blackList = Sets.newHashSet();
-    private static final Set<ItemStack> whiteList = Sets.newHashSet();
+    private static Set<ItemStack> blackList = Sets.newHashSet();
+    private static Set<ItemStack> whiteList = Sets.newHashSet();
 
     public static boolean showBeltOnPlayers = true;
     public static double beltItemScale = 0.5;
@@ -132,8 +133,8 @@ public class ConfigData
     public static void refreshServer()
     {
         disableAnvilUpgrading = SERVER.disableAnvilUpgrading.get();
-        SERVER.blacklist.get().stream().map(ConfigData::parseItemStack).forEach(blackList::add);
-        SERVER.whitelist.get().stream().map(ConfigData::parseItemStack).forEach(whiteList::add);
+        blackList = SERVER.blacklist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
+        whiteList = SERVER.whitelist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
     }
 
     private static final Pattern itemRegex = Pattern.compile("^(?<item>([a-zA-Z-0-9_]+:)?[a-zA-Z-0-9_]+)(?:@((?<meta>[0-9]+)|(?<any>any)))?$");
