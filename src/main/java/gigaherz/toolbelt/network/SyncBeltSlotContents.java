@@ -45,5 +45,6 @@ public class SyncBeltSlotContents
     public void handle(Supplier<NetworkEvent.Context> context)
     {
         ClientPacketHandlers.handleBeltSlotContents(this);
+        context.get().setPacketHandled(true);
     }
 }

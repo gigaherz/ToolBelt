@@ -12,25 +12,35 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.network.PacketDistributor;
 
+import java.util.Optional;
+
 public class BeltFinderBeltSlot extends BeltFinder
 {
+    public static final String FINDER_ID = "belt_slot";
+
     @CapabilityInject(BeltExtensionSlot.class)
     public static void initBaubles(Capability cap)
     {
         BeltFinder.addFinder(new BeltFinderBeltSlot());
     }
 
-    public LazyOptional<BeltGetter> findStack(PlayerEntity player)
+    @Override
+    public String getName()
     {
-        return BeltExtensionSlot.get(player).map((beltSlot) -> beltSlot.getSlots().stream().
-                filter(slot -> slot.getContents().getItem() instanceof ToolBeltItem)
-                .map(ExtensionSlotBeltGetter::new)
-                .findFirst()
-                .orElse(null));
+        return FINDER_ID;
     }
 
     @Override
-    public void setToBeltSlot(LivingEntity player, ItemStack stack)
+    public LazyOptional<BeltGetter> findStack(PlayerEntity player)
+    {
+        return BeltExtensionSlot.get(player).map((theCap) -> theCap.getSlots().stream().
+                filter(slot -> slot.getContents().getItem() instanceof ToolBeltItem)
+                .map(ExtensionSlotBeltGetter::new)
+                .findFirst()).filter(Optional::isPresent).map(Optional::get);
+    }
+
+    @Override
+    public void setToSlot(LivingEntity player, int slotNumber, ItemStack stack)
     {
         BeltExtensionSlot.get(player).ifPresent(slot -> slot.getBelt().setContents(stack));
     }
@@ -56,7 +66,7 @@ public class BeltFinderBeltSlot extends BeltFinder
             LivingEntity thePlayer = slot.getContainer().getOwner();
             if (thePlayer.world.isRemote)
                 return;
-            BeltContentsChange message = new BeltContentsChange(thePlayer, BeltContentsChange.ContainingInventory.BELT_SLOT, 0, slot.getContents());
+            BeltContentsChange message = new BeltContentsChange(thePlayer, FINDER_ID, 0, slot.getContents());
             ToolBelt.channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> thePlayer), message);
         }
     }

@@ -10,20 +10,12 @@ import java.util.function.Supplier;
 
 public class BeltContentsChange
 {
-
-    public enum ContainingInventory
-    {
-        MAIN, BAUBLES, BELT_SLOT;
-
-        public static final ContainingInventory[] VALUES = values();
-    }
-
     public int player;
-    public ContainingInventory where;
+    public String where;
     public int slot;
     public ItemStack stack;
 
-    public BeltContentsChange(LivingEntity player, ContainingInventory where, int slot, ItemStack stack)
+    public BeltContentsChange(LivingEntity player, String where, int slot, ItemStack stack)
     {
         this.player = player.getEntityId();
         this.where = where;
@@ -33,22 +25,23 @@ public class BeltContentsChange
 
     public BeltContentsChange(PacketBuffer buf)
     {
-        player = buf.readInt();
-        where = ContainingInventory.VALUES[buf.readByte()];
-        slot = buf.readByte();
+        player = buf.readVarInt();
+        where = buf.readString();
+        slot = buf.readVarInt();
         stack = buf.readItemStack();
     }
 
     public void encode(PacketBuffer buf)
     {
-        buf.writeInt(player);
-        buf.writeByte(where.ordinal());
-        buf.writeByte(slot);
+        buf.writeVarInt(player);
+        buf.writeString(where);
+        buf.writeVarInt(slot);
         buf.writeItemStack(stack);
     }
 
     public void handle(Supplier<NetworkEvent.Context> context)
     {
         ClientPacketHandlers.handleBeltContentsChange(this);
+        context.get().setPacketHandled(true);
     }
 }

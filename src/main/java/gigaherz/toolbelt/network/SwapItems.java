@@ -35,6 +35,7 @@ public class SwapItems
     public void handle(Supplier<NetworkEvent.Context> context)
     {
         context.get().enqueueWork(() -> swapItem(swapWith, context.get().getSender()));
+        context.get().setPacketHandled(true);
     }
 
     public static void swapItem(int swapWith, PlayerEntity player)

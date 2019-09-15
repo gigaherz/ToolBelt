@@ -10,20 +10,21 @@ public abstract class BeltFinder
 {
     private static NonNullList<BeltFinder> instances = NonNullList.create();
 
-    public static void addFinder(BeltFinderBeltSlot finder)
+    public static void addFinder(BeltFinder finder)
     {
         instances.add(0, finder);
     }
 
-    public static void setToAnyBeltSlot(PlayerEntity player, int slot, ItemStack stack)
+    public static void setFinderSlotContents(PlayerEntity player, String where, int slot, ItemStack stack)
     {
-        instances.forEach((i) -> i.setToBeltSlot(player, stack));
+        for(BeltFinder finder : instances) {
+            if (finder.getName().equals(where)) {
+                finder.setToSlot(player, slot, stack);
+            }
+        }
     }
 
-    public static void setToAnyBaubles(PlayerEntity player, int slot, ItemStack stack)
-    {
-        instances.forEach((i) -> i.setToBaubles(player, slot, stack));
-    }
+    public abstract String getName();
 
     public abstract LazyOptional<BeltGetter> findStack(PlayerEntity player);
 
@@ -41,11 +42,7 @@ public abstract class BeltFinder
         findBelt(player).ifPresent(BeltGetter::syncToClients);
     }
 
-    public void setToBaubles(PlayerEntity player, int slot, ItemStack stack)
-    {
-    }
-
-    public void setToBeltSlot(LivingEntity player, ItemStack stack)
+    public void setToSlot(LivingEntity player, int slot, ItemStack stack)
     {
     }
 

@@ -25,5 +25,6 @@ public class OpenBeltSlotInventory
         context.get().enqueueWork(() -> {
             Screens.openSlotScreen(context.get().getSender());
         });
+        context.get().setPacketHandled(true);
     }
 }

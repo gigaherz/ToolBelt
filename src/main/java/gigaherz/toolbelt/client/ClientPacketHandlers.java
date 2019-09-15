@@ -19,18 +19,7 @@ public class ClientPacketHandlers
             if (!(entity instanceof PlayerEntity))
                 return;
             PlayerEntity player = (PlayerEntity) entity;
-            switch (message.where)
-            {
-                case MAIN:
-                    player.inventory.setInventorySlotContents(message.slot, message.stack);
-                    break;
-                case BELT_SLOT:
-                    BeltFinder.setToAnyBeltSlot(player, message.slot, message.stack);
-                    break;
-                case BAUBLES:
-                    BeltFinder.setToAnyBaubles(player, message.slot, message.stack);
-                    break;
-            }
+            BeltFinder.setFinderSlotContents(player, message.where, message.slot, message.stack);
         });
     }
 
