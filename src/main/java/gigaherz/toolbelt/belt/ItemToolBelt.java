@@ -57,6 +57,9 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
     @Override
     public EnumActionResult onItemUse(EntityPlayer player, World worldIn, BlockPos pos, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ)
     {
+        if (hand != EnumHand.MAIN_HAND)
+            return EnumActionResult.PASS;
+
         player.openGui(ToolBelt.instance, GuiHandler.BELT, worldIn, hand.ordinal(), 0, 0);
 
         return EnumActionResult.SUCCESS;
@@ -65,6 +68,9 @@ public class ItemToolBelt extends ItemRegistered implements IBauble, IExtensionS
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand hand)
     {
+        if (hand != EnumHand.MAIN_HAND)
+            return new ActionResult<>(EnumActionResult.PASS, playerIn.getHeldItem(hand));
+
         playerIn.openGui(ToolBelt.instance, GuiHandler.BELT, worldIn, hand.ordinal(), 0, 0);
 
         return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(hand));

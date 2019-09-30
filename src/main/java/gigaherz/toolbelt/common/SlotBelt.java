@@ -3,16 +3,11 @@ package gigaherz.toolbelt.common;
 import gigaherz.toolbelt.Config;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.InventoryBasic;
 import net.minecraft.inventory.Slot;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.SlotItemHandler;
-
-import javax.annotation.Nonnull;
 
 public class SlotBelt extends Slot
 {
@@ -20,12 +15,16 @@ public class SlotBelt extends Slot
     {
         super(new IInventory(){
 
+            final IInventory sourceInventory = playerInventory;
+            final int slot = blockedSlot;
+            final int subSlot = index;
+
             ItemStack beltStack = null;
             IItemHandlerModifiable inventory = null;
 
             IItemHandlerModifiable findStack()
             {
-                ItemStack stack = playerInventory.getStackInSlot(blockedSlot);
+                ItemStack stack = sourceInventory.getStackInSlot(slot);
                 if (stack != beltStack)
                 {
                     beltStack = stack;
@@ -67,13 +66,13 @@ public class SlotBelt extends Slot
             @Override
             public ItemStack getStackInSlot(int n)
             {
-                return findStack().getStackInSlot(index);
+                return findStack().getStackInSlot(subSlot);
             }
 
             @Override
             public ItemStack decrStackSize(int n, int count)
             {
-                return findStack().extractItem(index, count, false);
+                return findStack().extractItem(subSlot, count, false);
             }
 
             @Override
@@ -85,13 +84,13 @@ public class SlotBelt extends Slot
             @Override
             public void setInventorySlotContents(int n, ItemStack stack)
             {
-                findStack().setStackInSlot(index, stack);
+                findStack().setStackInSlot(subSlot, stack);
             }
 
             @Override
             public int getInventoryStackLimit()
             {
-                return findStack().getSlotLimit(index);
+                return findStack().getSlotLimit(subSlot);
             }
 
             @Override
