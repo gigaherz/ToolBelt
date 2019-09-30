@@ -15,12 +15,16 @@ public class BeltSlot extends Slot
         super(new IInventory()
         {
 
+            final IInventory sourceInventory = playerInventory;
+            final int slot = blockedSlot;
+            final int subSlot = index;
+
             ItemStack beltStack = null;
             IItemHandlerModifiable inventory = null;
 
             IItemHandlerModifiable findStack()
             {
-                ItemStack stack = playerInventory.getStackInSlot(blockedSlot);
+                ItemStack stack = sourceInventory.getStackInSlot(slot);
                 if (stack != beltStack)
                 {
                     beltStack = stack;
@@ -47,13 +51,13 @@ public class BeltSlot extends Slot
             @Override
             public ItemStack getStackInSlot(int n)
             {
-                return findStack().getStackInSlot(index);
+                return findStack().getStackInSlot(subSlot);
             }
 
             @Override
             public ItemStack decrStackSize(int n, int count)
             {
-                return findStack().extractItem(index, count, false);
+                return findStack().extractItem(subSlot, count, false);
             }
 
             @Override
@@ -67,13 +71,13 @@ public class BeltSlot extends Slot
             @Override
             public void setInventorySlotContents(int n, ItemStack stack)
             {
-                findStack().setStackInSlot(index, stack);
+                findStack().setStackInSlot(subSlot, stack);
             }
 
             @Override
             public int getInventoryStackLimit()
             {
-                return findStack().getSlotLimit(index);
+                return findStack().getSlotLimit(subSlot);
             }
 
             @Override

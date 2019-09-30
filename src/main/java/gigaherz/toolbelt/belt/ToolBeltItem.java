@@ -68,9 +68,9 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
         return -1;
     }
 
-    private ActionResultType openBeltScreen(PlayerEntity player, ItemStack stack, World world)
+    private ActionResultType openBeltScreen(@Nullable PlayerEntity player, ItemStack stack, World world)
     {
-        int slot = getSlotFor(player.inventory, stack);
+        int slot = player != null ? getSlotFor(player.inventory, stack) : -1;
         if (slot == -1)
             return ActionResultType.FAIL;
 
@@ -85,18 +85,20 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
     @Override
     public ActionResultType onItemUse(ItemUseContext context)
     {
-        PlayerEntity player = context.getPlayer();
-        ItemStack stack = context.getItem();
-        World world = context.getWorld();
+        if (context.getHand() != Hand.MAIN_HAND)
+            return ActionResultType.PASS;
 
-        return openBeltScreen(player, stack, world);
+        return openBeltScreen(context.getPlayer(), context.getItem(), context.getWorld());
     }
 
     @Override
     public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
     {
         ItemStack stack = player.getHeldItem(hand);
-        return new ActionResult<>(openBeltScreen(player, stack, world), stack);
+        if (hand != Hand.MAIN_HAND)
+            return new ActionResult<>(ActionResultType.PASS, stack);
+        ActionResultType result = openBeltScreen(player, stack, world);
+        return new ActionResult<>(result, stack);
     }
 
     @Override

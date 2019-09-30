@@ -20,7 +20,7 @@ repositories {
     }
 }
 
-version = "1.12.0"
+version = "1.12.1"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.14.4"
 
