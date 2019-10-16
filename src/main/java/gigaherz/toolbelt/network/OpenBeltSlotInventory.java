@@ -20,11 +20,11 @@ public class OpenBeltSlotInventory
     {
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(Supplier<NetworkEvent.Context> context)
     {
         context.get().enqueueWork(() -> {
             Screens.openSlotScreen(context.get().getSender());
         });
-        context.get().setPacketHandled(true);
+        return true;
     }
 }

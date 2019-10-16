@@ -10,10 +10,13 @@ import gigaherz.toolbelt.customslots.ExtensionSlotItemCapability;
 import gigaherz.toolbelt.network.*;
 import gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.client.gui.ScreenManager;
+import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
+import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
+import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.Tuple;
 import net.minecraftforge.api.distmarker.Dist;
@@ -22,6 +25,8 @@ import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fluids.FluidAttributes;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.DistExecutor;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
@@ -39,6 +44,10 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
+
+import java.util.concurrent.Callable;
+import java.util.function.BiFunction;
+import java.util.function.Supplier;
 
 @Mod(ToolBelt.MODID)
 public class ToolBelt
@@ -105,7 +114,7 @@ public class ToolBelt
     public void registerContainers(RegistryEvent.Register<ContainerType<?>> event)
     {
         event.getRegistry().registerAll(
-                IForgeContainerType.create(BeltSlotContainer::new).setRegistryName("belt_slot_container"),
+                new ContainerType<>(BeltSlotContainer::new).setRegistryName("belt_slot_container"),
                 IForgeContainerType.create(BeltContainer::new).setRegistryName("belt_container")
         );
     }
@@ -142,6 +151,7 @@ public class ToolBelt
     public void loadComplete(FMLLoadCompleteEvent event)
     {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> ClientEvents::initKeybinds);
+
     }
 
     public void anvilChange(AnvilUpdateEvent ev)
@@ -170,5 +180,27 @@ public class ToolBelt
     public static ResourceLocation location(String path)
     {
         return new ResourceLocation(MODID, path);
+    }
+
+    public static class VariableTemperatureFluidAttributes extends FluidAttributes
+    {
+        public static FluidAttributes.Builder builder(ResourceLocation stillTexture, ResourceLocation flowingTexture)
+        {
+            return new FluidAttributes.Builder(stillTexture, flowingTexture, VariableTemperatureFluidAttributes::new) {};
+        }
+
+        protected VariableTemperatureFluidAttributes(Builder builder, Fluid fluid)
+        {
+            super(builder, fluid);
+        }
+
+        @Override
+        public int getTemperature(FluidStack stack)
+        {
+            CompoundNBT tag = stack.getTag();
+            if (tag != null && tag.contains("Temperature"))
+                return tag.getInt("Temperature");
+            return super.getTemperature(stack);
+        }
     }
 }

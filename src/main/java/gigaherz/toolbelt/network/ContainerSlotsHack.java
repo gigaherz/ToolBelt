@@ -19,9 +19,9 @@ public class ContainerSlotsHack
     {
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(Supplier<NetworkEvent.Context> context)
     {
         context.get().getSender().sendContainerToPlayer(context.get().getSender().openContainer);
-        context.get().setPacketHandled(true);
+        return true;
     }
 }

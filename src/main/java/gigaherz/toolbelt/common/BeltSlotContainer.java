@@ -56,7 +56,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
             () -> () -> ExtensionSlotSlot::new
     );
 
-    public BeltSlotContainer(int id, PlayerInventory playerInventory, PacketBuffer packetBuffer)
+    public BeltSlotContainer(int id, PlayerInventory playerInventory)
     {
         this(id, playerInventory, true);
     }

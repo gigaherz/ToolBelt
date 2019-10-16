@@ -39,9 +39,9 @@ public class BeltContentsChange
         buf.writeItemStack(stack);
     }
 
-    public void handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(Supplier<NetworkEvent.Context> context)
     {
         ClientPacketHandlers.handleBeltContentsChange(this);
-        context.get().setPacketHandled(true);
+        return true;
     }
 }
