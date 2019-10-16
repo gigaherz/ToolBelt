@@ -25,8 +25,12 @@ public class BeltFinderBeltSlot extends BeltFinder
     @Nullable
     public BeltGetter findStack(EntityPlayer player)
     {
-        ExtensionSlotBelt baubles = ExtensionSlotBelt.get(player);
-        for (IExtensionSlot slot : baubles.getSlots())
+        ExtensionSlotBelt beltSlot = ExtensionSlotBelt.get(player);
+
+        if (beltSlot == null)
+            return null;
+
+        for (IExtensionSlot slot : beltSlot.getSlots())
         {
             ItemStack inSlot = slot.getContents();
             if (inSlot.getCount() > 0)

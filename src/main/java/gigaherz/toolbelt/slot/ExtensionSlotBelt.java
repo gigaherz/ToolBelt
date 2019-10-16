@@ -1,6 +1,9 @@
 package gigaherz.toolbelt.slot;
 
+import baubles.api.cap.IBaublesItemHandler;
 import com.google.common.collect.ImmutableList;
+import gigaherz.toolbelt.BeltFinder;
+import gigaherz.toolbelt.Config;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import gigaherz.toolbelt.customslots.IExtensionContainer;
@@ -31,6 +34,8 @@ import net.minecraftforge.event.entity.player.PlayerDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
+import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
@@ -113,7 +118,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
                     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing)
                     {
                         if (capability == CAPABILITY)
-                            return true;
+                            return Config.customBeltSlotEnabled;
                         return false;
                     }
 
@@ -122,7 +127,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
                     @Override
                     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
                     {
-                        if (capability == CAPABILITY)
+                        if (capability == CAPABILITY && Config.customBeltSlotEnabled)
                             return (T) extensionContainer;
                         return null;
                     }
@@ -137,7 +142,8 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             if (target.world.isRemote)
                 return;
             ExtensionSlotBelt instance = get(target);
-            instance.syncToSelf();
+            if (instance != null)
+                instance.syncToSelf();
         }
 
         @SubscribeEvent
@@ -147,7 +153,8 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             if (target.world.isRemote)
                 return;
             ExtensionSlotBelt instance = get(target);
-            instance.syncToSelf();
+            if (instance != null)
+                instance.syncToSelf();
         }
 
         @SubscribeEvent
@@ -159,7 +166,8 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             if (target instanceof EntityPlayer)
             {
                 ExtensionSlotBelt instance = get((EntityLivingBase) target);
-                instance.syncTo(event.getEntityPlayer());
+                if (instance != null)
+                    instance.syncTo(event.getEntityPlayer());
             }
         }
 
@@ -288,7 +296,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             super.onContentsChanged(slot);
             belt.onContentsChanged();
         }
-    };;
+    };
     private final ExtensionSlotItemHandler belt = new ExtensionSlotItemHandler(this, BELT, inventory, 0);
     private final ImmutableList<IExtensionSlot> slots = ImmutableList.of(belt);
 

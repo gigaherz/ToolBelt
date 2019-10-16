@@ -5,11 +5,13 @@ import com.google.common.collect.Sets;
 import gigaherz.toolbelt.belt.ItemToolBelt;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.config.ConfigCategory;
 import net.minecraftforge.common.config.Configuration;
 import net.minecraftforge.common.config.Property;
 import net.minecraftforge.fml.client.event.ConfigChangedEvent;
+import net.minecraftforge.fml.common.Loader;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.registry.ForgeRegistries;
@@ -45,6 +47,9 @@ public class Config
 
     public static boolean disableAnvilUpgrading = false;
 
+    public static CustomBeltSlotMode customBeltSlotMode = CustomBeltSlotMode.ON;
+    public static boolean customBeltSlotEnabled = true;
+
     static void loadConfig(File configurationFile)
     {
         config = new Configuration(configurationFile);
@@ -76,6 +81,11 @@ public class Config
         Property disableAnvilUpgradingProperty = config.get("behaviour", "disableAnvilUpgrading", false);
         disableAnvilUpgradingProperty.setComment("If set to TRUE, the internal anvil upgrade will not work, and alternative methods for upgrades will have to be provided externally.");
 
+        Property customBeltSlotModeProperty = config.get("slot", "customBeltSlotMode", CustomBeltSlotMode.ON.getName());
+        customBeltSlotModeProperty.setValidValues(CustomBeltSlotMode.names());
+        customBeltSlotModeProperty.requiresMcRestart();
+        customBeltSlotModeProperty.setComment("If AUTO, the belt slot will be disabled if Baubles is present. If OFF, the belt slot will be disabled permanently.");
+
         display = config.getCategory("display");
         display.setComment("Options for customizing the display of tools on the player");
 
@@ -94,6 +104,11 @@ public class Config
         displayEmptySlots = displayEmptySlotsProperty.getBoolean();
 
         disableAnvilUpgrading = disableAnvilUpgradingProperty.getBoolean();
+
+        customBeltSlotMode = CustomBeltSlotMode.byName(customBeltSlotModeProperty.getString());
+
+        customBeltSlotEnabled = customBeltSlotMode == CustomBeltSlotMode.ON ||
+                (customBeltSlotMode == CustomBeltSlotMode.AUTO && !Loader.isModLoaded("baubles"));
 
         blackListString.addAll(Arrays.asList(bl.getStringList()));
         whiteListString.addAll(Arrays.asList(wl.getStringList()));
@@ -185,5 +200,40 @@ public class Config
             return false;
 
         return true;
+    }
+
+    public enum CustomBeltSlotMode implements IStringSerializable
+    {
+        OFF("off"),
+        AUTO("auto"),
+        ON("on");
+
+        private final String name;
+
+        CustomBeltSlotMode(String name)
+        {
+            this.name = name;
+        }
+
+        @Override
+        public String getName()
+        {
+            return name;
+        }
+
+        public static CustomBeltSlotMode byName(String name)
+        {
+            for(CustomBeltSlotMode mode : values())
+            {
+                if (mode.name.equalsIgnoreCase(name))
+                    return mode;
+            }
+            return CustomBeltSlotMode.ON;
+        }
+
+        public static String[] names()
+        {
+            return Arrays.stream(values()).map(CustomBeltSlotMode::getName).toArray(String[]::new);
+        }
     }
 }

@@ -73,11 +73,14 @@ public class ClientProxy implements ISideProxy
             }
         }
 
-        while (keyOpenBeltSlot.isPressed())
+        if (Config.customBeltSlotEnabled)
         {
-            if (mc.currentScreen == null)
+            while (keyOpenBeltSlot.isPressed())
             {
-                ToolBelt.channel.sendToServer(new OpenBeltSlotInventory());
+                if (mc.currentScreen == null)
+                {
+                    ToolBelt.channel.sendToServer(new OpenBeltSlotInventory());
+                }
             }
         }
     }
@@ -102,8 +105,11 @@ public class ClientProxy implements ISideProxy
         ClientRegistry.registerKeyBinding(keyCycleToolMenuR =
                 new KeyBinding("key.toolbelt.cycle.right", 0, "key.toolbelt.category"));
 
-        ClientRegistry.registerKeyBinding(keyOpenBeltSlot =
-                new KeyBinding("key.toolbelt.slot", Keyboard.KEY_V, "key.toolbelt.category"));
+        if (Config.customBeltSlotEnabled)
+        {
+            ClientRegistry.registerKeyBinding(keyOpenBeltSlot =
+                    new KeyBinding("key.toolbelt.slot", Keyboard.KEY_V, "key.toolbelt.category"));
+        }
 
         Map<String, RenderPlayer> skinMap = Minecraft.getMinecraft().getRenderManager().getSkinMap();
 
