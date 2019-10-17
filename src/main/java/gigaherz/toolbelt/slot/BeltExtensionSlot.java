@@ -1,6 +1,7 @@
 package gigaherz.toolbelt.slot;
 
 import com.google.common.collect.ImmutableList;
+import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import gigaherz.toolbelt.customslots.IExtensionContainer;
@@ -115,7 +116,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     @Override
                     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing)
                     {
-                        if (CAPABILITY == capability)
+                        if (CAPABILITY == capability && ConfigData.customBeltSlotEnabled)
                             return extensionContainerSupplier.cast();
 
                         return LazyOptional.empty();

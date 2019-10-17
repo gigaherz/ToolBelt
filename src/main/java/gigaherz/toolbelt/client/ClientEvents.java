@@ -88,11 +88,14 @@ public class ClientEvents
             toolMenuKeyWasDown = true;
         }
 
-        while (OPEN_BELT_SLOT_KEYBIND.isPressed())
+        if (ConfigData.customBeltSlotEnabled)
         {
-            if (mc.currentScreen == null)
+            while (OPEN_BELT_SLOT_KEYBIND.isPressed())
             {
-                ToolBelt.channel.sendToServer(new OpenBeltSlotInventory());
+                if (mc.currentScreen == null)
+                {
+                    ToolBelt.channel.sendToServer(new OpenBeltSlotInventory());
+                }
             }
         }
     }

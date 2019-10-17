@@ -5,11 +5,13 @@ import com.google.common.collect.Sets;
 import gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
 import org.apache.commons.lang3.tuple.Pair;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -51,11 +53,17 @@ public class ConfigData
 
     public static boolean disableAnvilUpgrading = false;
 
+    public static CustomBeltSlotMode customBeltSlotMode = CustomBeltSlotMode.ON;
+    public static boolean customBeltSlotEnabled = true;
+
+    public static boolean curiosPresent = false;
+
     public static class ServerConfig
     {
         public final ForgeConfigSpec.ConfigValue<List<? extends String>> whitelist;
         public final ForgeConfigSpec.ConfigValue<List<? extends String>> blacklist;
         public final ForgeConfigSpec.BooleanValue disableAnvilUpgrading;
+        public final ForgeConfigSpec.EnumValue<CustomBeltSlotMode> customBeltSlotMode;
 
         ServerConfig(ForgeConfigSpec.Builder builder)
         {
@@ -72,6 +80,10 @@ public class ConfigData
                     .comment("If set to TRUE, the internal anvil upgrade will not work, and alternative methods for upgrades will have to be provided externally.")
                     .translation("text.toolbelt.config.disable_anvil_update")
                     .define("disableAnvilUpgrading", false);
+            customBeltSlotMode = builder
+                    .comment("If AUTO, the belt slot will be disabled if Curios is present. If OFF, the belt slot will be disabled permanently.")
+                    .translation("text.toolbelt.config.custom_belt_slot_mode")
+                    .defineEnum("customBeltSlotMode", CustomBeltSlotMode.ON);
             builder.pop();
         }
     }
@@ -133,6 +145,11 @@ public class ConfigData
     public static void refreshServer()
     {
         disableAnvilUpgrading = SERVER.disableAnvilUpgrading.get();
+        customBeltSlotMode = SERVER.customBeltSlotMode.get();
+
+        customBeltSlotEnabled = customBeltSlotMode == CustomBeltSlotMode.ON ||
+                (customBeltSlotMode == CustomBeltSlotMode.AUTO && !curiosPresent);
+
         blackList = SERVER.blacklist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
         whiteList = SERVER.whitelist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
     }
@@ -177,5 +194,40 @@ public class ConfigData
             return false;
 
         return true;
+    }
+
+    public enum CustomBeltSlotMode implements IStringSerializable
+    {
+        OFF("off"),
+        AUTO("auto"),
+        ON("on");
+
+        private final String name;
+
+        CustomBeltSlotMode(String name)
+        {
+            this.name = name;
+        }
+
+        @Override
+        public String getName()
+        {
+            return name;
+        }
+
+        public static CustomBeltSlotMode byName(String name)
+        {
+            for(CustomBeltSlotMode mode : values())
+            {
+                if (mode.name.equalsIgnoreCase(name))
+                    return mode;
+            }
+            return CustomBeltSlotMode.ON;
+        }
+
+        public static String[] names()
+        {
+            return Arrays.stream(values()).map(CustomBeltSlotMode::getName).toArray(String[]::new);
+        }
     }
 }

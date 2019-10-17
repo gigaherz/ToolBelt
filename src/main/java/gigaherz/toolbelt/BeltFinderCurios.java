@@ -20,6 +20,7 @@ public class BeltFinderCurios extends BeltFinder
     public static void initBaubles(Capability cap)
     {
         BeltFinder.addFinder(new BeltFinderCurios());
+        ConfigData.curiosPresent = true;
     }
 
     @Override

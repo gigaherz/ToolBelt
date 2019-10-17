@@ -20,7 +20,7 @@ repositories {
     }
 }
 
-version = "1.12.1"
+version = "1.12.2"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.14.4"
 
@@ -70,7 +70,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.40'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.1.56'
 
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0")
     compileOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0:api")

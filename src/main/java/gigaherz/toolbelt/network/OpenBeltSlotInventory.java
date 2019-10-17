@@ -1,5 +1,6 @@
 package gigaherz.toolbelt.network;
 
+import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.common.Screens;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
@@ -22,9 +23,12 @@ public class OpenBeltSlotInventory
 
     public boolean handle(Supplier<NetworkEvent.Context> context)
     {
-        context.get().enqueueWork(() -> {
-            Screens.openSlotScreen(context.get().getSender());
-        });
+        if (ConfigData.customBeltSlotEnabled)
+        {
+            context.get().enqueueWork(() -> {
+                Screens.openSlotScreen(context.get().getSender());
+            });
+        }
         return true;
     }
 }
