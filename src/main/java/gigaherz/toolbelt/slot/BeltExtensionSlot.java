@@ -34,6 +34,7 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
@@ -72,6 +73,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             throw new RuntimeException("Can not instantiate this way. The capability needs a player as context.");
         });
 
+        MinecraftForge.EVENT_BUS.register(new AttachHandlers());
         MinecraftForge.EVENT_BUS.register(new EventHandlers());
     }
 
@@ -80,7 +82,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         return player.getCapability(CAPABILITY);
     }
 
-    static class EventHandlers
+    static class AttachHandlers
     {
         @SubscribeEvent
         public void attachCapabilities(AttachCapabilitiesEvent<Entity> event)
@@ -94,6 +96,8 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                         @Override
                         public void onContentsChanged(IExtensionSlot slot)
                         {
+                            if (!ConfigData.customBeltSlotEnabled)
+                                return;
                             if (!getOwner().world.isRemote)
                                 syncTo(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getOwner));
                         }
@@ -116,7 +120,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     @Override
                     public <T> LazyOptional<T> getCapability(@Nonnull Capability<T> capability, @Nullable Direction facing)
                     {
-                        if (CAPABILITY == capability && ConfigData.customBeltSlotEnabled)
+                        if (CAPABILITY == capability)
                             return extensionContainerSupplier.cast();
 
                         return LazyOptional.empty();
@@ -124,10 +128,15 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                 });
             }
         }
+    }
 
+    private static class EventHandlers
+    {
         @SubscribeEvent
         public void joinWorld(PlayerEvent.PlayerLoggedInEvent event)
         {
+            if (!ConfigData.customBeltSlotEnabled)
+                return;
             PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
                 return;
@@ -137,6 +146,8 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         @SubscribeEvent
         public void joinWorld(PlayerEvent.PlayerChangedDimensionEvent event)
         {
+            if (!ConfigData.customBeltSlotEnabled)
+                return;
             PlayerEntity target = event.getPlayer();
             if (target.world.isRemote)
                 return;
@@ -146,6 +157,8 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         @SubscribeEvent
         public void track(PlayerEvent.StartTracking event)
         {
+            if (!ConfigData.customBeltSlotEnabled)
+                return;
             Entity target = event.getTarget();
             if (target.world.isRemote)
                 return;
@@ -158,13 +171,20 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         @SubscribeEvent
         public void entityTick(TickEvent.PlayerTickEvent event)
         {
-            if (event.phase == TickEvent.Phase.END)
+            if (event.phase != TickEvent.Phase.END)
+                return;
+
+            if (ConfigData.customBeltSlotEnabled)
                 get(event.player).ifPresent(BeltExtensionSlot::tickAllSlots);
+            else
+                get(event.player).ifPresent(BeltExtensionSlot::dropContents);
         }
 
         @SubscribeEvent
         public void playerDeath(LivingDropsEvent event)
         {
+            if (!ConfigData.customBeltSlotEnabled)
+                return;
             if (event.getEntityLiving() instanceof PlayerEntity)
             {
                 PlayerEntity player = (PlayerEntity) event.getEntityLiving();
@@ -192,6 +212,8 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         @SubscribeEvent
         public void playerClone(PlayerEvent.Clone event)
         {
+            if (!ConfigData.customBeltSlotEnabled)
+                return;
             PlayerEntity oldPlayer = event.getOriginal();
             // FIXME: workaround for a forge issue that seems to be reappearing too often
             // at this time it's only needed when returning from the end alive
@@ -214,6 +236,22 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     newBelt.getBelt().setContents(stack);
                 }
             });
+        }
+    }
+
+    private void dropContents()
+    {
+        for(IExtensionSlot slot : slots)
+        {
+            ItemStack stack = slot.getContents();
+            if (stack.getCount() > 0)
+            {
+                if (owner instanceof PlayerEntity)
+                    ItemHandlerHelper.giveItemToPlayer((PlayerEntity) owner, stack);
+                else
+                    owner.entityDropItem(stack, 0.1f);
+                slot.setContents(ItemStack.EMPTY);
+            }
         }
     }
 
