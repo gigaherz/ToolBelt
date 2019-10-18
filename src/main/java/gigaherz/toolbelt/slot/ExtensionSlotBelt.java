@@ -36,6 +36,7 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 
 import javax.annotation.Nonnull;
@@ -75,7 +76,15 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             }
         }, () -> { throw new UnsupportedOperationException("Cannot instantiate extension slots without a player, use the class constructor."); });
 
-        MinecraftForge.EVENT_BUS.register(new EventHandlers());
+        MinecraftForge.EVENT_BUS.register(new AttachHandlers());
+        if (Config.customBeltSlotEnabled)
+        {
+            MinecraftForge.EVENT_BUS.register(new EventHandlers());
+        }
+        else
+        {
+            MinecraftForge.EVENT_BUS.register(new EventHandlers.Disabled());
+        }
     }
 
     public static ExtensionSlotBelt get(EntityLivingBase player)
@@ -83,7 +92,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         return player.getCapability(CAPABILITY, null);
     }
 
-    static class EventHandlers
+    private static class AttachHandlers
     {
         @SubscribeEvent
         public void attachCapabilities(AttachCapabilitiesEvent<Entity> event)
@@ -97,8 +106,11 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
                         @Override
                         public void onContentsChanged(IExtensionSlot slot)
                         {
-                            if (!getOwner().world.isRemote)
-                                syncToSelfAndTracking();
+                            if (Config.customBeltSlotEnabled)
+                            {
+                                if (!getOwner().world.isRemote)
+                                    syncToSelfAndTracking();
+                            }
                         }
                     };
 
@@ -118,7 +130,7 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
                     public boolean hasCapability(@Nonnull Capability<?> capability, @Nullable EnumFacing facing)
                     {
                         if (capability == CAPABILITY)
-                            return Config.customBeltSlotEnabled;
+                            return true;
                         return false;
                     }
 
@@ -127,11 +139,26 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
                     @Override
                     public <T> T getCapability(@Nonnull Capability<T> capability, @Nullable EnumFacing facing)
                     {
-                        if (capability == CAPABILITY && Config.customBeltSlotEnabled)
+                        if (capability == CAPABILITY)
                             return (T) extensionContainer;
                         return null;
                     }
                 });
+            }
+        }
+    }
+
+    private static class EventHandlers
+    {
+        static class Disabled
+        {
+
+            @SubscribeEvent
+            public void entityTick(TickEvent.PlayerTickEvent event)
+            {
+                ExtensionSlotBelt instance = get(event.player);
+                if (instance == null) return;
+                instance.dropContents();
             }
         }
 
@@ -142,8 +169,11 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             if (target.world.isRemote)
                 return;
             ExtensionSlotBelt instance = get(target);
-            if (instance != null)
+            if (Config.customBeltSlotEnabled)
+            {
+                if (instance == null) return;
                 instance.syncToSelf();
+            }
         }
 
         @SubscribeEvent
@@ -153,8 +183,11 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             if (target.world.isRemote)
                 return;
             ExtensionSlotBelt instance = get(target);
-            if (instance != null)
+            if (Config.customBeltSlotEnabled)
+            {
+                if (instance == null) return;
                 instance.syncToSelf();
+            }
         }
 
         @SubscribeEvent
@@ -166,8 +199,11 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
             if (target instanceof EntityPlayer)
             {
                 ExtensionSlotBelt instance = get((EntityLivingBase) target);
-                if (instance != null)
+                if (Config.customBeltSlotEnabled)
+                {
+                    if (instance == null) return;
                     instance.syncTo(event.getEntityPlayer());
+                }
             }
         }
 
@@ -265,6 +301,22 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         }
     }
 
+    private void dropContents()
+    {
+        for(IExtensionSlot slot : slots)
+        {
+            ItemStack stack = slot.getContents();
+            if (stack.getCount() > 0)
+            {
+                if (owner instanceof EntityPlayer)
+                    ItemHandlerHelper.giveItemToPlayer((EntityPlayer) owner, stack);
+                else
+                    owner.entityDropItem(stack, 0.1f);
+                slot.setContents(ItemStack.EMPTY);
+            }
+        }
+    }
+
     private void syncToSelf()
     {
         syncTo((EntityPlayerMP)owner);
@@ -295,6 +347,31 @@ public class ExtensionSlotBelt implements IExtensionContainer, INBTSerializable<
         {
             super.onContentsChanged(slot);
             belt.onContentsChanged();
+        }
+
+        @Nonnull
+        @Override
+        public ItemStack insertItem(int slot, @Nonnull ItemStack stack, boolean simulate)
+        {
+            if (!Config.customBeltSlotEnabled)
+                return stack;
+            return super.insertItem(slot, stack, simulate);
+        }
+
+        @Override
+        public int getSlotLimit(int slot)
+        {
+            if (!Config.customBeltSlotEnabled)
+                return 0;
+            return super.getSlotLimit(slot);
+        }
+
+        @Override
+        public boolean isItemValid(int slot, @Nonnull ItemStack stack)
+        {
+            if (!Config.customBeltSlotEnabled)
+                return false;
+            return super.isItemValid(slot, stack);
         }
     };
     private final ExtensionSlotItemHandler belt = new ExtensionSlotItemHandler(this, BELT, inventory, 0);
