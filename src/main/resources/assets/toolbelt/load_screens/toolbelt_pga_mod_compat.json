@@ -1,0 +1,8 @@
+{
+	"COMMENT" : "this json without naming convention , situated in the folder loading_screens in assets/modid will be loaded by Public Gui Announcement to add a visual gui in front of the players face whenever he opens the tool belt radial", 
+	"screens" : [{
+			"class" : "gigaherz.toolbelt.client.RadialMenuScreen", 
+			"texture" : "toolbelt:textures/gui/belt_gui_preview.png", 
+			"fullSize" : 255
+		}]
+}

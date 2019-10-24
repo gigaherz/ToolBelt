@@ -327,6 +327,8 @@ public class GenericRadialMenu
         GlStateManager.disableTexture();
         GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
+        //GL11.glEnable(GL11.GL_POLYGON_SMOOTH);
+
         Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder buffer = tessellator.getBuffer();
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
@@ -339,6 +341,8 @@ public class GenericRadialMenu
         tessellator.draw();
 
         GlStateManager.enableTexture();
+
+        //GL11.glDisable(GL11.GL_POLYGON_SMOOTH);
     }
 
     private static final float PRECISION = 2.5f / 360.0f;

@@ -10,21 +10,21 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 
 public class BeltSlot extends Slot
 {
-    public BeltSlot(IInventory playerInventory, int blockedSlot, int index, int xPosition, int yPosition)
+    public BeltSlot(IInventory playerInventory, ItemStack heldItem, int blockedSlot, int index, int xPosition, int yPosition)
     {
         super(new IInventory()
         {
-
             final IInventory sourceInventory = playerInventory;
             final int slot = blockedSlot;
             final int subSlot = index;
+            final ItemStack fallbackItem = heldItem;
 
             ItemStack beltStack = null;
             IItemHandlerModifiable inventory = null;
 
             IItemHandlerModifiable findStack()
             {
-                ItemStack stack = sourceInventory.getStackInSlot(slot);
+                ItemStack stack = slot >= 0 ? sourceInventory.getStackInSlot(slot) : fallbackItem;
                 if (stack != beltStack)
                 {
                     beltStack = stack;

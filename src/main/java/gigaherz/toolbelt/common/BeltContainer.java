@@ -38,7 +38,7 @@ public class BeltContainer extends Container
         int xoff = ((9 - beltSlots) * 18) / 2;
         for (int k = 0; k < beltSlots; ++k)
         {
-            this.addSlot(new BeltSlot(playerInventory, blockedSlot, k, 8 + xoff + k * 18, 20));
+            this.addSlot(new BeltSlot(playerInventory, heldItem, blockedSlot, k, 8 + xoff + k * 18, 20));
         }
 
         bindPlayerInventory(playerInventory, blockedSlot);
