@@ -1,0 +1,13 @@
+#####Translation into Spanish by OdinsRagnarok#####
+
+item.toolbelt.belt.name=Cinturón de Herramientas
+item.toolbelt.pouch.name=Bolsa del Cinturón
+key.toolbelt.open=Cambiar Herramienta
+key.toolbelt.category=Cinturón de Herramientas
+key.toolbelt.slot=Abrir Inventario de Ranuras del Cinturón
+text.toolbelt.empty=VACIO
+text.toolbelt.swap=CAMBIAR
+text.toolbelt.insert=INSERTAR
+text.toolbelt.extract=EXTRAER
+text.toolbelt.tooltip=Mejoras: %s (%s espacios)
+text.toolbelt.name=Cinturón de Herramientas
