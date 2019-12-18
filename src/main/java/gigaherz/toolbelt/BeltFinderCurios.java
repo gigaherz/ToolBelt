@@ -17,7 +17,7 @@ import java.util.Optional;
 public class BeltFinderCurios extends BeltFinder
 {
     @CapabilityInject(ICurioItemHandler.class)
-    public static void initBaubles(Capability cap)
+    public static void initBaubles(Capability<?> cap)
     {
         BeltFinder.addFinder(new BeltFinderCurios());
         ConfigData.curiosPresent = true;

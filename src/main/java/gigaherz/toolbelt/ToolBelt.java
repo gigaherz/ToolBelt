@@ -10,7 +10,6 @@ import gigaherz.toolbelt.customslots.ExtensionSlotItemCapability;
 import gigaherz.toolbelt.network.*;
 import gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.client.renderer.tileentity.ItemStackTileEntityRenderer;
 import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
@@ -44,10 +43,6 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.imc.CurioIMCMessage;
-
-import java.util.concurrent.Callable;
-import java.util.function.BiFunction;
-import java.util.function.Supplier;
 
 @Mod(ToolBelt.MODID)
 public class ToolBelt

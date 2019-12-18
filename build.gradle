@@ -70,10 +70,10 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.56'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.1.90'
 
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0:api")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0.5.3")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0.5.3:api")
 }
 
 jar {

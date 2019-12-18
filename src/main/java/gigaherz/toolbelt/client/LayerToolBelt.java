@@ -5,6 +5,7 @@ import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
@@ -18,22 +19,22 @@ import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.items.CapabilityItemHandler;
 
-public class LayerToolBelt<T extends PlayerEntity, M extends PlayerModel<T>> extends LayerRenderer<T, M>
+public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>
 {
     private static final ResourceLocation TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
 
-    private final LivingRenderer<T, M> owner;
+    private final LivingRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> owner;
 
     private final ModelBelt beltModel = new ModelBelt();
 
-    public LayerToolBelt(LivingRenderer<T, M> owner)
+    public LayerToolBelt(LivingRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> owner)
     {
         super(owner);
         this.owner = owner;
     }
 
     @Override
-    public void render(T player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
+    public void render(AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
     {
         boolean flag = player.getPrimaryHand() == HandSide.RIGHT;
 

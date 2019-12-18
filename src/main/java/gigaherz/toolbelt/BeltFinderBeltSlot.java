@@ -34,10 +34,12 @@ public class BeltFinderBeltSlot extends BeltFinder
     public LazyOptional<BeltGetter> findStack(PlayerEntity player)
     {
         return BeltExtensionSlot.get(player)
-                .map((theCap) -> theCap.getSlots().stream().
-                filter(slot -> slot.getContents().getItem() instanceof ToolBeltItem)
-                .map(ExtensionSlotBeltGetter::new)
-                .findFirst()).filter(Optional::isPresent).map(Optional::get);
+                .map((theCap) -> theCap.getSlots().stream()
+                        .filter(slot -> slot.getContents().getItem() instanceof ToolBeltItem)
+                        .map(ExtensionSlotBeltGetter::new)
+                        .findFirst())
+                .filter(Optional::isPresent)
+                .map(Optional::get);
     }
 
     @Override
