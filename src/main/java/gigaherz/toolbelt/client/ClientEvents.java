@@ -3,13 +3,18 @@ package gigaherz.toolbelt.client;
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
+import gigaherz.toolbelt.common.BeltSlotContainer;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.Atlases;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
@@ -19,7 +24,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.Map;
 
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ToolBelt.MODID)
+@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ToolBelt.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientEvents
 {
     public static KeyBinding OPEN_TOOL_MENU_KEYBIND;
@@ -102,7 +107,20 @@ public class ClientEvents
 
     public static boolean isKeyDown(KeyBinding keybind)
     {
-        return InputMappings.isKeyDown(Minecraft.getInstance().mainWindow.getHandle(), keybind.getKey().getKeyCode())
+        return InputMappings.isKeyDown(Minecraft.getInstance().func_228018_at_().getHandle(), keybind.getKey().getKeyCode())
                 && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
+    }
+
+    @Mod.EventBusSubscriber(modid=ToolBelt.MODID, value=Dist.CLIENT, bus= Mod.EventBusSubscriber.Bus.MOD)
+    public static class ModBusEvents
+    {
+        @SubscribeEvent
+        public static void textureStitch(TextureStitchEvent.Pre event)
+        {
+            if (event.getMap().func_229223_g_() == AtlasTexture.LOCATION_BLOCKS_TEXTURE)
+            {
+                event.addSprite(BeltSlotContainer.SLOT_BACKGROUND);
+            }
+        }
     }
 }

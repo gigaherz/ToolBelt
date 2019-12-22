@@ -42,9 +42,9 @@ public class SyncBeltSlotContents
         }
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> context)
+    public void handle(Supplier<NetworkEvent.Context> context)
     {
         ClientPacketHandlers.handleBeltSlotContents(this);
-        return true;
+        context.get().setPacketHandled(true);
     }
 }

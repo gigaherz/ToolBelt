@@ -44,7 +44,7 @@ public class ConfigData
     private static Set<ItemStack> whiteList = Sets.newHashSet();
 
     public static boolean showBeltOnPlayers = true;
-    public static double beltItemScale = 0.5;
+    public static float beltItemScale = 0.5f;
 
     public static boolean releaseToSwap = false;
     public static boolean clipMouseToCircle = true;
@@ -135,7 +135,7 @@ public class ConfigData
     public static void refreshClient()
     {
         showBeltOnPlayers = CLIENT.showBeltOnPlayers.get();
-        beltItemScale = CLIENT.beltItemScale.get();
+        beltItemScale = (float)(double)CLIENT.beltItemScale.get();
         releaseToSwap = CLIENT.releaseToSwap.get();
         clipMouseToCircle = CLIENT.clipMouseToCircle.get();
         allowClickOutsideBounds = CLIENT.allowClickOutsideBounds.get();

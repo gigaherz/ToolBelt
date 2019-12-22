@@ -1,17 +1,21 @@
 package gigaherz.toolbelt.client;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
+import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
 import net.minecraft.client.renderer.entity.model.PlayerModel;
-import net.minecraft.client.renderer.entity.model.RendererModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
+import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
@@ -34,7 +38,7 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
     }
 
     @Override
-    public void render(AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch, float scale)
+    public void func_225628_a_(MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch)
     {
         boolean flag = player.getPrimaryHand() == HandSide.RIGHT;
 
@@ -50,102 +54,103 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
                 ItemStack leftItem = flag ? firstItem : secondItem;
                 ItemStack rightItem = flag ? secondItem : firstItem;
 
-                GlStateManager.pushMatrix();
+                matrixStack.func_227860_a_();
 
-                if (player.isSneaking())
+                if (player.func_225608_bj_())
                 {
-                    GlStateManager.translatef(0.0F, 0.2F, 0.0F);
+                    matrixStack.func_227861_a_(0.0F, 0.2F, 0.0F);
                 }
 
-                this.translateToBody();
+                this.translateToBody(matrixStack);
 
                 if (!leftItem.isEmpty() || !rightItem.isEmpty())
                 {
-                    GlStateManager.pushMatrix();
+                    matrixStack.func_227860_a_();
 
                     if (this.getEntityModel().isSitting) // FIXME: maybe wrong field, can't tell
                     {
-                        GlStateManager.translatef(0.0F, 0.75F, 0.0F);
-                        GlStateManager.scalef(0.5F, 0.5F, 0.5F);
+                        matrixStack.func_227861_a_(0.0F, 0.75F, 0.0F);
+                        matrixStack.func_227862_a_(0.5F, 0.5F, 0.5F);
                     }
 
-                    this.renderHeldItem(player, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HandSide.RIGHT);
-                    this.renderHeldItem(player, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HandSide.LEFT);
+                    renderHeldItem(player, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HandSide.RIGHT, matrixStack, buffer, lightness);
+                    renderHeldItem(player, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HandSide.LEFT, matrixStack, buffer, lightness);
 
-                    GlStateManager.popMatrix();
+                    matrixStack.func_227865_b_();
                 }
 
-                GlStateManager.translatef(0.0F, 0.19F, 0.0F);
-                GlStateManager.scalef(0.85f, 0.6f, 0.78f);
+                matrixStack.func_227861_a_(0.0F, 0.19F, 0.0F);
+                matrixStack.func_227862_a_(0.85f, 0.6f, 0.78f);
 
-                this.owner.bindTexture(TEXTURE_BELT);
-                this.beltModel.render(player, 0, 0, 0, 0, 0, scale);
+                func_229141_a_(this.beltModel, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
 
-                GlStateManager.popMatrix();
+                matrixStack.func_227865_b_();
             });
         });
     }
 
-    private void translateToBody()
+    private void translateToBody(MatrixStack matrixStack)
     {
-        getEntityModel().bipedBody.postRender(0.0625F);
+        this.getEntityModel().bipedBody.func_228307_a_(matrixStack);
     }
 
-    private void renderHeldItem(LivingEntity player, ItemStack stack, TransformType cameraTransform, HandSide handSide)
-    {
+    private void renderHeldItem(LivingEntity player, ItemStack stack, TransformType transformType, HandSide handSide, MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness) {
         if (stack.isEmpty())
             return;
-
-        GlStateManager.pushMatrix();
-
+        matrixStack.func_227860_a_();
         if (handSide == HandSide.LEFT)
-            GlStateManager.translatef(-4.35f / 16.0F, 0.7f, -0.1f);
+            matrixStack.func_227861_a_(-4.35f / 16.0F, 0.7f, -0.1f);
         else
-            GlStateManager.translatef(4.35f / 16.0F, 0.7f, -0.1f);
-        GlStateManager.rotatef(40.0F, 1.0F, 0.0F, 0.0F);
-        double scale = ConfigData.beltItemScale;
-        GlStateManager.scaled(scale, scale, scale);
-        Minecraft.getInstance().getItemRenderer().renderItem(stack, player, cameraTransform, handSide == HandSide.LEFT);
-        GlStateManager.popMatrix();
-    }
-
-    @Override
-    public boolean shouldCombineTextures()
-    {
-        return false;
+            matrixStack.func_227861_a_(4.35f / 16.0F, 0.7f, -0.1f);
+        //((IHasArm)this.getEntityModel()).func_225599_a_(handSide, matrixStack);
+        matrixStack.func_227863_a_(Vector3f.field_229179_b_.func_229187_a_(40));
+        float scale = ConfigData.beltItemScale;
+        matrixStack.func_227862_a_(scale, scale, scale);
+        Minecraft.getInstance().getFirstPersonRenderer().func_228397_a_(player, stack, transformType, handSide == HandSide.LEFT, matrixStack, buffer, lightness);
+        matrixStack.func_227865_b_();
     }
 
     private static class ModelBelt extends EntityModel<PlayerEntity>
     {
-        final RendererModel belt = new RendererModel(this);
-        final RendererModel buckle = new RendererModel(this, 10, 10);
-        final RendererModel pocketL = new RendererModel(this, 0, 10);
-        final RendererModel pocketR = new RendererModel(this, 0, 10);
+        final ModelRenderer belt = new ModelRenderer(this);
+        final ModelRenderer buckle = new ModelRenderer(this, 10, 10);
+        final ModelRenderer pocketL = new ModelRenderer(this, 0, 10);
+        final ModelRenderer pocketR = new ModelRenderer(this, 0, 10);
 
         {
-            belt.addBox(-5, 10, -3, 10, 4, 6);
+            belt.func_228300_a_(-5, 10, -3, 10, 4, 6);
 
-            buckle.addBox(-2.5f, 9.5f, -3.5f, 5, 5, 1);
+            buckle.func_228300_a_(-2.5f, 9.5f, -3.5f, 5, 5, 1);
 
-            pocketL.addBox(-2, 12, 5, 4, 4, 1);
+            pocketL.func_228300_a_(-2, 12, 5, 4, 4, 1);
             pocketL.rotateAngleY = (float) Math.toRadians(-90);
-            pocketR.addBox(-2, 12, 5, 4, 4, 1);
+            pocketR.func_228300_a_(-2, 12, 5, 4, 4, 1);
             pocketR.rotateAngleY = (float) Math.toRadians(90);
         }
 
         @Override
-        public void render(PlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch, float scale)
+        public void func_225597_a_(PlayerEntity p_225597_1_, float p_225597_2_, float p_225597_3_, float p_225597_4_, float p_225597_5_, float p_225597_6_)
         {
-            GlStateManager.disableRescaleNormal();
-            GlStateManager.disableCull();
-            belt.render(scale);
-            pocketL.render(scale);
-            pocketR.render(scale);
 
-            GlStateManager.pushMatrix();
-            GlStateManager.scalef(0.8f, 1, 1);
-            buckle.render(scale);
-            GlStateManager.popMatrix();
+        }
+
+        @Override
+        public void func_225598_a_(MatrixStack p_225598_1_, IVertexBuilder p_225598_2_, int p_225598_3_, int p_225598_4_, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_)
+        {
+            RenderSystem.disableRescaleNormal();
+            RenderSystem.disableCull();
+
+            belt.func_228309_a_(p_225598_1_, p_225598_2_, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+            pocketL.func_228309_a_(p_225598_1_, p_225598_2_, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+            pocketR.func_228309_a_(p_225598_1_, p_225598_2_, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+
+            p_225598_1_.func_227860_a_();
+            p_225598_1_.func_227862_a_(0.8f, 1, 1);
+            buckle.func_228309_a_(p_225598_1_, p_225598_2_, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+            p_225598_1_.func_227865_b_();
+
+            RenderSystem.enableCull();
+            RenderSystem.enableRescaleNormal();
         }
     }
 }

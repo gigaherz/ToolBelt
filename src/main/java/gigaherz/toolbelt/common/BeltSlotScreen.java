@@ -1,6 +1,6 @@
 package gigaherz.toolbelt.common;
 
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
@@ -49,12 +49,11 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
         this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
         this.children.add(this.recipeBookGui);
         this.setFocusedDefault(this.recipeBookGui);
-        ImageButton recipebutton;
-        this.addButton(recipebutton = new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214086_1_) -> {
+        this.addButton(new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (button) -> {
             this.recipeBookGui.initSearchBar(this.widthTooNarrow);
             this.recipeBookGui.toggleVisibility();
             this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
-            ((ImageButton) p_214086_1_).setPosition(this.guiLeft + 104, this.height / 2 - 22);
+            ((ImageButton) button).setPosition(this.guiLeft + 104, this.height / 2 - 22);
             this.buttonClicked = true;
         }));
     }
@@ -69,7 +68,6 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     public void render(int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground();
-        this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
         if (this.recipeBookGui.isVisible() && this.widthTooNarrow)
         {
             this.drawGuiContainerBackgroundLayer(partialTicks, mouseX, mouseY);
@@ -92,12 +90,12 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     @Override
     protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
     {
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         minecraft.getTextureManager().bindTexture(SCREEN_BACKGROUND);
         int i = this.guiLeft;
         int j = this.guiTop;
         this.blit(i, j, 0, 0, this.xSize, this.ySize);
-        InventoryScreen.drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - this.oldMouseX, (float) (j + 75 - 50) - this.oldMouseY, minecraft.player);
+        InventoryScreen.func_228187_a_(i + 51, j + 75, 30, (float) (i + 51) - this.oldMouseX, (float) (j + 75 - 50) - this.oldMouseY, minecraft.player);
     }
 
     @Override

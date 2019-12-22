@@ -20,9 +20,9 @@ repositories {
     }
 }
 
-version = "1.12.5"
+version = "1.13.0"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
-archivesBaseName = "ToolBelt-1.14.4"
+archivesBaseName = "ToolBelt-1.15.1"
 
 sourceCompatibility = targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 compileJava {
@@ -70,10 +70,10 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.90'
+    minecraft 'net.minecraftforge:forge:1.15.1-30.0.15'
 
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0.5.3")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0.5.3:api")
+    //runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0.5.3")
+    //compileOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0.5.3:api")
 }
 
 jar {

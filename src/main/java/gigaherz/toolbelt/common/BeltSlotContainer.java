@@ -7,6 +7,7 @@ import gigaherz.toolbelt.customslots.ExtensionSlotSlot;
 import gigaherz.toolbelt.customslots.IExtensionSlot;
 import gigaherz.toolbelt.network.ContainerSlotsHack;
 import gigaherz.toolbelt.slot.BeltExtensionSlot;
+import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.util.RecipeBookCategories;
 import net.minecraft.enchantment.EnchantmentHelper;
@@ -36,7 +37,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     @ObjectHolder("toolbelt:belt_slot_container")
     public static ContainerType<BeltSlotContainer> TYPE;
 
-    public static final ResourceLocation SLOT_BACKGROUND = ToolBelt.location("textures/gui/empty_belt_slot_background.png");
+    public static final ResourceLocation SLOT_BACKGROUND = ToolBelt.location("gui/empty_belt_slot_background");
 
     private final ExtensionSlotSlot slotBelt;
     private final IExtensionSlot extensionSlot;
@@ -111,7 +112,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
                 @OnlyIn(Dist.CLIENT)
                 public String getSlotTexture()
                 {
-                    return PlayerContainer.ARMOR_SLOT_TEXTURES[equipmentslottype.getIndex()];
+                    return PlayerContainer.ARMOR_SLOT_TEXTURES[equipmentslottype.getIndex()].toString();
                 }
             });
         }
@@ -358,25 +359,12 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     private class ExtensionSlotSlotClient extends ExtensionSlotSlot
     {
         {
-            setBackgroundLocation(SLOT_BACKGROUND);
+            setBackground(AtlasTexture.LOCATION_BLOCKS_TEXTURE, SLOT_BACKGROUND);
         }
 
         public ExtensionSlotSlotClient(IExtensionSlot slot, int x, int y)
         {
             super(slot, x, y);
-        }
-
-        @OnlyIn(Dist.CLIENT)
-        @Nullable
-        @Override
-        public TextureAtlasSprite getBackgroundSprite()
-        {
-            return new TextureAtlasSprite(SLOT_BACKGROUND, 16, 16)
-            {
-                {
-                    func_217789_a(16, 16, 0, 0);
-                }
-            };
         }
     }
 }

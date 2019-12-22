@@ -32,10 +32,10 @@ public class SwapItems
         buf.writeInt(swapWith);
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> context)
+    public void handle(Supplier<NetworkEvent.Context> context)
     {
         context.get().enqueueWork(() -> swapItem(swapWith, context.get().getSender()));
-        return true;
+        context.get().setPacketHandled(true);
     }
 
     public static void swapItem(int swapWith, PlayerEntity player)

@@ -1,7 +1,7 @@
 package gigaherz.toolbelt.client.radial;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.toolbelt.ConfigData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
@@ -17,7 +17,6 @@ import org.lwjgl.glfw.GLFW;
 import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
-import javax.vecmath.Vector4f;
 import java.util.Collection;
 import java.util.List;
 
@@ -29,8 +28,8 @@ public class GenericRadialMenu
     private final List<RadialMenuItem> items = Lists.newArrayList();
     private final List<RadialMenuItem> visibleItems = Lists.newArrayList();
     private final Minecraft minecraft;
-    public Vector4f backgroundColor = new Vector4f(0, 0, 0, .25f);
-    public Vector4f backgroundColorHover = new Vector4f(1, 1, 1, .25f);
+    public int backgroundColor = 0x3F000000;
+    public int backgroundColorHover = 0x3FFFFFFF;
 
     public enum State
     {
@@ -220,12 +219,12 @@ public class GenericRadialMenu
         int y = owner.height / 2;
         float z = 0;
 
-        GlStateManager.pushMatrix();
-        GlStateManager.translatef(0, animTop, 0);
+        RenderSystem.pushMatrix();
+        RenderSystem.translatef(0, animTop, 0);
 
         drawBackground(x, y, z, radiusIn, radiusOut);
 
-        GlStateManager.popMatrix();
+        RenderSystem.popMatrix();
 
         if (isReady())
         {
@@ -322,10 +321,10 @@ public class GenericRadialMenu
 
     private void drawBackground(float x, float y, float z, float radiusIn, float radiusOut)
     {
-        GlStateManager.disableAlphaTest();
-        GlStateManager.enableBlend();
-        GlStateManager.disableTexture();
-        GlStateManager.color4f(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.disableAlphaTest();
+        RenderSystem.enableBlend();
+        RenderSystem.disableTexture();
+        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
 
         //GL11.glEnable(GL11.GL_POLYGON_SMOOTH);
 
@@ -334,25 +333,32 @@ public class GenericRadialMenu
         buffer.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_COLOR);
 
         iterateVisible((item, s, e) -> {
-            Vector4f color = item.isHovered() ? backgroundColorHover : backgroundColor;
-            drawPieArc(buffer, x, y, z, radiusIn, radiusOut, s, e, (int) (color.x * 255), (int) (color.y * 255), (int) (color.z * 255), (int) (color.w * 255));
+            int color = item.isHovered() ? backgroundColorHover : backgroundColor;
+            drawPieArc(buffer, x, y, z, radiusIn, radiusOut, s, e, color);
         });
 
         tessellator.draw();
 
-        GlStateManager.enableTexture();
+        RenderSystem.disableAlphaTest();
+        RenderSystem.disableBlend();
+        RenderSystem.enableTexture();
 
         //GL11.glDisable(GL11.GL_POLYGON_SMOOTH);
     }
 
     private static final float PRECISION = 2.5f / 360.0f;
 
-    private void drawPieArc(BufferBuilder buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int r, int g, int b, int a)
+    private void drawPieArc(BufferBuilder buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int color)
     {
         float angle = endAngle - startAngle;
         int sections = Math.max(1, MathHelper.ceil(angle / PRECISION));
 
         angle = endAngle - startAngle;
+
+        int r = (color >> 16) & 0xFF;
+        int g = (color >> 8) & 0xFF;
+        int b = (color >> 0) & 0xFF;
+        int a = (color >> 24) & 0xFF;
 
         for (int i = 0; i < sections; i++)
         {
@@ -368,10 +374,10 @@ public class GenericRadialMenu
             float pos2InX = x + radiusIn * (float) Math.cos(angle2);
             float pos2InY = y + radiusIn * (float) Math.sin(angle2);
 
-            buffer.pos(pos1OutX, pos1OutY, z).color(r, g, b, a).endVertex();
-            buffer.pos(pos1InX, pos1InY, z).color(r, g, b, a).endVertex();
-            buffer.pos(pos2InX, pos2InY, z).color(r, g, b, a).endVertex();
-            buffer.pos(pos2OutX, pos2OutY, z).color(r, g, b, a).endVertex();
+            buffer.func_225582_a_(pos1OutX, pos1OutY, z).func_225586_a_(r, g, b, a).endVertex();
+            buffer.func_225582_a_(pos1InX, pos1InY, z).func_225586_a_(r, g, b, a).endVertex();
+            buffer.func_225582_a_(pos2InX, pos2InY, z).func_225586_a_(r, g, b, a).endVertex();
+            buffer.func_225582_a_(pos2OutX, pos2OutY, z).func_225586_a_(r, g, b, a).endVertex();
         }
     }
 
@@ -418,7 +424,7 @@ public class GenericRadialMenu
     private void setMousePosition(double x, double y)
     {
         Screen owner = host.getScreen();
-        GLFW.glfwSetCursorPos(minecraft.mainWindow.getHandle(), (int) (x * minecraft.mainWindow.getWidth() / owner.width), (int) (y * minecraft.mainWindow.getHeight() / owner.height));
+        GLFW.glfwSetCursorPos(minecraft.func_228018_at_().getHandle(), (int) (x * minecraft.func_228018_at_().getWidth() / owner.width), (int) (y * minecraft.func_228018_at_().getHeight() / owner.height));
     }
 
     private static final double TWO_PI = 2.0 * Math.PI;
@@ -466,12 +472,12 @@ public class GenericRadialMenu
 
         if (ConfigData.clipMouseToCircle)
         {
-            int windowWidth = minecraft.mainWindow.getWidth();
-            int windowHeight = minecraft.mainWindow.getHeight();
+            int windowWidth = minecraft.func_228018_at_().getWidth();
+            int windowHeight = minecraft.func_228018_at_().getHeight();
 
             double[] xPos = new double[1];
             double[] yPos = new double[1];
-            GLFW.glfwGetCursorPos(minecraft.mainWindow.getHandle(), xPos, yPos);
+            GLFW.glfwGetCursorPos(minecraft.func_228018_at_().getHandle(), xPos, yPos);
 
             double scaledX = xPos[0] - (windowWidth / 2.0f);
             double scaledY = yPos[0] - (windowHeight / 2.0f);
@@ -484,7 +490,7 @@ public class GenericRadialMenu
                 double fixedX = scaledX * radius / distance;
                 double fixedY = scaledY * radius / distance;
 
-                GLFW.glfwSetCursorPos(minecraft.mainWindow.getHandle(), (int) (windowWidth / 2 + fixedX), (int) (windowHeight / 2 + fixedY));
+                GLFW.glfwSetCursorPos(minecraft.func_228018_at_().getHandle(), (int) (windowWidth / 2 + fixedX), (int) (windowHeight / 2 + fixedY));
             }
         }
     }

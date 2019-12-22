@@ -1,7 +1,7 @@
 package gigaherz.toolbelt.client.radial;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.platform.GlStateManager;
+import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.util.ITooltipFlag;
@@ -38,12 +38,12 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
     {
         if (stack.getCount() > 0)
         {
-            RenderHelper.enableGUIStandardItemLighting();
-            GlStateManager.pushMatrix();
-            GlStateManager.translatef(-8, -8, context.z);
+            RenderHelper.func_227780_a_();
+            RenderSystem.pushMatrix();
+            RenderSystem.translatef(-8, -8, context.z);
             context.itemRenderer.renderItemAndEffectIntoGUI(stack, (int) context.x, (int) context.y);
             context.itemRenderer.renderItemOverlayIntoGUI(context.fontRenderer, stack, (int) context.x, (int) context.y, "");
-            GlStateManager.popMatrix();
+            RenderSystem.popMatrix();
             RenderHelper.disableStandardItemLighting();
         }
         else

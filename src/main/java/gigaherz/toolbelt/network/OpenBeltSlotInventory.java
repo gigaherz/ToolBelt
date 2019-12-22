@@ -21,7 +21,7 @@ public class OpenBeltSlotInventory
     {
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> context)
+    public void handle(Supplier<NetworkEvent.Context> context)
     {
         if (ConfigData.customBeltSlotEnabled)
         {
@@ -29,6 +29,6 @@ public class OpenBeltSlotInventory
                 Screens.openSlotScreen(context.get().getSender());
             });
         }
-        return true;
+        context.get().setPacketHandled(true);
     }
 }
