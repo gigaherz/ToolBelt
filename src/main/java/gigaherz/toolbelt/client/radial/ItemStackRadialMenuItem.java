@@ -7,7 +7,7 @@ import net.minecraft.client.renderer.RenderHelper;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.fml.client.config.GuiUtils;
+import net.minecraftforge.fml.client.gui.GuiUtils;
 
 import java.util.List;
 
@@ -38,7 +38,7 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
     {
         if (stack.getCount() > 0)
         {
-            RenderHelper.func_227780_a_();
+            RenderHelper.enableStandardItemLighting();
             RenderSystem.pushMatrix();
             RenderSystem.translatef(-8, -8, context.z);
             context.itemRenderer.renderItemAndEffectIntoGUI(stack, (int) context.x, (int) context.y);
@@ -57,7 +57,7 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
     {
         if (stack.getCount() > 0)
         {
-            net.minecraftforge.fml.client.config.GuiUtils.preItemToolTip(stack);
+            GuiUtils.preItemToolTip(stack);
             GuiUtils.drawHoveringText(stack, getItemToolTip(stack), (int) context.x, (int) context.y, (int) context.width, (int) context.height, -1, context.fontRenderer);
             GuiUtils.postItemToolTip();
         }

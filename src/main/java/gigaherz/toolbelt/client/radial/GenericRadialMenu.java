@@ -3,6 +3,7 @@ package gigaherz.toolbelt.client.radial;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.toolbelt.ConfigData;
+import net.minecraft.client.MainWindow;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.gui.screen.Screen;
@@ -374,10 +375,10 @@ public class GenericRadialMenu
             float pos2InX = x + radiusIn * (float) Math.cos(angle2);
             float pos2InY = y + radiusIn * (float) Math.sin(angle2);
 
-            buffer.func_225582_a_(pos1OutX, pos1OutY, z).func_225586_a_(r, g, b, a).endVertex();
-            buffer.func_225582_a_(pos1InX, pos1InY, z).func_225586_a_(r, g, b, a).endVertex();
-            buffer.func_225582_a_(pos2InX, pos2InY, z).func_225586_a_(r, g, b, a).endVertex();
-            buffer.func_225582_a_(pos2OutX, pos2OutY, z).func_225586_a_(r, g, b, a).endVertex();
+            buffer.pos(pos1OutX, pos1OutY, z).color(r, g, b, a).endVertex();
+            buffer.pos(pos1InX, pos1InY, z).color(r, g, b, a).endVertex();
+            buffer.pos(pos2InX, pos2InY, z).color(r, g, b, a).endVertex();
+            buffer.pos(pos2OutX, pos2OutY, z).color(r, g, b, a).endVertex();
         }
     }
 
@@ -424,7 +425,8 @@ public class GenericRadialMenu
     private void setMousePosition(double x, double y)
     {
         Screen owner = host.getScreen();
-        GLFW.glfwSetCursorPos(minecraft.func_228018_at_().getHandle(), (int) (x * minecraft.func_228018_at_().getWidth() / owner.width), (int) (y * minecraft.func_228018_at_().getHeight() / owner.height));
+        MainWindow mainWindow = minecraft.getMainWindow();
+        GLFW.glfwSetCursorPos(mainWindow.getHandle(), (int) (x * mainWindow.getWidth() / owner.width), (int) (y * mainWindow.getHeight() / owner.height));
     }
 
     private static final double TWO_PI = 2.0 * Math.PI;
@@ -472,12 +474,14 @@ public class GenericRadialMenu
 
         if (ConfigData.clipMouseToCircle)
         {
-            int windowWidth = minecraft.func_228018_at_().getWidth();
-            int windowHeight = minecraft.func_228018_at_().getHeight();
+            MainWindow mainWindow = minecraft.getMainWindow();
+
+            int windowWidth = mainWindow.getWidth();
+            int windowHeight = mainWindow.getHeight();
 
             double[] xPos = new double[1];
             double[] yPos = new double[1];
-            GLFW.glfwGetCursorPos(minecraft.func_228018_at_().getHandle(), xPos, yPos);
+            GLFW.glfwGetCursorPos(mainWindow.getHandle(), xPos, yPos);
 
             double scaledX = xPos[0] - (windowWidth / 2.0f);
             double scaledY = yPos[0] - (windowHeight / 2.0f);
@@ -490,7 +494,7 @@ public class GenericRadialMenu
                 double fixedX = scaledX * radius / distance;
                 double fixedY = scaledY * radius / distance;
 
-                GLFW.glfwSetCursorPos(minecraft.func_228018_at_().getHandle(), (int) (windowWidth / 2 + fixedX), (int) (windowHeight / 2 + fixedY));
+                GLFW.glfwSetCursorPos(mainWindow.getHandle(), (int) (windowWidth / 2 + fixedX), (int) (windowHeight / 2 + fixedY));
             }
         }
     }

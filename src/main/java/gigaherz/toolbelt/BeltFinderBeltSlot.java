@@ -19,7 +19,7 @@ public class BeltFinderBeltSlot extends BeltFinder
     public static final String FINDER_ID = "belt_slot";
 
     @CapabilityInject(BeltExtensionSlot.class)
-    public static void initBaubles(Capability cap)
+    public static void initBaubles(Capability<?> cap)
     {
         BeltFinder.addFinder(new BeltFinderBeltSlot());
     }
@@ -31,15 +31,15 @@ public class BeltFinderBeltSlot extends BeltFinder
     }
 
     @Override
-    public LazyOptional<BeltGetter> findStack(PlayerEntity player)
+    public Optional<? extends BeltGetter> findStack(PlayerEntity player)
     {
+        //noinspection NullableProblems
         return BeltExtensionSlot.get(player)
                 .map((theCap) -> theCap.getSlots().stream()
                         .filter(slot -> slot.getContents().getItem() instanceof ToolBeltItem)
                         .map(ExtensionSlotBeltGetter::new)
                         .findFirst())
-                .filter(Optional::isPresent)
-                .map(Optional::get);
+                .orElseGet(Optional::empty);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class BeltFinderBeltSlot extends BeltFinder
         BeltExtensionSlot.get(player).ifPresent(slot -> slot.getBelt().setContents(stack));
     }
 
-    private class ExtensionSlotBeltGetter implements BeltGetter
+    private static class ExtensionSlotBeltGetter implements BeltGetter
     {
         private final IExtensionSlot slot;
 

@@ -17,7 +17,6 @@ import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.Tuple;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.extensions.IForgeContainerType;
@@ -27,7 +26,6 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -115,11 +113,11 @@ public class ToolBelt
     public void commonSetup(FMLCommonSetupEvent event)
     {
         int messageNumber = 0;
-        channel.registerMessage(messageNumber++, SwapItems.class, SwapItems::encode, SwapItems::new, SwapItems::handle);
-        channel.registerMessage(messageNumber++, BeltContentsChange.class, BeltContentsChange::encode, BeltContentsChange::new, BeltContentsChange::handle);
-        channel.registerMessage(messageNumber++, OpenBeltSlotInventory.class, OpenBeltSlotInventory::encode, OpenBeltSlotInventory::new, OpenBeltSlotInventory::handle);
-        channel.registerMessage(messageNumber++, ContainerSlotsHack.class, ContainerSlotsHack::encode, ContainerSlotsHack::new, ContainerSlotsHack::handle);
-        channel.registerMessage(messageNumber++, SyncBeltSlotContents.class, SyncBeltSlotContents::encode, SyncBeltSlotContents::new, SyncBeltSlotContents::handle);
+        channel.messageBuilder(SwapItems.class, messageNumber++).encoder(SwapItems::encode).decoder(SwapItems::new).consumer(SwapItems::handle).add();
+        channel.messageBuilder(BeltContentsChange.class, messageNumber++).encoder(BeltContentsChange::encode).decoder(BeltContentsChange::new).consumer(BeltContentsChange::handle).add();
+        channel.messageBuilder(OpenBeltSlotInventory.class, messageNumber++).encoder(OpenBeltSlotInventory::encode).decoder(OpenBeltSlotInventory::new).consumer(OpenBeltSlotInventory::handle).add();
+        channel.messageBuilder(ContainerSlotsHack.class, messageNumber++).encoder(ContainerSlotsHack::encode).decoder(ContainerSlotsHack::new).consumer(ContainerSlotsHack::handle).add();
+        channel.messageBuilder(SyncBeltSlotContents.class, messageNumber++).encoder(SyncBeltSlotContents::encode).decoder(SyncBeltSlotContents::new).consumer(SyncBeltSlotContents::handle).add();
         logger.debug("Final message number: " + messageNumber);
 
         //TODO File configurationFile = event.getSuggestedConfigurationFile();

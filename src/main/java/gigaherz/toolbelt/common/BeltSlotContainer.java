@@ -160,7 +160,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     }
 
     @Override
-    public void func_201771_a(RecipeItemHelper p_201771_1_)
+    public void fillStackedContents(RecipeItemHelper p_201771_1_)
     {
         this.craftingInventory.fillStackedContents(p_201771_1_);
     }
@@ -188,15 +188,15 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     public void onContainerClosed(PlayerEntity playerIn)
     {
         super.onContainerClosed(playerIn);
+
         this.craftResultInventory.clear();
+
         if (!playerIn.world.isRemote)
         {
             this.clearContainer(playerIn, playerIn.world, this.craftingInventory);
-        }
-        if (!playerIn.world.isRemote)
             BeltFinder.sendSync(playerIn);
+        }
     }
-
 
     @Override
     public boolean canInteractWith(PlayerEntity playerIn)

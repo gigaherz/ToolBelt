@@ -107,7 +107,7 @@ public class ClientEvents
 
     public static boolean isKeyDown(KeyBinding keybind)
     {
-        return InputMappings.isKeyDown(Minecraft.getInstance().func_228018_at_().getHandle(), keybind.getKey().getKeyCode())
+        return InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), keybind.getKey().getKeyCode())
                 && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }
 
@@ -117,7 +117,7 @@ public class ClientEvents
         @SubscribeEvent
         public static void textureStitch(TextureStitchEvent.Pre event)
         {
-            if (event.getMap().func_229223_g_() == AtlasTexture.LOCATION_BLOCKS_TEXTURE)
+            if (event.getMap().getBasePath() == AtlasTexture.LOCATION_BLOCKS_TEXTURE)
             {
                 event.addSprite(BeltSlotContainer.SLOT_BACKGROUND);
             }

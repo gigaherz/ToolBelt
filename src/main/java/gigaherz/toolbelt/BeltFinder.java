@@ -6,6 +6,8 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
 import net.minecraftforge.common.util.LazyOptional;
 
+import java.util.Optional;
+
 public abstract class BeltFinder
 {
     private static NonNullList<BeltFinder> instances = NonNullList.create();
@@ -26,15 +28,15 @@ public abstract class BeltFinder
 
     public abstract String getName();
 
-    public abstract LazyOptional<BeltGetter> findStack(PlayerEntity player);
+    public abstract Optional<? extends BeltGetter> findStack(PlayerEntity player);
 
-    public static LazyOptional<BeltGetter> findBelt(PlayerEntity player)
+    public static Optional<? extends BeltGetter> findBelt(PlayerEntity player)
     {
         return instances.stream()
                 .map(f -> f.findStack(player))
-                .filter(LazyOptional::isPresent)
+                .filter(Optional::isPresent)
                 .findFirst()
-                .orElseGet(LazyOptional::empty);
+                .orElseGet(Optional::empty);
     }
 
     public static void sendSync(PlayerEntity player)
