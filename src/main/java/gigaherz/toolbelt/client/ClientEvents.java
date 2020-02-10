@@ -6,13 +6,11 @@ import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.common.BeltSlotContainer;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.Atlases;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
 import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.TickEvent;
@@ -89,7 +87,9 @@ public class ClientEvents
                 }
             }
             toolMenuKeyWasDown = toolMenuKeyIsDown;
-        } else {
+        }
+        else
+        {
             toolMenuKeyWasDown = true;
         }
 
@@ -111,7 +111,7 @@ public class ClientEvents
                 && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }
 
-    @Mod.EventBusSubscriber(modid=ToolBelt.MODID, value=Dist.CLIENT, bus= Mod.EventBusSubscriber.Bus.MOD)
+    @Mod.EventBusSubscriber(modid = ToolBelt.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ModBusEvents
     {
         @SubscribeEvent

@@ -191,7 +191,8 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                 get(player).ifPresent((instance) -> {
                     IExtensionSlot belt = instance.getBelt();
                     ItemStack stack = belt.getContents();
-                    if (EnchantmentHelper.hasVanishingCurse(stack)) {
+                    if (EnchantmentHelper.hasVanishingCurse(stack))
+                    {
                         stack = ItemStack.EMPTY;
                         belt.setContents(stack);
                     }
@@ -241,7 +242,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
 
     private void dropContents()
     {
-        for(IExtensionSlot slot : slots)
+        for (IExtensionSlot slot : slots)
         {
             ItemStack stack = slot.getContents();
             if (stack.getCount() > 0)

@@ -89,7 +89,8 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
         this.getEntityModel().bipedBody.setAnglesAndRotation(matrixStack);
     }
 
-    private void renderHeldItem(LivingEntity player, ItemStack stack, TransformType transformType, HandSide handSide, MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness) {
+    private void renderHeldItem(LivingEntity player, ItemStack stack, TransformType transformType, HandSide handSide, MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness)
+    {
         if (stack.isEmpty())
             return;
         matrixStack.push();

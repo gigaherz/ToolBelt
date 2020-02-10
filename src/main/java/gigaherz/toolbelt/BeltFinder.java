@@ -4,7 +4,6 @@ import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.NonNullList;
-import net.minecraftforge.common.util.LazyOptional;
 
 import java.util.Optional;
 
@@ -19,8 +18,10 @@ public abstract class BeltFinder
 
     public static void setFinderSlotContents(PlayerEntity player, String where, int slot, ItemStack stack)
     {
-        for(BeltFinder finder : instances) {
-            if (finder.getName().equals(where)) {
+        for (BeltFinder finder : instances)
+        {
+            if (finder.getName().equals(where))
+            {
                 finder.setToSlot(player, slot, stack);
             }
         }

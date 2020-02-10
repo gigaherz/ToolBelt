@@ -135,7 +135,7 @@ public class ConfigData
     public static void refreshClient()
     {
         showBeltOnPlayers = CLIENT.showBeltOnPlayers.get();
-        beltItemScale = (float)(double)CLIENT.beltItemScale.get();
+        beltItemScale = (float) (double) CLIENT.beltItemScale.get();
         releaseToSwap = CLIENT.releaseToSwap.get();
         clipMouseToCircle = CLIENT.clipMouseToCircle.get();
         allowClickOutsideBounds = CLIENT.allowClickOutsideBounds.get();
@@ -217,7 +217,7 @@ public class ConfigData
 
         public static CustomBeltSlotMode byName(String name)
         {
-            for(CustomBeltSlotMode mode : values())
+            for (CustomBeltSlotMode mode : values())
             {
                 if (mode.name.equalsIgnoreCase(name))
                     return mode;

@@ -142,7 +142,6 @@ public class ToolBelt
     public void loadComplete(FMLLoadCompleteEvent event)
     {
         DistExecutor.runWhenOn(Dist.CLIENT, () -> ClientEvents::initKeybinds);
-
     }
 
     public void anvilChange(AnvilUpdateEvent ev)
