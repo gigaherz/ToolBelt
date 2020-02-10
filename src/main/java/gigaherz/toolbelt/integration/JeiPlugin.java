@@ -21,7 +21,7 @@ public class JeiPlugin implements IModPlugin
     @Override
     public ResourceLocation getPluginUid()
     {
-        return null;
+        return ID;
     }
 
     @Override
