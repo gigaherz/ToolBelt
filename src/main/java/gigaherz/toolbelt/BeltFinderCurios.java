@@ -1,18 +1,15 @@
 package gigaherz.toolbelt;
 
-/*
 import gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.util.LazyOptional;
 import top.theillusivec4.curios.api.CuriosAPI;
 import top.theillusivec4.curios.api.capability.ICurioItemHandler;
 import top.theillusivec4.curios.api.inventory.CurioStackHandler;
 
-import javax.annotation.Nullable;
 import java.util.Optional;
 
 public class BeltFinderCurios extends BeltFinder
@@ -39,9 +36,10 @@ public class BeltFinderCurios extends BeltFinder
         });
     }
 
-    @Nullable
-    public LazyOptional<BeltGetter> findStack(PlayerEntity player)
+    @Override
+    public Optional<? extends BeltGetter> findStack(PlayerEntity player)
     {
+        //noinspection NullableProblems
         return CuriosAPI.getCuriosHandler(player).map((curios) -> {
             CurioStackHandler handler = curios.getStackHandler("belt");
             for (int i = 0; i < handler.getSlots(); i++)
@@ -57,10 +55,10 @@ public class BeltFinderCurios extends BeltFinder
             }
 
             return Optional.<BeltGetter>empty();
-        }).filter(Optional::isPresent).map(Optional::get);
+        }).orElseGet(Optional::empty);
     }
 
-    private class CuriosBeltGetter implements BeltGetter
+    private static class CuriosBeltGetter implements BeltGetter
     {
         private final PlayerEntity thePlayer;
         private final int slotNumber;
@@ -86,4 +84,4 @@ public class BeltFinderCurios extends BeltFinder
             // No need! Curios does its own sync. I think.
         }
     }
-}*/
+}

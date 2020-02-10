@@ -1,47 +1,37 @@
 package gigaherz.toolbelt.integration;
 
-/*
 import com.google.common.collect.Lists;
-import gigaherz.toolbelt.Config;
+import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
-import mezz.jei.api.*;
-import mezz.jei.api.ingredients.IModIngredientRegistration;
-import mezz.jei.api.recipe.IRecipeCategoryRegistration;
-import mezz.jei.api.recipe.IVanillaRecipeFactory;
-import mezz.jei.api.recipe.VanillaRecipeCategoryUid;
+import mezz.jei.api.IModPlugin;
+import mezz.jei.api.constants.VanillaRecipeCategoryUid;
+import mezz.jei.api.recipe.vanilla.IVanillaRecipeFactory;
+import mezz.jei.api.registration.IRecipeRegistration;
 import net.minecraft.item.ItemStack;
+import net.minecraft.util.ResourceLocation;
 
 import java.util.Collections;
 import java.util.List;
 
-@mezz.jei.api.JEIPlugin
+@mezz.jei.api.JeiPlugin
 public class JeiPlugin implements IModPlugin
 {
+    private static final ResourceLocation ID = ToolBelt.location("jei_plugin");
+
     @Override
-    public void registerItemSubtypes(ISubtypeRegistry subtypeRegistry)
+    public ResourceLocation getPluginUid()
     {
+        return null;
     }
 
     @Override
-    public void registerIngredients(IModIngredientRegistration registry)
+    public void registerRecipes(IRecipeRegistration registration)
     {
-    }
-
-    @Override
-    public void registerCategories(IRecipeCategoryRegistration registry)
-    {
-
-    }
-
-    @Override
-    public void register(IModRegistry registry)
-    {
-        if (Config.disableAnvilUpgrading)
+        if (ConfigData.disableAnvilUpgrading)
             return;
-        IJeiHelpers helpers = registry.getJeiHelpers();
-        IVanillaRecipeFactory vanillaFactory = helpers.getVanillaRecipeFactory();
+        IVanillaRecipeFactory vanillaFactory = registration.getVanillaRecipeFactory();
         List<ItemStack> pouch = Collections.singletonList(new ItemStack(ToolBelt.pouch));
-        registry.addRecipes(Lists.newArrayList(
+        registration.addRecipes(Lists.newArrayList(
                 vanillaFactory.createAnvilRecipe(ToolBelt.belt.of(0), pouch, Collections.singletonList(ToolBelt.belt.of(1))),
                 vanillaFactory.createAnvilRecipe(ToolBelt.belt.of(1), pouch, Collections.singletonList(ToolBelt.belt.of(2))),
                 vanillaFactory.createAnvilRecipe(ToolBelt.belt.of(2), pouch, Collections.singletonList(ToolBelt.belt.of(3))),
@@ -51,10 +41,4 @@ public class JeiPlugin implements IModPlugin
                 vanillaFactory.createAnvilRecipe(ToolBelt.belt.of(6), pouch, Collections.singletonList(ToolBelt.belt.of(7)))
         ), VanillaRecipeCategoryUid.ANVIL);
     }
-
-    @Override
-    public void onRuntimeAvailable(IJeiRuntime jeiRuntime)
-    {
-    }
 }
-*/

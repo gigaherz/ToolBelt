@@ -10,22 +10,20 @@ import gigaherz.toolbelt.customslots.ExtensionSlotItemCapability;
 import gigaherz.toolbelt.network.*;
 import gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.client.gui.ScreenManager;
-import net.minecraft.fluid.Fluid;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemGroup;
 import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Tuple;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fluids.FluidAttributes;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fml.DistExecutor;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
@@ -39,6 +37,8 @@ import net.minecraftforge.fml.network.simple.SimpleChannel;
 import net.minecraftforge.registries.ObjectHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import top.theillusivec4.curios.api.CuriosAPI;
+import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 
 @Mod(ToolBelt.MODID)
 public class ToolBelt
@@ -46,7 +46,7 @@ public class ToolBelt
     public static final String MODID = "toolbelt";
 
     @ObjectHolder("toolbelt:belt")
-    public static Item belt;
+    public static ToolBeltItem belt;
 
     @ObjectHolder("toolbelt:pouch")
     public static Item pouch;
@@ -135,8 +135,8 @@ public class ToolBelt
 
     private void imcEnqueue(InterModEnqueueEvent event)
     {
-        //InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("belt").setSize(1).setEnabled(true).setHidden(false));
-        //InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_ICON, () -> new Tuple<>("belt", location("textures/gui/empty_belt_slot_background.png")));
+        InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("belt").setSize(1).setEnabled(true).setHidden(false));
+        InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_ICON, () -> new Tuple<>("belt", location("gui/empty_belt_slot_background")));
     }
 
     public void loadComplete(FMLLoadCompleteEvent event)
@@ -171,27 +171,5 @@ public class ToolBelt
     public static ResourceLocation location(String path)
     {
         return new ResourceLocation(MODID, path);
-    }
-
-    public static class VariableTemperatureFluidAttributes extends FluidAttributes
-    {
-        public static FluidAttributes.Builder builder(ResourceLocation stillTexture, ResourceLocation flowingTexture)
-        {
-            return new FluidAttributes.Builder(stillTexture, flowingTexture, VariableTemperatureFluidAttributes::new) {};
-        }
-
-        protected VariableTemperatureFluidAttributes(Builder builder, Fluid fluid)
-        {
-            super(builder, fluid);
-        }
-
-        @Override
-        public int getTemperature(FluidStack stack)
-        {
-            CompoundNBT tag = stack.getTag();
-            if (tag != null && tag.contains("Temperature"))
-                return tag.getInt("Temperature");
-            return super.getTemperature(stack);
-        }
     }
 }
