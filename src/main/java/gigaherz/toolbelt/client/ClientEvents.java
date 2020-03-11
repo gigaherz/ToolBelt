@@ -45,10 +45,10 @@ public class ClientEvents
                 new KeyBinding("key.toolbelt.open", GLFW.GLFW_KEY_R, "key.toolbelt.category"));
 
         ClientRegistry.registerKeyBinding(CYCLE_TOOL_MENU_LEFT_KEYBIND =
-                new KeyBinding("key.toolbelt.cycle.left", -1, "key.toolbelt.category"));
+                new KeyBinding("key.toolbelt.cycle.left",  InputMappings.INPUT_INVALID.getKeyCode(), "key.toolbelt.category"));
 
         ClientRegistry.registerKeyBinding(CYCLE_TOOL_MENU_RIGHT_KEYBIND =
-                new KeyBinding("key.toolbelt.cycle.right", -1, "key.toolbelt.category"));
+                new KeyBinding("key.toolbelt.cycle.right",  InputMappings.INPUT_INVALID.getKeyCode(), "key.toolbelt.category"));
 
         ClientRegistry.registerKeyBinding(OPEN_BELT_SLOT_KEYBIND =
                 new KeyBinding("key.toolbelt.slot", GLFW.GLFW_KEY_V, "key.toolbelt.category"));
@@ -107,6 +107,8 @@ public class ClientEvents
 
     public static boolean isKeyDown(KeyBinding keybind)
     {
+        if (keybind.isInvalid())
+            return false;
         return InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), keybind.getKey().getKeyCode())
                 && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }

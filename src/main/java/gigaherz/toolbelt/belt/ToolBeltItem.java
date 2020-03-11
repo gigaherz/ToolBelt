@@ -144,13 +144,12 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
 
             @Override
             @Nonnull
-            @SuppressWarnings("unchecked")
             public <T> LazyOptional<T> getCapability(@Nonnull final Capability<T> cap, final @Nullable Direction side)
             {
                 if (cap == ITEM_HANDLER)
-                    return (LazyOptional<T>) itemHandlerInstance;
+                    return itemHandlerInstance.cast();
                 if (cap == EXTENSION_SLOT_ITEM)
-                    return (LazyOptional<T>) extensionSlotInstance;
+                    return extensionSlotInstance.cast();
                 return LazyOptional.empty();
             }
         };
