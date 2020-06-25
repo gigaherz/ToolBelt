@@ -13,7 +13,7 @@ import gigaherz.toolbelt.customslots.SlotExtension;
 
 public class ContainerBeltSlot extends ContainerPlayer
 {
-    public static final ResourceLocation EMPTY_SPRITE = ToolBelt.location("gui/empty_belt_slot_background");
+    public static final ResourceLocation BACKGROUND_ICON = ToolBelt.location("gui/empty_belt_slot_background");
 
     private final SlotExtension slotBelt;
     private final IExtensionSlot extensionSlot;
@@ -27,7 +27,7 @@ public class ContainerBeltSlot extends ContainerPlayer
         extensionSlot = container.getBelt();
 
         this.addSlotToContainer(slotBelt = new SlotExtension(extensionSlot, 77, 44));
-        slotBelt.setBackgroundName(EMPTY_SPRITE.toString());
+        slotBelt.setBackgroundName(BACKGROUND_ICON.toString());
     }
 
     @Override

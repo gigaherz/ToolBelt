@@ -11,6 +11,11 @@ buildscript {
     }
 }
 
+plugins {
+    id 'com.github.johnrengelman.shadow' version '4.0.4'
+    id "com.wynprice.cursemaven" version "2.1.1"
+}
+
 repositories {
     maven {
         url "http://dvs1.progwml6.com/files/maven"
@@ -28,7 +33,7 @@ repositories {
 
 apply plugin: 'net.minecraftforge.gradle.forge'
 
-version = "1.9.12"
+version = "1.9.13"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.12.2"
 
@@ -44,31 +49,38 @@ minecraft {
 }
 
 configurations {
-    // configuration that holds jars to embed inside the jar
-    embed
+    shade
 }
 
 dependencies {
     deobfCompile "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
-    embed "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
+    shade "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
 
     deobfCompile "mezz.jei:jei_1.12.2:4.15.0.283:api"
     runtime "mezz.jei:jei_1.12.2:4.15.0.283"
 
     deobfCompile "com.azanor:Baubles:1.12-1.5.2"
 
+    deobfCompile "curse.maven:player-weight-mod:2804969"
+
     compile fileTree(dir: 'libs', include: '*.jar')
 }
 
 jar {
-    into('/') {
-        from configurations.embed
-    }
-
-    manifest {
-        attributes("ContainedDeps": configurations.embed.collect { it.getName() }.join(' '))
-    }
+    classifier = 'slim'
 }
+
+shadowJar {
+    classifier = ''
+    configurations = [project.configurations.shade]
+    relocate 'gigaherz.common', "${project.group}.shadow.commons"
+}
+
+reobf {
+    shadowJar { }
+}
+
+tasks.build.dependsOn reobfShadowJar
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8

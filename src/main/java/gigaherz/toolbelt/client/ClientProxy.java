@@ -11,10 +11,8 @@ import gigaherz.toolbelt.network.SyncBeltSlotContents;
 import gigaherz.toolbelt.slot.ExtensionSlotBelt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.entity.RenderPlayer;
-import net.minecraft.client.renderer.tileentity.TileEntityItemStackRenderer;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.entity.Entity;
-import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.client.event.ModelRegistryEvent;
@@ -49,7 +47,7 @@ public class ClientProxy implements ISideProxy
     @SubscribeEvent
     public static void textureStitch(TextureStitchEvent.Pre event)
     {
-        event.getMap().registerSprite(ContainerBeltSlot.EMPTY_SPRITE);
+        event.getMap().registerSprite(ContainerBeltSlot.BACKGROUND_ICON);
     }
 
     @SubscribeEvent
