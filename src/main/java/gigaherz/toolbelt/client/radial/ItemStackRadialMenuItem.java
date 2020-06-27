@@ -1,6 +1,5 @@
 package gigaherz.toolbelt.client.radial;
 
-import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
@@ -58,7 +57,7 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
         if (stack.getCount() > 0)
         {
             GuiUtils.preItemToolTip(stack);
-            GuiUtils.drawHoveringText(stack, getItemToolTip(stack), (int) context.x, (int) context.y, (int) context.width, (int) context.height, -1, context.fontRenderer);
+            GuiUtils.drawHoveringText(context.matrixStack, getItemToolTip(stack), (int) context.x, (int) context.y, (int) context.width, (int) context.height, -1, context.fontRenderer);
             GuiUtils.postItemToolTip();
         }
         else
@@ -67,17 +66,9 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
         }
     }
 
-    private List<String> getItemToolTip(ItemStack stack)
+    private List<ITextComponent> getItemToolTip(ItemStack stack)
     {
         Minecraft mc = Minecraft.getInstance();
-        List<ITextComponent> list = stack.getTooltip(mc.player, mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
-        List<String> list1 = Lists.newArrayList();
-
-        for (ITextComponent itextcomponent : list)
-        {
-            list1.add(itextcomponent.getFormattedText());
-        }
-
-        return list1;
+        return stack.getTooltip(mc.player, mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
     }
 }

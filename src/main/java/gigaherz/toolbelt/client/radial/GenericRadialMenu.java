@@ -1,6 +1,7 @@
 package gigaherz.toolbelt.client.radial;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.toolbelt.ConfigData;
 import net.minecraft.client.MainWindow;
@@ -196,7 +197,7 @@ public class GenericRadialMenu
         //updateAnimationState(minecraft.getRenderPartialTicks());
     }
 
-    public void draw(float partialTicks, int mouseX, int mouseY)
+    public void draw(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
         updateAnimationState(partialTicks);
 
@@ -214,10 +215,10 @@ public class GenericRadialMenu
         radiusIn = animated ? Math.max(0.1f, 30 * animProgress) : 30;
         radiusOut = radiusIn * 2;
         itemRadius = (radiusIn + radiusOut) * 0.5f;
-        animTop = animated ? (1 - animProgress) * owner.height / 2.0f : 0;
+        animTop = animated ? (1 - animProgress) * owner.field_230709_l_ / 2.0f : 0;
 
-        int x = owner.width / 2;
-        int y = owner.height / 2;
+        int x = owner.field_230708_k_ / 2;
+        int y = owner.field_230709_l_ / 2;
         float z = 0;
 
         RenderSystem.pushMatrix();
@@ -229,7 +230,7 @@ public class GenericRadialMenu
 
         if (isReady())
         {
-            drawItems(x, y, z, owner.width, owner.height, fontRenderer, itemRenderer);
+            drawItems(matrixStack, x, y, z, owner.field_230708_k_, owner.field_230709_l_, fontRenderer, itemRenderer);
 
             ITextComponent currentCentralText = centralText;
             for (int i = 0; i < visibleItems.size(); i++)
@@ -245,11 +246,11 @@ public class GenericRadialMenu
 
             if (currentCentralText != null)
             {
-                String text = currentCentralText.getFormattedText();
-                fontRenderer.drawStringWithShadow(text, (owner.width - fontRenderer.getStringWidth(text)) / 2.0f, (owner.height - fontRenderer.FONT_HEIGHT) / 2.0f, 0xFFFFFFFF);
+                String text = currentCentralText.getString();
+                fontRenderer.func_238405_a_(matrixStack, text, (owner.field_230708_k_ - fontRenderer.getStringWidth(text)) / 2.0f, (owner.field_230709_l_ - fontRenderer.FONT_HEIGHT) / 2.0f, 0xFFFFFFFF);
             }
 
-            drawTooltips(mouseX, mouseY);
+            drawTooltips(matrixStack, mouseX, mouseY);
         }
     }
 
@@ -279,7 +280,7 @@ public class GenericRadialMenu
         animProgress = openAnimation; // MathHelper.clamp(openAnimation, 0, 1);
     }
 
-    private void drawTooltips(int mouseX, int mouseY)
+    private void drawTooltips(MatrixStack matrixStack, int mouseX, int mouseY)
     {
         Screen owner = host.getScreen();
         FontRenderer fontRenderer = host.getFontRenderer();
@@ -289,20 +290,20 @@ public class GenericRadialMenu
             RadialMenuItem item = visibleItems.get(i);
             if (item.isHovered())
             {
-                DrawingContext context = new DrawingContext(owner.width, owner.height, mouseX, mouseY, 0, fontRenderer, itemRenderer);
+                DrawingContext context = new DrawingContext(matrixStack, owner.field_230708_k_, owner.field_230709_l_, mouseX, mouseY, 0, fontRenderer, itemRenderer);
                 item.drawTooltips(context);
             }
         }
     }
 
-    private void drawItems(int x, int y, float z, int width, int height, FontRenderer font, ItemRenderer itemRenderer)
+    private void drawItems(MatrixStack matrixStack, int x, int y, float z, int width, int height, FontRenderer font, ItemRenderer itemRenderer)
     {
         iterateVisible((item, s, e) -> {
             float middle = (s + e) * 0.5f;
             float posX = x + itemRadius * (float) Math.cos(middle);
             float posY = y + itemRadius * (float) Math.sin(middle);
 
-            DrawingContext context = new DrawingContext(width, height, posX, posY, z, font, itemRenderer);
+            DrawingContext context = new DrawingContext(matrixStack, width, height, posX, posY, z, font, itemRenderer);
             item.draw(context);
         });
     }
@@ -413,8 +414,8 @@ public class GenericRadialMenu
     private void moveMouseToItem(int which, int numItems)
     {
         Screen owner = host.getScreen();
-        int x = owner.width / 2;
-        int y = owner.height / 2;
+        int x = owner.field_230708_k_ / 2;
+        int y = owner.field_230709_l_ / 2;
         float angle = (float) getAngleFor(which, numItems);
         setMousePosition(
                 x + itemRadius * Math.cos(angle),
@@ -426,7 +427,7 @@ public class GenericRadialMenu
     {
         Screen owner = host.getScreen();
         MainWindow mainWindow = minecraft.getMainWindow();
-        GLFW.glfwSetCursorPos(mainWindow.getHandle(), (int) (x * mainWindow.getWidth() / owner.width), (int) (y * mainWindow.getHeight() / owner.height));
+        GLFW.glfwSetCursorPos(mainWindow.getHandle(), (int) (x * mainWindow.getWidth() / owner.field_230708_k_), (int) (y * mainWindow.getHeight() / owner.field_230709_l_));
     }
 
     private static final double TWO_PI = 2.0 * Math.PI;
@@ -439,8 +440,8 @@ public class GenericRadialMenu
         int numItems = getVisibleItemCount();
 
         Screen owner = host.getScreen();
-        int x = owner.width / 2;
-        int y = owner.height / 2;
+        int x = owner.field_230708_k_ / 2;
+        int y = owner.field_230709_l_ / 2;
         double a = Math.atan2(mouseY - y, mouseX - x);
         double d = Math.sqrt(Math.pow(mouseX - x, 2) + Math.pow(mouseY - y, 2));
         if (numItems > 0)
@@ -487,7 +488,7 @@ public class GenericRadialMenu
             double scaledY = yPos[0] - (windowHeight / 2.0f);
 
             double distance = Math.sqrt(scaledX * scaledX + scaledY * scaledY);
-            double radius = radiusOut * (windowWidth / (float) owner.width) * 0.975;
+            double radius = radiusOut * (windowWidth / (float) owner.field_230708_k_) * 0.975;
 
             if (distance > radius)
             {

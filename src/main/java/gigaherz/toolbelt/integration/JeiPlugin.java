@@ -1,5 +1,5 @@
 package gigaherz.toolbelt.integration;
-
+/*
 import com.google.common.collect.Lists;
 import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
@@ -41,4 +41,4 @@ public class JeiPlugin implements IModPlugin
                 vanillaFactory.createAnvilRecipe(ToolBelt.belt.of(6), pouch, Collections.singletonList(ToolBelt.belt.of(7)))
         ), VanillaRecipeCategoryUid.ANVIL);
     }
-}
+}*/

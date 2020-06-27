@@ -1,6 +1,7 @@
 package gigaherz.toolbelt.client;
 
 import com.google.common.collect.Lists;
+import com.mojang.blaze3d.matrix.MatrixStack;
 import gigaherz.toolbelt.BeltFinder;
 import gigaherz.toolbelt.ConfigData;
 import gigaherz.toolbelt.ToolBelt;
@@ -40,7 +41,7 @@ public class RadialMenuScreen extends Screen
 
     private ItemRenderer getItemRenderer()
     {
-        return itemRenderer;
+        return field_230707_j_;
     }
 
     public RadialMenuScreen(BeltFinder.BeltGetter getter)
@@ -61,7 +62,7 @@ public class RadialMenuScreen extends Screen
             @Override
             public FontRenderer getFontRenderer()
             {
-                return font;
+                return field_230712_o_;
             }
 
             @Override
@@ -99,17 +100,17 @@ public class RadialMenuScreen extends Screen
         }
     }
 
-    @Override
-    public void removed()
+    @Override // removed
+    public void func_231164_f_()
     {
-        super.removed();
+        super.func_231164_f_();
         ClientEvents.wipeOpen();
     }
 
-    @Override
-    public void tick()
+    @Override // tick
+    public void func_231023_e_()
     {
-        super.tick();
+        super.func_231023_e_();
 
         menu.tick();
 
@@ -123,7 +124,7 @@ public class RadialMenuScreen extends Screen
             return;
         }
 
-        ItemStack inHand = minecraft.player.getHeldItemMainhand();
+        ItemStack inHand = field_230706_i_.player.getHeldItemMainhand();
         if (!ConfigData.isItemStackAllowed(inHand))
         {
             inventory = null;
@@ -149,7 +150,7 @@ public class RadialMenuScreen extends Screen
         {
             Minecraft.getInstance().displayGuiScreen(null);
         }
-        else if (!InputMappings.isKeyDown(minecraft.getMainWindow().getHandle(), ClientEvents.OPEN_TOOL_MENU_KEYBIND.getKey().getKeyCode()))
+        else if (!InputMappings.isKeyDown(field_230706_i_.getMainWindow().getHandle(), ClientEvents.OPEN_TOOL_MENU_KEYBIND.getKey().getKeyCode()))
         {
             if (ConfigData.releaseToSwap)
             {
@@ -162,11 +163,11 @@ public class RadialMenuScreen extends Screen
         }
     }
 
-    @Override
-    public boolean mouseReleased(double p_mouseReleased_1_, double p_mouseReleased_3_, int p_mouseReleased_5_)
+    @Override // mouseReleased
+    public boolean func_231048_c_(double p_mouseReleased_1_, double p_mouseReleased_3_, int p_mouseReleased_5_)
     {
         processClick(true);
-        return super.mouseReleased(p_mouseReleased_1_, p_mouseReleased_3_, p_mouseReleased_5_);
+        return super.func_231048_c_(p_mouseReleased_1_, p_mouseReleased_3_, p_mouseReleased_5_);
     }
 
     protected void processClick(boolean triggeredByMouse)
@@ -175,14 +176,14 @@ public class RadialMenuScreen extends Screen
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks)
+    public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
-        super.render(mouseX, mouseY, partialTicks);
+        super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
 
         if (inventory == null)
             return;
 
-        ItemStack inHand = minecraft.player.getHeldItemMainhand();
+        ItemStack inHand = field_230706_i_.player.getHeldItemMainhand();
         if (!ConfigData.isItemStackAllowed(inHand))
             return;
 
@@ -243,18 +244,18 @@ public class RadialMenuScreen extends Screen
 
         checkCycleKeybinds();
 
-        menu.draw(partialTicks, mouseX, mouseY);
+        menu.draw(matrixStack, partialTicks, mouseX, mouseY);
     }
 
     private boolean trySwap(int slotNumber, ItemStack itemMouseOver)
     {
-        ItemStack inHand = minecraft.player.getHeldItemMainhand();
+        ItemStack inHand = field_230706_i_.player.getHeldItemMainhand();
         if (!ConfigData.isItemStackAllowed(inHand))
             return false;
 
         if (inHand.getCount() > 0 || itemMouseOver.getCount() > 0)
         {
-            SwapItems.swapItem(slotNumber, minecraft.player);
+            SwapItems.swapItem(slotNumber, field_230706_i_.player);
             ToolBelt.channel.sendToServer(new SwapItems(slotNumber));
         }
 
@@ -291,8 +292,8 @@ public class RadialMenuScreen extends Screen
         }
     }
 
-    @Override
-    public boolean isPauseScreen()
+    @Override // isPauseScreen
+    public boolean func_231177_au__()
     {
         return false;
     }

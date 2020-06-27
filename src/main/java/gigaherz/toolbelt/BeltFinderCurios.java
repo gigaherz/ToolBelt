@@ -1,5 +1,5 @@
 package gigaherz.toolbelt;
-
+/*
 import gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -84,4 +84,4 @@ public class BeltFinderCurios extends BeltFinder
             // No need! Curios does its own sync. I think.
         }
     }
-}
+}*/

@@ -1,5 +1,6 @@
 package gigaherz.toolbelt.common;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.systems.RenderSystem;
 import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.gui.screen.inventory.ContainerScreen;
@@ -19,36 +20,27 @@ public class BeltScreen extends ContainerScreen<BeltContainer>
         super(container, playerInventory, title);
         this.xSize = 176;
         this.ySize = 133;
+        this.field_238745_s_ = this.ySize - 94;
+    }
+
+    public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        this.func_230446_a_(matrixStack);
+        super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
+        this.func_230459_a_(matrixStack, mouseX, mouseY);
     }
 
     @Override
-    public void render(int mouseX, int mouseY, float partialTicks)
-    {
-        this.renderBackground();
-        super.render(mouseX, mouseY, partialTicks);
-        this.renderHoveredToolTip(mouseX, mouseY);
-    }
-
-    @Override
-    protected void drawGuiContainerForegroundLayer(int mouseX, int mouseY)
-    {
-        String text = this.getContainer().getDisplayName().getFormattedText();
-        this.font.drawString(text, (this.xSize - font.getStringWidth(text)) / 2, 6, 4210752);
-        this.font.drawString(this.playerInventory.getName().getFormattedText(), 8, this.ySize - 96 + 2, 4210752);
-    }
-
-    @Override
-    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY)
+    protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        minecraft.getTextureManager().bindTexture(GUI_TEXTURE);
-        int i = (this.width - this.xSize) / 2;
-        int j = (this.height - this.ySize) / 2;
-        this.blit(i, j, 0, 0, this.xSize, this.ySize);
+        field_230706_i_.getTextureManager().bindTexture(GUI_TEXTURE);
+        int i = (this.field_230708_k_ - this.xSize) / 2;
+        int j = (this.field_230709_l_ - this.ySize) / 2;
+        this.func_238474_b_(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
 
         int slots = this.getContainer().beltSlots;
         int width = slots * 18;
         int x = 7 + ((9 - slots) * 18) / 2;
-        this.blit(i + x, j + 19, 0, this.ySize, width, 18);
+        this.func_238474_b_(matrixStack,i + x, j + 19, 0, this.ySize, width, 18);
     }
 }

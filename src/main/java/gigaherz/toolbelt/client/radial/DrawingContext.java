@@ -1,5 +1,6 @@
 package gigaherz.toolbelt.client.radial;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import net.minecraft.client.gui.FontRenderer;
 import net.minecraft.client.renderer.ItemRenderer;
 
@@ -12,9 +13,11 @@ public class DrawingContext
     public final float z;
     public final FontRenderer fontRenderer;
     public final ItemRenderer itemRenderer;
+    public final MatrixStack matrixStack;
 
-    public DrawingContext(int width, int height, float x, float y, float z, FontRenderer fontRenderer, ItemRenderer itemRenderer)
+    public DrawingContext(MatrixStack matrixStack, int width, int height, float x, float y, float z, FontRenderer fontRenderer, ItemRenderer itemRenderer)
     {
+        this.matrixStack = matrixStack;
         this.width = width;
         this.height = height;
         this.x = x;

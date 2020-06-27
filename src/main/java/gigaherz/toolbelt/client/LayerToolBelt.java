@@ -9,7 +9,6 @@ import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
 import net.minecraft.client.renderer.entity.model.EntityModel;
@@ -21,6 +20,7 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>
@@ -86,7 +86,7 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
 
     private void translateToBody(MatrixStack matrixStack)
     {
-        this.getEntityModel().bipedBody.setAnglesAndRotation(matrixStack);
+        this.getEntityModel().bipedBody.translateRotate(matrixStack);
     }
 
     private void renderHeldItem(LivingEntity player, ItemStack stack, TransformType transformType, HandSide handSide, MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness)
@@ -125,9 +125,8 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
         }
 
         @Override
-        public void render/*updateAngles*/(PlayerEntity p_225597_1_, float p_225597_2_, float p_225597_3_, float p_225597_4_, float p_225597_5_, float p_225597_6_)
+        public void setRotationAngles(PlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
         {
-
         }
 
         @Override

@@ -119,7 +119,7 @@ public class ClientEvents
         @SubscribeEvent
         public static void textureStitch(TextureStitchEvent.Pre event)
         {
-            if (event.getMap().getBasePath() == AtlasTexture.LOCATION_BLOCKS_TEXTURE)
+            if (event.getMap().getTextureLocation() == AtlasTexture.LOCATION_BLOCKS_TEXTURE)
             {
                 event.addSprite(BeltSlotContainer.SLOT_BACKGROUND);
             }

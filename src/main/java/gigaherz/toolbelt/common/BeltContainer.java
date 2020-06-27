@@ -124,9 +124,4 @@ public class BeltContainer extends Container
 
         return itemstack;
     }
-
-    public ITextComponent getDisplayName()
-    {
-        return heldItem.getDisplayName();
-    }
 }
