@@ -19,6 +19,7 @@ import net.minecraft.nbt.INBT;
 import net.minecraft.util.Direction;
 import net.minecraft.util.NonNullList;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.Unit;
 import net.minecraft.world.GameRules;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -41,6 +42,7 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
 
 public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<CompoundNBT>
 {
@@ -216,26 +218,26 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             if (!ConfigData.customBeltSlotEnabled)
                 return;
             PlayerEntity oldPlayer = event.getOriginal();
+
             // FIXME: workaround for a forge issue that seems to be reappearing too often
             // at this time it's only needed when returning from the end alive
             oldPlayer.revive();
+
             PlayerEntity newPlayer = event.getPlayer();
             get(oldPlayer).ifPresent((oldBelt) -> {
-                BeltExtensionSlot newBelt = get(newPlayer).orElse(null);
                 ItemStack stack = oldBelt.getBelt().getContents();
-                if (newBelt == null)
-                {
+                get(newPlayer).map(newBelt -> {
+                    // Transfer any remaining item. If it was death and keepInventory was off,
+                    // it will have been removed in LivingDropsEvent.
+                    newBelt.getBelt().setContents(stack);
+                    return Unit.INSTANCE;
+                }).orElseGet(() -> {
                     if (stack.getCount() > 0)
                     {
                         oldPlayer.dropItem(stack, true, false);
                     }
-                }
-                else
-                {
-                    // Transfer any remaining item. If it was death and keepInventory was off,
-                    // it will have been removed in LivingDropsEvent.
-                    newBelt.getBelt().setContents(stack);
-                }
+                    return Unit.INSTANCE;
+                });
             });
         }
     }

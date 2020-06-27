@@ -6,6 +6,7 @@ import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.INamedContainerProvider;
+import net.minecraft.inventory.container.SimpleNamedContainerProvider;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
@@ -74,6 +75,11 @@ public class Screens
 
     public static void openSlotScreen(ServerPlayerEntity player)
     {
-        NetworkHooks.openGui(player, new BeltSlotContainerProvider());
+        player.openContainer(new BeltSlotContainerProvider());
+
+        player.openContainer(new SimpleNamedContainerProvider(
+                (i, playerInventory, playerEntity) -> new BeltSlotContainer(i, playerInventory, !playerEntity.world.isRemote),
+                new TranslationTextComponent("text.toolbelt.belt_slot_container.title")
+        ));
     }
 }

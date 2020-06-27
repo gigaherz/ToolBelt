@@ -22,10 +22,7 @@ import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.InterModComms;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.RegistryObject;
+import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -134,8 +131,10 @@ public class ToolBelt
 
     public void clientSetup(FMLClientSetupEvent event)
     {
-        ScreenManager.registerFactory(BeltContainer.TYPE, BeltScreen::new);
-        ScreenManager.registerFactory(BeltSlotContainer.TYPE, BeltSlotScreen::new);
+        DeferredWorkQueue.runLater(() -> {
+            ScreenManager.registerFactory(BeltContainer.TYPE, BeltScreen::new);
+            ScreenManager.registerFactory(BeltSlotContainer.TYPE, BeltSlotScreen::new);
+        });
     }
 
     private void imcEnqueue(InterModEnqueueEvent event)
