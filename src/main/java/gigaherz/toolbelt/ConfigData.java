@@ -210,7 +210,7 @@ public class ConfigData
         }
 
         @Override
-        public String func_176610_l()
+        public String getString()
         {
             return name;
         }
@@ -227,7 +227,7 @@ public class ConfigData
 
         public static String[] names()
         {
-            return Arrays.stream(values()).map(CustomBeltSlotMode::func_176610_l).toArray(String[]::new);
+            return Arrays.stream(values()).map(CustomBeltSlotMode::getString).toArray(String[]::new);
         }
     }
 }

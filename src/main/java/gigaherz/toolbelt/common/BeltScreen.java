@@ -23,9 +23,9 @@ public class BeltScreen extends ContainerScreen<BeltContainer>
         this.field_238745_s_ = this.ySize - 94;
     }
 
-    public void func_230430_a_(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
-        this.func_230446_a_(matrixStack);
-        super.func_230430_a_(matrixStack, mouseX, mouseY, partialTicks);
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+        this.renderBackground(matrixStack);
+        super.render(matrixStack, mouseX, mouseY, partialTicks);
         this.func_230459_a_(matrixStack, mouseX, mouseY);
     }
 
@@ -33,14 +33,14 @@ public class BeltScreen extends ContainerScreen<BeltContainer>
     protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        field_230706_i_.getTextureManager().bindTexture(GUI_TEXTURE);
-        int i = (this.field_230708_k_ - this.xSize) / 2;
-        int j = (this.field_230709_l_ - this.ySize) / 2;
-        this.func_238474_b_(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
+        minecraft.getTextureManager().bindTexture(GUI_TEXTURE);
+        int i = (this.width - this.xSize) / 2;
+        int j = (this.height - this.ySize) / 2;
+        this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
 
         int slots = this.getContainer().beltSlots;
         int width = slots * 18;
         int x = 7 + ((9 - slots) * 18) / 2;
-        this.func_238474_b_(matrixStack,i + x, j + 19, 0, this.ySize, width, 18);
+        this.blit(matrixStack,i + x, j + 19, 0, this.ySize, width, 18);
     }
 }

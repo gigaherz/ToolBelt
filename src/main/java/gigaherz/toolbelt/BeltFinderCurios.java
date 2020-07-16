@@ -1,20 +1,20 @@
 package gigaherz.toolbelt;
-/*
+
 import gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
-import top.theillusivec4.curios.api.CuriosAPI;
-import top.theillusivec4.curios.api.capability.ICurioItemHandler;
-import top.theillusivec4.curios.api.inventory.CurioStackHandler;
+import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 import java.util.Optional;
 
 public class BeltFinderCurios extends BeltFinder
 {
-    @CapabilityInject(ICurioItemHandler.class)
+    @CapabilityInject(ICuriosItemHandler.class)
     public static void initBaubles(Capability<?> cap)
     {
         BeltFinder.addFinder(new BeltFinderCurios());
@@ -30,21 +30,20 @@ public class BeltFinderCurios extends BeltFinder
     @Override
     public void setToSlot(LivingEntity player, int slot, ItemStack stack)
     {
-        CuriosAPI.getCuriosHandler(player).ifPresent((curios) -> {
-            CurioStackHandler handler = curios.getStackHandler("belt");
-            handler.setStackInSlot(slot, stack);
-        });
+        player.getCapability(CuriosCapability.INVENTORY).ifPresent((curios) ->
+                curios.getStacksHandler("belt").ifPresent(handler -> handler.getStacks().setStackInSlot(slot, stack)));
     }
 
     @Override
     public Optional<? extends BeltGetter> findStack(PlayerEntity player)
     {
         //noinspection NullableProblems
-        return CuriosAPI.getCuriosHandler(player).map((curios) -> {
-            CurioStackHandler handler = curios.getStackHandler("belt");
-            for (int i = 0; i < handler.getSlots(); i++)
+        return player.getCapability(CuriosCapability.INVENTORY)
+                .map((curios) -> curios.getStacksHandler("belt").map(handler -> {
+            IDynamicStackHandler stacks = handler.getStacks();
+            for (int i = 0; i < stacks.getSlots(); i++)
             {
-                ItemStack inSlot = handler.getStackInSlot(i);
+                ItemStack inSlot = stacks.getStackInSlot(i);
                 if (inSlot.getCount() > 0)
                 {
                     if (inSlot.getItem() instanceof ToolBeltItem)
@@ -53,9 +52,8 @@ public class BeltFinderCurios extends BeltFinder
                     }
                 }
             }
-
             return Optional.<BeltGetter>empty();
-        }).orElseGet(Optional::empty);
+        }).orElseGet(Optional::empty)).orElseGet(Optional::empty);
     }
 
     private static class CuriosBeltGetter implements BeltGetter
@@ -72,10 +70,10 @@ public class BeltFinderCurios extends BeltFinder
         @Override
         public ItemStack getBelt()
         {
-            return CuriosAPI.getCuriosHandler(thePlayer).map((curios) -> {
-                CurioStackHandler handler = curios.getStackHandler("belt");
-                return handler.getStackInSlot(slotNumber);
-            }).orElse(ItemStack.EMPTY);
+            return thePlayer.getCapability(CuriosCapability.INVENTORY).map((curios) ->
+                    curios.getStacksHandler("belt").map(handler ->
+                            handler.getStacks().getStackInSlot(slotNumber)).orElse(ItemStack.EMPTY)
+            ).orElse(ItemStack.EMPTY);
         }
 
         @Override
@@ -84,4 +82,4 @@ public class BeltFinderCurios extends BeltFinder
             // No need! Curios does its own sync. I think.
         }
     }
-}*/
+}

@@ -37,6 +37,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ObjectHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import top.theillusivec4.curios.api.SlotTypeMessage;
 //import top.theillusivec4.curios.api.CuriosAPI;
 //import top.theillusivec4.curios.api.imc.CurioIMCMessage;
 
@@ -139,8 +140,8 @@ public class ToolBelt
 
     private void imcEnqueue(InterModEnqueueEvent event)
     {
-        //InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_TYPE, () -> new CurioIMCMessage("belt").setSize(1).setEnabled(true).setHidden(false));
-        //InterModComms.sendTo("curios", CuriosAPI.IMC.REGISTER_ICON, () -> new Tuple<>("belt", location("gui/empty_belt_slot_background")));
+        InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> new SlotTypeMessage.Builder("belt")
+                .icon(location("gui/empty_belt_slot_background")).size(1).build());
     }
 
     public void loadComplete(FMLLoadCompleteEvent event)

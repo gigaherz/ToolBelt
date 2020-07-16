@@ -179,7 +179,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     @Override
     public void onCraftMatrixChanged(IInventory inventoryIn)
     {
-        WorkbenchContainer.func_217066_a(this.windowId, this.player.world, this.player, this.craftingInventory, this.craftResultInventory);
+        WorkbenchContainer.updateCraftingResult(this.windowId, this.player.world, this.player, this.craftingInventory, this.craftResultInventory);
     }
 
     @Override
