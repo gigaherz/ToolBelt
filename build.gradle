@@ -30,7 +30,7 @@ compileJava {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20191005-1.14.3'
+    mappings channel: 'stable', version: '56-1.14.3'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -40,15 +40,6 @@ minecraft {
 
             property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
-
-            ideaModule "${project.name}.main"
-
-            environment 'MOD_CLASSES', "${project.file("out/production/resources").canonicalPath};${project.file("out/production/classes").canonicalPath}"
-            /*mods {
-                main {
-                    sources sourceSets.main
-                }
-            }*/
         }
 
         server {
@@ -57,20 +48,13 @@ minecraft {
             property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
 
-            ideaModule "${project.name}.main"
-
-            environment 'MOD_CLASSES', "${project.file("out/production/resources").canonicalPath};${project.file("out/production/classes").canonicalPath}"
-            /*mods {
-                main {
-                    sources sourceSets.main
-                }
-            }*/
+            singleInstance(true)
         }
     }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.14.4-28.1.90'
+    minecraft 'net.minecraftforge:forge:1.14.4-28.2.0'
 
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0.5.3")
     compileOnly fg.deobf("top.theillusivec4.curios:curios:FORGE-1.14.4-1.0.5.3:api")
