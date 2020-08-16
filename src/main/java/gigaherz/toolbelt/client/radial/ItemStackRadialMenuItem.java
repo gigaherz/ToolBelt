@@ -1,14 +1,9 @@
 package gigaherz.toolbelt.client.radial;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.text.ITextComponent;
-import net.minecraftforge.fml.client.gui.GuiUtils;
-
-import java.util.List;
 
 public class ItemStackRadialMenuItem extends TextRadialMenuItem
 {
@@ -56,19 +51,11 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
     {
         if (stack.getCount() > 0)
         {
-            GuiUtils.preItemToolTip(stack);
-            GuiUtils.drawHoveringText(context.matrixStack, getItemToolTip(stack), (int) context.x, (int) context.y, (int) context.width, (int) context.height, -1, context.fontRenderer);
-            GuiUtils.postItemToolTip();
+            context.drawingHelper.renderTooltip(context.matrixStack, stack, (int)context.x, (int)context.y);
         }
         else
         {
             super.drawTooltips(context);
         }
-    }
-
-    private List<ITextComponent> getItemToolTip(ItemStack stack)
-    {
-        Minecraft mc = Minecraft.getInstance();
-        return stack.getTooltip(mc.player, mc.gameSettings.advancedItemTooltips ? ITooltipFlag.TooltipFlags.ADVANCED : ITooltipFlag.TooltipFlags.NORMAL);
     }
 }

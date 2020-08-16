@@ -14,8 +14,9 @@ public class DrawingContext
     public final FontRenderer fontRenderer;
     public final ItemRenderer itemRenderer;
     public final MatrixStack matrixStack;
+    public final IDrawingHelper drawingHelper;
 
-    public DrawingContext(MatrixStack matrixStack, int width, int height, float x, float y, float z, FontRenderer fontRenderer, ItemRenderer itemRenderer)
+    public DrawingContext(MatrixStack matrixStack, int width, int height, float x, float y, float z, FontRenderer fontRenderer, ItemRenderer itemRenderer, IDrawingHelper drawingHelper)
     {
         this.matrixStack = matrixStack;
         this.width = width;
@@ -25,5 +26,6 @@ public class DrawingContext
         this.z = z;
         this.fontRenderer = fontRenderer;
         this.itemRenderer = itemRenderer;
+        this.drawingHelper = drawingHelper;
     }
 }

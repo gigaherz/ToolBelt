@@ -12,6 +12,7 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.ItemRenderer;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -290,7 +291,7 @@ public class GenericRadialMenu
             RadialMenuItem item = visibleItems.get(i);
             if (item.isHovered())
             {
-                DrawingContext context = new DrawingContext(matrixStack, owner.width, owner.height, mouseX, mouseY, 0, fontRenderer, itemRenderer);
+                DrawingContext context = new DrawingContext(matrixStack, owner.width, owner.height, mouseX, mouseY, 0, fontRenderer, itemRenderer, host);
                 item.drawTooltips(context);
             }
         }
@@ -303,7 +304,7 @@ public class GenericRadialMenu
             float posX = x + itemRadius * (float) Math.cos(middle);
             float posY = y + itemRadius * (float) Math.sin(middle);
 
-            DrawingContext context = new DrawingContext(matrixStack, width, height, posX, posY, z, font, itemRenderer);
+            DrawingContext context = new DrawingContext(matrixStack, width, height, posX, posY, z, font, itemRenderer, host);
             item.draw(context);
         });
     }

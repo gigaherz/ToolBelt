@@ -54,6 +54,12 @@ public class RadialMenuScreen extends Screen
         menu = new GenericRadialMenu(Minecraft.getInstance(), new IRadialMenuHost()
         {
             @Override
+            public void renderTooltip(MatrixStack matrixStack, ItemStack stack, int mouseX, int mouseY)
+            {
+                RadialMenuScreen.this.renderTooltip(matrixStack, stack, mouseX, mouseY);
+            }
+
+            @Override
             public Screen getScreen()
             {
                 return RadialMenuScreen.this;
@@ -101,9 +107,9 @@ public class RadialMenuScreen extends Screen
     }
 
     @Override // removed
-    public void removed()
+    public void onClose()
     {
-        super.removed();
+        super.onClose();
         ClientEvents.wipeOpen();
     }
 

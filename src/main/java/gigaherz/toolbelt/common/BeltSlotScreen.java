@@ -31,7 +31,7 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     {
         super(container, playerInventory, title);
         this.passEvents = true;
-        this.field_238742_p_ = 97;
+        this.titleX = 97;
     }
 
     @Override
@@ -58,8 +58,8 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     }
 
     @Override
-    protected void func_230451_b_(MatrixStack matrixStack, int mouseX, int mouseY) {
-        this.font.func_238422_b_(matrixStack, this.title, (float)this.field_238742_p_, (float)this.field_238743_q_, 4210752);
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
+        this.font.func_243248_b(matrixStack, this.title, (float)this.titleX, (float)this.titleY, 4210752);
     }
 
     @Override
@@ -67,7 +67,7 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
         this.renderBackground(matrixStack);
         this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
         if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
-            this.func_230450_a_(matrixStack, partialTicks, mouseX, mouseY);
+            this.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
             this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
         } else {
             this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
@@ -75,15 +75,15 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
             this.recipeBookGui.func_230477_a_(matrixStack, this.guiLeft, this.guiTop, false, partialTicks);
         }
 
-        this.func_230459_a_(matrixStack, mouseX, mouseY);
+        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
         this.recipeBookGui.func_238924_c_(matrixStack, this.guiLeft, this.guiTop, mouseX, mouseY);
         this.oldMouseX = (float)mouseX;
         this.oldMouseY = (float)mouseY;
-        this.func_212932_b(this.recipeBookGui);
+        this.setListenerDefault(this.recipeBookGui);
     }
 
     @Override
-    protected void func_230450_a_(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bindTexture(SCREEN_BACKGROUND);
         int i = this.guiLeft;
@@ -101,7 +101,7 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     @Override
     public boolean mouseClicked(double p_231044_1_, double p_231044_3_, int p_231044_5_) {
         if (this.recipeBookGui.mouseClicked(p_231044_1_, p_231044_3_, p_231044_5_)) {
-            this.setFocused(this.recipeBookGui);
+            this.setListener(this.recipeBookGui);
             return true;
         } else {
             return this.widthTooNarrow && this.recipeBookGui.isVisible() ? false : super.mouseClicked(p_231044_1_, p_231044_3_, p_231044_5_);
@@ -138,12 +138,12 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     }
 
     @Override
-    public void removed() {
+    public void onClose() {
         if (this.removeRecipeBookGui) {
             this.recipeBookGui.removed();
         }
 
-        super.removed();
+        super.onClose();
     }
 
     @Override
