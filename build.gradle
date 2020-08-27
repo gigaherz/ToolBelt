@@ -8,7 +8,6 @@ buildscript {
         classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
     }
 }
-
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'maven-publish'
 
@@ -22,10 +21,16 @@ repositories {
     maven {
         url = "https://maven.theillusivec4.top/"
     }
+    maven {
+        url 'https://www.dogforce-games.com/maven/'
+    }
+    maven {
+        url = "https://www.cursemaven.com"
+    }
     mavenLocal()
 }
 
-version = "1.14.3"
+version = "1.14.4"
 group= "gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
@@ -36,7 +41,7 @@ project.afterEvaluate {
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200813-1.16.1'
+    mappings channel: 'snapshot', version: '20200820-1.16.1'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -74,13 +79,15 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.2-33.0.5'
+    minecraft 'net.minecraftforge:forge:1.16.2-33.0.22'
 
-    compileOnly fg.deobf("mezz.jei:jei-1.16.2:7.1.0.11:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.2:7.1.0.11")
+    compileOnly fg.deobf("mezz.jei:jei-1.16.2:7.1.3.19:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.16.2:7.1.3.19")
 
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.2-4.0.0.0")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.2-4.0.0.0:api")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.2-4.0.0.1")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.2-4.0.0.1:api")
+
+    runtimeOnly fg.deobf("curse.maven:gravestone-mod:3040798")
 }
 
 jar {

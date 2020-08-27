@@ -32,13 +32,12 @@ public class BeltFinderBeltSlot extends BeltFinder
     @Override
     public Optional<? extends BeltGetter> findStack(PlayerEntity player)
     {
-        //noinspection NullableProblems
         return BeltExtensionSlot.get(player)
-                .map((theCap) -> theCap.getSlots().stream()
+                .resolve()
+                .flatMap(ext -> ext.getSlots().stream()
                         .filter(slot -> slot.getContents().getItem() instanceof ToolBeltItem)
                         .map(ExtensionSlotBeltGetter::new)
-                        .findFirst())
-                .orElseGet(Optional::empty);
+                        .findFirst());
     }
 
     @Override

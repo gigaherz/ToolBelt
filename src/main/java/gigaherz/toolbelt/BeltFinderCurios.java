@@ -37,23 +37,24 @@ public class BeltFinderCurios extends BeltFinder
     @Override
     public Optional<? extends BeltGetter> findStack(PlayerEntity player)
     {
-        //noinspection NullableProblems
         return player.getCapability(CuriosCapability.INVENTORY)
-                .map((curios) -> curios.getStacksHandler("belt").map(handler -> {
-            IDynamicStackHandler stacks = handler.getStacks();
-            for (int i = 0; i < stacks.getSlots(); i++)
-            {
-                ItemStack inSlot = stacks.getStackInSlot(i);
-                if (inSlot.getCount() > 0)
-                {
-                    if (inSlot.getItem() instanceof ToolBeltItem)
+                .resolve()
+                .flatMap(curios -> curios.getStacksHandler("belt"))
+                .flatMap(handler -> {
+                    IDynamicStackHandler stacks = handler.getStacks();
+                    for (int i = 0; i < stacks.getSlots(); i++)
                     {
-                        return Optional.of(new CuriosBeltGetter(player, i));
+                        ItemStack inSlot = stacks.getStackInSlot(i);
+                        if (inSlot.getCount() > 0)
+                        {
+                            if (inSlot.getItem() instanceof ToolBeltItem)
+                            {
+                                return Optional.of(new CuriosBeltGetter(player, i));
+                            }
+                        }
                     }
-                }
-            }
-            return Optional.<BeltGetter>empty();
-        }).orElseGet(Optional::empty)).orElseGet(Optional::empty);
+                    return Optional.<BeltGetter>empty();
+                });
     }
 
     private static class CuriosBeltGetter implements BeltGetter
