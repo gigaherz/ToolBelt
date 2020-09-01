@@ -31,7 +31,7 @@ repositories {
 }
 
 version = "1.14.4"
-group= "gigaherz.toolbelt"
+group = "gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
 project.afterEvaluate {

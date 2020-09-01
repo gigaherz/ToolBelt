@@ -6,6 +6,7 @@ import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.common.BeltSlotContainer;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.MouseHelper;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.settings.KeyBinding;
@@ -71,7 +72,7 @@ public class ClientEvents
 
         if (mc.currentScreen == null)
         {
-            boolean toolMenuKeyIsDown = isKeyDown(OPEN_TOOL_MENU_KEYBIND);
+            boolean toolMenuKeyIsDown = OPEN_TOOL_MENU_KEYBIND.isKeyDown();
             if (toolMenuKeyIsDown && !toolMenuKeyWasDown)
             {
                 while (OPEN_TOOL_MENU_KEYBIND.isPressed())
@@ -109,8 +110,18 @@ public class ClientEvents
     {
         if (keybind.isInvalid())
             return false;
-        return InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), keybind.getKey().getKeyCode())
-                && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
+
+        boolean isDown = false;
+        switch (keybind.getKey().getType())
+        {
+            case KEYSYM:
+                isDown = InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), keybind.getKey().getKeyCode());
+                break;
+            case MOUSE:
+                isDown = GLFW.glfwGetMouseButton(Minecraft.getInstance().getMainWindow().getHandle(), keybind.getKey().getKeyCode()) == GLFW.GLFW_PRESS;
+                break;
+        }
+        return isDown && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }
 
     @Mod.EventBusSubscriber(modid = ToolBelt.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
