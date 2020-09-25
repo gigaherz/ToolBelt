@@ -23,7 +23,8 @@ public class BeltScreen extends ContainerScreen<BeltContainer>
         this.playerInventoryTitleY = this.ySize - 94;
     }
 
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    {
         this.renderBackground(matrixStack);
         super.render(matrixStack, mouseX, mouseY, partialTicks);
         this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
@@ -41,6 +42,6 @@ public class BeltScreen extends ContainerScreen<BeltContainer>
         int slots = this.getContainer().beltSlots;
         int width = slots * 18;
         int x = 7 + ((9 - slots) * 18) / 2;
-        this.blit(matrixStack,i + x, j + 19, 0, this.ySize, width, 18);
+        this.blit(matrixStack, i + x, j + 19, 0, this.ySize, width, 18);
     }
 }

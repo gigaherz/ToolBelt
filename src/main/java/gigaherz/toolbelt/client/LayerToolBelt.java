@@ -98,7 +98,7 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
             matrixStack.translate(-4.35f / 16.0F, 0.7f, -0.1f);
         else
             matrixStack.translate(4.35f / 16.0F, 0.7f, -0.1f);
-        //((IHasArm)this.getEntityModel()).func_225599_a_(handSide, matrixStack);
+        //((IHasArm)this.getEntityModel()).translateHand(handSide, matrixStack);
         matrixStack.rotate(Vector3f.XP.rotationDegrees(40));
         float scale = ConfigData.beltItemScale;
         matrixStack.scale(scale, scale, scale);
@@ -130,18 +130,18 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
         }
 
         @Override
-        public void render(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int p_225598_3_, int p_225598_4_, float p_225598_5_, float p_225598_6_, float p_225598_7_, float p_225598_8_)
+        public void render(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
         {
             RenderSystem.disableRescaleNormal();
             RenderSystem.disableCull();
 
-            belt.render(matrixStack, vertexBuilder, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-            pocketL.render(matrixStack, vertexBuilder, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
-            pocketR.render(matrixStack, vertexBuilder, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+            belt.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+            pocketL.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+            pocketR.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 
             matrixStack.push();
             matrixStack.scale(0.8f, 1, 1);
-            buckle.render(matrixStack, vertexBuilder, p_225598_3_, p_225598_4_, p_225598_5_, p_225598_6_, p_225598_7_, p_225598_8_);
+            buckle.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             matrixStack.pop();
 
             RenderSystem.enableCull();

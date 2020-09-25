@@ -165,9 +165,9 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     }
 
     @Override
-    public void fillStackedContents(RecipeItemHelper p_201771_1_)
+    public void fillStackedContents(RecipeItemHelper itemHelperIn)
     {
-        this.craftingInventory.fillStackedContents(p_201771_1_);
+        this.craftingInventory.fillStackedContents(itemHelperIn);
     }
 
     @Override
@@ -178,9 +178,9 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     }
 
     @Override
-    public boolean matches(IRecipe<? super CraftingInventory> p_201769_1_)
+    public boolean matches(IRecipe<? super CraftingInventory> recipeIn)
     {
-        return p_201769_1_.matches(this.craftingInventory, this.player.world);
+        return recipeIn.matches(this.craftingInventory, this.player.world);
     }
 
     @Override

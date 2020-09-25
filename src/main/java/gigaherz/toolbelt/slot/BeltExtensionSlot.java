@@ -42,7 +42,6 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.List;
-import java.util.Optional;
 
 public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<CompoundNBT>
 {

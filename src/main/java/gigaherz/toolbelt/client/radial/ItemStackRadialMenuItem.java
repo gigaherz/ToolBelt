@@ -51,7 +51,7 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
     {
         if (stack.getCount() > 0)
         {
-            context.drawingHelper.renderTooltip(context.matrixStack, stack, (int)context.x, (int)context.y);
+            context.drawingHelper.renderTooltip(context.matrixStack, stack, (int) context.x, (int) context.y);
         }
         else
         {

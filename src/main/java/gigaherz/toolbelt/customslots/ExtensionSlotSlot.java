@@ -60,7 +60,7 @@ public class ExtensionSlotSlot extends Slot
      * if par2 has more items than par1, onCrafting(item,countIncrease) is called
      */
     @Override
-    public void onSlotChange(@Nonnull ItemStack p_75220_1_, @Nonnull ItemStack p_75220_2_)
+    public void onSlotChange(@Nonnull ItemStack oldStackIn, @Nonnull ItemStack newStackIn)
     {
 
     }

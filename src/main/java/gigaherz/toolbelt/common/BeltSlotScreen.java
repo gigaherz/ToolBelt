@@ -6,7 +6,6 @@ import gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.gui.DisplayEffectsScreen;
 import net.minecraft.client.gui.recipebook.IRecipeShownListener;
 import net.minecraft.client.gui.recipebook.RecipeBookGui;
-import net.minecraft.client.gui.screen.inventory.CreativeScreen;
 import net.minecraft.client.gui.widget.button.ImageButton;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.container.ClickType;
@@ -35,12 +34,14 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     }
 
     @Override
-    public void tick() {
+    public void tick()
+    {
         this.recipeBookGui.tick();
     }
 
     @Override
-    protected void init() {
+    protected void init()
+    {
         super.init();
         this.widthTooNarrow = this.width < 379;
         this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.container);
@@ -48,28 +49,33 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
         this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
         this.children.add(this.recipeBookGui);
         this.setFocusedDefault(this.recipeBookGui);
-        this.addButton(new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (p_214086_1_) -> {
+        this.addButton(new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (button) -> {
             this.recipeBookGui.initSearchBar(this.widthTooNarrow);
             this.recipeBookGui.toggleVisibility();
             this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
-            ((ImageButton)p_214086_1_).setPosition(this.guiLeft + 104, this.height / 2 - 22);
+            ((ImageButton) button).setPosition(this.guiLeft + 104, this.height / 2 - 22);
             this.buttonClicked = true;
         }));
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY) {
-        this.font.func_243248_b(matrixStack, this.title, (float)this.titleX, (float)this.titleY, 4210752);
+    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY)
+    {
+        this.font.func_243248_b(matrixStack, this.title, (float) this.titleX, (float) this.titleY, 4210752);
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks) {
+    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    {
         this.renderBackground(matrixStack);
         this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
-        if (this.recipeBookGui.isVisible() && this.widthTooNarrow) {
+        if (this.recipeBookGui.isVisible() && this.widthTooNarrow)
+        {
             this.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
             this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
-        } else {
+        }
+        else
+        {
             this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
             super.render(matrixStack, mouseX, mouseY, partialTicks);
             this.recipeBookGui.func_230477_a_(matrixStack, this.guiLeft, this.guiTop, false, partialTicks);
@@ -77,50 +83,61 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
 
         this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
         this.recipeBookGui.func_238924_c_(matrixStack, this.guiLeft, this.guiTop, mouseX, mouseY);
-        this.oldMouseX = (float)mouseX;
-        this.oldMouseY = (float)mouseY;
+        this.oldMouseX = (float) mouseX;
+        this.oldMouseY = (float) mouseY;
         this.setListenerDefault(this.recipeBookGui);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY) {
+    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
+    {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
         this.minecraft.getTextureManager().bindTexture(SCREEN_BACKGROUND);
         int i = this.guiLeft;
         int j = this.guiTop;
         this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
-        drawEntityOnScreen(i + 51, j + 75, 30, (float)(i + 51) - this.oldMouseX, (float)(j + 75 - 50) - this.oldMouseY, this.minecraft.player);
+        drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - this.oldMouseX, (float) (j + 75 - 50) - this.oldMouseY, this.minecraft.player);
     }
 
 
     @Override
-    protected boolean isPointInRegion(int x, int y, int width, int height, double mouseX, double mouseY) {
+    protected boolean isPointInRegion(int x, int y, int width, int height, double mouseX, double mouseY)
+    {
         return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super.isPointInRegion(x, y, width, height, mouseX, mouseY);
     }
 
     @Override
-    public boolean mouseClicked(double p_231044_1_, double p_231044_3_, int p_231044_5_) {
-        if (this.recipeBookGui.mouseClicked(p_231044_1_, p_231044_3_, p_231044_5_)) {
+    public boolean mouseClicked(double mouseX, double mouseY, int button)
+    {
+        if (this.recipeBookGui.mouseClicked(mouseX, mouseY, button))
+        {
             this.setListener(this.recipeBookGui);
             return true;
-        } else {
-            return this.widthTooNarrow && this.recipeBookGui.isVisible() ? false : super.mouseClicked(p_231044_1_, p_231044_3_, p_231044_5_);
+        }
+        else
+        {
+            return this.widthTooNarrow && this.recipeBookGui.isVisible() ? false : super.mouseClicked(mouseX, mouseY, button);
         }
     }
 
     @Override
-    public boolean mouseReleased(double p_231048_1_, double p_231048_3_, int p_231048_5_) {
-        if (this.buttonClicked) {
+    public boolean mouseReleased(double mouseX, double mouseY, int button)
+    {
+        if (this.buttonClicked)
+        {
             this.buttonClicked = false;
             return true;
-        } else {
-            return super.mouseReleased(p_231048_1_, p_231048_3_, p_231048_5_);
+        }
+        else
+        {
+            return super.mouseReleased(mouseX, mouseY, button);
         }
     }
 
     @Override
-    protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn, int mouseButton) {
-        boolean flag = mouseX < (double)guiLeftIn || mouseY < (double)guiTopIn || mouseX >= (double)(guiLeftIn + this.xSize) || mouseY >= (double)(guiTopIn + this.ySize);
+    protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn, int mouseButton)
+    {
+        boolean flag = mouseX < (double) guiLeftIn || mouseY < (double) guiTopIn || mouseX >= (double) (guiLeftIn + this.xSize) || mouseY >= (double) (guiTopIn + this.ySize);
         return this.recipeBookGui.func_195604_a(mouseX, mouseY, this.guiLeft, this.guiTop, this.xSize, this.ySize, mouseButton) && flag;
     }
 
@@ -138,8 +155,10 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     }
 
     @Override
-    public void onClose() {
-        if (this.removeRecipeBookGui) {
+    public void onClose()
+    {
+        if (this.removeRecipeBookGui)
+        {
             this.recipeBookGui.removed();
         }
 

@@ -6,7 +6,6 @@ import gigaherz.toolbelt.ToolBelt;
 import gigaherz.toolbelt.common.BeltSlotContainer;
 import gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.MouseHelper;
 import net.minecraft.client.renderer.entity.PlayerRenderer;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.settings.KeyBinding;
@@ -46,10 +45,10 @@ public class ClientEvents
                 new KeyBinding("key.toolbelt.open", GLFW.GLFW_KEY_R, "key.toolbelt.category"));
 
         ClientRegistry.registerKeyBinding(CYCLE_TOOL_MENU_LEFT_KEYBIND =
-                new KeyBinding("key.toolbelt.cycle.left",  InputMappings.INPUT_INVALID.getKeyCode(), "key.toolbelt.category"));
+                new KeyBinding("key.toolbelt.cycle.left", InputMappings.INPUT_INVALID.getKeyCode(), "key.toolbelt.category"));
 
         ClientRegistry.registerKeyBinding(CYCLE_TOOL_MENU_RIGHT_KEYBIND =
-                new KeyBinding("key.toolbelt.cycle.right",  InputMappings.INPUT_INVALID.getKeyCode(), "key.toolbelt.category"));
+                new KeyBinding("key.toolbelt.cycle.right", InputMappings.INPUT_INVALID.getKeyCode(), "key.toolbelt.category"));
 
         ClientRegistry.registerKeyBinding(OPEN_BELT_SLOT_KEYBIND =
                 new KeyBinding("key.toolbelt.slot", GLFW.GLFW_KEY_V, "key.toolbelt.category"));
