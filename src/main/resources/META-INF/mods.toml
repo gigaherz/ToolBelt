@@ -28,3 +28,9 @@ Declutter your inventory of tools
    versionRange="[1.16.2,1.17)"
    ordering="NONE"
    side="BOTH"
+[[dependencies.toolbelt]]
+   modId="sewingkit"
+   mandatory=false
+   versionRange="[1.1,)"
+   ordering="NONE"
+   side="BOTH"

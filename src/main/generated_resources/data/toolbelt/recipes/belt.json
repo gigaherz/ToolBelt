@@ -1,0 +1,34 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "type": "toolbelt:enable_normal_crafting"
+        }
+      ],
+      "recipe": {
+        "type": "minecraft:crafting_shaped",
+        "pattern": [
+          "sls",
+          "l l",
+          "lil"
+        ],
+        "key": {
+          "s": {
+            "item": "minecraft:string"
+          },
+          "l": {
+            "item": "minecraft:leather"
+          },
+          "i": {
+            "item": "minecraft:iron_ingot"
+          }
+        },
+        "result": {
+          "item": "toolbelt:belt"
+        }
+      }
+    }
+  ]
+}

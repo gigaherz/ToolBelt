@@ -1,0 +1,51 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "modid": "sewingkit",
+          "type": "forge:mod_loaded"
+        },
+        {
+          "type": "toolbelt:enable_sewing_crafting"
+        }
+      ],
+      "recipe": {
+        "type": "toolbelt:sewing_upgrade",
+        "materials": [
+          {
+            "ingredient": {
+              "type": "toolbelt:belt_upgrade_level",
+              "upgrade_level": 3
+            },
+            "count": 1
+          },
+          {
+            "ingredient": {
+              "item": "toolbelt:pouch"
+            },
+            "count": 1
+          },
+          {
+            "ingredient": {
+              "item": "minecraft:string"
+            },
+            "count": 1
+          }
+        ],
+        "tool": {
+          "type": "sewingkit:tool_ingredient",
+          "tool_type": "sewing_needle",
+          "tool_level": 3
+        },
+        "result": {
+          "item": "toolbelt:belt",
+          "nbt": {
+            "Size": 6
+          }
+        }
+      }
+    }
+  ]
+}

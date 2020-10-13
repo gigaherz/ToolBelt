@@ -30,7 +30,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.14.4"
+version = "1.15.0"
 group = "gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
@@ -39,6 +39,10 @@ project.afterEvaluate {
 }
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+
+sourceSets {
+    main.resources.srcDirs += 'src/main/generated_resources'
+}
 
 minecraft {
     mappings channel: 'snapshot', version: '20200916-1.16.2'
@@ -75,11 +79,26 @@ minecraft {
                 }
             }
         }
+
+        data {
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', ''
+            property 'forge.logging.console.level', 'debug'
+
+            args '--mod', 'toolbelt', '--all', '--output', file('src/main/generated_resources/'), '--existing', file('src/main/resources/')
+
+            mods {
+                thismod {
+                    source sourceSets.main
+                }
+            }
+        }
     }
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.3-34.1.0'
+    minecraft 'net.minecraftforge:forge:1.16.3-34.1.15'
 
     compileOnly fg.deobf("mezz.jei:jei-1.16.2:7.1.3.19:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.16.2:7.1.3.19")
@@ -87,7 +106,9 @@ dependencies {
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.2-4.0.0.1")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.2-4.0.0.1:api")
 
-    runtimeOnly fg.deobf("curse.maven:gravestone-mod:3040798")
+    runtimeOnly fg.deobf("curse.maven:gravestone-mod:3071555")
+
+    implementation fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.16.3:1.0.6.2")
 }
 
 jar {

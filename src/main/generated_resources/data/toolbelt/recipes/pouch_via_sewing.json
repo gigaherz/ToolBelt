@@ -1,0 +1,53 @@
+{
+  "type": "forge:conditional",
+  "recipes": [
+    {
+      "conditions": [
+        {
+          "modid": "sewingkit",
+          "type": "forge:mod_loaded"
+        },
+        {
+          "type": "toolbelt:enable_sewing_crafting"
+        }
+      ],
+      "recipe": {
+        "type": "sewingkit:sewing",
+        "materials": [
+          {
+            "ingredient": {
+              "item": "sewingkit:leather_strip"
+            },
+            "count": 2
+          },
+          {
+            "ingredient": {
+              "item": "sewingkit:leather_sheet"
+            },
+            "count": 3
+          },
+          {
+            "ingredient": {
+              "item": "minecraft:gold_ingot"
+            },
+            "count": 1
+          },
+          {
+            "ingredient": {
+              "item": "minecraft:string"
+            },
+            "count": 1
+          }
+        ],
+        "tool": {
+          "type": "sewingkit:tool_ingredient",
+          "tool_type": "sewing_needle",
+          "tool_level": 1
+        },
+        "result": {
+          "item": "toolbelt:pouch"
+        }
+      }
+    }
+  ]
+}

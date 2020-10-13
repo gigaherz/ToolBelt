@@ -1,0 +1,43 @@
+{
+  "advancements": [
+    {
+      "conditions": [
+        {
+          "type": "toolbelt:enable_normal_crafting"
+        }
+      ],
+      "advancement": {
+        "parent": "minecraft:recipes/root",
+        "rewards": {
+          "recipes": [
+            "toolbelt:pouch"
+          ]
+        },
+        "criteria": {
+          "has_leather": {
+            "trigger": "minecraft:inventory_changed",
+            "conditions": {
+              "items": [
+                {
+                  "tag": "forge:leather"
+                }
+              ]
+            }
+          },
+          "has_the_recipe": {
+            "trigger": "minecraft:recipe_unlocked",
+            "conditions": {
+              "recipe": "toolbelt:pouch"
+            }
+          }
+        },
+        "requirements": [
+          [
+            "has_leather",
+            "has_the_recipe"
+          ]
+        ]
+      }
+    }
+  ]
+}
