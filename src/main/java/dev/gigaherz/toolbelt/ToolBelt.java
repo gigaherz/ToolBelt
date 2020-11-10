@@ -2,7 +2,6 @@ package dev.gigaherz.toolbelt;
 
 import com.mojang.datafixers.util.Pair;
 import dev.gigaherz.sewingkit.SewingKitMod;
-import dev.gigaherz.sewingkit.api.SewingRecipe;
 import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
 import dev.gigaherz.sewingkit.api.ToolIngredient;
 import dev.gigaherz.sewingkit.needle.NeedleItem;
@@ -13,7 +12,7 @@ import dev.gigaherz.toolbelt.common.BeltScreen;
 import dev.gigaherz.toolbelt.common.BeltSlotContainer;
 import dev.gigaherz.toolbelt.common.BeltSlotScreen;
 import dev.gigaherz.toolbelt.customslots.ExtensionSlotItemCapability;
-import dev.gigaherz.toolbelt.integration.SewingUpgradeRecipe;
+import dev.gigaherz.toolbelt.integration.SewingKitIntegration;
 import dev.gigaherz.toolbelt.integration.SewingUpgradeRecipeBuilder;
 import dev.gigaherz.toolbelt.network.*;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
@@ -41,16 +40,12 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
 import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.NBTIngredient;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.DeferredWorkQueue;
-import net.minecraftforge.fml.DistExecutor;
-import net.minecraftforge.fml.InterModComms;
-import net.minecraftforge.fml.ModLoadingContext;
+import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.*;
@@ -75,6 +70,9 @@ public class ToolBelt
 
     @ObjectHolder("toolbelt:pouch")
     public static Item POUCH;
+
+    @ObjectHolder("toolbelt:sewing_upgrade")
+    public static IRecipeSerializer<?> SEWING_UGRADE_SERIALIZER = null;
 
     public static ToolBelt instance;
 
@@ -109,6 +107,12 @@ public class ToolBelt
 
         modLoadingContext.registerConfig(ModConfig.Type.SERVER, ConfigData.SERVER_SPEC);
         modLoadingContext.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
+        modLoadingContext.registerConfig(ModConfig.Type.COMMON, ConfigData.COMMON_SPEC);
+
+        if (ModList.get().isLoaded("sewingkit"))
+        {
+            SewingKitIntegration.init();
+        }
     }
 
     public void gatherData(GatherDataEvent event)
@@ -136,12 +140,7 @@ public class ToolBelt
     private void registerRecipes(RegistryEvent.Register<IRecipeSerializer<?>> event)
     {
         CraftingHelper.register(BeltIngredient.NAME, BeltIngredient.Serializer.INSTANCE);
-
-        event.getRegistry().registerAll(
-                new SewingUpgradeRecipe.Serializer().setRegistryName("sewing_upgrade")
-        );
     }
-
 
     public void registerContainers(RegistryEvent.Register<ContainerType<?>> event)
     {

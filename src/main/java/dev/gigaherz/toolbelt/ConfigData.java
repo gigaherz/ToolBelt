@@ -5,6 +5,7 @@ import com.google.common.collect.Sets;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
+import net.minecraft.item.Items;
 import net.minecraft.util.IStringSerializable;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
@@ -201,26 +202,16 @@ public class ConfigData
         whiteList = SERVER.whitelist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
     }
 
-    private static final Pattern itemRegex = Pattern.compile("^(?<item>([a-zA-Z-0-9_]+:)?[a-zA-Z-0-9_]+)(?:@((?<meta>[0-9]+)|(?<any>any)))?$");
-
     private static ItemStack parseItemStack(String itemString)
     {
-        Matcher matcher = itemRegex.matcher(itemString);
-
-        if (!matcher.matches())
+        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemString));
+        if (item == null || item == Items.AIR)
         {
-            ToolBelt.logger.warn("Could not parse item " + itemString);
+            ToolBelt.logger.warn("Could not find item " + itemString);
             return ItemStack.EMPTY;
         }
 
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(matcher.group("item")));
-        if (item == null)
-        {
-            ToolBelt.logger.warn("Could not parse item " + itemString);
-            return ItemStack.EMPTY;
-        }
-
-        return new ItemStack(item, 1);
+        return new ItemStack(item);
     }
 
     public static boolean isItemStackAllowed(final ItemStack stack)

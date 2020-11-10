@@ -2,6 +2,7 @@ package dev.gigaherz.toolbelt.integration;
 
 import dev.gigaherz.sewingkit.api.SewingRecipe;
 import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
+import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.data.IFinishedRecipe;
 import net.minecraft.item.Item;
@@ -9,16 +10,12 @@ import net.minecraft.item.crafting.IRecipeSerializer;
 import net.minecraft.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.registries.ObjectHolder;
 
 import javax.annotation.Nullable;
 import java.util.List;
 
 public class SewingUpgradeRecipeBuilder extends SewingRecipeBuilder
 {
-    @ObjectHolder("toolbelt:sewing_upgrade")
-    public static IRecipeSerializer<?> SERIALIZER = null;
-
     public static SewingRecipeBuilder begin(Item result, CompoundNBT tag) {
         return begin(result, 1, tag);
     }
@@ -48,7 +45,7 @@ public class SewingUpgradeRecipeBuilder extends SewingRecipeBuilder
         @Override
         public IRecipeSerializer<?> getSerializer()
         {
-            return SERIALIZER;
+            return ToolBelt.SEWING_UGRADE_SERIALIZER;
         }
     }
 }
