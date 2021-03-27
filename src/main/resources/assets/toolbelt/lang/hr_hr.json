@@ -1,0 +1,15 @@
+{
+  "item.toolbelt.belt": "Alatni pojas",
+  "item.toolbelt.pouch": "Džep za pojas",
+  "key.toolbelt.open": "Zamjeni alat",
+  "key.toolbelt.category": "Alatni pojas",
+  "key.toolbelt.slot": "Otvori inventar džepova za pojas",
+  "key.toolbelt.cycle.left": "Mjenja alat lijevo",
+  "key.toolbelt.cycle.right": "Mjenja alat desno",
+  "text.toolbelt.empty": "PRAZNO",
+  "text.toolbelt.swap": "ZAMJENI",
+  "text.toolbelt.insert": "UNESI",
+  "text.toolbelt.extract": "IZVUCI",
+  "text.toolbelt.tooltip": "Poboljšanja: %s (%s utora)",
+  "text.toolbelt": "Alatni pojas"
+}
