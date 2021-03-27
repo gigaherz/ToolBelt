@@ -1,0 +1,15 @@
+{
+  "item.toolbelt.belt": "Gereedschapsgordel",
+  "item.toolbelt.pouch": "Heuptasje",
+  "key.toolbelt.open": "Wissel tool",
+  "key.toolbelt.category": "Gereedschapsgordel",
+  "key.toolbelt.slot": "Open inventaris van riem",
+  "key.toolbelt.cycle.left": "Cyclustool naar links",
+  "key.toolbelt.cycle.right": "Cyclustool naar rechts",
+  "text.toolbelt.empty": "LEEG",
+  "text.toolbelt.swap": "RUIL",
+  "text.toolbelt.insert": "INVOEGEN",
+  "text.toolbelt.extract": "EXTRACT",
+  "text.toolbelt.tooltip": "Upgrades: %s (%s slots)",
+  "text.toolbelt": "Gereedschapsgordel"
+}
