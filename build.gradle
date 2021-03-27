@@ -106,8 +106,6 @@ dependencies {
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.2-4.0.0.1")
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.2-4.0.0.1:api")
 
-    runtimeOnly fg.deobf("curse.maven:gravestone-mod:3071555")
-
     compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.16.3:1.1.0")
 }
 

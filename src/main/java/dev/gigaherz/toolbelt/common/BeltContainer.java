@@ -91,36 +91,43 @@ public class BeltContainer extends Container
     @Override
     public ItemStack transferStackInSlot(PlayerEntity playerIn, int index)
     {
-        ItemStack itemstack = ItemStack.EMPTY;
         Slot slot = this.inventorySlots.get(index);
 
-        if (slot != null && slot.getHasStack())
+        if (slot == null || !slot.getHasStack())
+            return ItemStack.EMPTY;
+
+        ItemStack containedStack = slot.getStack();
+        ItemStack originalStack = containedStack.copy();
+
+        int start;
+        int end;
+        boolean reverse = false;
+        if (index < beltSlots)
         {
-            ItemStack itemstack1 = slot.getStack();
-            itemstack = itemstack1.copy();
-
-            if (index < beltSlots)
-            {
-                if (!this.mergeItemStack(itemstack1, beltSlots, this.inventorySlots.size(), true))
-                {
-                    return ItemStack.EMPTY;
-                }
-            }
-            else if (!this.mergeItemStack(itemstack1, 0, beltSlots, false))
-            {
-                return ItemStack.EMPTY;
-            }
-
-            if (itemstack1.getCount() == 0)
-            {
-                slot.putStack(ItemStack.EMPTY);
-            }
-            else
-            {
-                slot.onSlotChanged();
-            }
+            start = beltSlots;
+            end = this.inventorySlots.size();
+            reverse = true;
+        }
+        else
+        {
+            start = 0;
+            end = beltSlots;
         }
 
-        return itemstack;
+        if (!this.mergeItemStack(containedStack, start, end, reverse))
+        {
+            return ItemStack.EMPTY;
+        }
+
+        if (containedStack.getCount() == 0)
+        {
+            slot.putStack(ItemStack.EMPTY);
+        }
+        else
+        {
+            slot.onSlotChanged();
+        }
+
+        return originalStack;
     }
 }

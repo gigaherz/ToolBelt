@@ -67,6 +67,9 @@ public class ClientEvents
     @SubscribeEvent
     public static void handleKeys(TickEvent.ClientTickEvent ev)
     {
+        if (ev.phase != TickEvent.Phase.START)
+            return;
+
         Minecraft mc = Minecraft.getInstance();
 
         if (mc.currentScreen == null)

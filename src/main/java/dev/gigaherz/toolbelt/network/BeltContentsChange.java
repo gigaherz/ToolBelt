@@ -20,7 +20,7 @@ public class BeltContentsChange
         this.player = player.getEntityId();
         this.where = where;
         this.slot = slot;
-        this.stack = stack;
+        this.stack = stack.copy();
     }
 
     public BeltContentsChange(PacketBuffer buf)
