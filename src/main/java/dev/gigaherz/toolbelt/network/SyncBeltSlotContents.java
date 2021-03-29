@@ -18,7 +18,7 @@ public class SyncBeltSlotContents
 
     public SyncBeltSlotContents(PlayerEntity player, BeltExtensionSlot extension)
     {
-        this.entityId = player.getEntityId();
+        this.entityId = player.getId();
         extension.getSlots().stream().map(IExtensionSlot::getContents).forEach(stacks::add);
     }
 
@@ -28,7 +28,7 @@ public class SyncBeltSlotContents
         int numStacks = buf.readVarInt();
         for (int i = 0; i < numStacks; i++)
         {
-            stacks.add(buf.readItemStack());
+            stacks.add(buf.readItem());
         }
     }
 
@@ -38,7 +38,7 @@ public class SyncBeltSlotContents
         buf.writeVarInt(stacks.size());
         for (ItemStack stack : stacks)
         {
-            buf.writeItemStack(stack);
+            buf.writeItem(stack);
         }
     }
 

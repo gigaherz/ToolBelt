@@ -15,7 +15,7 @@ public class ClientPacketHandlers
     {
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
-            Entity entity = minecraft.world.getEntityByID(message.player);
+            Entity entity = minecraft.level.getEntity(message.player);
             if (!(entity instanceof PlayerEntity))
                 return;
             PlayerEntity player = (PlayerEntity) entity;
@@ -27,7 +27,7 @@ public class ClientPacketHandlers
     {
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
-            Entity entity = minecraft.world.getEntityByID(message.entityId);
+            Entity entity = minecraft.level.getEntity(message.entityId);
             if (entity instanceof PlayerEntity)
             {
                 BeltExtensionSlot.get((LivingEntity) entity).ifPresent((slot) -> slot.setAll(message.stacks));

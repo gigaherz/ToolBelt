@@ -11,29 +11,29 @@ public class Screens
 {
     public static void openBeltScreen(ServerPlayerEntity player, int slot)
     {
-        final ItemStack heldItem = player.inventory.getStackInSlot(slot);
+        final ItemStack heldItem = player.inventory.getItem(slot);
         if (heldItem.getCount() > 0 && heldItem.getItem() instanceof ToolBeltItem)
         {
             NetworkHooks.openGui(player, new SimpleNamedContainerProvider(
                     (i, playerInventory, playerEntity) -> {
                         int blockedSlot = -1;
-                        if (player.getHeldItemMainhand() == heldItem)
-                            blockedSlot = playerInventory.currentItem;
+                        if (player.getMainHandItem() == heldItem)
+                            blockedSlot = playerInventory.selected;
 
                         return new BeltContainer(i, playerInventory, blockedSlot, heldItem);
                     },
-                    heldItem.getDisplayName()
+                    heldItem.getHoverName()
             ), (data) -> {
                 data.writeVarInt(slot);
-                data.writeItemStack(heldItem);
+                data.writeItem(heldItem);
             });
         }
     }
 
     public static void openSlotScreen(ServerPlayerEntity player)
     {
-        player.openContainer(new SimpleNamedContainerProvider(
-                (i, playerInventory, playerEntity) -> new BeltSlotContainer(i, playerInventory, !playerEntity.world.isRemote),
+        player.openMenu(new SimpleNamedContainerProvider(
+                (i, playerInventory, playerEntity) -> new BeltSlotContainer(i, playerInventory, !playerEntity.level.isClientSide),
                 new TranslationTextComponent("container.crafting")
         ));
     }

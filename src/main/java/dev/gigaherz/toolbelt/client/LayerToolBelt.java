@@ -40,7 +40,7 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
     @Override
     public void render(MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch)
     {
-        boolean flag = player.getPrimaryHand() == HandSide.RIGHT;
+        boolean flag = player.getMainArm() == HandSide.RIGHT;
 
         if (!ConfigData.showBeltOnPlayers)
             return;
@@ -54,15 +54,15 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
                 ItemStack leftItem = flag ? firstItem : secondItem;
                 ItemStack rightItem = flag ? secondItem : firstItem;
 
-                matrixStack.push();
+                matrixStack.pushPose();
 
                 this.translateToBody(matrixStack);
 
                 if (!leftItem.isEmpty() || !rightItem.isEmpty())
                 {
-                    matrixStack.push();
+                    matrixStack.pushPose();
 
-                    if (this.getEntityModel().isChild)
+                    if (this.getParentModel().young)
                     {
                         matrixStack.translate(0.0F, 0.75F, 0.0F);
                         matrixStack.scale(0.5F, 0.5F, 0.5F);
@@ -71,39 +71,39 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
                     renderHeldItem(player, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HandSide.RIGHT, matrixStack, buffer, lightness);
                     renderHeldItem(player, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HandSide.LEFT, matrixStack, buffer, lightness);
 
-                    matrixStack.pop();
+                    matrixStack.popPose();
                 }
 
                 matrixStack.translate(0.0F, 0.19F, 0.0F);
                 matrixStack.scale(0.85f, 0.6f, 0.78f);
 
-                renderCutoutModel(this.beltModel, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
+                renderColoredCutoutModel(this.beltModel, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
 
-                matrixStack.pop();
+                matrixStack.popPose();
             });
         });
     }
 
     private void translateToBody(MatrixStack matrixStack)
     {
-        this.getEntityModel().bipedBody.translateRotate(matrixStack);
+        this.getParentModel().body.translateAndRotate(matrixStack);
     }
 
     private void renderHeldItem(LivingEntity player, ItemStack stack, TransformType transformType, HandSide handSide, MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness)
     {
         if (stack.isEmpty())
             return;
-        matrixStack.push();
+        matrixStack.pushPose();
         if (handSide == HandSide.LEFT)
             matrixStack.translate(-4.35f / 16.0F, 0.7f, -0.1f);
         else
             matrixStack.translate(4.35f / 16.0F, 0.7f, -0.1f);
         //((IHasArm)this.getEntityModel()).translateHand(handSide, matrixStack);
-        matrixStack.rotate(Vector3f.XP.rotationDegrees(40));
+        matrixStack.mulPose(Vector3f.XP.rotationDegrees(40));
         float scale = ConfigData.beltItemScale;
         matrixStack.scale(scale, scale, scale);
-        Minecraft.getInstance().getFirstPersonRenderer().renderItemSide(player, stack, transformType, handSide == HandSide.LEFT, matrixStack, buffer, lightness);
-        matrixStack.pop();
+        Minecraft.getInstance().getItemInHandRenderer().renderItem(player, stack, transformType, handSide == HandSide.LEFT, matrixStack, buffer, lightness);
+        matrixStack.popPose();
     }
 
     private static class ModelBelt extends EntityModel<PlayerEntity>
@@ -119,18 +119,18 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
             buckle.addBox(-2.5f, 9.5f, -3.5f, 5, 5, 1);
 
             pocketL.addBox(-2, 12, 5, 4, 4, 1);
-            pocketL.rotateAngleY = (float) Math.toRadians(-90);
+            pocketL.yRot = (float) Math.toRadians(-90);
             pocketR.addBox(-2, 12, 5, 4, 4, 1);
-            pocketR.rotateAngleY = (float) Math.toRadians(90);
+            pocketR.yRot = (float) Math.toRadians(90);
         }
 
         @Override
-        public void setRotationAngles(PlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+        public void setupAnim(PlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
         {
         }
 
         @Override
-        public void render(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
+        public void renderToBuffer(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
         {
             RenderSystem.disableRescaleNormal();
             RenderSystem.disableCull();
@@ -139,10 +139,10 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
             pocketL.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             pocketR.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 
-            matrixStack.push();
+            matrixStack.pushPose();
             matrixStack.scale(0.8f, 1, 1);
             buckle.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-            matrixStack.pop();
+            matrixStack.popPose();
 
             RenderSystem.enableCull();
             RenderSystem.enableRescaleNormal();

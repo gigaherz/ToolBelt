@@ -12,6 +12,8 @@ import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 import java.util.Optional;
 
+import dev.gigaherz.toolbelt.BeltFinder.BeltGetter;
+
 public class BeltFinderCurios extends BeltFinder
 {
     @CapabilityInject(ICuriosItemHandler.class)

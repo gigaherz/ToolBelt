@@ -219,10 +219,10 @@ public class ConfigData
         if (stack.getCount() <= 0)
             return true;
 
-        if (whiteList.stream().anyMatch((s) -> ItemStack.areItemsEqual(s, stack)))
+        if (whiteList.stream().anyMatch((s) -> ItemStack.isSame(s, stack)))
             return true;
 
-        if (blackList.stream().anyMatch((s) -> ItemStack.areItemsEqual(s, stack)))
+        if (blackList.stream().anyMatch((s) -> ItemStack.isSame(s, stack)))
             return false;
 
         if (stack.getItem() instanceof ToolBeltItem)
@@ -248,7 +248,7 @@ public class ConfigData
         }
 
         @Override
-        public String getString()
+        public String getSerializedName()
         {
             return name;
         }
@@ -265,7 +265,7 @@ public class ConfigData
 
         public static String[] names()
         {
-            return Arrays.stream(values()).map(ThreeWayChoice::getString).toArray(String[]::new);
+            return Arrays.stream(values()).map(ThreeWayChoice::getSerializedName).toArray(String[]::new);
         }
     }
 }
