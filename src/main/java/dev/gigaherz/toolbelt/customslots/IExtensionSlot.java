@@ -46,7 +46,7 @@ public interface IExtensionSlot
     default boolean canUnequip(@Nonnull ItemStack stack)
     {
         return stack.getCapability(ExtensionSlotItemCapability.INSTANCE, null)
-                .map((extItem) -> extItem.canUnequip(stack, this) && EnchantmentHelper.getEnchantmentLevel(Enchantments.BINDING_CURSE, stack) <= 0).orElse(true);
+                .map((extItem) -> extItem.canUnequip(stack, this) && EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BINDING_CURSE, stack) <= 0).orElse(true);
     }
 
     static boolean isAcceptableSlot(@Nonnull IExtensionSlot slot, @Nonnull ItemStack stack, @Nonnull IExtensionSlotItem extItem)

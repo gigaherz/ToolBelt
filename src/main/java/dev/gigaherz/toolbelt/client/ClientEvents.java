@@ -33,8 +33,8 @@ public class ClientEvents
 
     public static void wipeOpen()
     {
-        Minecraft.getInstance().keyboardListener.enableRepeatEvents(false);
-        while (OPEN_TOOL_MENU_KEYBIND.isPressed())
+        Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(false);
+        while (OPEN_TOOL_MENU_KEYBIND.consumeClick())
         {
         }
     }
@@ -45,15 +45,15 @@ public class ClientEvents
                 new KeyBinding("key.toolbelt.open", GLFW.GLFW_KEY_R, "key.toolbelt.category"));
 
         ClientRegistry.registerKeyBinding(CYCLE_TOOL_MENU_LEFT_KEYBIND =
-                new KeyBinding("key.toolbelt.cycle.left", InputMappings.INPUT_INVALID.getKeyCode(), "key.toolbelt.category"));
+                new KeyBinding("key.toolbelt.cycle.left", InputMappings.UNKNOWN.getValue(), "key.toolbelt.category"));
 
         ClientRegistry.registerKeyBinding(CYCLE_TOOL_MENU_RIGHT_KEYBIND =
-                new KeyBinding("key.toolbelt.cycle.right", InputMappings.INPUT_INVALID.getKeyCode(), "key.toolbelt.category"));
+                new KeyBinding("key.toolbelt.cycle.right", InputMappings.UNKNOWN.getValue(), "key.toolbelt.category"));
 
         ClientRegistry.registerKeyBinding(OPEN_BELT_SLOT_KEYBIND =
                 new KeyBinding("key.toolbelt.slot", GLFW.GLFW_KEY_V, "key.toolbelt.category"));
 
-        Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
+        Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getEntityRenderDispatcher().getSkinMap();
 
         PlayerRenderer render = skinMap.get("default");
         render.addLayer(new LayerToolBelt(render));
@@ -72,19 +72,19 @@ public class ClientEvents
 
         Minecraft mc = Minecraft.getInstance();
 
-        if (mc.currentScreen == null)
+        if (mc.screen == null)
         {
-            boolean toolMenuKeyIsDown = OPEN_TOOL_MENU_KEYBIND.isKeyDown();
+            boolean toolMenuKeyIsDown = OPEN_TOOL_MENU_KEYBIND.isDown();
             if (toolMenuKeyIsDown && !toolMenuKeyWasDown)
             {
-                while (OPEN_TOOL_MENU_KEYBIND.isPressed())
+                while (OPEN_TOOL_MENU_KEYBIND.consumeClick())
                 {
-                    if (mc.currentScreen == null)
+                    if (mc.screen == null)
                     {
-                        ItemStack inHand = mc.player.getHeldItemMainhand();
+                        ItemStack inHand = mc.player.getMainHandItem();
                         if (ConfigData.isItemStackAllowed(inHand))
                         {
-                            BeltFinder.findBelt(mc.player).ifPresent((getter) -> mc.displayGuiScreen(new RadialMenuScreen(getter)));
+                            BeltFinder.findBelt(mc.player).ifPresent((getter) -> mc.setScreen(new RadialMenuScreen(getter)));
                         }
                     }
                 }
@@ -98,9 +98,9 @@ public class ClientEvents
 
         if (ConfigData.customBeltSlotEnabled)
         {
-            while (OPEN_BELT_SLOT_KEYBIND.isPressed())
+            while (OPEN_BELT_SLOT_KEYBIND.consumeClick())
             {
-                if (mc.currentScreen == null)
+                if (mc.screen == null)
                 {
                     ToolBelt.channel.sendToServer(new OpenBeltSlotInventory());
                 }
@@ -110,17 +110,17 @@ public class ClientEvents
 
     public static boolean isKeyDown(KeyBinding keybind)
     {
-        if (keybind.isInvalid())
+        if (keybind.isUnbound())
             return false;
 
         boolean isDown = false;
         switch (keybind.getKey().getType())
         {
             case KEYSYM:
-                isDown = InputMappings.isKeyDown(Minecraft.getInstance().getMainWindow().getHandle(), keybind.getKey().getKeyCode());
+                isDown = InputMappings.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue());
                 break;
             case MOUSE:
-                isDown = GLFW.glfwGetMouseButton(Minecraft.getInstance().getMainWindow().getHandle(), keybind.getKey().getKeyCode()) == GLFW.GLFW_PRESS;
+                isDown = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue()) == GLFW.GLFW_PRESS;
                 break;
         }
         return isDown && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
@@ -132,7 +132,7 @@ public class ClientEvents
         @SubscribeEvent
         public static void textureStitch(TextureStitchEvent.Pre event)
         {
-            if (event.getMap().getTextureLocation() == AtlasTexture.LOCATION_BLOCKS_TEXTURE)
+            if (event.getMap().location() == AtlasTexture.LOCATION_BLOCKS)
             {
                 event.addSprite(BeltSlotContainer.SLOT_BACKGROUND);
             }

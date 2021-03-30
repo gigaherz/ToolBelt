@@ -13,6 +13,8 @@ import net.minecraftforge.fml.network.PacketDistributor;
 
 import java.util.Optional;
 
+import dev.gigaherz.toolbelt.BeltFinder.BeltGetter;
+
 public class BeltFinderBeltSlot extends BeltFinder
 {
     public static final String FINDER_ID = "belt_slot";
@@ -65,7 +67,7 @@ public class BeltFinderBeltSlot extends BeltFinder
         public void syncToClients()
         {
             LivingEntity thePlayer = slot.getContainer().getOwner();
-            if (thePlayer.world.isRemote)
+            if (thePlayer.level.isClientSide)
                 return;
             BeltContentsChange message = new BeltContentsChange(thePlayer, FINDER_ID, 0, slot.getContents());
             ToolBelt.channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> thePlayer), message);

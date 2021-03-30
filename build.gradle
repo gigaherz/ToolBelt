@@ -9,9 +9,11 @@ buildscript {
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
 apply plugin: 'maven-publish'
 
-repositories {
+repositories  {
+
     maven {
         url "http://dvs1.progwml6.com/files/maven/"
     }
@@ -24,8 +26,9 @@ repositories {
     maven {
         url 'https://www.dogforce-games.com/maven/'
     }
-    maven {
-        url = "https://www.cursemaven.com"
+   maven {
+        name = "CurseForge"
+        url = "https://minecraft.curseforge.com/api/maven"
     }
     mavenLocal()
 }
@@ -45,7 +48,7 @@ sourceSets {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20200916-1.16.2'
+    mappings channel: 'official', version: '1.16.5'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -98,7 +101,7 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.3-34.1.15'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.1.2'
 
     compileOnly fg.deobf("mezz.jei:jei-1.16.2:7.1.3.19:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.16.2:7.1.3.19")

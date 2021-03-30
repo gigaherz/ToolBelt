@@ -34,6 +34,8 @@ import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
 
+import net.minecraft.item.Item.Properties;
+
 public class ToolBeltItem extends Item implements IExtensionSlotItem
 {
     @CapabilityInject(IItemHandler.class)
@@ -51,12 +53,12 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
 
     private static int getSlotFor(PlayerInventory inv, ItemStack stack)
     {
-        if (inv.getCurrentItem() == stack)
-            return inv.currentItem;
+        if (inv.getSelected() == stack)
+            return inv.selected;
 
-        for (int i = 0; i < inv.mainInventory.size(); ++i)
+        for (int i = 0; i < inv.items.size(); ++i)
         {
-            ItemStack invStack = inv.mainInventory.get(i);
+            ItemStack invStack = inv.items.get(i);
             if (invStack == stack)
             {
                 return i;
@@ -73,7 +75,7 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
         if (slot == -1)
             return ActionResultType.FAIL;
 
-        if (!world.isRemote && player instanceof ServerPlayerEntity)
+        if (!world.isClientSide && player instanceof ServerPlayerEntity)
         {
             Screens.openBeltScreen((ServerPlayerEntity) player, slot);
         }
@@ -82,18 +84,18 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context)
+    public ActionResultType useOn(ItemUseContext context)
     {
         if (context.getHand() != Hand.MAIN_HAND)
             return ActionResultType.PASS;
 
-        return openBeltScreen(context.getPlayer(), context.getItem(), context.getWorld());
+        return openBeltScreen(context.getPlayer(), context.getItemInHand(), context.getLevel());
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
+    public ActionResult<ItemStack> use(World world, PlayerEntity player, Hand hand)
     {
-        ItemStack stack = player.getHeldItem(hand);
+        ItemStack stack = player.getItemInHand(hand);
         if (hand != Hand.MAIN_HAND)
             return new ActionResult<>(ActionResultType.PASS, stack);
         ActionResultType result = openBeltScreen(player, stack, world);
@@ -101,9 +103,9 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+    public void appendHoverText(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
     {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
 
         int size = getSlotsCount(stack);
 
@@ -158,7 +160,7 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
     {
-        return !ItemStack.areItemsEqual(oldStack, newStack); // super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
+        return !ItemStack.isSame(oldStack, newStack); // super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
     }
 
     public static int getSlotsCount(ItemStack stack)

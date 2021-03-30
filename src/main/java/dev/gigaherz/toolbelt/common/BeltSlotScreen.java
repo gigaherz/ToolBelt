@@ -13,7 +13,7 @@ import net.minecraft.inventory.container.Slot;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.text.ITextComponent;
 
-import static net.minecraft.client.gui.screen.inventory.InventoryScreen.drawEntityOnScreen;
+import static net.minecraft.client.gui.screen.inventory.InventoryScreen.renderEntityInInventory;
 
 public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> implements IRecipeShownListener
 {
@@ -30,7 +30,7 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     {
         super(container, playerInventory, title);
         this.passEvents = true;
-        this.titleX = 97;
+        this.titleLabelX = 97;
     }
 
     @Override
@@ -44,66 +44,66 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     {
         super.init();
         this.widthTooNarrow = this.width < 379;
-        this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.container);
+        this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
         this.removeRecipeBookGui = true;
-        this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
+        this.leftPos = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.imageWidth);
         this.children.add(this.recipeBookGui);
-        this.setFocusedDefault(this.recipeBookGui);
-        this.addButton(new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (button) -> {
-            this.recipeBookGui.initSearchBar(this.widthTooNarrow);
+        this.setInitialFocus(this.recipeBookGui);
+        this.addButton(new ImageButton(this.leftPos + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (button) -> {
+            this.recipeBookGui.initVisuals(this.widthTooNarrow);
             this.recipeBookGui.toggleVisibility();
-            this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
-            ((ImageButton) button).setPosition(this.guiLeft + 104, this.height / 2 - 22);
+            this.leftPos = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.imageWidth);
+            ((ImageButton) button).setPosition(this.leftPos + 104, this.height / 2 - 22);
             this.buttonClicked = true;
         }));
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY)
+    protected void renderLabels(MatrixStack matrixStack, int mouseX, int mouseY)
     {
-        this.font.func_243248_b(matrixStack, this.title, (float) this.titleX, (float) this.titleY, 4210752);
+        this.font.draw(matrixStack, this.title, (float) this.titleLabelX, (float) this.titleLabelY, 4210752);
     }
 
     @Override
     public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
-        this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
+        this.doRenderEffects = !this.recipeBookGui.isVisible();
         if (this.recipeBookGui.isVisible() && this.widthTooNarrow)
         {
-            this.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
+            this.renderBg(matrixStack, partialTicks, mouseX, mouseY);
             this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
         }
         else
         {
             this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
             super.render(matrixStack, mouseX, mouseY, partialTicks);
-            this.recipeBookGui.func_230477_a_(matrixStack, this.guiLeft, this.guiTop, false, partialTicks);
+            this.recipeBookGui.renderGhostRecipe(matrixStack, this.leftPos, this.topPos, false, partialTicks);
         }
 
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
-        this.recipeBookGui.func_238924_c_(matrixStack, this.guiLeft, this.guiTop, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
+        this.recipeBookGui.renderTooltip(matrixStack, this.leftPos, this.topPos, mouseX, mouseY);
         this.oldMouseX = (float) mouseX;
         this.oldMouseY = (float) mouseY;
-        this.setListenerDefault(this.recipeBookGui);
+        this.magicalSpecialHackyFocus(this.recipeBookGui);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
+    protected void renderBg(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
         RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(SCREEN_BACKGROUND);
-        int i = this.guiLeft;
-        int j = this.guiTop;
-        this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
-        drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - this.oldMouseX, (float) (j + 75 - 50) - this.oldMouseY, this.minecraft.player);
+        this.minecraft.getTextureManager().bind(SCREEN_BACKGROUND);
+        int i = this.leftPos;
+        int j = this.topPos;
+        this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        renderEntityInInventory(i + 51, j + 75, 30, (float) (i + 51) - this.oldMouseX, (float) (j + 75 - 50) - this.oldMouseY, this.minecraft.player);
     }
 
 
     @Override
-    protected boolean isPointInRegion(int x, int y, int width, int height, double mouseX, double mouseY)
+    protected boolean isHovering(int x, int y, int width, int height, double mouseX, double mouseY)
     {
-        return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super.isPointInRegion(x, y, width, height, mouseX, mouseY);
+        return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super.isHovering(x, y, width, height, mouseX, mouseY);
     }
 
     @Override
@@ -111,7 +111,7 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     {
         if (this.recipeBookGui.mouseClicked(mouseX, mouseY, button))
         {
-            this.setListener(this.recipeBookGui);
+            this.setFocused(this.recipeBookGui);
             return true;
         }
         else
@@ -137,14 +137,14 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     @Override
     protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn, int mouseButton)
     {
-        boolean flag = mouseX < (double) guiLeftIn || mouseY < (double) guiTopIn || mouseX >= (double) (guiLeftIn + this.xSize) || mouseY >= (double) (guiTopIn + this.ySize);
-        return this.recipeBookGui.func_195604_a(mouseX, mouseY, this.guiLeft, this.guiTop, this.xSize, this.ySize, mouseButton) && flag;
+        boolean flag = mouseX < (double) guiLeftIn || mouseY < (double) guiTopIn || mouseX >= (double) (guiLeftIn + this.imageWidth) || mouseY >= (double) (guiTopIn + this.imageHeight);
+        return this.recipeBookGui.hasClickedOutside(mouseX, mouseY, this.leftPos, this.topPos, this.imageWidth, this.imageHeight, mouseButton) && flag;
     }
 
     @Override
-    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type)
+    protected void slotClicked(Slot slotIn, int slotId, int mouseButton, ClickType type)
     {
-        super.handleMouseClick(slotIn, slotId, mouseButton, type);
+        super.slotClicked(slotIn, slotId, mouseButton, type);
         this.recipeBookGui.slotClicked(slotIn);
     }
 
@@ -155,18 +155,18 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     }
 
     @Override
-    public void onClose()
+    public void removed()
     {
         if (this.removeRecipeBookGui)
         {
             this.recipeBookGui.removed();
         }
 
-        super.onClose();
+        super.removed();
     }
 
     @Override
-    public RecipeBookGui getRecipeGui()
+    public RecipeBookGui getRecipeBookComponent()
     {
         return this.recipeBookGui;
     }

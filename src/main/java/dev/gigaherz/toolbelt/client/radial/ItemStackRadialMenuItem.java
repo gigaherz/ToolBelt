@@ -32,13 +32,13 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
     {
         if (stack.getCount() > 0)
         {
-            RenderHelper.enableStandardItemLighting();
+            RenderHelper.turnBackOn();
             RenderSystem.pushMatrix();
             RenderSystem.translatef(-8, -8, context.z);
-            context.itemRenderer.renderItemAndEffectIntoGUI(stack, (int) context.x, (int) context.y);
-            context.itemRenderer.renderItemOverlayIntoGUI(context.fontRenderer, stack, (int) context.x, (int) context.y, "");
+            context.itemRenderer.renderAndDecorateItem(stack, (int) context.x, (int) context.y);
+            context.itemRenderer.renderGuiItemDecorations(context.fontRenderer, stack, (int) context.x, (int) context.y, "");
             RenderSystem.popMatrix();
-            RenderHelper.disableStandardItemLighting();
+            RenderHelper.turnOff();
         }
         else
         {

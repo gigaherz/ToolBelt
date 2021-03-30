@@ -17,7 +17,7 @@ public class BeltContentsChange
 
     public BeltContentsChange(LivingEntity player, String where, int slot, ItemStack stack)
     {
-        this.player = player.getEntityId();
+        this.player = player.getId();
         this.where = where;
         this.slot = slot;
         this.stack = stack.copy();
@@ -26,17 +26,17 @@ public class BeltContentsChange
     public BeltContentsChange(PacketBuffer buf)
     {
         player = buf.readVarInt();
-        where = buf.readString();
+        where = buf.readUtf();
         slot = buf.readVarInt();
-        stack = buf.readItemStack();
+        stack = buf.readItem();
     }
 
     public void encode(PacketBuffer buf)
     {
         buf.writeVarInt(player);
-        buf.writeString(where);
+        buf.writeUtf(where);
         buf.writeVarInt(slot);
-        buf.writeItemStack(stack);
+        buf.writeItem(stack);
     }
 
     public boolean handle(Supplier<NetworkEvent.Context> context)
