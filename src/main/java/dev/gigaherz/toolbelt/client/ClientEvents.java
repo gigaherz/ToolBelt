@@ -56,10 +56,10 @@ public class ClientEvents
         Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
 
         PlayerRenderer render = skinMap.get("default");
-        render.addLayer(new LayerToolBelt(render));
+        render.addLayer(new ToolBeltLayer(render));
 
         render = skinMap.get("slim");
-        render.addLayer(new LayerToolBelt(render));
+        render.addLayer(new ToolBeltLayer(render));
     }
 
     private static boolean toolMenuKeyWasDown = false;
