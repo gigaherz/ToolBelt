@@ -22,47 +22,52 @@ import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.items.IItemHandler;
 
 public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>
 {
     private static final ResourceLocation TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
 
-    private final LivingRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> owner;
-
-    private final ModelBelt beltModel = new ModelBelt();
+    private static final BeltModel BELT_MODEL = new BeltModel();
 
     public LayerToolBelt(LivingRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> owner)
     {
         super(owner);
-        this.owner = owner;
+    }
+
+    private void translateToBody(MatrixStack matrixStack)
+    {
+        this.getEntityModel().bipedBody.translateRotate(matrixStack);
     }
 
     @Override
     public void render(MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch)
     {
-        boolean flag = player.getPrimaryHand() == HandSide.RIGHT;
-
         if (!ConfigData.showBeltOnPlayers)
             return;
 
         BeltFinder.findBelt(player).ifPresent((getter) -> {
+
+            if (getter.isHidden())
+                return;
+
             getter.getBelt().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent((cap) -> {
+                boolean rightHanded = player.getPrimaryHand() == HandSide.RIGHT;
+
+                matrixStack.push();
+                this.translateToBody(matrixStack);
 
                 ItemStack firstItem = cap.getStackInSlot(0);
                 ItemStack secondItem = cap.getStackInSlot(1);
 
-                ItemStack leftItem = flag ? firstItem : secondItem;
-                ItemStack rightItem = flag ? secondItem : firstItem;
-
-                matrixStack.push();
-
-                this.translateToBody(matrixStack);
+                ItemStack leftItem = rightHanded ? firstItem : secondItem;
+                ItemStack rightItem = rightHanded ? secondItem : firstItem;
 
                 if (!leftItem.isEmpty() || !rightItem.isEmpty())
                 {
                     matrixStack.push();
 
-                    if (this.getEntityModel().isChild)
+                    if (getEntityModel().isChild)
                     {
                         matrixStack.translate(0.0F, 0.75F, 0.0F);
                         matrixStack.scale(0.5F, 0.5F, 0.5F);
@@ -77,19 +82,15 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
                 matrixStack.translate(0.0F, 0.19F, 0.0F);
                 matrixStack.scale(0.85f, 0.6f, 0.78f);
 
-                renderCutoutModel(this.beltModel, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
+                renderCutoutModel(BELT_MODEL, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
+
 
                 matrixStack.pop();
             });
         });
     }
 
-    private void translateToBody(MatrixStack matrixStack)
-    {
-        this.getEntityModel().bipedBody.translateRotate(matrixStack);
-    }
-
-    private void renderHeldItem(LivingEntity player, ItemStack stack, TransformType transformType, HandSide handSide, MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness)
+    private static void renderHeldItem(LivingEntity player, ItemStack stack, TransformType transformType, HandSide handSide, MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness)
     {
         if (stack.isEmpty())
             return;
@@ -106,7 +107,7 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
         matrixStack.pop();
     }
 
-    private static class ModelBelt extends EntityModel<PlayerEntity>
+    private static class BeltModel extends EntityModel<PlayerEntity>
     {
         final ModelRenderer belt = new ModelRenderer(this);
         final ModelRenderer buckle = new ModelRenderer(this, 10, 10);

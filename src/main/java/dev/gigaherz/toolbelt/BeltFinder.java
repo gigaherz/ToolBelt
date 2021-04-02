@@ -53,6 +53,10 @@ public abstract class BeltFinder
     {
         ItemStack getBelt();
 
+        default boolean isHidden() {
+            return false;
+        }
+
         void syncToClients();
     }
 }

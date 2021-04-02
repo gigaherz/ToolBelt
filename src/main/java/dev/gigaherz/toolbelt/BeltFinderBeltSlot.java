@@ -2,6 +2,7 @@ package dev.gigaherz.toolbelt;
 
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
+import dev.gigaherz.toolbelt.integration.CosmeticArmorIntegration;
 import dev.gigaherz.toolbelt.network.BeltContentsChange;
 import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.entity.LivingEntity;
@@ -9,7 +10,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.network.PacketDistributor;
+import top.theillusivec4.curios.api.CuriosCapability;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
 import java.util.Optional;
 
@@ -36,7 +40,7 @@ public class BeltFinderBeltSlot extends BeltFinder
                 .resolve()
                 .flatMap(ext -> ext.getSlots().stream()
                         .filter(slot -> slot.getContents().getItem() instanceof ToolBeltItem)
-                        .map(ExtensionSlotBeltGetter::new)
+                        .map(slot -> new ExtensionSlotBeltGetter(player, slot))
                         .findFirst());
     }
 
@@ -48,10 +52,12 @@ public class BeltFinderBeltSlot extends BeltFinder
 
     private static class ExtensionSlotBeltGetter implements BeltGetter
     {
+        private PlayerEntity player;
         private final IExtensionSlot slot;
 
-        private ExtensionSlotBeltGetter(IExtensionSlot slot)
+        private ExtensionSlotBeltGetter(PlayerEntity player, IExtensionSlot slot)
         {
+            this.player = player;
             this.slot = slot;
         }
 
@@ -61,6 +67,18 @@ public class BeltFinderBeltSlot extends BeltFinder
             return slot.getContents();
         }
 
+
+        @Override
+        public boolean isHidden()
+        {
+            if (ModList.get().isLoaded("cosmeticarmorreworked"))
+            {
+                if (CosmeticArmorIntegration.isHidden(player, ToolBelt.MODID, "belt#0"))
+                    return true;
+            }
+
+            return false;
+        }
         @Override
         public void syncToClients()
         {

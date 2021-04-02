@@ -61,7 +61,7 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     @Override
     protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY)
     {
-        this.font.func_243248_b(matrixStack, this.title, (float) this.titleX, (float) this.titleY, 4210752);
+        this.font.drawText(matrixStack, this.title, (float) this.titleX, (float) this.titleY, 4210752);
     }
 
     @Override
