@@ -16,8 +16,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class ConfigData
@@ -74,8 +72,15 @@ public class ConfigData
     public static ThreeWayChoice customBeltSlotMode = ThreeWayChoice.AUTO;
     public static boolean customBeltSlotEnabled = true;
 
-    public static boolean curiosPresent() { return ModList.get().isLoaded("curios"); }
-    public static boolean sewingKitPresent() { return ModList.get().isLoaded("sewingkit"); }
+    public static boolean curiosPresent()
+    {
+        return ModList.get().isLoaded("curios");
+    }
+
+    public static boolean sewingKitPresent()
+    {
+        return ModList.get().isLoaded("sewingkit");
+    }
 
     public static class ServerConfig
     {

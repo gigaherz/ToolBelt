@@ -12,8 +12,6 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.network.PacketDistributor;
-import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 
 import java.util.Optional;
 
@@ -79,6 +77,7 @@ public class BeltFinderBeltSlot extends BeltFinder
 
             return false;
         }
+
         @Override
         public void syncToClients()
         {

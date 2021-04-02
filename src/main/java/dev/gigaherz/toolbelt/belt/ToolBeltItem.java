@@ -2,16 +2,12 @@ package dev.gigaherz.toolbelt.belt;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
-import com.mojang.blaze3d.matrix.MatrixStack;
-import dev.gigaherz.toolbelt.client.LayerToolBelt;
 import dev.gigaherz.toolbelt.common.Screens;
 import dev.gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import dev.gigaherz.toolbelt.customslots.IExtensionContainer;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlotItem;
 import dev.gigaherz.toolbelt.customslots.example.RpgEquipment;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
-import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.util.ITooltipFlag;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
@@ -28,18 +24,11 @@ import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.text.ITextComponent;
 import net.minecraft.util.text.TranslationTextComponent;
 import net.minecraft.world.World;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.type.capability.ICurio;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -237,7 +226,7 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
 
     public int getLevel(ItemStack stack)
     {
-        return getSlotsCount(stack)-2;
+        return getSlotsCount(stack) - 2;
     }
 
     private void tickAllSlots(ItemStack source, LivingEntity player)

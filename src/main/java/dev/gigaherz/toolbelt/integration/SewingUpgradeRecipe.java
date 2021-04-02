@@ -22,7 +22,7 @@ public class SewingUpgradeRecipe extends SewingRecipe
     public ItemStack getCraftingResult(IInventory inv)
     {
         ItemStack inputBelt = ItemStack.EMPTY;
-        for(int i=2;i<6;i++)
+        for (int i = 2; i < 6; i++)
         {
             if (inv.getStackInSlot(i).getItem() instanceof ToolBeltItem)
             {

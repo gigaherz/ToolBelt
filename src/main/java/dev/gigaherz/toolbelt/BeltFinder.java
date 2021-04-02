@@ -53,7 +53,8 @@ public abstract class BeltFinder
     {
         ItemStack getBelt();
 
-        default boolean isHidden() {
+        default boolean isHidden()
+        {
             return false;
         }
 

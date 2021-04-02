@@ -1,7 +1,6 @@
 package dev.gigaherz.toolbelt.client;
 
 import com.mojang.blaze3d.matrix.MatrixStack;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
@@ -22,7 +21,6 @@ import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.items.CapabilityItemHandler;
-import net.minecraftforge.items.IItemHandler;
 
 public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>
 {
@@ -133,9 +131,6 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
         @Override
         public void render(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
         {
-            RenderSystem.disableRescaleNormal();
-            RenderSystem.disableCull();
-
             belt.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             pocketL.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             pocketR.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
@@ -144,9 +139,6 @@ public class LayerToolBelt extends LayerRenderer<AbstractClientPlayerEntity, Pla
             matrixStack.scale(0.8f, 1, 1);
             buckle.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             matrixStack.pop();
-
-            RenderSystem.enableCull();
-            RenderSystem.enableRescaleNormal();
         }
     }
 }

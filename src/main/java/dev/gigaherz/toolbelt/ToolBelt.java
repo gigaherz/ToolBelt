@@ -7,6 +7,8 @@ import dev.gigaherz.sewingkit.api.ToolIngredient;
 import dev.gigaherz.sewingkit.needle.NeedleItem;
 import dev.gigaherz.sewingkit.needle.Needles;
 import dev.gigaherz.toolbelt.belt.BeltIngredient;
+import dev.gigaherz.toolbelt.belt.ToolBeltItem;
+import dev.gigaherz.toolbelt.client.ClientEvents;
 import dev.gigaherz.toolbelt.common.BeltContainer;
 import dev.gigaherz.toolbelt.common.BeltScreen;
 import dev.gigaherz.toolbelt.common.BeltSlotContainer;
@@ -15,8 +17,6 @@ import dev.gigaherz.toolbelt.customslots.ExtensionSlotItemCapability;
 import dev.gigaherz.toolbelt.integration.SewingKitIntegration;
 import dev.gigaherz.toolbelt.integration.SewingUpgradeRecipeBuilder;
 import dev.gigaherz.toolbelt.network.*;
-import dev.gigaherz.toolbelt.belt.ToolBeltItem;
-import dev.gigaherz.toolbelt.client.ClientEvents;
 import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.client.gui.ScreenManager;
 import net.minecraft.data.DataGenerator;
@@ -257,15 +257,15 @@ public class ToolBelt
                 ConditionalRecipe.builder()
                         .addCondition(new Conditions.EnableNormalCrafting())
                         .addRecipe(
-                            ShapedRecipeBuilder.shapedRecipe(ToolBelt.BELT)
-                                    .patternLine("sls")
-                                    .patternLine("l l")
-                                    .patternLine("lil")
-                                    .key('s', Ingredient.fromItems(Items.STRING))
-                                    .key('l', Ingredient.fromItems(Items.LEATHER))
-                                    .key('i', Ingredient.fromItems(Items.IRON_INGOT))
-                                    .addCriterion("has_leather", hasItem(ItemTags.makeWrapperTag("forge:leather")))
-                                ::build
+                                ShapedRecipeBuilder.shapedRecipe(ToolBelt.BELT)
+                                        .patternLine("sls")
+                                        .patternLine("l l")
+                                        .patternLine("lil")
+                                        .key('s', Ingredient.fromItems(Items.STRING))
+                                        .key('l', Ingredient.fromItems(Items.LEATHER))
+                                        .key('i', Ingredient.fromItems(Items.IRON_INGOT))
+                                        .addCriterion("has_leather", hasItem(ItemTags.makeWrapperTag("forge:leather")))
+                                        ::build
                         )
                         .generateAdvancement()
                         .build(consumer, beltId);
@@ -328,7 +328,7 @@ public class ToolBelt
                         ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.DIAMOND.getHarvestLevel()),
                         ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.NETHERITE.getHarvestLevel()),
                 };
-                for(int i=0;i<7;i++)
+                for (int i = 0; i < 7; i++)
                 {
                     ConditionalRecipe.builder()
                             .addCondition(modLoaded("sewingkit"))
@@ -336,7 +336,7 @@ public class ToolBelt
                             .addRecipe(
                                     SewingUpgradeRecipeBuilder.begin(ToolBelt.BELT,
                                             compound(
-                                                    Pair.of("Size", IntNBT.valueOf(i+3))
+                                                    Pair.of("Size", IntNBT.valueOf(i + 3))
                                             ))
                                             .withTool(needleTiers[i])
                                             .addMaterial(BeltIngredient.withLevel(i))
@@ -346,7 +346,7 @@ public class ToolBelt
                                             ::build
                             )
                             .generateAdvancement()
-                            .build(consumer, new ResourceLocation(pouchId.getNamespace(), pouchId.getPath() + "_upgrade_" + (i+1) + "_via_sewing"));
+                            .build(consumer, new ResourceLocation(pouchId.getNamespace(), pouchId.getPath() + "_upgrade_" + (i + 1) + "_via_sewing"));
                 }
             }
 
@@ -361,7 +361,7 @@ public class ToolBelt
             public final CompoundNBT compound(Pair<String, INBT>... entries)
             {
                 CompoundNBT tag = new CompoundNBT();
-                for(Pair<String, INBT> entry : entries)
+                for (Pair<String, INBT> entry : entries)
                 {
                     tag.put(entry.getFirst(), entry.getSecond());
                 }
@@ -369,5 +369,4 @@ public class ToolBelt
             }
         }
     }
-
 }

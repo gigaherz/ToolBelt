@@ -1,8 +1,8 @@
 package dev.gigaherz.toolbelt.customslots.example;
 
 import com.google.common.collect.ImmutableList;
-import dev.gigaherz.toolbelt.customslots.IExtensionContainer;
 import dev.gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
+import dev.gigaherz.toolbelt.customslots.IExtensionContainer;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;

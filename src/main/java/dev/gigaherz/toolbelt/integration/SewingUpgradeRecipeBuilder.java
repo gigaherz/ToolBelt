@@ -16,11 +16,13 @@ import java.util.List;
 
 public class SewingUpgradeRecipeBuilder extends SewingRecipeBuilder
 {
-    public static SewingRecipeBuilder begin(Item result, CompoundNBT tag) {
+    public static SewingRecipeBuilder begin(Item result, CompoundNBT tag)
+    {
         return begin(result, 1, tag);
     }
 
-    public static SewingRecipeBuilder begin(Item result, int count, @Nullable CompoundNBT tag) {
+    public static SewingRecipeBuilder begin(Item result, int count, @Nullable CompoundNBT tag)
+    {
         return new SewingUpgradeRecipeBuilder(result, count, tag);
     }
 
