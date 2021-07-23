@@ -1,5 +1,7 @@
 package dev.gigaherz.toolbelt;
 
+import com.google.gson.JsonElement;
+import com.google.gson.JsonPrimitive;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
 import dev.gigaherz.toolbelt.integration.CosmeticArmorIntegration;
@@ -26,13 +28,23 @@ public class BeltFinderBeltSlot extends BeltFinder
     }
 
     @Override
+    protected Optional<BeltGetter> getSlotFromId(PlayerEntity player, JsonElement packetData)
+    {
+        return BeltExtensionSlot.get(player)
+                .resolve()
+                .map(BeltExtensionSlot::getSlots)
+                .map(slots -> slots.get(packetData.getAsInt()))
+                .map(slot -> new ExtensionSlotBeltGetter(player,  slot));
+    }
+
+    @Override
     public String getName()
     {
         return FINDER_ID;
     }
 
     @Override
-    public Optional<? extends BeltGetter> findStack(PlayerEntity player)
+    public Optional<? extends BeltGetter> findStack(LivingEntity player, boolean allowCosmetic)
     {
         return BeltExtensionSlot.get(player)
                 .resolve()
@@ -42,18 +54,12 @@ public class BeltFinderBeltSlot extends BeltFinder
                         .findFirst());
     }
 
-    @Override
-    public void setToSlot(LivingEntity player, int slotNumber, ItemStack stack)
-    {
-        BeltExtensionSlot.get(player).ifPresent(slot -> slot.getBelt().setContents(stack));
-    }
-
     private static class ExtensionSlotBeltGetter implements BeltGetter
     {
-        private PlayerEntity player;
+        private final LivingEntity player;
         private final IExtensionSlot slot;
 
-        private ExtensionSlotBeltGetter(PlayerEntity player, IExtensionSlot slot)
+        private ExtensionSlotBeltGetter(LivingEntity player, IExtensionSlot slot)
         {
             this.player = player;
             this.slot = slot;
@@ -65,17 +71,18 @@ public class BeltFinderBeltSlot extends BeltFinder
             return slot.getContents();
         }
 
+        @Override
+        public void setBelt(ItemStack stack)
+        {
+            slot.setContents(stack);
+        }
 
         @Override
         public boolean isHidden()
         {
-            if (ModList.get().isLoaded("cosmeticarmorreworked"))
-            {
-                if (CosmeticArmorIntegration.isHidden(player, ToolBelt.MODID, "belt#0"))
-                    return true;
-            }
-
-            return false;
+            return ModList.get().isLoaded("cosmeticarmorreworked")
+                    && player instanceof PlayerEntity
+                    && CosmeticArmorIntegration.isHidden((PlayerEntity) player, ToolBelt.MODID, "belt#0");
         }
 
         @Override
@@ -84,7 +91,7 @@ public class BeltFinderBeltSlot extends BeltFinder
             LivingEntity thePlayer = slot.getContainer().getOwner();
             if (thePlayer.world.isRemote)
                 return;
-            BeltContentsChange message = new BeltContentsChange(thePlayer, FINDER_ID, 0, slot.getContents());
+            BeltContentsChange message = new BeltContentsChange(thePlayer, FINDER_ID, new JsonPrimitive(0), slot.getContents());
             ToolBelt.channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> thePlayer), message);
         }
     }

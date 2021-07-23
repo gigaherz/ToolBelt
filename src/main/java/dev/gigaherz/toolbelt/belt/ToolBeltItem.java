@@ -29,6 +29,8 @@ import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import top.theillusivec4.curios.api.type.capability.ICurio;
+import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -41,6 +43,10 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
 
     @CapabilityInject(IExtensionSlotItem.class)
     public static Capability<IExtensionSlotItem> EXTENSION_SLOT_ITEM;
+
+    @Nullable
+    @CapabilityInject(ICurio.class)
+    public static Capability<ICurio> CURIO_ITEM;
 
     public static final ImmutableSet<ResourceLocation> BELT_SLOT_LIST = ImmutableSet.of(RpgEquipment.BELT);
 
@@ -142,6 +148,7 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
 
             final LazyOptional<IItemHandler> itemHandlerInstance = LazyOptional.of(() -> itemHandler);
             final LazyOptional<IExtensionSlotItem> extensionSlotInstance = LazyOptional.of(() -> ToolBeltItem.this);
+            final LazyOptional<ICurio> curioItemInstance = CURIO_ITEM != null ? LazyOptional.of(CURIO_ITEM::getDefaultInstance) : LazyOptional.empty();
 
             @Override
             @Nonnull
@@ -151,6 +158,8 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
                     return itemHandlerInstance.cast();
                 if (cap == EXTENSION_SLOT_ITEM)
                     return extensionSlotInstance.cast();
+                if (cap == CURIO_ITEM && CURIO_ITEM != null)
+                    return curioItemInstance.cast();
                 return LazyOptional.empty();
             }
         };

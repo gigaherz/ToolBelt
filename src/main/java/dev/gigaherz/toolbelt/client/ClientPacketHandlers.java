@@ -19,7 +19,7 @@ public class ClientPacketHandlers
             if (!(entity instanceof PlayerEntity))
                 return;
             PlayerEntity player = (PlayerEntity) entity;
-            BeltFinder.setFinderSlotContents(player, message.where, message.slot, message.stack);
+            BeltFinder.setBeltFromPacket(player, message.where, message.slot, message.stack);
         });
     }
 

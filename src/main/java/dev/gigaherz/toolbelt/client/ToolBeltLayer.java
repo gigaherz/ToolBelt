@@ -6,29 +6,27 @@ import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.entity.player.AbstractClientPlayerEntity;
 import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.LivingRenderer;
 import net.minecraft.client.renderer.entity.layers.LayerRenderer;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.entity.model.EntityModel;
-import net.minecraft.client.renderer.entity.model.PlayerModel;
 import net.minecraft.client.renderer.model.ItemCameraTransforms.TransformType;
 import net.minecraft.client.renderer.model.ModelRenderer;
 import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.HandSide;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.items.CapabilityItemHandler;
 
-public class ToolBeltLayer extends LayerRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>>
+public class ToolBeltLayer<T extends LivingEntity, M extends BipedModel<T>> extends LayerRenderer<T, M>
 {
     private static final ResourceLocation TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
 
-    private static final BeltModel BELT_MODEL = new BeltModel();
+    private final BeltModel<T> beltModel = new BeltModel<>();
 
-    public ToolBeltLayer(LivingRenderer<AbstractClientPlayerEntity, PlayerModel<AbstractClientPlayerEntity>> owner)
+    public ToolBeltLayer(LivingRenderer<T, M> owner)
     {
         super(owner);
     }
@@ -39,12 +37,12 @@ public class ToolBeltLayer extends LayerRenderer<AbstractClientPlayerEntity, Pla
     }
 
     @Override
-    public void render(MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness, AbstractClientPlayerEntity player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch)
+    public void render(MatrixStack matrixStack, IRenderTypeBuffer buffer, int lightness, T player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch)
     {
         if (!ConfigData.showBeltOnPlayers)
             return;
 
-        BeltFinder.findBelt(player).ifPresent((getter) -> {
+        BeltFinder.findBelt(player, true).ifPresent((getter) -> {
 
             if (getter.isHidden())
                 return;
@@ -80,7 +78,7 @@ public class ToolBeltLayer extends LayerRenderer<AbstractClientPlayerEntity, Pla
                 matrixStack.translate(0.0F, 0.19F, 0.0F);
                 matrixStack.scale(0.85f, 0.6f, 0.78f);
 
-                renderCutoutModel(BELT_MODEL, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
+                renderCutoutModel(beltModel, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
 
 
                 matrixStack.pop();
@@ -105,7 +103,7 @@ public class ToolBeltLayer extends LayerRenderer<AbstractClientPlayerEntity, Pla
         matrixStack.pop();
     }
 
-    private static class BeltModel extends EntityModel<PlayerEntity>
+    private static class BeltModel<T extends LivingEntity> extends EntityModel<T>
     {
         final ModelRenderer belt = new ModelRenderer(this);
         final ModelRenderer buckle = new ModelRenderer(this, 10, 10);
@@ -124,7 +122,7 @@ public class ToolBeltLayer extends LayerRenderer<AbstractClientPlayerEntity, Pla
         }
 
         @Override
-        public void setRotationAngles(PlayerEntity entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+        public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
         {
         }
 

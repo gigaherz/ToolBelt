@@ -50,6 +50,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
@@ -173,7 +174,7 @@ public class ToolBelt
 
     public void clientSetup(FMLClientSetupEvent event)
     {
-        DeferredWorkQueue.runLater(() -> {
+        event.enqueueWork(() -> {
             ScreenManager.registerFactory(BeltContainer.TYPE, BeltScreen::new);
             ScreenManager.registerFactory(BeltSlotContainer.TYPE, BeltSlotScreen::new);
         });
@@ -187,7 +188,9 @@ public class ToolBelt
 
     public void loadComplete(FMLLoadCompleteEvent event)
     {
-        DistExecutor.runWhenOn(Dist.CLIENT, () -> ClientEvents::initKeybinds);
+        event.enqueueWork(() -> {
+            if (FMLEnvironment.dist == Dist.CLIENT) ClientEvents.initKeybinds();
+        });
     }
 
     public void anvilChange(AnvilUpdateEvent ev)

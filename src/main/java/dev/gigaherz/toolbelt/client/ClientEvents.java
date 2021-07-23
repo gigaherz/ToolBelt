@@ -6,10 +6,13 @@ import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.common.BeltSlotContainer;
 import dev.gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.entity.PlayerRenderer;
+import net.minecraft.client.renderer.entity.*;
+import net.minecraft.client.renderer.entity.model.BipedModel;
 import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.settings.KeyBinding;
 import net.minecraft.client.util.InputMappings;
+import net.minecraft.entity.EntityType;
+import net.minecraft.entity.LivingEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.TextureStitchEvent;
@@ -17,6 +20,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Map;
@@ -53,13 +57,34 @@ public class ClientEvents
         ClientRegistry.registerKeyBinding(OPEN_BELT_SLOT_KEYBIND =
                 new KeyBinding("key.toolbelt.slot", GLFW.GLFW_KEY_V, "key.toolbelt.category"));
 
+        addLayerToEntity(EntityType.ARMOR_STAND, ArmorStandRenderer.class);
+        addLayerToEntity(EntityType.ZOMBIE, ZombieRenderer.class);
+        addLayerToEntity(EntityType.SKELETON, SkeletonRenderer.class);
+        addLayerToEntity(EntityType.HUSK, HuskRenderer.class);
+        addLayerToEntity(EntityType.DROWNED, DrownedRenderer.class);
+        addLayerToEntity(EntityType.STRAY, StrayRenderer.class);
+
         Map<String, PlayerRenderer> skinMap = Minecraft.getInstance().getRenderManager().getSkinMap();
+        addLayerToPlayerSkin(skinMap, "default");
+        addLayerToPlayerSkin(skinMap, "slim");
+    }
 
-        PlayerRenderer render = skinMap.get("default");
-        render.addLayer(new ToolBeltLayer(render));
+    private static void addLayerToPlayerSkin(Map<String, PlayerRenderer> skinMap, String skinName)
+    {
+        PlayerRenderer render = skinMap.get(skinName);
+        render.addLayer(new ToolBeltLayer<>(render));
+    }
 
-        render = skinMap.get("slim");
-        render.addLayer(new ToolBeltLayer(render));
+    private static <T extends LivingEntity, M extends BipedModel<T>, R extends LivingRenderer<? super T, M>> void addLayerToEntity(EntityType<? extends T> entityType, Class<R> rendererClass)
+    {
+        EntityRenderer<?> renderer = Minecraft.getInstance().getRenderManager().renderers.get(entityType);
+        if (!rendererClass.isInstance(renderer))
+            throw new IllegalStateException("Mismatched renderer class?!");
+        if (!(((LivingRenderer<?,?>)renderer).getEntityModel() instanceof BipedModel))
+            throw new IllegalStateException("Wrong model type, renderer for entity "+entityType.getRegistryName()+" needs to use a BipedModel.");
+        @SuppressWarnings("unchecked")
+        LivingRenderer<T, M> bipedRenderer = (LivingRenderer<T, M>) renderer;
+        bipedRenderer.addLayer(new ToolBeltLayer<>(bipedRenderer));
     }
 
     private static boolean toolMenuKeyWasDown = false;

@@ -10,6 +10,7 @@ import dev.gigaherz.toolbelt.network.SyncBeltSlotContents;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.LivingEntity;
+import net.minecraft.entity.item.ArmorStandEntity;
 import net.minecraft.entity.item.ItemEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -88,11 +89,12 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         @SubscribeEvent
         public void attachCapabilities(AttachCapabilitiesEvent<Entity> event)
         {
-            if (event.getObject() instanceof PlayerEntity)
+            final Entity entity = event.getObject();
+            if (entity instanceof PlayerEntity || entity instanceof ArmorStandEntity)
             {
                 event.addCapability(CAPABILITY_ID, new ICapabilitySerializable<CompoundNBT>()
                 {
-                    final BeltExtensionSlot extensionContainer = new BeltExtensionSlot((PlayerEntity) event.getObject())
+                    final BeltExtensionSlot extensionContainer = new BeltExtensionSlot((LivingEntity) entity)
                     {
                         @Override
                         public void onContentsChanged(IExtensionSlot slot)

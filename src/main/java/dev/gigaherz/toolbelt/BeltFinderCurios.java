@@ -1,16 +1,22 @@
 package dev.gigaherz.toolbelt;
 
+import com.google.gson.JsonElement;
+import com.mojang.datafixers.util.Pair;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
+import net.minecraftforge.items.IItemHandler;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
+import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 import java.util.Optional;
+import java.util.function.Function;
+import java.util.function.IntFunction;
 
 public class BeltFinderCurios extends BeltFinder
 {
@@ -27,62 +33,81 @@ public class BeltFinderCurios extends BeltFinder
     }
 
     @Override
-    public void setToSlot(LivingEntity player, int slot, ItemStack stack)
+    public Optional<? extends BeltGetter> findStack(LivingEntity entity, boolean allowCosmetic)
     {
-        player.getCapability(CuriosCapability.INVENTORY).ifPresent((curios) ->
-                curios.getStacksHandler("belt").ifPresent(handler -> handler.getStacks().setStackInSlot(slot, stack)));
+        return entity.getCapability(CuriosCapability.INVENTORY).resolve()
+                .flatMap(curios -> curios.getCurios().entrySet().stream()
+                        .map(pair -> {
+                            String slotName = pair.getKey();
+                            ICurioStacksHandler handler = pair.getValue();
+                            if (allowCosmetic)
+                            {
+                                Optional<? extends BeltGetter> result = findBeltInInventory(entity, slotName, true, handler.getCosmeticStacks());
+                                if (result.isPresent())
+                                    return result;
+                            }
+
+                            return findBeltInInventory(entity, slotName, false, handler.getStacks());
+                        })
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .findFirst());
+    }
+
+    private Optional<? extends BeltGetter> findBeltInInventory(LivingEntity entity, String slotName, boolean isCosmetic, IItemHandler inventory)
+    {
+        return findBeltInInventory(inventory, i -> new CuriosBeltGetter(entity, slotName, isCosmetic, i));
     }
 
     @Override
-    public Optional<? extends BeltGetter> findStack(PlayerEntity player)
+    protected Optional<BeltGetter> getSlotFromId(PlayerEntity entity, JsonElement slot)
     {
-        return player.getCapability(CuriosCapability.INVENTORY)
-                .resolve()
-                .flatMap(curios -> curios.getStacksHandler("belt"))
-                .flatMap(handler -> {
-                    IDynamicStackHandler stacks = handler.getStacks();
-                    for (int i = 0; i < stacks.getSlots(); i++)
-                    {
-                        ItemStack inSlot = stacks.getStackInSlot(i);
-                        if (inSlot.getCount() > 0)
-                        {
-                            if (inSlot.getItem() instanceof ToolBeltItem)
-                            {
-                                return Optional.of(new CuriosBeltGetter(player, i));
-                            }
-                        }
-                    }
-                    return Optional.<BeltGetter>empty();
-                });
+        return Optional.empty();
     }
 
     private static class CuriosBeltGetter implements BeltGetter
     {
-        private final PlayerEntity thePlayer;
+        private final LivingEntity entity;
+        private final String slotKind;
+        private final boolean isCosmeticSlot;
         private final int slotNumber;
 
-        private CuriosBeltGetter(PlayerEntity thePlayer, int slotNumber)
+        private CuriosBeltGetter(LivingEntity entity, String slotKind, boolean isCosmeticSlot, int slotNumber)
         {
-            this.thePlayer = thePlayer;
+            this.entity = entity;
+            this.slotKind = slotKind;
+            this.isCosmeticSlot = isCosmeticSlot;
             this.slotNumber = slotNumber;
+        }
+
+        private Optional<IDynamicStackHandler> getCuriosInventory()
+        {
+            return getCuriosHandler()
+                    .map(handler -> (isCosmeticSlot ? handler.getCosmeticStacks() : handler.getStacks()));
+        }
+
+        private Optional<ICurioStacksHandler> getCuriosHandler()
+        {
+            return entity.getCapability(CuriosCapability.INVENTORY).resolve()
+                    .flatMap((curios) -> curios.getStacksHandler(slotKind));
         }
 
         @Override
         public ItemStack getBelt()
         {
-            return thePlayer.getCapability(CuriosCapability.INVENTORY).map((curios) ->
-                    curios.getStacksHandler("belt").map(handler ->
-                            handler.getStacks().getStackInSlot(slotNumber)).orElse(ItemStack.EMPTY)
-            ).orElse(ItemStack.EMPTY);
+            return getCuriosInventory().map(inventory -> inventory.getStackInSlot(slotNumber)).orElse(ItemStack.EMPTY);
+        }
+
+        @Override
+        public void setBelt(ItemStack stack)
+        {
+            getCuriosInventory().ifPresent(inventory -> inventory.setStackInSlot(slotNumber, stack));
         }
 
         @Override
         public boolean isHidden()
         {
-            return !thePlayer.getCapability(CuriosCapability.INVENTORY).resolve()
-                    .flatMap((curios) -> curios.getStacksHandler("belt"))
-                    .map(handler -> handler.isVisible() && handler.getRenders().get(slotNumber))
-                    .orElse(true);
+            return !getCuriosHandler().map(handler -> handler.isVisible() && handler.getRenders().get(slotNumber)).orElse(true);
         }
 
         @Override
