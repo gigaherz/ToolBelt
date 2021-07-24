@@ -1,8 +1,8 @@
 package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.BeltFinder;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -14,10 +14,10 @@ public class BeltEvents
     public static void startTracking(PlayerEvent.StartTracking event)
     {
         Entity entity = event.getTarget();
-        if (!(entity instanceof PlayerEntity))
+        if (!(entity instanceof Player))
             return;
 
-        PlayerEntity player = (PlayerEntity) entity;
+        Player player = (Player) entity;
         BeltFinder.sendSync(player);
     }
 }

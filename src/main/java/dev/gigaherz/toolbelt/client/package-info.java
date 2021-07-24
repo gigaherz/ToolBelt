@@ -2,6 +2,6 @@
 @ParametersAreNonnullByDefault
 package dev.gigaherz.toolbelt.client;
 
-import mcp.MethodsReturnNonnullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 
 import javax.annotation.ParametersAreNonnullByDefault;

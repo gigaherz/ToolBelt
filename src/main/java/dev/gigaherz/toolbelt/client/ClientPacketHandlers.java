@@ -5,9 +5,9 @@ import dev.gigaherz.toolbelt.network.BeltContentsChange;
 import dev.gigaherz.toolbelt.network.SyncBeltSlotContents;
 import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.client.Minecraft;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 
 public class ClientPacketHandlers
 {
@@ -15,11 +15,11 @@ public class ClientPacketHandlers
     {
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
-            Entity entity = minecraft.world.getEntityByID(message.player);
-            if (!(entity instanceof PlayerEntity))
+            Entity entity = minecraft.level.getEntity(message.player);
+            if (!(entity instanceof Player))
                 return;
-            PlayerEntity player = (PlayerEntity) entity;
-            BeltFinder.setFinderSlotContents(player, message.where, message.slot, message.stack);
+            Player player = (Player) entity;
+            BeltFinder.setBeltFromPacket(player, message.where, message.slot, message.stack);
         });
     }
 
@@ -27,8 +27,8 @@ public class ClientPacketHandlers
     {
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
-            Entity entity = minecraft.world.getEntityByID(message.entityId);
-            if (entity instanceof PlayerEntity)
+            Entity entity = minecraft.level.getEntity(message.entityId);
+            if (entity instanceof Player)
             {
                 BeltExtensionSlot.get((LivingEntity) entity).ifPresent((slot) -> slot.setAll(message.stacks));
             }

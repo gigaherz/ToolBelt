@@ -1,40 +1,40 @@
 package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.inventory.container.SimpleNamedContainerProvider;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraftforge.fml.network.NetworkHooks;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.SimpleMenuProvider;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
 public class Screens
 {
-    public static void openBeltScreen(ServerPlayerEntity player, int slot)
+    public static void openBeltScreen(ServerPlayer player, int slot)
     {
-        final ItemStack heldItem = player.inventory.getStackInSlot(slot);
+        final ItemStack heldItem = player.getInventory().getItem(slot);
         if (heldItem.getCount() > 0 && heldItem.getItem() instanceof ToolBeltItem)
         {
-            NetworkHooks.openGui(player, new SimpleNamedContainerProvider(
+            NetworkHooks.openGui(player, new SimpleMenuProvider(
                     (i, playerInventory, playerEntity) -> {
                         int blockedSlot = -1;
-                        if (player.getHeldItemMainhand() == heldItem)
-                            blockedSlot = playerInventory.currentItem;
+                        if (player.getMainHandItem() == heldItem)
+                            blockedSlot = playerInventory.selected;
 
                         return new BeltContainer(i, playerInventory, blockedSlot, heldItem);
                     },
-                    heldItem.getDisplayName()
+                    heldItem.getHoverName()
             ), (data) -> {
                 data.writeVarInt(slot);
-                data.writeItemStack(heldItem);
+                data.writeItem(heldItem);
             });
         }
     }
 
-    public static void openSlotScreen(ServerPlayerEntity player)
+    public static void openSlotScreen(ServerPlayer player)
     {
-        player.openContainer(new SimpleNamedContainerProvider(
-                (i, playerInventory, playerEntity) -> new BeltSlotContainer(i, playerInventory, !playerEntity.world.isRemote),
-                new TranslationTextComponent("container.crafting")
+        player.openMenu(new SimpleMenuProvider(
+                (i, playerInventory, playerEntity) -> new BeltSlotContainer(i, playerInventory, !playerEntity.level.isClientSide),
+                new TranslatableComponent("container.crafting")
         ));
     }
 }

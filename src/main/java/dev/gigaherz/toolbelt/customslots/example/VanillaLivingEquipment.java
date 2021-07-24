@@ -3,30 +3,30 @@ package dev.gigaherz.toolbelt.customslots.example;
 import com.google.common.collect.ImmutableList;
 import dev.gigaherz.toolbelt.customslots.IExtensionContainer;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 
 public class VanillaLivingEquipment implements IExtensionContainer
 {
-    public static final ResourceLocation HEAD = new ResourceLocation("minecraft", EquipmentSlotType.HEAD.getName());
-    public static final ResourceLocation CHEST = new ResourceLocation("minecraft", EquipmentSlotType.CHEST.getName());
-    public static final ResourceLocation LEGS = new ResourceLocation("minecraft", EquipmentSlotType.LEGS.getName());
-    public static final ResourceLocation FEET = new ResourceLocation("minecraft", EquipmentSlotType.FEET.getName());
-    public static final ResourceLocation OFFHAND = new ResourceLocation("minecraft", EquipmentSlotType.OFFHAND.getName());
-    public static final ResourceLocation MAINHAND = new ResourceLocation("minecraft", EquipmentSlotType.MAINHAND.getName());
+    public static final ResourceLocation HEAD = new ResourceLocation("minecraft", EquipmentSlot.HEAD.getName());
+    public static final ResourceLocation CHEST = new ResourceLocation("minecraft", EquipmentSlot.CHEST.getName());
+    public static final ResourceLocation LEGS = new ResourceLocation("minecraft", EquipmentSlot.LEGS.getName());
+    public static final ResourceLocation FEET = new ResourceLocation("minecraft", EquipmentSlot.FEET.getName());
+    public static final ResourceLocation OFFHAND = new ResourceLocation("minecraft", EquipmentSlot.OFFHAND.getName());
+    public static final ResourceLocation MAINHAND = new ResourceLocation("minecraft", EquipmentSlot.MAINHAND.getName());
 
     private final LivingEntity owner;
     private final ImmutableList<IExtensionSlot> slots = ImmutableList.of(
-            new Slot(HEAD, EquipmentSlotType.HEAD),
-            new Slot(CHEST, EquipmentSlotType.CHEST),
-            new Slot(LEGS, EquipmentSlotType.LEGS),
-            new Slot(FEET, EquipmentSlotType.FEET),
-            new Slot(OFFHAND, EquipmentSlotType.OFFHAND),
-            new Slot(MAINHAND, EquipmentSlotType.MAINHAND)
+            new Slot(HEAD, EquipmentSlot.HEAD),
+            new Slot(CHEST, EquipmentSlot.CHEST),
+            new Slot(LEGS, EquipmentSlot.LEGS),
+            new Slot(FEET, EquipmentSlot.FEET),
+            new Slot(OFFHAND, EquipmentSlot.OFFHAND),
+            new Slot(MAINHAND, EquipmentSlot.MAINHAND)
     );
 
     public VanillaLivingEquipment(LivingEntity owner)
@@ -57,9 +57,9 @@ public class VanillaLivingEquipment implements IExtensionContainer
     private class Slot implements IExtensionSlot
     {
         private final ResourceLocation id;
-        private final EquipmentSlotType slot;
+        private final EquipmentSlot slot;
 
-        private Slot(ResourceLocation id, EquipmentSlotType slot)
+        private Slot(ResourceLocation id, EquipmentSlot slot)
         {
             this.id = id;
             this.slot = slot;
@@ -86,13 +86,13 @@ public class VanillaLivingEquipment implements IExtensionContainer
         @Override
         public ItemStack getContents()
         {
-            return owner.getItemStackFromSlot(slot);
+            return owner.getItemBySlot(slot);
         }
 
         @Override
         public void setContents(@Nonnull ItemStack stack)
         {
-            owner.setItemStackToSlot(slot, stack);
+            owner.setItemSlot(slot, stack);
         }
 
         @Override

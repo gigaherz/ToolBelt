@@ -4,13 +4,13 @@ import com.google.common.collect.ImmutableList;
 import dev.gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import dev.gigaherz.toolbelt.customslots.IExtensionContainer;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
@@ -26,7 +26,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class RpgEquipment implements IExtensionContainer, INBTSerializable<CompoundNBT>
+public class RpgEquipment implements IExtensionContainer, INBTSerializable<CompoundTag>
 {
     ////////////////////////////////////////////////////////////
     // Capability support code
@@ -40,26 +40,12 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<Compo
     public static void register()
     {
         // Internal capability, IStorage and default instances are meaningless.
-        CapabilityManager.INSTANCE.register(RpgEquipment.class, new Capability.IStorage<RpgEquipment>()
-        {
-            @Nullable
-            @Override
-            public INBT writeNBT(Capability<RpgEquipment> capability, RpgEquipment instance, Direction side)
-            {
-                return null;
-            }
-
-            @Override
-            public void readNBT(Capability<RpgEquipment> capability, RpgEquipment instance, Direction side, INBT nbt)
-            {
-
-            }
-        }, () -> null);
+        CapabilityManager.INSTANCE.register(RpgEquipment.class);
 
         MinecraftForge.EVENT_BUS.register(new EventHandlers());
     }
 
-    public static RpgEquipment get(PlayerEntity player)
+    public static RpgEquipment get(Player player)
     {
         return player.getCapability(CAPABILITY, null).orElseThrow(() -> new RuntimeException("Capability not attached!"));
     }
@@ -69,22 +55,22 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<Compo
         @SubscribeEvent
         public void attachCapabilities(AttachCapabilitiesEvent<Entity> event)
         {
-            if (event.getObject() instanceof PlayerEntity)
+            if (event.getObject() instanceof Player)
             {
-                event.addCapability(CAPABILITY_ID, new ICapabilitySerializable<CompoundNBT>()
+                event.addCapability(CAPABILITY_ID, new ICapabilitySerializable<CompoundTag>()
                 {
-                    final RpgEquipment extensionContainer = new RpgEquipment((PlayerEntity) event.getObject());
+                    final RpgEquipment extensionContainer = new RpgEquipment((Player) event.getObject());
 
                     final LazyOptional<RpgEquipment> extensionContainerInstance = LazyOptional.of(() -> extensionContainer);
 
                     @Override
-                    public CompoundNBT serializeNBT()
+                    public CompoundTag serializeNBT()
                     {
                         return extensionContainer.serializeNBT();
                     }
 
                     @Override
-                    public void deserializeNBT(CompoundNBT nbt)
+                    public void deserializeNBT(CompoundTag nbt)
                     {
                         extensionContainer.deserializeNBT(nbt);
                     }
@@ -222,13 +208,13 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<Compo
     }
 
     @Override
-    public CompoundNBT serializeNBT()
+    public CompoundTag serializeNBT()
     {
         return inventory.serializeNBT();
     }
 
     @Override
-    public void deserializeNBT(CompoundNBT nbt)
+    public void deserializeNBT(CompoundTag nbt)
     {
         inventory.deserializeNBT(nbt);
     }

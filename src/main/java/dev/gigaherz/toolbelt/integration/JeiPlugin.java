@@ -1,5 +1,5 @@
 package dev.gigaherz.toolbelt.integration;
-
+/*
 import com.google.common.collect.Lists;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
@@ -7,8 +7,8 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.constants.VanillaRecipeCategoryUid;
 import mezz.jei.api.recipe.vanilla.IVanillaRecipeFactory;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 
 import java.util.Collections;
 import java.util.List;
@@ -43,3 +43,4 @@ public class JeiPlugin implements IModPlugin
         }
     }
 }
+*/

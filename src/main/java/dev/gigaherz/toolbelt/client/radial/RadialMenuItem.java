@@ -1,13 +1,13 @@
 package dev.gigaherz.toolbelt.client.radial;
 
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.network.chat.Component;
 
 import javax.annotation.Nullable;
 
 public abstract class RadialMenuItem
 {
     private final GenericRadialMenu owner;
-    private ITextComponent centralText;
+    private Component centralText;
     private boolean visible;
     private boolean hovered;
 
@@ -28,12 +28,12 @@ public abstract class RadialMenuItem
     }
 
     @Nullable
-    public ITextComponent getCentralText()
+    public Component getCentralText()
     {
         return centralText;
     }
 
-    public void setCentralText(@Nullable ITextComponent centralText)
+    public void setCentralText(@Nullable Component centralText)
     {
         this.centralText = centralText;
     }

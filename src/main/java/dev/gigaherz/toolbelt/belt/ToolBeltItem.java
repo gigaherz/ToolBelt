@@ -8,31 +8,43 @@ import dev.gigaherz.toolbelt.customslots.IExtensionContainer;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlotItem;
 import dev.gigaherz.toolbelt.customslots.example.RpgEquipment;
-import net.minecraft.client.util.ITooltipFlag;
-import net.minecraft.entity.Entity;
-import net.minecraft.entity.LivingEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
+import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
+import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.util.*;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.text.ITextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
-import net.minecraft.world.World;
+import net.minecraft.network.chat.Component;
+import net.minecraft.network.chat.TranslatableComponent;
+import net.minecraft.world.level.Level;
+import net.minecraftforge.client.IItemRenderProperties;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+//import top.theillusivec4.curios.api.type.capability.ICurio;
+//import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.function.Consumer;
+
+import net.minecraft.world.item.Item.Properties;
+
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 
 public class ToolBeltItem extends Item implements IExtensionSlotItem
 {
@@ -42,6 +54,10 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
     @CapabilityInject(IExtensionSlotItem.class)
     public static Capability<IExtensionSlotItem> EXTENSION_SLOT_ITEM;
 
+    //@Nullable
+    //@CapabilityInject(ICurio.class)
+    //public static Capability<ICurio> CURIO_ITEM;
+
     public static final ImmutableSet<ResourceLocation> BELT_SLOT_LIST = ImmutableSet.of(RpgEquipment.BELT);
 
     public ToolBeltItem(Properties properties)
@@ -49,14 +65,14 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
         super(properties);
     }
 
-    private static int getSlotFor(PlayerInventory inv, ItemStack stack)
+    private static int getSlotFor(Inventory inv, ItemStack stack)
     {
-        if (inv.getCurrentItem() == stack)
-            return inv.currentItem;
+        if (inv.getSelected() == stack)
+            return inv.selected;
 
-        for (int i = 0; i < inv.mainInventory.size(); ++i)
+        for (int i = 0; i < inv.items.size(); ++i)
         {
-            ItemStack invStack = inv.mainInventory.get(i);
+            ItemStack invStack = inv.items.get(i);
             if (invStack == stack)
             {
                 return i;
@@ -67,47 +83,47 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
         return -1;
     }
 
-    private ActionResultType openBeltScreen(@Nullable PlayerEntity player, ItemStack stack, World world)
+    private InteractionResult openBeltScreen(@Nullable Player player, ItemStack stack, Level world)
     {
-        int slot = player != null ? getSlotFor(player.inventory, stack) : -1;
+        int slot = player != null ? getSlotFor(player.getInventory(), stack) : -1;
         if (slot == -1)
-            return ActionResultType.FAIL;
+            return InteractionResult.FAIL;
 
-        if (!world.isRemote && player instanceof ServerPlayerEntity)
+        if (!world.isClientSide && player instanceof ServerPlayer)
         {
-            Screens.openBeltScreen((ServerPlayerEntity) player, slot);
+            Screens.openBeltScreen((ServerPlayer) player, slot);
         }
 
-        return ActionResultType.SUCCESS;
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    public ActionResultType onItemUse(ItemUseContext context)
+    public InteractionResult useOn(UseOnContext context)
     {
-        if (context.getHand() != Hand.MAIN_HAND)
-            return ActionResultType.PASS;
+        if (context.getHand() != InteractionHand.MAIN_HAND)
+            return InteractionResult.PASS;
 
-        return openBeltScreen(context.getPlayer(), context.getItem(), context.getWorld());
+        return openBeltScreen(context.getPlayer(), context.getItemInHand(), context.getLevel());
     }
 
     @Override
-    public ActionResult<ItemStack> onItemRightClick(World world, PlayerEntity player, Hand hand)
+    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
     {
-        ItemStack stack = player.getHeldItem(hand);
-        if (hand != Hand.MAIN_HAND)
-            return new ActionResult<>(ActionResultType.PASS, stack);
-        ActionResultType result = openBeltScreen(player, stack, world);
-        return new ActionResult<>(result, stack);
+        ItemStack stack = player.getItemInHand(hand);
+        if (hand != InteractionHand.MAIN_HAND)
+            return new InteractionResultHolder<>(InteractionResult.PASS, stack);
+        InteractionResult result = openBeltScreen(player, stack, world);
+        return new InteractionResultHolder<>(result, stack);
     }
 
     @Override
-    public void addInformation(ItemStack stack, @Nullable World worldIn, List<ITextComponent> tooltip, ITooltipFlag flagIn)
+    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
     {
-        super.addInformation(stack, worldIn, tooltip, flagIn);
+        super.appendHoverText(stack, worldIn, tooltip, flagIn);
 
         int size = getSlotsCount(stack);
 
-        tooltip.add(new TranslationTextComponent("text.toolbelt.tooltip", size - 2, size));
+        tooltip.add(new TranslatableComponent("text.toolbelt.tooltip", size - 2, size));
     }
 
     @Nonnull
@@ -124,7 +140,7 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
     }
 
     @Override
-    public void inventoryTick(ItemStack stack, World worldIn, Entity entityIn, int itemSlot, boolean isSelected)
+    public void inventoryTick(ItemStack stack, Level worldIn, Entity entityIn, int itemSlot, boolean isSelected)
     {
         if (entityIn instanceof LivingEntity)
         {
@@ -133,7 +149,7 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
     }
 
     @Override
-    public ICapabilityProvider initCapabilities(final ItemStack stack, CompoundNBT nbt)
+    public ICapabilityProvider initCapabilities(final ItemStack stack, CompoundTag nbt)
     {
         return new ICapabilityProvider()
         {
@@ -142,6 +158,7 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
 
             final LazyOptional<IItemHandler> itemHandlerInstance = LazyOptional.of(() -> itemHandler);
             final LazyOptional<IExtensionSlotItem> extensionSlotInstance = LazyOptional.of(() -> ToolBeltItem.this);
+            //final LazyOptional<ICurio> curioItemInstance = CURIO_ITEM != null ? LazyOptional.of(CURIO_ITEM::getDefaultInstance) : LazyOptional.empty();
 
             @Override
             @Nonnull
@@ -151,6 +168,8 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
                     return itemHandlerInstance.cast();
                 if (cap == EXTENSION_SLOT_ITEM)
                     return extensionSlotInstance.cast();
+                //if (cap == CURIO_ITEM && CURIO_ITEM != null)
+                //    return curioItemInstance.cast();
                 return LazyOptional.empty();
             }
         };
@@ -159,28 +178,28 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
     {
-        return !ItemStack.areItemsEqual(oldStack, newStack); // super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
+        return !ItemStack.isSame(oldStack, newStack); // super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
     }
 
     public static int getSlotsCount(ItemStack stack)
     {
         int size = 2;
 
-        CompoundNBT nbt = stack.getTag();
+        CompoundTag nbt = stack.getTag();
         if (nbt != null)
         {
-            size = MathHelper.clamp(nbt.getInt("Size"), 2, 9);
+            size = Mth.clamp(nbt.getInt("Size"), 2, 9);
         }
         return size;
     }
 
     public static void setSlotsCount(ItemStack stack, int newSize)
     {
-        CompoundNBT nbt = stack.getTag();
+        CompoundTag nbt = stack.getTag();
         if (nbt == null)
         {
-            nbt = new CompoundNBT();
-            nbt.put("Items", new ListNBT());
+            nbt = new CompoundTag();
+            nbt.put("Items", new ListTag());
         }
 
         nbt.putInt("Size", newSize);

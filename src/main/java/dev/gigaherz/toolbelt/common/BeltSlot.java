@@ -1,20 +1,20 @@
 package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.ConfigData;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
 public class BeltSlot extends Slot
 {
-    public BeltSlot(IInventory playerInventory, ItemStack heldItem, int blockedSlot, int index, int xPosition, int yPosition)
+    public BeltSlot(Container playerInventory, ItemStack heldItem, int blockedSlot, int index, int xPosition, int yPosition)
     {
-        super(new IInventory()
+        super(new Container()
         {
-            final IInventory sourceInventory = playerInventory;
+            final Container sourceInventory = playerInventory;
             final int slot = blockedSlot;
             final int subSlot = index;
             final ItemStack fallbackItem = heldItem;
@@ -24,7 +24,7 @@ public class BeltSlot extends Slot
 
             IItemHandlerModifiable findStack()
             {
-                ItemStack stack = slot >= 0 ? sourceInventory.getStackInSlot(slot) : fallbackItem;
+                ItemStack stack = slot >= 0 ? sourceInventory.getItem(slot) : fallbackItem;
                 if (stack != beltStack)
                 {
                     beltStack = stack;
@@ -37,7 +37,7 @@ public class BeltSlot extends Slot
             }
 
             @Override
-            public int getSizeInventory()
+            public int getContainerSize()
             {
                 return 1;
             }
@@ -45,73 +45,73 @@ public class BeltSlot extends Slot
             @Override
             public boolean isEmpty()
             {
-                return getStackInSlot(0).getCount() <= 0;
+                return getItem(0).getCount() <= 0;
             }
 
             @Override
-            public ItemStack getStackInSlot(int n)
+            public ItemStack getItem(int n)
             {
                 return findStack().getStackInSlot(subSlot);
             }
 
             @Override
-            public ItemStack decrStackSize(int n, int count)
+            public ItemStack removeItem(int n, int count)
             {
                 return findStack().extractItem(subSlot, count, false);
             }
 
             @Override
-            public ItemStack removeStackFromSlot(int n)
+            public ItemStack removeItemNoUpdate(int n)
             {
-                ItemStack existing = getStackInSlot(0);
-                setInventorySlotContents(n, ItemStack.EMPTY);
+                ItemStack existing = getItem(0);
+                setItem(n, ItemStack.EMPTY);
                 return existing;
             }
 
             @Override
-            public void setInventorySlotContents(int n, ItemStack stack)
+            public void setItem(int n, ItemStack stack)
             {
                 findStack().setStackInSlot(subSlot, stack);
             }
 
             @Override
-            public int getInventoryStackLimit()
+            public int getMaxStackSize()
             {
                 return findStack().getSlotLimit(subSlot);
             }
 
             @Override
-            public void markDirty()
+            public void setChanged()
             {
 
             }
 
             @Override
-            public boolean isUsableByPlayer(PlayerEntity player)
+            public boolean stillValid(Player player)
             {
                 return false;
             }
 
             @Override
-            public void openInventory(PlayerEntity player)
+            public void startOpen(Player player)
             {
 
             }
 
             @Override
-            public void closeInventory(PlayerEntity player)
+            public void stopOpen(Player player)
             {
 
             }
 
             @Override
-            public boolean isItemValidForSlot(int index, ItemStack stack)
+            public boolean canPlaceItem(int index, ItemStack stack)
             {
                 return ConfigData.isItemStackAllowed(stack);
             }
 
             @Override
-            public void clear()
+            public void clearContent()
             {
 
             }
@@ -119,7 +119,7 @@ public class BeltSlot extends Slot
     }
 
     @Override
-    public boolean isItemValid(ItemStack stack)
+    public boolean mayPlace(ItemStack stack)
     {
         return ConfigData.isItemStackAllowed(stack);
     }

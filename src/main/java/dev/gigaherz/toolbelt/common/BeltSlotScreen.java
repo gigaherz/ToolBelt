@@ -1,42 +1,48 @@
 package dev.gigaherz.toolbelt.common;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import dev.gigaherz.toolbelt.ToolBelt;
-import net.minecraft.client.gui.DisplayEffectsScreen;
-import net.minecraft.client.gui.recipebook.IRecipeShownListener;
-import net.minecraft.client.gui.recipebook.RecipeBookGui;
-import net.minecraft.client.gui.widget.button.ImageButton;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.container.ClickType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.text.ITextComponent;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.Slot;
 
-import static net.minecraft.client.gui.screen.inventory.InventoryScreen.drawEntityOnScreen;
-
-public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> implements IRecipeShownListener
+public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotContainer> implements RecipeUpdateListener
 {
     private static final ResourceLocation SCREEN_BACKGROUND = ToolBelt.location("textures/gui/belt_slot.png");
     private static final ResourceLocation RECIPE_BUTTON_TEXTURE = new ResourceLocation("textures/gui/recipe_button.png");
     private float oldMouseX;
     private float oldMouseY;
-    private final RecipeBookGui recipeBookGui = new RecipeBookGui();
+    private final RecipeBookComponent recipeBookComponent = new RecipeBookComponent();
     private boolean removeRecipeBookGui;
     private boolean widthTooNarrow;
     private boolean buttonClicked;
 
-    public BeltSlotScreen(BeltSlotContainer container, PlayerInventory playerInventory, ITextComponent title)
+    public BeltSlotScreen(BeltSlotContainer container, Inventory playerInventory, Component title)
     {
         super(container, playerInventory, title);
         this.passEvents = true;
-        this.titleX = 97;
+        this.titleLabelX = 97;
     }
 
     @Override
-    public void tick()
+    public void containerTick()
     {
-        this.recipeBookGui.tick();
+        this.recipeBookComponent.tick();
     }
 
     @Override
@@ -44,79 +50,80 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     {
         super.init();
         this.widthTooNarrow = this.width < 379;
-        this.recipeBookGui.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.container);
+        this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
         this.removeRecipeBookGui = true;
-        this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
-        this.children.add(this.recipeBookGui);
-        this.setFocusedDefault(this.recipeBookGui);
-        this.addButton(new ImageButton(this.guiLeft + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (button) -> {
-            this.recipeBookGui.initSearchBar(this.widthTooNarrow);
-            this.recipeBookGui.toggleVisibility();
-            this.guiLeft = this.recipeBookGui.updateScreenPosition(this.widthTooNarrow, this.width, this.xSize);
-            ((ImageButton) button).setPosition(this.guiLeft + 104, this.height / 2 - 22);
+        this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
+        this.addRenderableWidget(new ImageButton(this.leftPos + 104, this.height / 2 - 22, 20, 18, 0, 0, 19, RECIPE_BUTTON_TEXTURE, (button) -> {
+            this.recipeBookComponent.initVisuals();
+            this.recipeBookComponent.toggleVisibility();
+            this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
+            ((ImageButton) button).setPosition(this.leftPos + 104, this.height / 2 - 22);
             this.buttonClicked = true;
         }));
+        this.addWidget(this.recipeBookComponent);
+        this.setInitialFocus(this.recipeBookComponent);
     }
 
     @Override
-    protected void drawGuiContainerForegroundLayer(MatrixStack matrixStack, int mouseX, int mouseY)
+    protected void renderLabels(PoseStack matrixStack, int mouseX, int mouseY)
     {
-        this.font.drawText(matrixStack, this.title, (float) this.titleX, (float) this.titleY, 4210752);
+        this.font.draw(matrixStack, this.title, (float) this.titleLabelX, (float) this.titleLabelY, 4210752);
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
-        this.hasActivePotionEffects = !this.recipeBookGui.isVisible();
-        if (this.recipeBookGui.isVisible() && this.widthTooNarrow)
+        this.doRenderEffects = !this.recipeBookComponent.isVisible();
+        if (this.recipeBookComponent.isVisible() && this.widthTooNarrow)
         {
-            this.drawGuiContainerBackgroundLayer(matrixStack, partialTicks, mouseX, mouseY);
-            this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
+            this.renderBg(matrixStack, partialTicks, mouseX, mouseY);
+            this.recipeBookComponent.render(matrixStack, mouseX, mouseY, partialTicks);
         }
         else
         {
-            this.recipeBookGui.render(matrixStack, mouseX, mouseY, partialTicks);
+            this.recipeBookComponent.render(matrixStack, mouseX, mouseY, partialTicks);
             super.render(matrixStack, mouseX, mouseY, partialTicks);
-            this.recipeBookGui.func_230477_a_(matrixStack, this.guiLeft, this.guiTop, false, partialTicks);
+            this.recipeBookComponent.renderGhostRecipe(matrixStack, this.leftPos, this.topPos, false, partialTicks);
         }
 
-        this.renderHoveredTooltip(matrixStack, mouseX, mouseY);
-        this.recipeBookGui.func_238924_c_(matrixStack, this.guiLeft, this.guiTop, mouseX, mouseY);
+        this.renderTooltip(matrixStack, mouseX, mouseY);
+        this.recipeBookComponent.renderTooltip(matrixStack, this.leftPos, this.topPos, mouseX, mouseY);
         this.oldMouseX = (float) mouseX;
         this.oldMouseY = (float) mouseY;
-        this.setListenerDefault(this.recipeBookGui);
     }
 
     @Override
-    protected void drawGuiContainerBackgroundLayer(MatrixStack matrixStack, float partialTicks, int mouseX, int mouseY)
+    protected void renderBg(PoseStack matrixStack, float partialTicks, int mouseX, int mouseY)
     {
-        RenderSystem.color4f(1.0F, 1.0F, 1.0F, 1.0F);
-        this.minecraft.getTextureManager().bindTexture(SCREEN_BACKGROUND);
-        int i = this.guiLeft;
-        int j = this.guiTop;
-        this.blit(matrixStack, i, j, 0, 0, this.xSize, this.ySize);
-        drawEntityOnScreen(i + 51, j + 75, 30, (float) (i + 51) - this.oldMouseX, (float) (j + 75 - 50) - this.oldMouseY, this.minecraft.player);
+        RenderSystem.setShader(GameRenderer::getPositionTexShader);
+        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        RenderSystem.setShaderTexture(0, SCREEN_BACKGROUND);
+
+        int i = this.leftPos;
+        int j = this.topPos;
+        this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        renderEntityInInventory(i + 51, j + 75, 30, (float) (i + 51) - this.oldMouseX, (float) (j + 75 - 50) - this.oldMouseY, this.minecraft.player);
     }
 
 
     @Override
-    protected boolean isPointInRegion(int x, int y, int width, int height, double mouseX, double mouseY)
+    protected boolean isHovering(int x, int y, int width, int height, double mouseX, double mouseY)
     {
-        return (!this.widthTooNarrow || !this.recipeBookGui.isVisible()) && super.isPointInRegion(x, y, width, height, mouseX, mouseY);
+        return (!this.widthTooNarrow || !this.recipeBookComponent.isVisible()) && super.isHovering(x, y, width, height, mouseX, mouseY);
     }
 
     @Override
     public boolean mouseClicked(double mouseX, double mouseY, int button)
     {
-        if (this.recipeBookGui.mouseClicked(mouseX, mouseY, button))
+        if (this.recipeBookComponent.mouseClicked(mouseX, mouseY, button))
         {
-            this.setListener(this.recipeBookGui);
+            this.setFocused(this.recipeBookComponent);
             return true;
         }
         else
         {
-            return this.widthTooNarrow && this.recipeBookGui.isVisible() ? false : super.mouseClicked(mouseX, mouseY, button);
+            return this.widthTooNarrow && this.recipeBookComponent.isVisible() ? false : super.mouseClicked(mouseX, mouseY, button);
         }
     }
 
@@ -137,37 +144,83 @@ public class BeltSlotScreen extends DisplayEffectsScreen<BeltSlotContainer> impl
     @Override
     protected boolean hasClickedOutside(double mouseX, double mouseY, int guiLeftIn, int guiTopIn, int mouseButton)
     {
-        boolean flag = mouseX < (double) guiLeftIn || mouseY < (double) guiTopIn || mouseX >= (double) (guiLeftIn + this.xSize) || mouseY >= (double) (guiTopIn + this.ySize);
-        return this.recipeBookGui.func_195604_a(mouseX, mouseY, this.guiLeft, this.guiTop, this.xSize, this.ySize, mouseButton) && flag;
+        boolean flag = mouseX < (double) guiLeftIn || mouseY < (double) guiTopIn || mouseX >= (double) (guiLeftIn + this.imageWidth) || mouseY >= (double) (guiTopIn + this.imageHeight);
+        return this.recipeBookComponent.hasClickedOutside(mouseX, mouseY, this.leftPos, this.topPos, this.imageWidth, this.imageHeight, mouseButton) && flag;
     }
 
     @Override
-    protected void handleMouseClick(Slot slotIn, int slotId, int mouseButton, ClickType type)
+    protected void slotClicked(Slot slotIn, int slotId, int mouseButton, ClickType type)
     {
-        super.handleMouseClick(slotIn, slotId, mouseButton, type);
-        this.recipeBookGui.slotClicked(slotIn);
+        super.slotClicked(slotIn, slotId, mouseButton, type);
+        this.recipeBookComponent.slotClicked(slotIn);
     }
 
     @Override
     public void recipesUpdated()
     {
-        this.recipeBookGui.recipesUpdated();
+        this.recipeBookComponent.recipesUpdated();
     }
 
     @Override
-    public void onClose()
+    public void removed()
     {
         if (this.removeRecipeBookGui)
         {
-            this.recipeBookGui.removed();
+            this.recipeBookComponent.removed();
         }
 
-        super.onClose();
+        super.removed();
     }
 
     @Override
-    public RecipeBookGui getRecipeGui()
+    public RecipeBookComponent getRecipeBookComponent()
     {
-        return this.recipeBookGui;
+        return this.recipeBookComponent;
+    }
+
+    public static void renderEntityInInventory(int p_98851_, int p_98852_, int p_98853_, float p_98854_, float p_98855_, LivingEntity p_98856_) {
+        float f = (float)Math.atan((double)(p_98854_ / 40.0F));
+        float f1 = (float)Math.atan((double)(p_98855_ / 40.0F));
+        PoseStack posestack = RenderSystem.getModelViewStack();
+        posestack.pushPose();
+        posestack.translate((double)p_98851_, (double)p_98852_, 1050.0D);
+        posestack.scale(1.0F, 1.0F, -1.0F);
+        RenderSystem.applyModelViewMatrix();
+        PoseStack posestack1 = new PoseStack();
+        posestack1.translate(0.0D, 0.0D, 1000.0D);
+        posestack1.scale((float)p_98853_, (float)p_98853_, (float)p_98853_);
+        Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
+        Quaternion quaternion1 = Vector3f.XP.rotationDegrees(f1 * 20.0F);
+        quaternion.mul(quaternion1);
+        posestack1.mulPose(quaternion);
+        float f2 = p_98856_.yBodyRot;
+        float f3 = p_98856_.getYRot();
+        float f4 = p_98856_.getXRot();
+        float f5 = p_98856_.yHeadRotO;
+        float f6 = p_98856_.yHeadRot;
+        p_98856_.yBodyRot = 180.0F + f * 20.0F;
+        p_98856_.setYRot(180.0F + f * 40.0F);
+        p_98856_.setXRot(-f1 * 20.0F);
+        p_98856_.yHeadRot = p_98856_.getYRot();
+        p_98856_.yHeadRotO = p_98856_.getYRot();
+        Lighting.setupForEntityInInventory();
+        EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
+        quaternion1.conj();
+        entityrenderdispatcher.overrideCameraOrientation(quaternion1);
+        entityrenderdispatcher.setRenderShadow(false);
+        MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
+        RenderSystem.runAsFancy(() -> {
+            entityrenderdispatcher.render(p_98856_, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, posestack1, multibuffersource$buffersource, 15728880);
+        });
+        multibuffersource$buffersource.endBatch();
+        entityrenderdispatcher.setRenderShadow(true);
+        p_98856_.yBodyRot = f2;
+        p_98856_.setYRot(f3);
+        p_98856_.setXRot(f4);
+        p_98856_.yHeadRotO = f5;
+        p_98856_.yHeadRot = f6;
+        posestack.popPose();
+        RenderSystem.applyModelViewMatrix();
+        Lighting.setupFor3DItems();
     }
 }

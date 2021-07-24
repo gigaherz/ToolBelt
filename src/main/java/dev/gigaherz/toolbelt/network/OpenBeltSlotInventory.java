@@ -2,8 +2,8 @@ package dev.gigaherz.toolbelt.network;
 
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.common.Screens;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -13,11 +13,11 @@ public class OpenBeltSlotInventory
     {
     }
 
-    public OpenBeltSlotInventory(PacketBuffer buf)
+    public OpenBeltSlotInventory(FriendlyByteBuf buf)
     {
     }
 
-    public void encode(PacketBuffer buf)
+    public void encode(FriendlyByteBuf buf)
     {
     }
 

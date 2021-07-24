@@ -1,10 +1,10 @@
 package dev.gigaherz.toolbelt.customslots;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.Inventory;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.Container;
+import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
 
 import javax.annotation.Nonnull;
 
@@ -13,7 +13,7 @@ import javax.annotation.Nonnull;
  */
 public class ExtensionSlotSlot extends Slot
 {
-    private static IInventory emptyInventory = new Inventory(0);
+    private static Container emptyInventory = new SimpleContainer(0);
     private final IExtensionSlot slot;
 
     public ExtensionSlotSlot(IExtensionSlot slot, int x, int y)
@@ -26,7 +26,7 @@ public class ExtensionSlotSlot extends Slot
      * Check if the stack is allowed to be placed in this slot, used for armor slots as well as furnace fuel.
      */
     @Override
-    public boolean isItemValid(@Nonnull ItemStack stack)
+    public boolean mayPlace(@Nonnull ItemStack stack)
     {
         if (stack.isEmpty())
             return false;
@@ -39,7 +39,7 @@ public class ExtensionSlotSlot extends Slot
      */
     @Override
     @Nonnull
-    public ItemStack getStack()
+    public ItemStack getItem()
     {
         return slot.getContents();
     }
@@ -50,17 +50,17 @@ public class ExtensionSlotSlot extends Slot
      * Helper method to put a stack in the slot.
      */
     @Override
-    public void putStack(@Nonnull ItemStack stack)
+    public void set(@Nonnull ItemStack stack)
     {
         slot.setContents(stack);
-        this.onSlotChanged();
+        this.setChanged();
     }
 
     /**
      * if par2 has more items than par1, onCrafting(item,countIncrease) is called
      */
     @Override
-    public void onSlotChange(@Nonnull ItemStack oldStackIn, @Nonnull ItemStack newStackIn)
+    public void onQuickCraft(@Nonnull ItemStack oldStackIn, @Nonnull ItemStack newStackIn)
     {
 
     }
@@ -70,13 +70,13 @@ public class ExtensionSlotSlot extends Slot
      * of armor slots)
      */
     @Override
-    public int getSlotStackLimit()
+    public int getMaxStackSize()
     {
         return 1;
     }
 
     @Override
-    public int getItemStackLimit(@Nonnull ItemStack stack)
+    public int getMaxStackSize(@Nonnull ItemStack stack)
     {
         return 1;
     }
@@ -85,7 +85,7 @@ public class ExtensionSlotSlot extends Slot
      * Return whether this slot's stack can be taken from this slot.
      */
     @Override
-    public boolean canTakeStack(PlayerEntity playerIn)
+    public boolean mayPickup(Player playerIn)
     {
         return slot.canUnequip(slot.getContents());
     }
@@ -96,7 +96,7 @@ public class ExtensionSlotSlot extends Slot
      */
     @Override
     @Nonnull
-    public ItemStack decrStackSize(int amount)
+    public ItemStack remove(int amount)
     {
         ItemStack itemstack = slot.getContents();
 
@@ -110,7 +110,7 @@ public class ExtensionSlotSlot extends Slot
         if (remaining <= 0)
             slot.setContents(ItemStack.EMPTY);
 
-        this.onSlotChanged();
+        this.setChanged();
 
         return split;
     }

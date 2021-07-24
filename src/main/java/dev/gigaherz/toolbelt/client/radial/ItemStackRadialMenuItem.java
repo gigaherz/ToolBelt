@@ -1,9 +1,10 @@
 package dev.gigaherz.toolbelt.client.radial;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import net.minecraft.client.renderer.RenderHelper;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.ITextComponent;
+import com.mojang.blaze3d.platform.Lighting;
+import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.Component;
 
 public class ItemStackRadialMenuItem extends TextRadialMenuItem
 {
@@ -20,7 +21,7 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
         return stack;
     }
 
-    public ItemStackRadialMenuItem(GenericRadialMenu owner, int slot, ItemStack stack, ITextComponent altText)
+    public ItemStackRadialMenuItem(GenericRadialMenu owner, int slot, ItemStack stack, Component altText)
     {
         super(owner, altText, 0x7FFFFFFF);
         this.slot = slot;
@@ -32,13 +33,15 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
     {
         if (stack.getCount() > 0)
         {
-            RenderHelper.enableStandardItemLighting();
-            RenderSystem.pushMatrix();
-            RenderSystem.translatef(-8, -8, context.z);
-            context.itemRenderer.renderItemAndEffectIntoGUI(stack, (int) context.x, (int) context.y);
-            context.itemRenderer.renderItemOverlayIntoGUI(context.fontRenderer, stack, (int) context.x, (int) context.y, "");
-            RenderSystem.popMatrix();
-            RenderHelper.disableStandardItemLighting();
+            PoseStack viewModelPose = RenderSystem.getModelViewStack();
+            viewModelPose.pushPose();
+            viewModelPose.mulPoseMatrix(context.matrixStack.last().pose());
+            viewModelPose.translate(-8, -8, context.z);
+            RenderSystem.applyModelViewMatrix();
+            context.itemRenderer.renderAndDecorateItem(stack, (int) context.x, (int) context.y);
+            context.itemRenderer.renderGuiItemDecorations(context.fontRenderer, stack, (int) context.x, (int) context.y, "");
+            viewModelPose.popPose();
+            RenderSystem.applyModelViewMatrix();
         }
         else
         {

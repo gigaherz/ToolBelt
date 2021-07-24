@@ -1,21 +1,22 @@
 package dev.gigaherz.toolbelt.client;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.matrix.MatrixStack;
+import com.mojang.blaze3d.vertex.PoseStack;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.client.radial.*;
 import dev.gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.FontRenderer;
-import net.minecraft.client.gui.screen.Screen;
-import net.minecraft.client.renderer.ItemRenderer;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.text.StringTextComponent;
-import net.minecraft.util.text.TranslationTextComponent;
+import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.chat.TextComponent;
+import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.gui.ForgeIngameGui;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -45,7 +46,7 @@ public class RadialMenuScreen extends Screen
 
     public RadialMenuScreen(BeltFinder.BeltGetter getter)
     {
-        super(new StringTextComponent("RADIAL MENU"));
+        super(new TextComponent("RADIAL MENU"));
 
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
@@ -53,7 +54,7 @@ public class RadialMenuScreen extends Screen
         menu = new GenericRadialMenu(Minecraft.getInstance(), new IRadialMenuHost()
         {
             @Override
-            public void renderTooltip(MatrixStack matrixStack, ItemStack stack, int mouseX, int mouseY)
+            public void renderTooltip(PoseStack matrixStack, ItemStack stack, int mouseX, int mouseY)
             {
                 RadialMenuScreen.this.renderTooltip(matrixStack, stack, mouseX, mouseY);
             }
@@ -65,7 +66,7 @@ public class RadialMenuScreen extends Screen
             }
 
             @Override
-            public FontRenderer getFontRenderer()
+            public Font getFontRenderer()
             {
                 return font;
             }
@@ -83,7 +84,7 @@ public class RadialMenuScreen extends Screen
                 close();
             }
         };
-        insertMenuItem = new TextRadialMenuItem(menu, new TranslationTextComponent("text.toolbelt.insert"))
+        insertMenuItem = new TextRadialMenuItem(menu, new TranslatableComponent("text.toolbelt.insert"))
         {
             @Override
             public boolean onClick()
@@ -94,21 +95,21 @@ public class RadialMenuScreen extends Screen
     }
 
     @SubscribeEvent
-    public static void overlayEvent(RenderGameOverlayEvent.Pre event)
+    public static void overlayEvent(RenderGameOverlayEvent.PreLayer event)
     {
-        if (event.getType() != RenderGameOverlayEvent.ElementType.CROSSHAIRS)
+        if (event.getOverlay() != ForgeIngameGui.CROSSHAIR_ELEMENT)
             return;
 
-        if (Minecraft.getInstance().currentScreen instanceof RadialMenuScreen)
+        if (Minecraft.getInstance().screen instanceof RadialMenuScreen)
         {
             event.setCanceled(true);
         }
     }
 
     @Override // removed
-    public void onClose()
+    public void removed()
     {
-        super.onClose();
+        super.removed();
         ClientEvents.wipeOpen();
     }
 
@@ -121,7 +122,7 @@ public class RadialMenuScreen extends Screen
 
         if (menu.isClosed())
         {
-            Minecraft.getInstance().displayGuiScreen(null);
+            Minecraft.getInstance().setScreen(null);
             ClientEvents.wipeOpen();
         }
         if (!menu.isReady() || inventory == null)
@@ -129,7 +130,7 @@ public class RadialMenuScreen extends Screen
             return;
         }
 
-        ItemStack inHand = minecraft.player.getHeldItemMainhand();
+        ItemStack inHand = minecraft.player.getMainHandItem();
         if (!ConfigData.isItemStackAllowed(inHand))
         {
             inventory = null;
@@ -153,7 +154,7 @@ public class RadialMenuScreen extends Screen
 
         if (inventory == null)
         {
-            Minecraft.getInstance().displayGuiScreen(null);
+            Minecraft.getInstance().setScreen(null);
         }
         else if (!ClientEvents.isKeyDown(ClientEvents.OPEN_TOOL_MENU_KEYBIND))
         {
@@ -181,14 +182,16 @@ public class RadialMenuScreen extends Screen
     }
 
     @Override
-    public void render(MatrixStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
+        matrixStack.pushPose();
         super.render(matrixStack, mouseX, mouseY, partialTicks);
+        matrixStack.popPose();
 
         if (inventory == null)
             return;
 
-        ItemStack inHand = minecraft.player.getHeldItemMainhand();
+        ItemStack inHand = minecraft.player.getMainHandItem();
         if (!ConfigData.isItemStackAllowed(inHand))
             return;
 
@@ -198,7 +201,7 @@ public class RadialMenuScreen extends Screen
             for (int i = 0; i < inventory.getSlots(); i++)
             {
                 ItemStack inSlot = inventory.getStackInSlot(i);
-                ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(menu, i, inSlot, new TranslationTextComponent("text.toolbelt.empty"))
+                ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(menu, i, inSlot, new TranslatableComponent("text.toolbelt.empty"))
                 {
                     @Override
                     public boolean onClick()
@@ -210,16 +213,16 @@ public class RadialMenuScreen extends Screen
                 if (inHand.getCount() > 0)
                 {
                     if (inSlot.getCount() > 0)
-                        item.setCentralText(new TranslationTextComponent("text.toolbelt.swap"));
+                        item.setCentralText(new TranslatableComponent("text.toolbelt.swap"));
                     else
-                        item.setCentralText(new TranslationTextComponent("text.toolbelt.insert"));
+                        item.setCentralText(new TranslatableComponent("text.toolbelt.insert"));
                 }
                 else
                 {
                     if (inSlot.getCount() > 0)
-                        item.setCentralText(new TranslationTextComponent("text.toolbelt.extract"));
+                        item.setCentralText(new TranslatableComponent("text.toolbelt.extract"));
                     else
-                        item.setCentralText(new TranslationTextComponent("text.toolbelt.empty"));
+                        item.setCentralText(new TranslatableComponent("text.toolbelt.empty"));
                 }
                 cachedMenuItems.add(item);
             }
@@ -240,7 +243,7 @@ public class RadialMenuScreen extends Screen
 
         if (cachedMenuItems.stream().noneMatch(RadialMenuItem::isVisible))
         {
-            menu.setCentralText(new TranslationTextComponent("text.toolbelt.empty"));
+            menu.setCentralText(new TranslatableComponent("text.toolbelt.empty"));
         }
         else
         {
@@ -254,7 +257,7 @@ public class RadialMenuScreen extends Screen
 
     private boolean trySwap(int slotNumber, ItemStack itemMouseOver)
     {
-        ItemStack inHand = minecraft.player.getHeldItemMainhand();
+        ItemStack inHand = minecraft.player.getMainHandItem();
         if (!ConfigData.isItemStackAllowed(inHand))
             return false;
 

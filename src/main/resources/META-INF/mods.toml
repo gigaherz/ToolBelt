@@ -19,13 +19,13 @@ Declutter your inventory of tools
 [[dependencies.toolbelt]]
    modId="forge"
    mandatory=true
-   versionRange="[33.0.21,)"
+   versionRange="[37.0.1,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
    modId="minecraft"
    mandatory=true
-   versionRange="[1.16.2,1.17)"
+   versionRange="[1.17.1,1.18)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]

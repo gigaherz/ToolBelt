@@ -1,12 +1,12 @@
 package dev.gigaherz.toolbelt.integration;
 
-import lain.mods.cos.api.CosArmorAPI;
-import net.minecraft.entity.player.PlayerEntity;
+//import lain.mods.cos.api.CosArmorAPI;
+import net.minecraft.world.entity.player.Player;
 
 public class CosmeticArmorIntegration
 {
-    public static boolean isHidden(PlayerEntity player, String modid, String id)
+    public static boolean isHidden(Player player, String modid, String id)
     {
-        return CosArmorAPI.getCAStacksClient(player.getUniqueID()).isHidden(modid, id);
+        return false; // TODO: CosArmorAPI.getCAStacksClient(player.getUUID()).isHidden(modid, id);
     }
 }

@@ -7,22 +7,20 @@ import dev.gigaherz.toolbelt.customslots.ExtensionSlotSlot;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
 import dev.gigaherz.toolbelt.network.ContainerSlotsHack;
 import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
-import net.minecraft.client.renderer.texture.AtlasTexture;
-import net.minecraft.client.util.RecipeBookCategories;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.entity.MobEntity;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.CraftResultInventory;
-import net.minecraft.inventory.CraftingInventory;
-import net.minecraft.inventory.EquipmentSlotType;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.*;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.RecipeBookCategory;
-import net.minecraft.item.crafting.RecipeItemHelper;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.RecipeBookCategories;
+import net.minecraft.world.inventory.*;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.entity.Mob;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.entity.player.StackedContents;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fml.DistExecutor;
@@ -31,20 +29,20 @@ import net.minecraftforge.registries.ObjectHolder;
 import javax.annotation.Nullable;
 import java.util.List;
 
-public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
+public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
 {
     @ObjectHolder("toolbelt:belt_slot_container")
-    public static ContainerType<BeltSlotContainer> TYPE;
+    public static MenuType<BeltSlotContainer> TYPE;
 
     public static final ResourceLocation SLOT_BACKGROUND = ToolBelt.location("gui/empty_belt_slot_background");
 
     private final ExtensionSlotSlot slotBelt;
     private final IExtensionSlot extensionSlot;
 
-    private final CraftingInventory craftingInventory = new CraftingInventory(this, 2, 2);
-    private final CraftResultInventory craftResultInventory = new CraftResultInventory();
+    private final CraftingContainer craftingInventory = new CraftingContainer(this, 2, 2);
+    private final ResultContainer craftResultInventory = new ResultContainer();
     public final boolean isLocalWorld;
-    private final PlayerEntity player;
+    private final Player player;
 
     private interface SlotFactory<T extends Slot>
     {
@@ -56,17 +54,17 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
             () -> () -> ExtensionSlotSlot::new
     );
 
-    public BeltSlotContainer(int id, PlayerInventory playerInventory)
+    public BeltSlotContainer(int id, Inventory playerInventory)
     {
         this(id, playerInventory, true);
     }
 
-    public BeltSlotContainer(int id, PlayerInventory playerInventory, boolean localWorld)
+    public BeltSlotContainer(int id, Inventory playerInventory, boolean localWorld)
     {
         super(TYPE, id);
         this.isLocalWorld = localWorld;
         this.player = playerInventory.player;
-        this.addSlot(new CraftingResultSlot(playerInventory.player, this.craftingInventory, this.craftResultInventory, 0, 154, 28));
+        this.addSlot(new ResultSlot(playerInventory.player, this.craftingInventory, this.craftResultInventory, 0, 154, 28));
 
         for (int i = 0; i < 2; ++i)
         {
@@ -78,14 +76,14 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
 
         for (int k = 0; k < 4; ++k)
         {
-            final EquipmentSlotType equipmentslottype = PlayerContainer.VALID_EQUIPMENT_SLOTS[k];
+            final EquipmentSlot equipmentslottype = InventoryMenu.SLOT_IDS[k];
             this.addSlot(new Slot(playerInventory, 39 - k, 8, 8 + k * 18)
             {
                 /**
                  * Returns the maximum stack size for a given slot (usually the same as getInventoryStackLimit(), but 1 in
                  * the case of armor slots)
                  */
-                public int getSlotStackLimit()
+                public int getMaxStackSize()
                 {
                     return 1;
                 }
@@ -93,7 +91,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
                 /**
                  * Check if the stack is allowed to be placed in this slot, used for armor slots as well as furnace fuel.
                  */
-                public boolean isItemValid(ItemStack stack)
+                public boolean mayPlace(ItemStack stack)
                 {
                     return stack.canEquip(equipmentslottype, player);
                 }
@@ -101,17 +99,17 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
                 /**
                  * Return whether this slot's stack can be taken from this slot.
                  */
-                public boolean canTakeStack(PlayerEntity playerIn)
+                public boolean mayPickup(Player playerIn)
                 {
-                    ItemStack itemstack = this.getStack();
-                    return !itemstack.isEmpty() && !playerIn.isCreative() && EnchantmentHelper.hasBindingCurse(itemstack) ? false : super.canTakeStack(playerIn);
+                    ItemStack itemstack = this.getItem();
+                    return !itemstack.isEmpty() && !playerIn.isCreative() && EnchantmentHelper.hasBindingCurse(itemstack) ? false : super.mayPickup(playerIn);
                 }
 
                 @Nullable
                 @OnlyIn(Dist.CLIENT)
                 public String getSlotTexture()
                 {
-                    return PlayerContainer.ARMOR_SLOT_TEXTURES[equipmentslottype.getIndex()].toString();
+                    return InventoryMenu.TEXTURE_EMPTY_SLOTS[equipmentslottype.getIndex()].toString();
                 }
             });
         }
@@ -159,76 +157,96 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     }
 
     @Override
-    public RecipeBookCategory func_241850_m()
+    public RecipeBookType getRecipeBookType()
     {
-        return RecipeBookCategory.CRAFTING;
+        return RecipeBookType.CRAFTING;
     }
 
     @Override
-    public void fillStackedContents(RecipeItemHelper itemHelperIn)
+    public boolean shouldMoveToInventory(int slot)
+    {
+        return slot != this.getResultSlotIndex();
+    }
+
+    @Override
+    public void fillCraftSlotsStackedContents(StackedContents itemHelperIn)
     {
         this.craftingInventory.fillStackedContents(itemHelperIn);
     }
 
     @Override
-    public void clear()
+    public void clearCraftingContent()
     {
-        this.craftResultInventory.clear();
-        this.craftingInventory.clear();
+        this.craftResultInventory.clearContent();
+        this.craftingInventory.clearContent();
     }
 
     @Override
-    public boolean matches(IRecipe<? super CraftingInventory> recipeIn)
+    public boolean recipeMatches(Recipe<? super CraftingContainer> recipeIn)
     {
-        return recipeIn.matches(this.craftingInventory, this.player.world);
+        return recipeIn.matches(this.craftingInventory, this.player.level);
     }
 
     @Override
-    public void onCraftMatrixChanged(IInventory inventoryIn)
+    public void slotsChanged(Container inventoryIn)
     {
-        WorkbenchContainer.updateCraftingResult(this.windowId, this.player.world, this.player, this.craftingInventory, this.craftResultInventory);
+        Bridge.slotChangedCraftingGridAccessor(this, this.player.level, this.player, this.craftingInventory, this.craftResultInventory);
     }
 
-    @Override
-    public void onContainerClosed(PlayerEntity playerIn)
+    private static class Bridge extends CraftingMenu
     {
-        super.onContainerClosed(playerIn);
-
-        this.craftResultInventory.clear();
-
-        if (!playerIn.world.isRemote)
+        private Bridge(int p_39353_, Inventory p_39354_)
         {
-            this.clearContainer(playerIn, playerIn.world, this.craftingInventory);
+            super(p_39353_, p_39354_);
+            throw new IllegalStateException("Not instantiable.");
+        }
+
+        public static void slotChangedCraftingGridAccessor(AbstractContainerMenu container, Level level, Player player, CraftingContainer craftingInventory, ResultContainer craftResultInventory)
+        {
+            CraftingMenu.slotChangedCraftingGrid(container, level, player, craftingInventory, craftResultInventory);
+        }
+    }
+
+    @Override
+    public void removed(Player playerIn)
+    {
+        super.removed(playerIn);
+
+        this.craftResultInventory.clearContent();
+
+        if (!playerIn.level.isClientSide)
+        {
+            this.clearContainer(playerIn, this.craftingInventory);
             BeltFinder.sendSync(playerIn);
         }
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn)
+    public boolean stillValid(Player playerIn)
     {
         return true;
     }
 
     @Override
-    public boolean canMergeSlot(ItemStack stack, Slot slotIn)
+    public boolean canTakeItemForPickAll(ItemStack stack, Slot slotIn)
     {
-        return slotIn.inventory != this.craftResultInventory && super.canMergeSlot(stack, slotIn);
+        return slotIn.container != this.craftResultInventory && super.canTakeItemForPickAll(stack, slotIn);
     }
 
     @Override
-    public int getOutputSlot()
+    public int getResultSlotIndex()
     {
         return 0;
     }
 
     @Override
-    public int getWidth()
+    public int getGridWidth()
     {
         return this.craftingInventory.getWidth();
     }
 
     @Override
-    public int getHeight()
+    public int getGridHeight()
     {
         return this.craftingInventory.getHeight();
     }
@@ -240,34 +258,34 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     }
 
     @Override
-    public void detectAndSendChanges()
+    public void broadcastChanges()
     {
-        super.detectAndSendChanges();
+        super.broadcastChanges();
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index)
+    public ItemStack quickMoveStack(Player playerIn, int index)
     {
-        Slot slot = this.inventorySlots.get(index);
+        Slot slot = this.slots.get(index);
 
-        if (slot != null && slot.getHasStack())
+        if (slot != null && slot.hasItem())
         {
             ItemStack remaining = ItemStack.EMPTY;
-            ItemStack slotContents = slot.getStack();
+            ItemStack slotContents = slot.getItem();
             remaining = slotContents.copy();
 
-            if (index == slotBelt.slotNumber)
+            if (index == slotBelt.index)
             {
-                if (!this.mergeItemStack(slotContents, 9, 45, false))
+                if (!this.moveItemStackTo(slotContents, 9, 45, false))
                 {
                     return ItemStack.EMPTY;
                 }
 
                 return remaining;
             }
-            else if (slot.isItemValid(slotContents))
+            else if (slot.mayPlace(slotContents))
             {
-                if (!this.mergeItemStack(slotContents, slotBelt.slotNumber, slotBelt.slotNumber + 1, false))
+                if (!this.moveItemStackTo(slotContents, slotBelt.index, slotBelt.index + 1, false))
                 {
                     return ItemStack.EMPTY;
                 }
@@ -275,75 +293,75 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
         }
 
         ItemStack itemstack = ItemStack.EMPTY;
-        if (slot != null && slot.getHasStack())
+        if (slot != null && slot.hasItem())
         {
-            ItemStack itemstack1 = slot.getStack();
+            ItemStack itemstack1 = slot.getItem();
             itemstack = itemstack1.copy();
-            EquipmentSlotType equipmentslottype = MobEntity.getSlotForItemStack(itemstack);
+            EquipmentSlot equipmentslottype = Mob.getEquipmentSlotForItem(itemstack);
             if (index == 0)
             {
-                if (!this.mergeItemStack(itemstack1, 9, 45, true))
+                if (!this.moveItemStackTo(itemstack1, 9, 45, true))
                 {
                     return ItemStack.EMPTY;
                 }
 
-                slot.onSlotChange(itemstack1, itemstack);
+                slot.onQuickCraft(itemstack1, itemstack);
             }
             else if (index >= 1 && index < 5)
             {
-                if (!this.mergeItemStack(itemstack1, 9, 45, false))
+                if (!this.moveItemStackTo(itemstack1, 9, 45, false))
                 {
                     return ItemStack.EMPTY;
                 }
             }
             else if (index >= 5 && index < 9)
             {
-                if (!this.mergeItemStack(itemstack1, 9, 45, false))
+                if (!this.moveItemStackTo(itemstack1, 9, 45, false))
                 {
                     return ItemStack.EMPTY;
                 }
             }
-            else if (equipmentslottype.getSlotType() == EquipmentSlotType.Group.ARMOR && !this.inventorySlots.get(8 - equipmentslottype.getIndex()).getHasStack())
+            else if (equipmentslottype.getType() == EquipmentSlot.Type.ARMOR && !this.slots.get(8 - equipmentslottype.getIndex()).hasItem())
             {
                 int i = 8 - equipmentslottype.getIndex();
-                if (!this.mergeItemStack(itemstack1, i, i + 1, false))
+                if (!this.moveItemStackTo(itemstack1, i, i + 1, false))
                 {
                     return ItemStack.EMPTY;
                 }
             }
-            else if (equipmentslottype == EquipmentSlotType.OFFHAND && !this.inventorySlots.get(45).getHasStack())
+            else if (equipmentslottype == EquipmentSlot.OFFHAND && !this.slots.get(45).hasItem())
             {
-                if (!this.mergeItemStack(itemstack1, 45, 46, false))
+                if (!this.moveItemStackTo(itemstack1, 45, 46, false))
                 {
                     return ItemStack.EMPTY;
                 }
             }
             else if (index >= 9 && index < 36)
             {
-                if (!this.mergeItemStack(itemstack1, 36, 45, false))
+                if (!this.moveItemStackTo(itemstack1, 36, 45, false))
                 {
                     return ItemStack.EMPTY;
                 }
             }
             else if (index >= 36 && index < 45)
             {
-                if (!this.mergeItemStack(itemstack1, 9, 36, false))
+                if (!this.moveItemStackTo(itemstack1, 9, 36, false))
                 {
                     return ItemStack.EMPTY;
                 }
             }
-            else if (!this.mergeItemStack(itemstack1, 9, 45, false))
+            else if (!this.moveItemStackTo(itemstack1, 9, 45, false))
             {
                 return ItemStack.EMPTY;
             }
 
             if (itemstack1.isEmpty())
             {
-                slot.putStack(ItemStack.EMPTY);
+                slot.set(ItemStack.EMPTY);
             }
             else
             {
-                slot.onSlotChanged();
+                slot.setChanged();
             }
 
             if (itemstack1.getCount() == itemstack.getCount())
@@ -351,10 +369,10 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
                 return ItemStack.EMPTY;
             }
 
-            ItemStack itemstack2 = slot.onTake(playerIn, itemstack1);
+            slot.onTake(playerIn, itemstack1);
             if (index == 0)
             {
-                playerIn.dropItem(itemstack2, false);
+                playerIn.drop(itemstack1, false);
             }
         }
 
@@ -364,7 +382,7 @@ public class BeltSlotContainer extends RecipeBookContainer<CraftingInventory>
     private class ExtensionSlotSlotClient extends ExtensionSlotSlot
     {
         {
-            setBackground(AtlasTexture.LOCATION_BLOCKS_TEXTURE, SLOT_BACKGROUND);
+            setBackground(TextureAtlas.LOCATION_BLOCKS, SLOT_BACKGROUND);
         }
 
         public ExtensionSlotSlotClient(IExtensionSlot slot, int x, int y)

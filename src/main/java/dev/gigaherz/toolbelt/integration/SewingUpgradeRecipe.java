@@ -2,14 +2,16 @@ package dev.gigaherz.toolbelt.integration;
 
 import dev.gigaherz.sewingkit.api.SewingRecipe;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.NonNullList;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.Container;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.core.NonNullList;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;
+
+import dev.gigaherz.sewingkit.api.SewingRecipe.Material;
 
 public class SewingUpgradeRecipe extends SewingRecipe
 {
@@ -19,24 +21,24 @@ public class SewingUpgradeRecipe extends SewingRecipe
     }
 
     @Override
-    public ItemStack getCraftingResult(IInventory inv)
+    public ItemStack assemble(Container inv)
     {
         ItemStack inputBelt = ItemStack.EMPTY;
         for (int i = 2; i < 6; i++)
         {
-            if (inv.getStackInSlot(i).getItem() instanceof ToolBeltItem)
+            if (inv.getItem(i).getItem() instanceof ToolBeltItem)
             {
-                inputBelt = inv.getStackInSlot(i);
+                inputBelt = inv.getItem(i);
                 break;
             }
         }
-        ItemStack upgradedBelt = super.getCraftingResult(inv);
+        ItemStack upgradedBelt = super.assemble(inv);
         if (inputBelt.getCount() > 0)
         {
-            CompoundNBT inputTag = inputBelt.getTag();
+            CompoundTag inputTag = inputBelt.getTag();
             if (inputTag != null)
             {
-                CompoundNBT tag = upgradedBelt.getOrCreateTag();
+                CompoundTag tag = upgradedBelt.getOrCreateTag();
                 upgradedBelt.setTag(inputTag.copy().merge(tag));
             }
         }

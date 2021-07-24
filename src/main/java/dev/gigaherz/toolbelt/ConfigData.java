@@ -3,11 +3,11 @@ package dev.gigaherz.toolbelt;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
-import net.minecraft.item.Item;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.Items;
-import net.minecraft.util.IStringSerializable;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.util.StringRepresentable;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -224,10 +224,10 @@ public class ConfigData
         if (stack.getCount() <= 0)
             return true;
 
-        if (whiteList.stream().anyMatch((s) -> ItemStack.areItemsEqual(s, stack)))
+        if (whiteList.stream().anyMatch((s) -> ItemStack.isSame(s, stack)))
             return true;
 
-        if (blackList.stream().anyMatch((s) -> ItemStack.areItemsEqual(s, stack)))
+        if (blackList.stream().anyMatch((s) -> ItemStack.isSame(s, stack)))
             return false;
 
         if (stack.getItem() instanceof ToolBeltItem)
@@ -239,7 +239,7 @@ public class ConfigData
         return true;
     }
 
-    public enum ThreeWayChoice implements IStringSerializable
+    public enum ThreeWayChoice implements StringRepresentable
     {
         OFF("off"),
         AUTO("auto"),
@@ -253,7 +253,7 @@ public class ConfigData
         }
 
         @Override
-        public String getString()
+        public String getSerializedName()
         {
             return name;
         }
@@ -270,7 +270,7 @@ public class ConfigData
 
         public static String[] names()
         {
-            return Arrays.stream(values()).map(ThreeWayChoice::getString).toArray(String[]::new);
+            return Arrays.stream(values()).map(ThreeWayChoice::getSerializedName).toArray(String[]::new);
         }
     }
 }

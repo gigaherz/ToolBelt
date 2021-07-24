@@ -1,9 +1,9 @@
 package dev.gigaherz.toolbelt.customslots;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.nbt.INBT;
-import net.minecraft.util.Direction;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.nbt.Tag;
+import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -22,27 +22,6 @@ public class ExtensionSlotItemCapability
 
     public static void register()
     {
-        CapabilityManager.INSTANCE.register(IExtensionSlotItem.class, new Storage(), DefaultImplementation::new);
-    }
-
-    static class Storage implements Capability.IStorage<IExtensionSlotItem>
-    {
-
-        @Nullable
-        @Override
-        public INBT writeNBT(Capability<IExtensionSlotItem> capability, IExtensionSlotItem instance, Direction side)
-        {
-            return null;
-        }
-
-        @Override
-        public void readNBT(Capability<IExtensionSlotItem> capability, IExtensionSlotItem instance, Direction side, INBT nbt)
-        {
-
-        }
-    }
-
-    private static class DefaultImplementation implements IExtensionSlotItem
-    {
+        CapabilityManager.INSTANCE.register(IExtensionSlotItem.class);
     }
 }

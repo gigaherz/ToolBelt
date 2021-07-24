@@ -1,10 +1,10 @@
 package dev.gigaherz.toolbelt.customslots;
 
 import com.google.common.collect.ImmutableSet;
-import net.minecraft.enchantment.EnchantmentHelper;
-import net.minecraft.enchantment.Enchantments;
-import net.minecraft.item.ItemStack;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 
@@ -79,6 +79,6 @@ public interface IExtensionSlotItem
      */
     default boolean canUnequip(@Nonnull ItemStack stack, @Nonnull IExtensionSlot slot)
     {
-        return EnchantmentHelper.getEnchantmentLevel(Enchantments.BINDING_CURSE, stack) <= 0;
+        return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BINDING_CURSE, stack) <= 0;
     }
 }

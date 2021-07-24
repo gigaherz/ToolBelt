@@ -1,7 +1,7 @@
 package dev.gigaherz.toolbelt.customslots;
 
 import com.google.common.collect.ImmutableList;
-import net.minecraft.entity.LivingEntity;
+import net.minecraft.world.entity.LivingEntity;
 
 import javax.annotation.Nonnull;
 

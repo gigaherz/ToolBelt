@@ -3,11 +3,11 @@ package dev.gigaherz.toolbelt.network;
 import dev.gigaherz.toolbelt.client.ClientPacketHandlers;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
 import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.NonNullList;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.NonNullList;
+import net.minecraftforge.fmllegacy.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -16,29 +16,29 @@ public class SyncBeltSlotContents
     public final NonNullList<ItemStack> stacks = NonNullList.create();
     public int entityId;
 
-    public SyncBeltSlotContents(PlayerEntity player, BeltExtensionSlot extension)
+    public SyncBeltSlotContents(Player player, BeltExtensionSlot extension)
     {
-        this.entityId = player.getEntityId();
+        this.entityId = player.getId();
         extension.getSlots().stream().map(IExtensionSlot::getContents).forEach(stacks::add);
     }
 
-    public SyncBeltSlotContents(PacketBuffer buf)
+    public SyncBeltSlotContents(FriendlyByteBuf buf)
     {
         entityId = buf.readVarInt();
         int numStacks = buf.readVarInt();
         for (int i = 0; i < numStacks; i++)
         {
-            stacks.add(buf.readItemStack());
+            stacks.add(buf.readItem());
         }
     }
 
-    public void encode(PacketBuffer buf)
+    public void encode(FriendlyByteBuf buf)
     {
         buf.writeVarInt(entityId);
         buf.writeVarInt(stacks.size());
         for (ItemStack stack : stacks)
         {
-            buf.writeItemStack(stack);
+            buf.writeItem(stack);
         }
     }
 

@@ -3,15 +3,17 @@ package dev.gigaherz.toolbelt.belt;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import dev.gigaherz.toolbelt.ToolBelt;
-import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.Ingredient;
-import net.minecraft.network.PacketBuffer;
-import net.minecraft.util.JSONUtils;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.util.GsonHelper;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.crafting.IIngredientSerializer;
 
 import javax.annotation.Nullable;
 import java.util.stream.Stream;
+
+import net.minecraft.world.item.crafting.Ingredient.ItemValue;
 
 public class BeltIngredient extends Ingredient
 {
@@ -26,7 +28,7 @@ public class BeltIngredient extends Ingredient
 
     protected BeltIngredient(int level)
     {
-        super(Stream.of(new SingleItemList(ToolBelt.BELT.of(level))));
+        super(Stream.of(new ItemValue(ToolBelt.BELT.of(level))));
         this.level = level;
     }
 
@@ -37,7 +39,7 @@ public class BeltIngredient extends Ingredient
     }
 
     @Override
-    public JsonElement serialize()
+    public JsonElement toJson()
     {
         JsonObject object = new JsonObject();
         object.addProperty("type", NAME.toString());
@@ -57,13 +59,13 @@ public class BeltIngredient extends Ingredient
         public static final IIngredientSerializer<? extends Ingredient> INSTANCE = new Serializer();
 
         @Override
-        public BeltIngredient parse(PacketBuffer buffer)
+        public BeltIngredient parse(FriendlyByteBuf buffer)
         {
             return new BeltIngredient(buffer.readVarInt());
         }
 
         @Override
-        public void write(PacketBuffer buffer, BeltIngredient ingredient)
+        public void write(FriendlyByteBuf buffer, BeltIngredient ingredient)
         {
             buffer.writeVarInt(ingredient.level);
         }
@@ -72,7 +74,7 @@ public class BeltIngredient extends Ingredient
         public BeltIngredient parse(JsonObject json)
         {
             return new BeltIngredient(
-                    JSONUtils.getInt(json, "upgrade_level")
+                    GsonHelper.getAsInt(json, "upgrade_level")
             );
         }
     }

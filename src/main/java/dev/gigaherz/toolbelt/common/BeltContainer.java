@@ -2,31 +2,31 @@ package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.belt.ToolBeltInventory;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.PlayerInventory;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.inventory.container.Container;
-import net.minecraft.inventory.container.ContainerType;
-import net.minecraft.inventory.container.Slot;
-import net.minecraft.item.ItemStack;
-import net.minecraft.network.PacketBuffer;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.Container;
+import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.MenuType;
+import net.minecraft.world.inventory.Slot;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.registries.ObjectHolder;
 
-public class BeltContainer extends Container
+public class BeltContainer extends AbstractContainerMenu
 {
     @ObjectHolder("toolbelt:belt_container")
-    public static ContainerType<BeltContainer> TYPE;
+    public static MenuType<BeltContainer> TYPE;
 
     public final int beltSlots;
     private final ItemStack heldItem;
 
-    public BeltContainer(int id, PlayerInventory inventory, PacketBuffer extraData)
+    public BeltContainer(int id, Inventory inventory, FriendlyByteBuf extraData)
     {
-        this(id, inventory, extraData.readVarInt(), extraData.readItemStack());
+        this(id, inventory, extraData.readVarInt(), extraData.readItem());
     }
 
-    public BeltContainer(int id, IInventory playerInventory, int blockedSlot, ItemStack heldItem)
+    public BeltContainer(int id, Container playerInventory, int blockedSlot, ItemStack heldItem)
     {
         super(TYPE, id);
         this.heldItem = heldItem;
@@ -43,7 +43,7 @@ public class BeltContainer extends Container
         bindPlayerInventory(playerInventory, blockedSlot);
     }
 
-    private void bindPlayerInventory(IInventory playerInventory, int blockedSlot)
+    private void bindPlayerInventory(Container playerInventory, int blockedSlot)
     {
         for (int l = 0; l < 3; ++l)
         {
@@ -69,34 +69,34 @@ public class BeltContainer extends Container
     }
 
     @Override
-    public void onContainerClosed(PlayerEntity playerIn)
+    public void removed(Player playerIn)
     {
-        super.onContainerClosed(playerIn);
-        if (!playerIn.world.isRemote)
+        super.removed(playerIn);
+        if (!playerIn.level.isClientSide)
             BeltFinder.sendSync(playerIn);
     }
 
     @Override
-    public void detectAndSendChanges()
+    public void broadcastChanges()
     {
-        super.detectAndSendChanges();
+        super.broadcastChanges();
     }
 
     @Override
-    public boolean canInteractWith(PlayerEntity playerIn)
+    public boolean stillValid(Player playerIn)
     {
         return true;
     }
 
     @Override
-    public ItemStack transferStackInSlot(PlayerEntity playerIn, int index)
+    public ItemStack quickMoveStack(Player playerIn, int index)
     {
-        Slot slot = this.inventorySlots.get(index);
+        Slot slot = this.slots.get(index);
 
-        if (slot == null || !slot.getHasStack())
+        if (slot == null || !slot.hasItem())
             return ItemStack.EMPTY;
 
-        ItemStack containedStack = slot.getStack();
+        ItemStack containedStack = slot.getItem();
         ItemStack originalStack = containedStack.copy();
 
         int start;
@@ -105,7 +105,7 @@ public class BeltContainer extends Container
         if (index < beltSlots)
         {
             start = beltSlots;
-            end = this.inventorySlots.size();
+            end = this.slots.size();
             reverse = true;
         }
         else
@@ -114,18 +114,18 @@ public class BeltContainer extends Container
             end = beltSlots;
         }
 
-        if (!this.mergeItemStack(containedStack, start, end, reverse))
+        if (!this.moveItemStackTo(containedStack, start, end, reverse))
         {
             return ItemStack.EMPTY;
         }
 
         if (containedStack.getCount() == 0)
         {
-            slot.putStack(ItemStack.EMPTY);
+            slot.set(ItemStack.EMPTY);
         }
         else
         {
-            slot.onSlotChanged();
+            slot.setChanged();
         }
 
         return originalStack;
