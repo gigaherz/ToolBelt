@@ -13,28 +13,22 @@ import net.minecraft.client.model.PlayerModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.*;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.ReloadableResourceManager;
-import net.minecraft.server.packs.resources.ResourceManager;
-import net.minecraft.server.packs.resources.ResourceManagerReloadListener;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.GuiContainerEvent;
-import net.minecraftforge.client.event.ParticleFactoryRegisterEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fmlclient.registry.ClientRegistry;
-import net.minecraftforge.fmlclient.registry.RenderingRegistry;
 import org.lwjgl.glfw.GLFW;
-
-import java.util.Map;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ToolBelt.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientEvents
@@ -144,9 +138,23 @@ public class ClientEvents
     public static class ModBusEvents
     {
         @SubscribeEvent
-        public static void clientSetup(FMLClientSetupEvent event)
+        public static void clientSetup(EntityRenderersEvent.RegisterLayerDefinitions event)
         {
-            RenderingRegistry.registerLayerDefinition(BELT_LAYER, ToolBeltLayer.BeltModel::createBodyLayer);
+            event.registerLayerDefinition(BELT_LAYER, ToolBeltLayer.BeltModel::createBodyLayer);
+        }
+
+        @SubscribeEvent
+        public static void construct(EntityRenderersEvent.AddLayers event)
+        {
+            addLayerToEntity(event, EntityType.ARMOR_STAND);
+            addLayerToEntity(event, EntityType.ZOMBIE);
+            addLayerToEntity(event, EntityType.SKELETON);
+            addLayerToEntity(event, EntityType.HUSK);
+            addLayerToEntity(event, EntityType.DROWNED);
+            addLayerToEntity(event, EntityType.STRAY);
+
+            addLayerToPlayerSkin(event, "default");
+            addLayerToPlayerSkin(event, "slim");
         }
 
         @SubscribeEvent
@@ -158,49 +166,21 @@ public class ClientEvents
             }
         }
 
-        @SubscribeEvent
-        public static void construct(ParticleFactoryRegisterEvent event)
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        private static void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, String skinName)
         {
-            ((ReloadableResourceManager)Minecraft.getInstance().getResourceManager()).registerReloadListener(new ResourceManagerReloadListener()
+            EntityRenderer<? extends Player> render = event.getSkin(skinName);
+            if (render instanceof LivingEntityRenderer livingRenderer)
             {
-                @Override
-                public void onResourceManagerReload(ResourceManager p_10758_)
-                {
-                    addLayerToEntity(EntityType.ARMOR_STAND, ArmorStandRenderer.class);
-                    addLayerToEntity(EntityType.ZOMBIE, ZombieRenderer.class);
-                    addLayerToEntity(EntityType.SKELETON, SkeletonRenderer.class);
-                    addLayerToEntity(EntityType.HUSK, HuskRenderer.class);
-                    addLayerToEntity(EntityType.DROWNED, DrownedRenderer.class);
-                    addLayerToEntity(EntityType.STRAY, StrayRenderer.class);
-
-                    Map<String, EntityRenderer<? extends Player>> skinMap = Minecraft.getInstance().getEntityRenderDispatcher().getSkinMap();
-                    addLayerToPlayerSkin(skinMap, "default");
-                    addLayerToPlayerSkin(skinMap, "slim");
-                }
-            });
-        }
-
-        private static void addLayerToPlayerSkin(Map<String, EntityRenderer<? extends Player>> skinMap, String skinName)
-        {
-            EntityRenderer<? extends Player> render = skinMap.get(skinName);
-            if (render instanceof LivingEntityRenderer)
-            {
-                LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>> livingRenderer
-                        = (LivingEntityRenderer<AbstractClientPlayer, PlayerModel<AbstractClientPlayer>>) render;
                 livingRenderer.addLayer(new ToolBeltLayer<>(livingRenderer));
             }
         }
 
-        private static <T extends LivingEntity, M extends HumanoidModel<T>, R extends LivingEntityRenderer<? super T, M>> void addLayerToEntity(EntityType<? extends T> entityType, Class<R> rendererClass)
+        private static <T extends LivingEntity, M extends HumanoidModel<T>, R extends LivingEntityRenderer<T, M>> void addLayerToEntity(
+                EntityRenderersEvent.AddLayers event, EntityType<? extends T> entityType)
         {
-            EntityRenderer<?> renderer = Minecraft.getInstance().getEntityRenderDispatcher().renderers.get(entityType);
-            if (!rendererClass.isInstance(renderer))
-                throw new IllegalStateException("Mismatched renderer class?!");
-            if (!(((LivingEntityRenderer<?,?>)renderer).getModel() instanceof HumanoidModel))
-                throw new IllegalStateException("Wrong model type, renderer for entity "+entityType.getRegistryName()+" needs to use a BipedModel.");
-            @SuppressWarnings("unchecked")
-            LivingEntityRenderer<T, M> bipedRenderer = (LivingEntityRenderer<T, M>) renderer;
-            bipedRenderer.addLayer(new ToolBeltLayer<>(bipedRenderer));
+            R renderer = event.getRenderer(entityType);
+            if (renderer != null) renderer.addLayer(new ToolBeltLayer<>(renderer));
         }
     }
 }

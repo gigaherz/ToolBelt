@@ -30,7 +30,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.17.0"
+version = "1.17.1"
 group = "dev.gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
@@ -56,6 +56,7 @@ minecraft {
 
             property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
+            property 'legacyClassPath', '{minecraft_classpath}'
 
             ideaModule "${project.name}.main"
 
@@ -103,7 +104,7 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.1'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.0.8'
 
     compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-mc1171:1.4.1.3")
     runtimeMod fg.deobf("dev.gigaherz.sewingkit:SewingKit-mc1171:1.4.1.3")
