@@ -16,19 +16,25 @@ import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.GuiContainerEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
+import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fmlclient.registry.ClientRegistry;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.function.Function;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ToolBelt.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientEvents
@@ -138,7 +144,16 @@ public class ClientEvents
     public static class ModBusEvents
     {
         @SubscribeEvent
-        public static void clientSetup(EntityRenderersEvent.RegisterLayerDefinitions event)
+        public static void textureStitch(TextureStitchEvent.Pre event)
+        {
+            if (event.getMap().location() == TextureAtlas.LOCATION_BLOCKS)
+            {
+                event.addSprite(BeltSlotContainer.SLOT_BACKGROUND);
+            }
+        }
+
+        @SubscribeEvent
+        public static void registerLayer(EntityRenderersEvent.RegisterLayerDefinitions event)
         {
             event.registerLayerDefinition(BELT_LAYER, ToolBeltLayer.BeltModel::createBodyLayer);
         }
@@ -155,15 +170,6 @@ public class ClientEvents
 
             addLayerToPlayerSkin(event, "default");
             addLayerToPlayerSkin(event, "slim");
-        }
-
-        @SubscribeEvent
-        public static void textureStitch(TextureStitchEvent.Pre event)
-        {
-            if (event.getMap().location() == TextureAtlas.LOCATION_BLOCKS)
-            {
-                event.addSprite(BeltSlotContainer.SLOT_BACKGROUND);
-            }
         }
 
         @SuppressWarnings({"rawtypes", "unchecked"})

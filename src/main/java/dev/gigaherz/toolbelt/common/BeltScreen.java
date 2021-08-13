@@ -24,6 +24,7 @@ public class BeltScreen extends AbstractContainerScreen<BeltContainer>
         this.inventoryLabelY = this.imageHeight - 94;
     }
 
+    @Override
     public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);

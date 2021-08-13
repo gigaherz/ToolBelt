@@ -4,7 +4,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonPrimitive;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
-import dev.gigaherz.toolbelt.integration.CosmeticArmorIntegration;
 import dev.gigaherz.toolbelt.network.BeltContentsChange;
 import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -80,9 +79,7 @@ public class BeltFinderBeltSlot extends BeltFinder
         @Override
         public boolean isHidden()
         {
-            return ModList.get().isLoaded("cosmeticarmorreworked")
-                    && player instanceof Player
-                    && CosmeticArmorIntegration.isHidden((Player) player, ToolBelt.MODID, "belt#0");
+            return false;
         }
 
         @Override

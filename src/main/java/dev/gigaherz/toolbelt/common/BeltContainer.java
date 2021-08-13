@@ -1,6 +1,7 @@
 package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.BeltFinder;
+import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.belt.ToolBeltInventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
@@ -20,18 +21,21 @@ public class BeltContainer extends AbstractContainerMenu
 
     public final int beltSlots;
     private final ItemStack heldItem;
+    private final int blockedSlot;
 
     public BeltContainer(int id, Inventory inventory, FriendlyByteBuf extraData)
     {
         this(id, inventory, extraData.readVarInt(), extraData.readItem());
     }
 
-    public BeltContainer(int id, Container playerInventory, int blockedSlot, ItemStack heldItem)
+    public BeltContainer(int id, Inventory playerInventory, int blockedSlot, ItemStack heldItem)
     {
         super(TYPE, id);
         this.heldItem = heldItem;
-        ToolBeltInventory beltInventory = (ToolBeltInventory) heldItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                .orElseThrow(() -> new RuntimeException("Item handler not present."));
+        this.blockedSlot = blockedSlot;
+        ToolBeltInventory beltInventory = stillValid(playerInventory.player) && heldItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                        .orElseThrow(() -> new RuntimeException("Item handler not present.")) instanceof ToolBeltInventory inv
+                ? inv : new ToolBeltInventory(new ItemStack(ToolBelt.BELT));
 
         beltSlots = beltInventory.getSlots();
         int xoff = ((9 - beltSlots) * 18) / 2;
@@ -85,7 +89,7 @@ public class BeltContainer extends AbstractContainerMenu
     @Override
     public boolean stillValid(Player playerIn)
     {
-        return true;
+        return blockedSlot < 0 || playerIn.getInventory().getItem(blockedSlot).equals(heldItem, false);
     }
 
     @Override

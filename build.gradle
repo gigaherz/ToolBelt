@@ -30,7 +30,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.17.1"
+version = "1.17.2"
 group = "dev.gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
@@ -104,20 +104,17 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.8'
+    minecraft 'net.minecraftforge:forge:1.17.1-37.0.32'
 
     compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-mc1171:1.4.1.3")
-    runtimeMod fg.deobf("dev.gigaherz.sewingkit:SewingKit-mc1171:1.4.1.3")
+    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-mc1171:1.4.1.3")
 
     //compileOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.110:api")
     //runtimeOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.110")
 
-    //runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.5-4.0.5.2")
-    //compileOnly "top.theillusivec4.curios:curios-forge:1.16.5-4.0.5.2"
-
-    // 1.16.5-v1b
-    //compileOnly fg.deobf("curse.maven:cosmetic-armor-reworked-237307:3205904:api")
-    //runtimeOnly fg.deobf("curse.maven:cosmetic-armor-reworked-237307:3205904")
+    //runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.17.1-5.0.0.0")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.17.1-5.0.0.0")
+    runtimeMod fg.deobf("top.theillusivec4.curios:curios-forge:1.17.1-5.0.0.0")
 
     // 2.1.1
     //runtimeOnly fg.deobf("curse.maven:curious-armor-stands-398784:3343340")

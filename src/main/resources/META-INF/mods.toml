@@ -1,8 +1,6 @@
 modLoader="javafml"
 loaderVersion="[37,)"
 #updateJSONURL="http://myurl.me/"
-issueTrackerURL="https://github.com/gigaherz/ToolBelt/issues"
-displayURL="https://github.com/gigaherz/ToolBelt"
 logoFile="logo.png"
 credits="Thanks for this example mod goes to Java"
 authors="gigaherz"
@@ -15,6 +13,8 @@ displayName="Tool Belt"
 description='''
 Declutter your inventory of tools
 '''
+issueTrackerURL="https://github.com/gigaherz/ToolBelt/issues"
+displayURL="https://github.com/gigaherz/ToolBelt"
 
 [[dependencies.toolbelt]]
    modId="forge"

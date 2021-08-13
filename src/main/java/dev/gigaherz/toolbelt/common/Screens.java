@@ -11,17 +11,11 @@ public class Screens
 {
     public static void openBeltScreen(ServerPlayer player, int slot)
     {
-        final ItemStack heldItem = player.getInventory().getItem(slot);
+        final ItemStack heldItem = player.getInventory().getItem(slot).copy();
         if (heldItem.getCount() > 0 && heldItem.getItem() instanceof ToolBeltItem)
         {
             NetworkHooks.openGui(player, new SimpleMenuProvider(
-                    (i, playerInventory, playerEntity) -> {
-                        int blockedSlot = -1;
-                        if (player.getMainHandItem() == heldItem)
-                            blockedSlot = playerInventory.selected;
-
-                        return new BeltContainer(i, playerInventory, blockedSlot, heldItem);
-                    },
+                    (i, playerInventory, playerEntity) -> new BeltContainer(i, playerInventory, slot, heldItem),
                     heldItem.getHoverName()
             ), (data) -> {
                 data.writeVarInt(slot);

@@ -1,8 +1,6 @@
 package dev.gigaherz.toolbelt;
-/*
+
 import com.google.gson.JsonElement;
-import com.mojang.datafixers.util.Pair;
-import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -15,8 +13,6 @@ import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 import java.util.Optional;
-import java.util.function.Function;
-import java.util.function.IntFunction;
 
 public class BeltFinderCurios extends BeltFinder
 {
@@ -116,4 +112,4 @@ public class BeltFinderCurios extends BeltFinder
             // No need! Curios does its own sync. I think.
         }
     }
-}*/
+}
