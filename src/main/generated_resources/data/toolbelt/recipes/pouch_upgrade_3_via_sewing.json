@@ -36,8 +36,8 @@
         ],
         "tool": {
           "type": "sewingkit:tool_ingredient",
-          "tool_type": "sewing_needle",
-          "tool_level": 3
+          "tool_type": "sewingkit_sew",
+          "tool_level": "minecraft:iron"
         },
         "result": {
           "item": "toolbelt:belt",

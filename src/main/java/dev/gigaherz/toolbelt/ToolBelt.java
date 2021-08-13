@@ -3,7 +3,7 @@ package dev.gigaherz.toolbelt;
 import com.mojang.datafixers.util.Pair;
 import dev.gigaherz.sewingkit.SewingKitMod;
 import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
-import dev.gigaherz.sewingkit.api.ToolIngredient;
+import dev.gigaherz.sewingkit.api.ToolActionIngredient;
 import dev.gigaherz.sewingkit.needle.NeedleItem;
 import dev.gigaherz.sewingkit.needle.Needles;
 import dev.gigaherz.toolbelt.belt.BeltIngredient;
@@ -282,7 +282,7 @@ public class ToolBelt
                         .addCondition(new Conditions.EnableSewingCrafting())
                         .addRecipe(
                                 SewingRecipeBuilder.begin(ToolBelt.BELT)
-                                        .withTool(ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.WOOD.getLevel()))
+                                        .withTool(ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.WOOD.getTier()))
                                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_STRIP.get()), 2)
                                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET.get()), 3)
                                         .addMaterial(Ingredient.of(Items.IRON_INGOT), 1)
@@ -315,7 +315,7 @@ public class ToolBelt
                         .addCondition(new Conditions.EnableSewingCrafting())
                         .addRecipe(
                                 SewingRecipeBuilder.begin(ToolBelt.POUCH)
-                                        .withTool(ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.WOOD.getLevel()))
+                                        .withTool(ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.WOOD.getTier()))
                                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_STRIP.get()), 2)
                                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET.get()), 3)
                                         .addMaterial(Ingredient.of(Items.GOLD_INGOT))
@@ -325,14 +325,14 @@ public class ToolBelt
                         )
                         .generateAdvancement()
                         .build(consumer, new ResourceLocation(pouchId.getNamespace(), pouchId.getPath() + "_via_sewing"));
-                ToolIngredient needleTiers[] = {
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.WOOD.getLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.BONE.getLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.IRON.getLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.IRON.getLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.DIAMOND.getLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.DIAMOND.getLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.NETHERITE.getLevel()),
+                ToolActionIngredient needleTiers[] = {
+                        ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.WOOD.getTier()),
+                        ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.BONE.getTier()),
+                        ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.IRON.getTier()),
+                        ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.IRON.getTier()),
+                        ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.DIAMOND.getTier()),
+                        ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.DIAMOND.getTier()),
+                        ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.NETHERITE.getTier()),
                 };
                 for (int i = 0; i < 7; i++)
                 {
