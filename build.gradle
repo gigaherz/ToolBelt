@@ -30,7 +30,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.17.3"
+version = "1.17.3.2"
 group = "dev.gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 

@@ -5,6 +5,7 @@ import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.common.BeltSlotContainer;
+import dev.gigaherz.toolbelt.customslots.ExtensionSlotSlot;
 import dev.gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
@@ -21,6 +22,7 @@ import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.animal.Pig;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
@@ -125,16 +127,12 @@ public class ClientEvents
         if (keybind.isUnbound())
             return false;
 
-        boolean isDown = false;
-        switch (keybind.getKey().getType())
-        {
-            case KEYSYM:
-                isDown = InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue());
-                break;
-            case MOUSE:
-                isDown = GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue()) == GLFW.GLFW_PRESS;
-                break;
-        }
+        boolean isDown = switch (keybind.getKey().getType())
+                {
+                    case KEYSYM -> InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue());
+                    case MOUSE -> GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue()) == GLFW.GLFW_PRESS;
+                    default -> false;
+                };
         return isDown && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }
 
@@ -146,9 +144,9 @@ public class ClientEvents
         @SubscribeEvent
         public static void textureStitch(TextureStitchEvent.Pre event)
         {
-            if (event.getMap().location() == TextureAtlas.LOCATION_BLOCKS)
+            if (event.getMap().location() == InventoryMenu.BLOCK_ATLAS)
             {
-                event.addSprite(BeltSlotContainer.SLOT_BACKGROUND);
+                event.addSprite(ExtensionSlotSlot.SLOT_BACKGROUND);
             }
         }
 

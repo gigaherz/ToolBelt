@@ -37,6 +37,8 @@ import net.minecraftforge.fmllegacy.network.NetworkDirection;
 import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
@@ -45,6 +47,8 @@ import java.util.List;
 
 public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<CompoundTag>
 {
+    private static final Logger LOGGER = LogManager.getLogger();
+
     ////////////////////////////////////////////////////////////
     // Capability support code
     //
@@ -93,6 +97,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     @Override
                     public CompoundTag serializeNBT()
                     {
+                        LOGGER.info("Saving belt slot data for player {}({})", entity.getScoreboardName(), entity.getUUID());
                         return extensionContainer.serializeNBT();
                     }
 
@@ -100,6 +105,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     public void deserializeNBT(CompoundTag nbt)
                     {
                         extensionContainer.deserializeNBT(nbt);
+                        LOGGER.info("Read belt slot data for player {}({})", entity.getScoreboardName(), entity.getUUID());
                     }
 
                     @Override
@@ -170,29 +176,37 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         {
             if (!ConfigData.customBeltSlotEnabled)
                 return;
-            if (event.getEntityLiving() instanceof Player)
-            {
-                Player player = (Player) event.getEntityLiving();
-                get(player).ifPresent((instance) -> {
-                    IExtensionSlot belt = instance.getBelt();
-                    ItemStack stack = belt.getContents();
-                    if (EnchantmentHelper.hasVanishingCurse(stack))
+            LivingEntity entity = event.getEntityLiving();
+
+            get(entity).ifPresent((instance) -> {
+                LOGGER.info("Processing belt slot data for entity death {}({})", entity.getScoreboardName(), entity.getUUID());
+                IExtensionSlot belt = instance.getBelt();
+                ItemStack stack = belt.getContents();
+                if (EnchantmentHelper.hasVanishingCurse(stack))
+                {
+                    stack = ItemStack.EMPTY;
+                    belt.setContents(stack);
+                }
+                if (stack.getCount() > 0)
+                {
+                    if (entity instanceof Player player)
                     {
-                        stack = ItemStack.EMPTY;
-                        belt.setContents(stack);
-                    }
-                    if (!player.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
-                    {
-                        if (stack.getCount() > 0)
+                        if (!entity.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
                         {
-                            Collection<ItemEntity> old = player.captureDrops(event.getDrops());
+                            LOGGER.info("Entity is player, and keepInventory is not set. Spilling...");
+                            Collection<ItemEntity> old = entity.captureDrops(event.getDrops());
                             player.drop(stack, true, false);
-                            player.captureDrops(old);
+                            entity.captureDrops(old);
                             belt.setContents(ItemStack.EMPTY);
                         }
                     }
-                });
-            }
+                    else
+                    {
+                        entity.spawnAtLocation(stack);
+                        belt.setContents(ItemStack.EMPTY);
+                    }
+                }
+            });
         }
 
         @SubscribeEvent
@@ -207,9 +221,13 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             oldPlayer.revive();
 
             Player newPlayer = event.getPlayer();
+
+            LOGGER.info("Processing respawn for entity {}({})", newPlayer.getScoreboardName(), newPlayer.getUUID());
             get(oldPlayer).ifPresent((oldBelt) -> {
+                LOGGER.info("Old entity has data, copying...");
                 ItemStack stack = oldBelt.getBelt().getContents();
                 get(newPlayer).map(newBelt -> {
+                    LOGGER.warn("New entity has data, contents assigned.");
                     // Transfer any remaining item. If it was death and keepInventory was off,
                     // it will have been removed in LivingDropsEvent.
                     newBelt.getBelt().setContents(stack);
@@ -217,6 +235,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                 }).orElseGet(() -> {
                     if (stack.getCount() > 0)
                     {
+                        LOGGER.warn("New entity doesn't have capability attached, dropping item to the ground!");
                         oldPlayer.drop(stack, true, false);
                     }
                     return Unit.INSTANCE;
@@ -232,6 +251,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             ItemStack stack = slot.getContents();
             if (stack.getCount() > 0)
             {
+                LOGGER.info("Player {}({}) has item in the belt slot, but the belt is disabled. Dropping to the ground.", owner.getScoreboardName(), owner.getUUID());
                 if (owner instanceof Player)
                     ItemHandlerHelper.giveItemToPlayer((Player) owner, stack);
                 else

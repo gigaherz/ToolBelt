@@ -34,14 +34,11 @@ public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
     @ObjectHolder("toolbelt:belt_slot_container")
     public static MenuType<BeltSlotContainer> TYPE;
 
-    public static final ResourceLocation SLOT_BACKGROUND = ToolBelt.location("gui/empty_belt_slot_background");
-
     private final ExtensionSlotSlot slotBelt;
     private final IExtensionSlot extensionSlot;
 
     private final CraftingContainer craftingInventory = new CraftingContainer(this, 2, 2);
     private final ResultContainer craftResultInventory = new ResultContainer();
-    public final boolean isLocalWorld;
     private final Player player;
 
     private interface SlotFactory<T extends Slot>
@@ -49,20 +46,9 @@ public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
         T create(IExtensionSlot slot, int x, int y);
     }
 
-    private SlotFactory<ExtensionSlotSlot> slotFactory = DistExecutor.runForDist(
-            () -> () -> ExtensionSlotSlotClient::new,
-            () -> () -> ExtensionSlotSlot::new
-    );
-
     public BeltSlotContainer(int id, Inventory playerInventory)
     {
-        this(id, playerInventory, true);
-    }
-
-    public BeltSlotContainer(int id, Inventory playerInventory, boolean localWorld)
-    {
         super(TYPE, id);
-        this.isLocalWorld = localWorld;
         this.player = playerInventory.player;
         this.addSlot(new ResultSlot(playerInventory.player, this.craftingInventory, this.craftResultInventory, 0, 154, 28));
 
@@ -129,11 +115,8 @@ public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
 
         this.addSlot(new Slot(playerInventory, 40, 77, 62)
         {
-            @Nullable
-            @OnlyIn(Dist.CLIENT)
-            public String getSlotTexture()
             {
-                return "item/empty_armor_slot_shield";
+                setBackground(InventoryMenu.BLOCK_ATLAS, InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD);
             }
         });
 
@@ -142,9 +125,9 @@ public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
 
         extensionSlot = container.getBelt();
 
-        this.addSlot(slotBelt = slotFactory.create(BeltSlotContainer.this.extensionSlot, 77, 44));
+        this.addSlot(slotBelt = new ExtensionSlotSlot(BeltSlotContainer.this.extensionSlot, 77, 44));
 
-        if (!localWorld)
+        if (playerInventory.player.level.isClientSide)
         {
             ToolBelt.channel.sendToServer(new ContainerSlotsHack());
         }
@@ -377,17 +360,5 @@ public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
         }
 
         return itemstack;
-    }
-
-    private class ExtensionSlotSlotClient extends ExtensionSlotSlot
-    {
-        {
-            setBackground(TextureAtlas.LOCATION_BLOCKS, SLOT_BACKGROUND);
-        }
-
-        public ExtensionSlotSlotClient(IExtensionSlot slot, int x, int y)
-        {
-            super(slot, x, y);
-        }
     }
 }

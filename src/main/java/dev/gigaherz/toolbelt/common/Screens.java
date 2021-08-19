@@ -7,6 +7,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraftforge.fmllegacy.network.NetworkHooks;
 
+import java.util.Arrays;
+import java.util.stream.IntStream;
+
 public class Screens
 {
     public static void openBeltScreen(ServerPlayer player, int slot)
@@ -27,7 +30,7 @@ public class Screens
     public static void openSlotScreen(ServerPlayer player)
     {
         player.openMenu(new SimpleMenuProvider(
-                (i, playerInventory, playerEntity) -> new BeltSlotContainer(i, playerInventory, !playerEntity.level.isClientSide),
+                (i, playerInventory, playerEntity) -> new BeltSlotContainer(i, playerInventory),
                 new TranslatableComponent("container.crafting")
         ));
     }
