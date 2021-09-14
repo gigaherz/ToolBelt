@@ -11,8 +11,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.johnrengelman.shadow' version '4.0.4'
-    id "com.wynprice.cursemaven" version "2.1.1"
+    id 'com.github.johnrengelman.shadow' version '1.2.3'
 }
 
 apply plugin: 'net.minecraftforge.gradle.forge'
@@ -36,7 +35,7 @@ repositories {
     }
 }
 
-version = "1.9.13"
+version = "1.9.14"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.12.2"
 
@@ -51,39 +50,38 @@ minecraft {
     useDepAts = true
 }
 
-configurations {
-    shade
-}
-
-dependencies {
-    deobfCompile "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
-    shade "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
-
-    deobfCompile "mezz.jei:jei_1.12.2:4.15.0.283:api"
-    runtime "mezz.jei:jei_1.12.2:4.15.0.283"
-
-    deobfCompile "com.azanor:Baubles:1.12-1.5.2"
-
-    deobfCompile "curse.maven:player-weight-mod:2804969"
-
-    compile fileTree(dir: 'libs', include: '*.jar')
-}
-
 jar {
     classifier = 'slim'
 }
 
 shadowJar {
     classifier = ''
-    configurations = [project.configurations.shade]
+    dependencies {
+        include(dependency(':gigaherz.commons-1.12.1:'))
+        exclude '*CraftTweaker*'
+        exclude '*Baubles*'
+    }
     relocate 'gigaherz.common', "${project.group}.shadow.commons"
 }
 
 reobf {
-    shadowJar { }
+    shadowJar { mappingType = 'SEARGE' }
 }
 
 tasks.build.dependsOn reobfShadowJar
+
+artifacts {
+    archives shadowJar
+}
+
+dependencies {
+    deobfCompile "gigaherz.commons:gigaherz.commons-1.12.1:0.6.4"
+
+    deobfCompile "mezz.jei:jei_1.12.2:4.15.0.283:api"
+    runtime "mezz.jei:jei_1.12.2:4.15.0.283"
+
+    deobfCompile "com.azanor:Baubles:1.12-1.5.2"
+}
 
 sourceCompatibility = JavaVersion.VERSION_1_8
 targetCompatibility = JavaVersion.VERSION_1_8
