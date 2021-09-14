@@ -1,9 +1,8 @@
 buildscript {
     repositories {
-        jcenter()
         maven {
             name = "forge"
-            url = "http://files.minecraftforge.net/maven"
+            url = "https://maven.minecraftforge.net/"
         }
     }
     dependencies {
@@ -16,29 +15,33 @@ plugins {
     id "com.wynprice.cursemaven" version "2.1.1"
 }
 
+apply plugin: 'net.minecraftforge.gradle.forge'
+
 repositories {
+    removeIf { it instanceof MavenArtifactRepository && it.url.host == 'files.minecraftforge.net' }
+    maven {
+        url "https://maven.minecraftforge.net/"
+    }
     maven {
         url "http://dvs1.progwml6.com/files/maven"
     }
-    maven {
+    /*maven {
         url 'http://maven.epoxide.xyz'
-    }
+    }*/
     maven {
-        url 'http://dogforce-games.com/maven'
+        url 'https://dogforce-games.com/maven'
     }
     maven {
         url 'https://maven.mcmoddev.com'
     }
 }
 
-apply plugin: 'net.minecraftforge.gradle.forge'
-
 version = "1.9.13"
 group= "gigaherz.toolbelt" // http://maven.apache.org/guides/mini/guide-naming-conventions.html
 archivesBaseName = "ToolBelt-1.12.2"
 
 minecraft {
-    version = "1.12.2-14.23.5.2838"
+    version = "1.12.2-14.23.5.2847"
     runDir = "run"
     mappings = "stable_39"
 

@@ -9,6 +9,8 @@ import net.minecraft.util.text.ITextComponent;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 
+import java.util.Optional;
+
 public class SlotBelt extends Slot
 {
     public SlotBelt(IInventory playerInventory, int blockedSlot, int index, int xPosition, int yPosition)
@@ -22,7 +24,7 @@ public class SlotBelt extends Slot
             ItemStack beltStack = null;
             IItemHandlerModifiable inventory = null;
 
-            IItemHandlerModifiable findStack()
+            Optional<IItemHandlerModifiable> findStack()
             {
                 ItemStack stack = sourceInventory.getStackInSlot(slot);
                 if (stack != beltStack)
@@ -30,7 +32,7 @@ public class SlotBelt extends Slot
                     beltStack = stack;
                     inventory = (IItemHandlerModifiable)stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null);
                 }
-                return inventory;
+                return Optional.ofNullable(inventory);
             }
 
             @Override
@@ -66,31 +68,31 @@ public class SlotBelt extends Slot
             @Override
             public ItemStack getStackInSlot(int n)
             {
-                return findStack().getStackInSlot(subSlot);
+                return findStack().map(inv -> inv.getStackInSlot(subSlot)).orElse(ItemStack.EMPTY);
             }
 
             @Override
             public ItemStack decrStackSize(int n, int count)
             {
-                return findStack().extractItem(subSlot, count, false);
+                return findStack().map(inv -> inv.extractItem(subSlot, count, false)).orElse(ItemStack.EMPTY);
             }
 
             @Override
             public ItemStack removeStackFromSlot(int n)
             {
-                return null;
+                return ItemStack.EMPTY;
             }
 
             @Override
             public void setInventorySlotContents(int n, ItemStack stack)
             {
-                findStack().setStackInSlot(subSlot, stack);
+                findStack().ifPresent(inv -> inv.setStackInSlot(subSlot, stack));
             }
 
             @Override
             public int getInventoryStackLimit()
             {
-                return findStack().getSlotLimit(subSlot);
+                return findStack().map(inv -> inv.getSlotLimit(subSlot)).orElse(0);
             }
 
             @Override
