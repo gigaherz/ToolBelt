@@ -36,12 +36,12 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
     {
         super(owner);
 
-        beltModel = new BeltModel(Minecraft.getInstance().getEntityModels().bakeLayer(ClientEvents.BELT_LAYER));
+        beltModel = new BeltModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ClientEvents.BELT_LAYER));
     }
 
-    private void translateToBody(PoseStack matrixStack)
+    private void translateToBody(PoseStack poseStack)
     {
-        this.getParentModel().body.translateAndRotate(matrixStack);
+        this.getParentModel().body.translateAndRotate(poseStack);
     }
 
     @Override
@@ -61,33 +61,34 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
                 matrixStack.pushPose();
                 this.translateToBody(matrixStack);
 
-                ItemStack firstItem = cap.getStackInSlot(0);
-                ItemStack secondItem = cap.getStackInSlot(1);
-
-                ItemStack leftItem = rightHanded ? firstItem : secondItem;
-                ItemStack rightItem = rightHanded ? secondItem : firstItem;
-
-                if (!leftItem.isEmpty() || !rightItem.isEmpty())
                 {
-                    matrixStack.pushPose();
+                    ItemStack firstItem = cap.getStackInSlot(0);
+                    ItemStack secondItem = cap.getStackInSlot(1);
 
-                    if (getParentModel().young)
+                    ItemStack leftItem = rightHanded ? firstItem : secondItem;
+                    ItemStack rightItem = rightHanded ? secondItem : firstItem;
+
+                    if (!leftItem.isEmpty() || !rightItem.isEmpty())
                     {
-                        matrixStack.translate(0.0F, 0.75F, 0.0F);
-                        matrixStack.scale(0.5F, 0.5F, 0.5F);
+                        matrixStack.pushPose();
+
+                        if (getParentModel().young)
+                        {
+                            matrixStack.translate(0.0F, 0.75F, 0.0F);
+                            matrixStack.scale(0.5F, 0.5F, 0.5F);
+                        }
+
+                        renderHeldItem(player, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HumanoidArm.RIGHT, matrixStack, buffer, lightness);
+                        renderHeldItem(player, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HumanoidArm.LEFT, matrixStack, buffer, lightness);
+
+                        matrixStack.popPose();
                     }
-
-                    renderHeldItem(player, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HumanoidArm.RIGHT, matrixStack, buffer, lightness);
-                    renderHeldItem(player, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HumanoidArm.LEFT, matrixStack, buffer, lightness);
-
-                    matrixStack.popPose();
                 }
 
                 matrixStack.translate(0.0F, 0.19F, 0.0F);
                 matrixStack.scale(0.85f, 0.6f, 0.78f);
 
                 renderColoredCutoutModel(beltModel, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
-
 
                 matrixStack.popPose();
             });

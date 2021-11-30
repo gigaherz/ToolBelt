@@ -33,6 +33,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.fmllegacy.network.NetworkDirection;
 import net.minecraftforge.fmllegacy.network.PacketDistributor;
 import net.minecraftforge.items.ItemHandlerHelper;
@@ -48,6 +49,15 @@ import java.util.List;
 public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<CompoundTag>
 {
     private static final Logger LOGGER = LogManager.getLogger();
+    private static final boolean ENABLE_DEBUG_LOGGING = "true".equals(System.getProperty("toolbelt.debug", FMLEnvironment.production ? "false" : "true"));
+
+    private static void printDebugLog(String message, Object... params)
+    {
+        if (ENABLE_DEBUG_LOGGING)
+        {
+            LOGGER.info(message, params);
+        }
+    }
 
     ////////////////////////////////////////////////////////////
     // Capability support code
@@ -97,7 +107,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     @Override
                     public CompoundTag serializeNBT()
                     {
-                        LOGGER.info("Saving belt slot data for player {}({})", entity.getScoreboardName(), entity.getUUID());
+                        printDebugLog("Saving belt slot data for player {}({})", entity.getScoreboardName(), entity.getUUID());
                         return extensionContainer.serializeNBT();
                     }
 
@@ -105,7 +115,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     public void deserializeNBT(CompoundTag nbt)
                     {
                         extensionContainer.deserializeNBT(nbt);
-                        LOGGER.info("Read belt slot data for player {}({})", entity.getScoreboardName(), entity.getUUID());
+                        printDebugLog("Read belt slot data for player {}({})", entity.getScoreboardName(), entity.getUUID());
                     }
 
                     @Override
@@ -179,7 +189,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             LivingEntity entity = event.getEntityLiving();
 
             get(entity).ifPresent((instance) -> {
-                LOGGER.info("Processing belt slot data for entity death {}({})", entity.getScoreboardName(), entity.getUUID());
+                printDebugLog("Processing belt slot data for entity death {}({})", entity.getScoreboardName(), entity.getUUID());
                 IExtensionSlot belt = instance.getBelt();
                 ItemStack stack = belt.getContents();
                 if (EnchantmentHelper.hasVanishingCurse(stack))
@@ -193,7 +203,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     {
                         if (!entity.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
                         {
-                            LOGGER.info("Entity is player, and keepInventory is not set. Spilling...");
+                            printDebugLog("Entity is player, and keepInventory is not set. Spilling...");
                             Collection<ItemEntity> old = entity.captureDrops(event.getDrops());
                             player.drop(stack, true, false);
                             entity.captureDrops(old);
@@ -222,9 +232,9 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
 
             Player newPlayer = event.getPlayer();
 
-            LOGGER.info("Processing respawn for entity {}({})", newPlayer.getScoreboardName(), newPlayer.getUUID());
+            printDebugLog("Processing respawn for entity {}({})", newPlayer.getScoreboardName(), newPlayer.getUUID());
             get(oldPlayer).ifPresent((oldBelt) -> {
-                LOGGER.info("Old entity has data, copying...");
+                printDebugLog("Old entity has data, copying...");
                 ItemStack stack = oldBelt.getBelt().getContents();
                 get(newPlayer).map(newBelt -> {
                     LOGGER.warn("New entity has data, contents assigned.");
@@ -251,7 +261,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             ItemStack stack = slot.getContents();
             if (stack.getCount() > 0)
             {
-                LOGGER.info("Player {}({}) has item in the belt slot, but the belt is disabled. Dropping to the ground.", owner.getScoreboardName(), owner.getUUID());
+                printDebugLog("Player {}({}) has item in the belt slot, but the belt is disabled. Dropping to the ground.", owner.getScoreboardName(), owner.getUUID());
                 if (owner instanceof Player)
                     ItemHandlerHelper.giveItemToPlayer((Player) owner, stack);
                 else

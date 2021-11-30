@@ -62,6 +62,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.SlotTypeMessage;
 
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
 

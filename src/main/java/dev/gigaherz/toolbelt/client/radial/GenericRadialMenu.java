@@ -362,10 +362,12 @@ public class GenericRadialMenu
         int b = (color >> 0) & 0xFF;
         int a = (color >> 24) & 0xFF;
 
+        float slice = angle / sections;
+
         for (int i = 0; i < sections; i++)
         {
-            float angle1 = startAngle + (i / (float) sections) * angle;
-            float angle2 = startAngle + ((i + 1) / (float) sections) * angle;
+            float angle1 = startAngle + i * slice;
+            float angle2 = startAngle + (i + 1) * slice;
 
             float pos1InX = x + radiusIn * (float) Math.cos(angle1);
             float pos1InY = y + radiusIn * (float) Math.sin(angle1);

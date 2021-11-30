@@ -19,7 +19,7 @@ displayURL="https://github.com/gigaherz/ToolBelt"
 [[dependencies.toolbelt]]
    modId="forge"
    mandatory=true
-   versionRange="[37.0.8,)"
+   versionRange="[37.0.29,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
