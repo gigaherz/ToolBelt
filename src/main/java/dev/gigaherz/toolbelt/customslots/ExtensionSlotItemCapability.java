@@ -5,8 +5,9 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 
 import javax.annotation.Nullable;
 
@@ -17,11 +18,10 @@ public class ExtensionSlotItemCapability
     public static final ImmutableSet<ResourceLocation> ANY_SLOT_LIST = ImmutableSet.of(ANY_SLOT);
 
     // The Capability
-    @CapabilityInject(IExtensionSlotItem.class)
-    public static Capability<IExtensionSlotItem> INSTANCE = null;
+    public static Capability<IExtensionSlotItem> INSTANCE = CapabilityManager.get(new CapabilityToken<>(){});
 
-    public static void register()
+    public static void register(RegisterCapabilitiesEvent event)
     {
-        CapabilityManager.INSTANCE.register(IExtensionSlotItem.class);
+        event.register(IExtensionSlotItem.class);
     }
 }

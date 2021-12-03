@@ -1,30 +1,21 @@
 package dev.gigaherz.toolbelt;
 
 import com.google.gson.JsonElement;
-import net.minecraft.Util;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.energy.CapabilityEnergy;
-import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.items.IItemHandler;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
-import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Stream;
 
 public class BeltFinderCurios extends BeltFinder
 {
-    @CapabilityInject(ICuriosItemHandler.class)
-    public static void initCurios(Capability<?> cap)
+    public static void initCurios()
     {
         BeltFinder.addFinder(new BeltFinderCurios());
     }

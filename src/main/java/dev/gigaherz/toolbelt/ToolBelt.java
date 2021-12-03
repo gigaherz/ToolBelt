@@ -15,7 +15,6 @@ import dev.gigaherz.toolbelt.common.BeltSlotContainer;
 import dev.gigaherz.toolbelt.common.BeltSlotScreen;
 import dev.gigaherz.toolbelt.customslots.ExtensionSlotItemCapability;
 import dev.gigaherz.toolbelt.integration.SewingKitIntegration;
-import dev.gigaherz.toolbelt.integration.SewingUpgradeRecipe;
 import dev.gigaherz.toolbelt.integration.SewingUpgradeRecipeBuilder;
 import dev.gigaherz.toolbelt.network.*;
 import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
@@ -39,10 +38,14 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.common.crafting.ConditionalRecipe;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
-import net.minecraftforge.common.extensions.IForgeContainerType;
+import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -53,16 +56,16 @@ import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fmllegacy.network.NetworkDirection;
-import net.minecraftforge.fmllegacy.network.NetworkRegistry;
-import net.minecraftforge.fmllegacy.network.simple.SimpleChannel;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ObjectHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.SlotTypeMessage;
+import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.function.Consumer;
 
@@ -108,6 +111,7 @@ public class ToolBelt
         modEventBus.addListener(this::modConfig);
         modEventBus.addListener(this::imcEnqueue);
         modEventBus.addListener(this::gatherData);
+        modEventBus.addListener(this::registerCapabilities);
 
         MinecraftForge.EVENT_BUS.addListener(this::anvilChange);
 
@@ -154,11 +158,17 @@ public class ToolBelt
     {
         event.getRegistry().registerAll(
                 new MenuType<>(BeltSlotContainer::new).setRegistryName("belt_slot_container"),
-                IForgeContainerType.create(BeltContainer::new).setRegistryName("belt_container")
+                IForgeMenuType.create(BeltContainer::new).setRegistryName("belt_container")
         );
 
         // FIXME: Move elsewhere:
         Conditions.register();
+    }
+
+    private void registerCapabilities(RegisterCapabilitiesEvent event)
+    {
+        ExtensionSlotItemCapability.register(event);
+        event.register(BeltExtensionSlot.class);
     }
 
     public void commonSetup(FMLCommonSetupEvent event)
@@ -174,9 +184,12 @@ public class ToolBelt
         //TODO File configurationFile = event.getSuggestedConfigurationFile();
         //Config.loadConfig(configurationFile);
 
-        ExtensionSlotItemCapability.register();
         BeltExtensionSlot.register();
+        BeltFinderBeltSlot.initBaubles();
+        CURIOS.addListener(cap -> BeltFinderCurios.initCurios());
     }
+
+    private static final Capability<ICuriosItemHandler> CURIOS = CapabilityManager.get(new CapabilityToken<>(){});
 
     public void clientSetup(FMLClientSetupEvent event)
     {

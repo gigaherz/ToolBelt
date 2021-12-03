@@ -20,7 +20,7 @@ public class BeltContainer extends AbstractContainerMenu
     public static MenuType<BeltContainer> TYPE;
 
     public final int beltSlots;
-    private final ItemStack heldItem;
+    private ItemStack blockedStack;
     private final int blockedSlot;
 
     public BeltContainer(int id, Inventory inventory, FriendlyByteBuf extraData)
@@ -28,12 +28,16 @@ public class BeltContainer extends AbstractContainerMenu
         this(id, inventory, extraData.readVarInt(), extraData.readItem());
     }
 
-    public BeltContainer(int id, Inventory playerInventory, int blockedSlot, ItemStack heldItem)
+    public BeltContainer(int id, Inventory playerInventory, int blockedSlot, ItemStack blockedStack)
     {
         super(TYPE, id);
-        this.heldItem = heldItem;
+        this.blockedStack = blockedStack;
         this.blockedSlot = blockedSlot;
-        ToolBeltInventory beltInventory = stillValid(playerInventory.player) && heldItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        if (blockedSlot >= 0 && !stillValid(playerInventory.player))
+        {
+            blockedStack = ItemStack.EMPTY;
+        }
+        ToolBeltInventory beltInventory = stillValid(playerInventory.player) && blockedStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                         .orElseThrow(() -> new RuntimeException("Item handler not present.")) instanceof ToolBeltInventory inv
                 ? inv : new ToolBeltInventory(new ItemStack(ToolBelt.BELT));
 
@@ -41,7 +45,7 @@ public class BeltContainer extends AbstractContainerMenu
         int xoff = ((9 - beltSlots) * 18) / 2;
         for (int k = 0; k < beltSlots; ++k)
         {
-            this.addSlot(new BeltSlot(playerInventory, heldItem, blockedSlot, k, 8 + xoff + k * 18, 20));
+            this.addSlot(new BeltSlot(playerInventory, blockedStack, blockedSlot, k, 8 + xoff + k * 18, 20));
         }
 
         bindPlayerInventory(playerInventory, blockedSlot);
@@ -89,7 +93,10 @@ public class BeltContainer extends AbstractContainerMenu
     @Override
     public boolean stillValid(Player playerIn)
     {
-        return blockedSlot < 0 || playerIn.getInventory().getItem(blockedSlot).equals(heldItem, false);
+        ItemStack held = playerIn.getInventory().getItem(blockedSlot);
+        var equal = blockedSlot < 0 || held == blockedStack || held.equals(blockedStack, false);
+        blockedStack = held;
+        return equal;
     }
 
     @Override

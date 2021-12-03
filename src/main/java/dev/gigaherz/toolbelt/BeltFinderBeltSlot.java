@@ -10,9 +10,9 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.network.PacketDistributor;
 
 import java.util.Optional;
 
@@ -20,8 +20,10 @@ public class BeltFinderBeltSlot extends BeltFinder
 {
     public static final String FINDER_ID = "belt_slot";
 
-    @CapabilityInject(BeltExtensionSlot.class)
-    public static void initBaubles(Capability<?> cap)
+    public static Capability<BeltExtensionSlot> BELT_EXTENSION_SLOT_CAPABILITY
+            = CapabilityManager.get(new CapabilityToken<>(){});
+
+    public static void initBaubles()
     {
         BeltFinder.addFinder(new BeltFinderBeltSlot());
     }

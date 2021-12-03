@@ -5,10 +5,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.TranslatableComponent;
-import net.minecraftforge.fmllegacy.network.NetworkHooks;
-
-import java.util.Arrays;
-import java.util.stream.IntStream;
+import net.minecraftforge.network.NetworkHooks;
 
 public class Screens
 {

@@ -1,11 +1,11 @@
 package dev.gigaherz.toolbelt.belt;
 
 import dev.gigaherz.toolbelt.ConfigData;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.util.Mth;
-import net.minecraftforge.common.util.Constants;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
@@ -40,7 +40,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
     public ItemStack getStackInSlot(int slot)
     {
         validateSlotIndex(slot);
-        ListTag tagList = getTag().getList("Items", Constants.NBT.TAG_COMPOUND);
+        ListTag tagList = getTag().getList("Items", Tag.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++)
         {
             CompoundTag itemTags = tagList.getCompound(i);
@@ -67,7 +67,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
             stack.save(itemTag);
         }
 
-        ListTag tagList = getTag().getList("Items", Constants.NBT.TAG_COMPOUND);
+        ListTag tagList = getTag().getList("Items", Tag.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++)
         {
             CompoundTag existing = tagList.getCompound(i);

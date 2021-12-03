@@ -1,9 +1,5 @@
 modLoader="javafml"
-loaderVersion="[37,)"
-#updateJSONURL="http://myurl.me/"
-logoFile="logo.png"
-credits="Thanks for this example mod goes to Java"
-authors="gigaherz"
+loaderVersion="[38,)"
 license="BSD (3 clause)"
 
 [[mods]]
@@ -15,22 +11,25 @@ Declutter your inventory of tools
 '''
 issueTrackerURL="https://github.com/gigaherz/ToolBelt/issues"
 displayURL="https://github.com/gigaherz/ToolBelt"
+logoFile="logo.png"
+credits="Thanks for this example mod goes to Java"
+authors="gigaherz"
 
 [[dependencies.toolbelt]]
    modId="forge"
    mandatory=true
-   versionRange="[37.0.29,)"
+   versionRange="[38.0.10,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
    modId="minecraft"
    mandatory=true
-   versionRange="[1.17.1,1.18)"
+   versionRange="[1.18,1.19)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
    modId="sewingkit"
    mandatory=false
-   versionRange="[1.1,)"
+   versionRange="[1.5,)"
    ordering="NONE"
    side="BOTH"

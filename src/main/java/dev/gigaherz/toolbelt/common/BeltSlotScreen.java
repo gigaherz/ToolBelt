@@ -74,7 +74,6 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotConta
     public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
     {
         this.renderBackground(matrixStack);
-        this.doRenderEffects = !this.recipeBookComponent.isVisible();
         if (this.recipeBookComponent.isVisible() && this.widthTooNarrow)
         {
             this.renderBg(matrixStack, partialTicks, mouseX, mouseY);

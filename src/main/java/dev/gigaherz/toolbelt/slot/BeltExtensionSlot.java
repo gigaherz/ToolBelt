@@ -23,8 +23,8 @@ import net.minecraft.util.Unit;
 import net.minecraft.world.level.GameRules;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
 import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ICapabilitySerializable;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
@@ -34,8 +34,8 @@ import net.minecraftforge.event.entity.living.LivingDropsEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.fmllegacy.network.NetworkDirection;
-import net.minecraftforge.fmllegacy.network.PacketDistributor;
+import net.minecraftforge.network.NetworkDirection;
+import net.minecraftforge.network.PacketDistributor;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.items.ItemStackHandler;
 import org.apache.logging.log4j.LogManager;
@@ -64,13 +64,11 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
     //
     private static final ResourceLocation CAPABILITY_ID = new ResourceLocation("toolbelt", "belt_slot");
 
-    @CapabilityInject(BeltExtensionSlot.class)
-    public static Capability<BeltExtensionSlot> CAPABILITY = null;
+    public static Capability<BeltExtensionSlot> CAPABILITY
+            = CapabilityManager.get(new CapabilityToken<>(){});
 
     public static void register()
     {
-        CapabilityManager.INSTANCE.register(BeltExtensionSlot.class);
-
         MinecraftForge.EVENT_BUS.register(new AttachHandlers());
         MinecraftForge.EVENT_BUS.register(new EventHandlers());
     }

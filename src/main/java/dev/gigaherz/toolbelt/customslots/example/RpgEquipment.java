@@ -4,18 +4,14 @@ import com.google.common.collect.ImmutableList;
 import dev.gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
 import dev.gigaherz.toolbelt.customslots.IExtensionContainer;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
+import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityInject;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.ICapabilitySerializable;
+import net.minecraftforge.common.capabilities.*;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -34,13 +30,11 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<Compo
 
     private static final ResourceLocation CAPABILITY_ID = new ResourceLocation("examplemod", "rpg_inventory");
 
-    @CapabilityInject(RpgEquipment.class)
-    public static Capability<RpgEquipment> CAPABILITY = null;
+    public static Capability<RpgEquipment> CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
 
-    public static void register()
+    public static void register(RegisterCapabilitiesEvent event)
     {
-        // Internal capability, IStorage and default instances are meaningless.
-        CapabilityManager.INSTANCE.register(RpgEquipment.class);
+        event.register(RpgEquipment.class);
 
         MinecraftForge.EVENT_BUS.register(new EventHandlers());
     }

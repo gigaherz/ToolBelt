@@ -32,7 +32,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.17.3.2"
+version = "1.18.0"
 group = "dev.gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
@@ -40,14 +40,14 @@ project.afterEvaluate {
     archivesBaseName = "ToolBelt-${project.MC_VERSION}"
 }
 
-sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '16' // Need this here so eclipse task generates correctly.
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
 
 sourceSets {
     main.resources.srcDirs += 'src/main/generated_resources'
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.17.1'
+    mappings channel: 'official', version: '1.18'
     //mappings channel: 'snapshot', version: '20210309-1.16.5'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -108,25 +108,20 @@ minecraft {
 
 configurations {
     runtimeMod { transitive = false }
+    runtimeOnly.extendsFrom(runtimeMod)
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.17.1-37.0.73'
+    minecraft 'net.minecraftforge:forge:1.18-38.0.12'
 
-    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-mc1171:1.4.1.5")
-    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-mc1171:1.4.1.5")
+    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.18:1.5.0")
+    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.18:1.5.0")
 
     //compileOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.110:api")
     //runtimeOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.110")
 
-    //runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.17.1-5.0.0.0")
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.17.1-5.0.0.0")
-    runtimeMod fg.deobf("top.theillusivec4.curios:curios-forge:1.17.1-5.0.0.0")
-
-    // 2.1.1
-    //runtimeOnly fg.deobf("curse.maven:curious-armor-stands-398784:3343340")
-
-    implementation('cpw.mods:securejarhandler') { version { strictly '0.9.45' } }
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18-5.0.2.3")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18-5.0.2.3")
 }
 
 project.afterEvaluate {
