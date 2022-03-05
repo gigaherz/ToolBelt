@@ -32,7 +32,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.18.0"
+version = "1.18.5"
 group = "dev.gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
@@ -47,8 +47,8 @@ sourceSets {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.18'
-    //mappings channel: 'snapshot', version: '20210309-1.16.5'
+    mappings channel: 'official', version: '1.18.2'
+    //mappings channel: 'parchment', version: '2021.12.13-nightly-SNAPSHOT-1.18.1'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -112,16 +112,16 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.18-38.0.12'
+    minecraft 'net.minecraftforge:forge:1.18.2-40.0.3'
 
-    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.18:1.5.0")
-    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.18:1.5.0")
+    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.18.2:1.5.5")
+    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.18.2:1.5.5")
 
-    //compileOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.110:api")
-    //runtimeOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.110")
+    compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.4.2.119:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.4.2.119")
 
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18-5.0.2.3")
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18-5.0.2.3")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.6.3")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.6.3")
 }
 
 project.afterEvaluate {

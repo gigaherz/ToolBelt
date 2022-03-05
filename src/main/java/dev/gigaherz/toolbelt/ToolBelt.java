@@ -19,10 +19,12 @@ import dev.gigaherz.toolbelt.integration.SewingUpgradeRecipeBuilder;
 import dev.gigaherz.toolbelt.network.*;
 import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
 import net.minecraft.client.gui.screens.MenuScreens;
+import net.minecraft.core.Registry;
 import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.tags.TagKey;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.CreativeModeTab;
@@ -33,7 +35,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.IntTag;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
@@ -285,7 +286,7 @@ public class ToolBelt
                                         .define('s', Ingredient.of(Items.STRING))
                                         .define('l', Ingredient.of(Items.LEATHER))
                                         .define('i', Ingredient.of(Items.IRON_INGOT))
-                                        .unlockedBy("has_leather", has(ItemTags.bind("forge:leather")))
+                                        .unlockedBy("has_leather", has(itemTag("forge:leather")))
                                         ::save
                         )
                         .generateAdvancement()
@@ -301,7 +302,7 @@ public class ToolBelt
                                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET.get()), 3)
                                         .addMaterial(Ingredient.of(Items.IRON_INGOT), 1)
                                         .addMaterial(Ingredient.of(Items.STRING), 2)
-                                        .addCriterion("has_leather", has(ItemTags.bind("forge:leather")))
+                                        .addCriterion("has_leather", has(itemTag("forge:leather")))
                                         ::build
                         )
                         .generateAdvancement()
@@ -318,7 +319,7 @@ public class ToolBelt
                                         .define('s', Ingredient.of(Items.STRING))
                                         .define('l', Ingredient.of(Items.LEATHER))
                                         .define('g', Ingredient.of(Items.GOLD_INGOT))
-                                        .unlockedBy("has_leather", has(ItemTags.bind("forge:leather")))
+                                        .unlockedBy("has_leather", has(itemTag("forge:leather")))
                                         ::save
                         )
                         .generateAdvancement()
@@ -334,7 +335,7 @@ public class ToolBelt
                                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET.get()), 3)
                                         .addMaterial(Ingredient.of(Items.GOLD_INGOT))
                                         .addMaterial(Ingredient.of(Items.STRING))
-                                        .addCriterion("has_leather", has(ItemTags.bind("forge:leather")))
+                                        .addCriterion("has_leather", has(itemTag("forge:leather")))
                                         ::build
                         )
                         .generateAdvancement()
@@ -362,7 +363,7 @@ public class ToolBelt
                                             .addMaterial(BeltIngredient.withLevel(i))
                                             .addMaterial(Ingredient.of(POUCH))
                                             .addMaterial(Ingredient.of(Items.STRING))
-                                            .addCriterion("has_leather", has(ItemTags.bind("forge:leather")))
+                                            .addCriterion("has_leather", has(itemTag("forge:leather")))
                                             ::build
                             )
                             .generateAdvancement()
@@ -389,5 +390,9 @@ public class ToolBelt
                 return tag;
             }
         }
+    }
+
+    private static TagKey<Item> itemTag(String name) {
+        return TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(name));
     }
 }
