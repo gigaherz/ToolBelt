@@ -1,0 +1,15 @@
+{
+  "item.toolbelt.belt": "Pas na narzędzia",
+  "item.toolbelt.pouch": "Kieszonka pasa",
+  "key.toolbelt.open": "Zamień narzędzie",
+  "key.toolbelt.category": "Pas na narzędzia",
+  "key.toolbelt.slot": "Otwórz ekwipunek ze slotami pasa",
+  "key.toolbelt.cycle.left": "Przełącz narzędzie w lewo",
+  "key.toolbelt.cycle.right": "Przełącz narzędzie w prawo",
+  "text.toolbelt.empty": "PUSTE",
+  "text.toolbelt.swap": "ZAMIEŃ",
+  "text.toolbelt.insert": "WŁÓŻ",
+  "text.toolbelt.extract": "WYCIĄGNIJ",
+  "text.toolbelt.tooltip": "Ulepszenia: %s (%s slotów)",
+  "text.toolbelt": "Pas na narzędzia"
+}
