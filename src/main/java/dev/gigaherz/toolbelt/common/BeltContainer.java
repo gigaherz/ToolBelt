@@ -1,10 +1,12 @@
 package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.BeltFinder;
+import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.belt.ToolBeltInventory;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.PlayerInventory;
 import net.minecraft.inventory.IInventory;
+import net.minecraft.inventory.container.ClickType;
 import net.minecraft.inventory.container.Container;
 import net.minecraft.inventory.container.ContainerType;
 import net.minecraft.inventory.container.Slot;
@@ -19,31 +21,39 @@ public class BeltContainer extends Container
     public static ContainerType<BeltContainer> TYPE;
 
     public final int beltSlots;
-    private final ItemStack heldItem;
+    private ItemStack blockedStack;
+    private final int blockedSlot;
 
     public BeltContainer(int id, PlayerInventory inventory, PacketBuffer extraData)
     {
         this(id, inventory, extraData.readVarInt(), extraData.readItem());
     }
 
-    public BeltContainer(int id, IInventory playerInventory, int blockedSlot, ItemStack heldItem)
+    public BeltContainer(int id, PlayerInventory playerInventory, int blockedSlot, ItemStack blockedStack)
     {
         super(TYPE, id);
-        this.heldItem = heldItem;
-        ToolBeltInventory beltInventory = (ToolBeltInventory) heldItem.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                .orElseThrow(() -> new RuntimeException("Item handler not present."));
+        this.blockedSlot = blockedSlot;
+        this.blockedStack = blockedStack;
+        if (blockedSlot >= 0 && !stillValid(playerInventory.player))
+        {
+            blockedStack = ItemStack.EMPTY;
+        }
+        ToolBeltInventory beltInventory = stillValid(playerInventory.player)
+                ? ((ToolBeltInventory) blockedStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+                .orElseThrow(() -> new RuntimeException("Item handler not present.")))
+            : new ToolBeltInventory(new ItemStack(ToolBelt.BELT));
 
         beltSlots = beltInventory.getSlots();
         int xoff = ((9 - beltSlots) * 18) / 2;
         for (int k = 0; k < beltSlots; ++k)
         {
-            this.addSlot(new BeltSlot(playerInventory, heldItem, blockedSlot, k, 8 + xoff + k * 18, 20));
+            this.addSlot(new BeltSlot(playerInventory, blockedStack, blockedSlot, k, 8 + xoff + k * 18, 20));
         }
 
-        bindPlayerInventory(playerInventory, blockedSlot);
+        bindPlayerInventory(playerInventory);
     }
 
-    private void bindPlayerInventory(IInventory playerInventory, int blockedSlot)
+    private void bindPlayerInventory(IInventory playerInventory)
     {
         for (int l = 0; l < 3; ++l)
         {
@@ -85,7 +95,18 @@ public class BeltContainer extends Container
     @Override
     public boolean stillValid(PlayerEntity playerIn)
     {
-        return true;
+        ItemStack held = playerIn.inventory.getItem(blockedSlot);
+        boolean equal = blockedSlot < 0 || held == blockedStack || held.equals(blockedStack, false);
+        blockedStack = held;
+        return equal;
+    }
+
+    @Override
+    public ItemStack clicked(int slot, int button, ClickType clickType, PlayerEntity player)
+    {
+        if (clickType == ClickType.SWAP && button == blockedSlot)
+            return ItemStack.EMPTY;
+        return super.clicked(slot, button, clickType, player);
     }
 
     @Override
@@ -93,7 +114,7 @@ public class BeltContainer extends Container
     {
         Slot slot = this.slots.get(index);
 
-        if (slot == null || !slot.hasItem())
+        if (slot == null || !slot.hasItem() || index == blockedSlot)
             return ItemStack.EMPTY;
 
         ItemStack containedStack = slot.getItem();

@@ -15,7 +15,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
 {
     private final ItemStack itemStack;
 
-    ToolBeltInventory(ItemStack itemStack)
+    public ToolBeltInventory(ItemStack itemStack)
     {
         this.itemStack = itemStack;
     }

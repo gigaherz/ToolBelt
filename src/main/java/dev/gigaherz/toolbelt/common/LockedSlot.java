@@ -3,6 +3,9 @@ package dev.gigaherz.toolbelt.common;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Slot;
+import net.minecraft.item.ItemStack;
+
+import java.util.Optional;
 
 class LockedSlot extends Slot
 {
@@ -15,5 +18,17 @@ class LockedSlot extends Slot
     public boolean mayPickup(PlayerEntity playerIn)
     {
         return false;
+    }
+
+    @Override
+    public boolean mayPlace(ItemStack stack)
+    {
+        return false;
+    }
+
+    @Override
+    public ItemStack remove(int quantity)
+    {
+        return ItemStack.EMPTY;
     }
 }
