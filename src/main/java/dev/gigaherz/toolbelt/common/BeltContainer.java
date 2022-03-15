@@ -7,6 +7,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.Container;
 import net.minecraft.world.inventory.AbstractContainerMenu;
+import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
@@ -100,11 +101,19 @@ public class BeltContainer extends AbstractContainerMenu
     }
 
     @Override
+    public void clicked(int slot, int button, ClickType clickType, Player player)
+    {
+        if (clickType == ClickType.SWAP && button == blockedSlot)
+            return;
+        super.clicked(slot, button, clickType, player);
+    }
+
+    @Override
     public ItemStack quickMoveStack(Player playerIn, int index)
     {
         Slot slot = this.slots.get(index);
 
-        if (slot == null || !slot.hasItem())
+        if (slot == null || !slot.hasItem() || index == blockedSlot)
             return ItemStack.EMPTY;
 
         ItemStack containedStack = slot.getItem();

@@ -7,9 +7,13 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.ItemStackHandler;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class BeltSlot extends Slot
 {
+    private static final Logger LOGGER = LogManager.getLogger();
     public BeltSlot(Container playerInventory, ItemStack heldItem, int blockedSlot, int index, int xPosition, int yPosition)
     {
         super(new Container()
@@ -30,7 +34,10 @@ public class BeltSlot extends Slot
                     beltStack = stack;
                     inventory = (IItemHandlerModifiable) (
                             stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
-                                    .orElseThrow(() -> new RuntimeException("No inventory!"))
+                                    .orElseGet(() -> {
+                                            LOGGER.error("No Inventory!!");
+                                            return new ItemStackHandler(9);
+                                    })
                     );
                 }
                 return inventory;
