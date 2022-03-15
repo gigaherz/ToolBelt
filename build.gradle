@@ -1,17 +1,22 @@
 buildscript {
     repositories {
         maven { url = 'https://files.minecraftforge.net/maven' }
-        jcenter()
+        maven { url = 'https://maven.parchmentmc.org' }
         mavenCentral()
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.+', changing: true
+        classpath 'org.parchmentmc:librarian:1.+'
     }
 }
 apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'org.parchmentmc.librarian.forgegradle'
 apply plugin: 'maven-publish'
 
 repositories {
+    maven {
+        url "https://www.cursemaven.com"
+    }
     maven { // JEI
         url "https://dvs1.progwml6.com/files/maven/"
     }
@@ -23,9 +28,6 @@ repositories {
     }
     maven {
         url 'https://www.dogforce-games.com/maven/'
-    }
-    maven {
-        url "https://www.cursemaven.com"
     }
     mavenLocal()
 }
@@ -45,7 +47,8 @@ sourceSets {
 }
 
 minecraft {
-    mappings channel: 'snapshot', version: '20210309-1.16.5'
+    mappings channel: 'official', version: '1.16.5'
+    //mappings channel: 'parchment', version: '2022.03.06-1.16.5'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -98,22 +101,22 @@ minecraft {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.16.5-36.1.35'
+    minecraft 'net.minecraftforge:forge:1.16.5-36.2.31'
 
-    compileOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.110:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.110")
+    compileOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.152:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.16.5:7.7.1.152")
 
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.5-4.0.5.2")
-    compileOnly "top.theillusivec4.curios:curios-forge:1.16.5-4.0.5.2"
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.16.5-4.0.8.1")
+    compileOnly "top.theillusivec4.curios:curios-forge:1.16.5-4.0.8.1"
 
-    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.16.5:1.3.2")
+    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.16.5:1.3.2.2")
 
-    // 1.16.5-v1b
-    compileOnly fg.deobf("curse.maven:cosmetic-armor-reworked-237307:3205904:api")
-    runtimeOnly fg.deobf("curse.maven:cosmetic-armor-reworked-237307:3205904")
+    // 1.16.5-v4a
+    compileOnly fg.deobf("curse.maven:cosmetic-armor-reworked-237307:3540310:api")
+    runtimeOnly fg.deobf("curse.maven:cosmetic-armor-reworked-237307:3540310")
 
-    // 2.1.1
-    runtimeOnly fg.deobf("curse.maven:curious-armor-stands-398784:3343340")
+    // 2.2.0
+    runtimeOnly fg.deobf("curse.maven:curious-armor-stands-398784:3574644")
 }
 
 jar {

@@ -18,6 +18,8 @@ import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.IntFunction;
 
+import dev.gigaherz.toolbelt.BeltFinder.BeltGetter;
+
 public class BeltFinderCurios extends BeltFinder
 {
     @CapabilityInject(ICuriosItemHandler.class)

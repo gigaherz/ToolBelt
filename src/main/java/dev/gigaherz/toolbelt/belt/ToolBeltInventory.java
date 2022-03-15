@@ -47,7 +47,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
             if (itemTags.getInt("Slot") != slot)
                 continue;
 
-            return ItemStack.read(itemTags);
+            return ItemStack.of(itemTags);
         }
 
         return ItemStack.EMPTY;
@@ -64,7 +64,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
         {
             itemTag = new CompoundNBT();
             itemTag.putInt("Slot", slot);
-            stack.write(itemTag);
+            stack.save(itemTag);
         }
 
         ListNBT tagList = getTag().getList("Items", Constants.NBT.TAG_COMPOUND);

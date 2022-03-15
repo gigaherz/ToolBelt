@@ -45,7 +45,7 @@ public class SwapItems
             if (stack.getCount() <= 0)
                 return;
 
-            ItemStack inHand = player.getHeldItemMainhand();
+            ItemStack inHand = player.getMainHandItem();
 
             if (!ConfigData.isItemStackAllowed(inHand))
                 return;
@@ -55,12 +55,12 @@ public class SwapItems
                             .orElseThrow(() -> new RuntimeException("No inventory!")));
             if (swapWith < 0)
             {
-                player.setHeldItem(Hand.MAIN_HAND, ItemHandlerHelper.insertItem(cap, inHand, false));
+                player.setItemInHand(Hand.MAIN_HAND, ItemHandlerHelper.insertItem(cap, inHand, false));
             }
             else
             {
                 ItemStack inSlot = cap.getStackInSlot(swapWith);
-                player.setHeldItem(Hand.MAIN_HAND, inSlot);
+                player.setItemInHand(Hand.MAIN_HAND, inSlot);
                 cap.setStackInSlot(swapWith, inHand);
             }
             getter.syncToClients();

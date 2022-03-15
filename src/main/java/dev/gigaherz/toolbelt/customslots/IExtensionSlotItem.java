@@ -79,6 +79,6 @@ public interface IExtensionSlotItem
      */
     default boolean canUnequip(@Nonnull ItemStack stack, @Nonnull IExtensionSlot slot)
     {
-        return EnchantmentHelper.getEnchantmentLevel(Enchantments.BINDING_CURSE, stack) <= 0;
+        return EnchantmentHelper.getItemEnchantmentLevel(Enchantments.BINDING_CURSE, stack) <= 0;
     }
 }

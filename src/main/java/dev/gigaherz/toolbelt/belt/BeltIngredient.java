@@ -13,6 +13,8 @@ import net.minecraftforge.common.crafting.IIngredientSerializer;
 import javax.annotation.Nullable;
 import java.util.stream.Stream;
 
+import net.minecraft.item.crafting.Ingredient.SingleItemList;
+
 public class BeltIngredient extends Ingredient
 {
     public static final ResourceLocation NAME = ToolBelt.location("belt_upgrade_level");
@@ -37,7 +39,7 @@ public class BeltIngredient extends Ingredient
     }
 
     @Override
-    public JsonElement serialize()
+    public JsonElement toJson()
     {
         JsonObject object = new JsonObject();
         object.addProperty("type", NAME.toString());
@@ -72,7 +74,7 @@ public class BeltIngredient extends Ingredient
         public BeltIngredient parse(JsonObject json)
         {
             return new BeltIngredient(
-                    JSONUtils.getInt(json, "upgrade_level")
+                    JSONUtils.getAsInt(json, "upgrade_level")
             );
         }
     }

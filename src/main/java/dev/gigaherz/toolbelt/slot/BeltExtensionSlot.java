@@ -101,7 +101,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                         {
                             if (!ConfigData.customBeltSlotEnabled)
                                 return;
-                            if (!getOwner().world.isRemote)
+                            if (!getOwner().level.isClientSide)
                                 syncTo(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getOwner));
                         }
                     };
@@ -141,7 +141,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             if (!ConfigData.customBeltSlotEnabled)
                 return;
             PlayerEntity target = event.getPlayer();
-            if (target.world.isRemote)
+            if (target.level.isClientSide)
                 return;
             get(target).ifPresent(BeltExtensionSlot::syncToSelf);
         }
@@ -152,7 +152,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             if (!ConfigData.customBeltSlotEnabled)
                 return;
             PlayerEntity target = event.getPlayer();
-            if (target.world.isRemote)
+            if (target.level.isClientSide)
                 return;
             get(target).ifPresent(BeltExtensionSlot::syncToSelf);
         }
@@ -163,7 +163,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             if (!ConfigData.customBeltSlotEnabled)
                 return;
             Entity target = event.getTarget();
-            if (target.world.isRemote)
+            if (target.level.isClientSide)
                 return;
             if (target instanceof PlayerEntity)
             {
@@ -199,12 +199,12 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                         stack = ItemStack.EMPTY;
                         belt.setContents(stack);
                     }
-                    if (!player.world.getGameRules().getBoolean(GameRules.KEEP_INVENTORY) && !player.isSpectator())
+                    if (!player.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
                     {
                         if (stack.getCount() > 0)
                         {
                             Collection<ItemEntity> old = player.captureDrops(event.getDrops());
-                            player.dropItem(stack, true, false);
+                            player.drop(stack, true, false);
                             player.captureDrops(old);
                             belt.setContents(ItemStack.EMPTY);
                         }
@@ -235,7 +235,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                 }).orElseGet(() -> {
                     if (stack.getCount() > 0)
                     {
-                        oldPlayer.dropItem(stack, true, false);
+                        oldPlayer.drop(stack, true, false);
                     }
                     return Unit.INSTANCE;
                 });
@@ -253,7 +253,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                 if (owner instanceof PlayerEntity)
                     ItemHandlerHelper.giveItemToPlayer((PlayerEntity) owner, stack);
                 else
-                    owner.entityDropItem(stack, 0.1f);
+                    owner.spawnAtLocation(stack, 0.1f);
                 slot.setContents(ItemStack.EMPTY);
             }
         }
@@ -267,7 +267,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
     protected void syncTo(PlayerEntity target)
     {
         SyncBeltSlotContents message = new SyncBeltSlotContents((PlayerEntity) owner, this);
-        ToolBelt.channel.sendTo(message, ((ServerPlayerEntity) target).connection.getNetworkManager(), NetworkDirection.PLAY_TO_CLIENT);
+        ToolBelt.channel.sendTo(message, ((ServerPlayerEntity) target).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
     }
 
     protected void syncTo(PacketDistributor.PacketTarget target)

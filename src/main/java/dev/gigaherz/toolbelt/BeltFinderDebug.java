@@ -12,6 +12,8 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.util.Optional;
 
+import dev.gigaherz.toolbelt.BeltFinder.BeltGetter;
+
 @Mod.EventBusSubscriber(modid=ToolBelt.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
 public class BeltFinderDebug extends BeltFinder
 {

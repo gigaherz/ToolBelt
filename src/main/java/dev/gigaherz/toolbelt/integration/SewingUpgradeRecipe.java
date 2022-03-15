@@ -11,6 +11,8 @@ import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
 
+import dev.gigaherz.sewingkit.api.SewingRecipe.Material;
+
 public class SewingUpgradeRecipe extends SewingRecipe
 {
     public SewingUpgradeRecipe(ResourceLocation id, String group, NonNullList<Material> materials, @Nullable Ingredient pattern, @Nullable Ingredient tool, ItemStack output)
@@ -19,18 +21,18 @@ public class SewingUpgradeRecipe extends SewingRecipe
     }
 
     @Override
-    public ItemStack getCraftingResult(IInventory inv)
+    public ItemStack assemble(IInventory inv)
     {
         ItemStack inputBelt = ItemStack.EMPTY;
         for (int i = 2; i < 6; i++)
         {
-            if (inv.getStackInSlot(i).getItem() instanceof ToolBeltItem)
+            if (inv.getItem(i).getItem() instanceof ToolBeltItem)
             {
-                inputBelt = inv.getStackInSlot(i);
+                inputBelt = inv.getItem(i);
                 break;
             }
         }
-        ItemStack upgradedBelt = super.getCraftingResult(inv);
+        ItemStack upgradedBelt = super.assemble(inv);
         if (inputBelt.getCount() > 0)
         {
             CompoundNBT inputTag = inputBelt.getTag();

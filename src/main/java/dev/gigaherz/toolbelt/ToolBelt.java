@@ -134,8 +134,8 @@ public class ToolBelt
     public void registerItems(RegistryEvent.Register<Item> event)
     {
         event.getRegistry().registerAll(
-                new ToolBeltItem(new Item.Properties().maxStackSize(1).group(ItemGroup.TOOLS)).setRegistryName("belt"),
-                new Item(new Item.Properties().group(ItemGroup.TOOLS)).setRegistryName("pouch")
+                new ToolBeltItem(new Item.Properties().stacksTo(1).tab(ItemGroup.TAB_TOOLS)).setRegistryName("belt"),
+                new Item(new Item.Properties().tab(ItemGroup.TAB_TOOLS)).setRegistryName("pouch")
         );
     }
 
@@ -175,8 +175,8 @@ public class ToolBelt
     public void clientSetup(FMLClientSetupEvent event)
     {
         event.enqueueWork(() -> {
-            ScreenManager.registerFactory(BeltContainer.TYPE, BeltScreen::new);
-            ScreenManager.registerFactory(BeltSlotContainer.TYPE, BeltSlotScreen::new);
+            ScreenManager.register(BeltContainer.TYPE, BeltScreen::new);
+            ScreenManager.register(BeltSlotContainer.TYPE, BeltSlotScreen::new);
         });
     }
 
@@ -254,21 +254,21 @@ public class ToolBelt
             }
 
             @Override
-            protected void registerRecipes(Consumer<IFinishedRecipe> consumer)
+            protected void buildShapelessRecipes(Consumer<IFinishedRecipe> consumer)
             {
                 ResourceLocation beltId = Objects.requireNonNull(ToolBelt.BELT.getRegistryName());
                 ConditionalRecipe.builder()
                         .addCondition(new Conditions.EnableNormalCrafting())
                         .addRecipe(
-                                ShapedRecipeBuilder.shapedRecipe(ToolBelt.BELT)
-                                        .patternLine("sls")
-                                        .patternLine("l l")
-                                        .patternLine("lil")
-                                        .key('s', Ingredient.fromItems(Items.STRING))
-                                        .key('l', Ingredient.fromItems(Items.LEATHER))
-                                        .key('i', Ingredient.fromItems(Items.IRON_INGOT))
-                                        .addCriterion("has_leather", hasItem(ItemTags.makeWrapperTag("forge:leather")))
-                                        ::build
+                                ShapedRecipeBuilder.shaped(ToolBelt.BELT)
+                                        .pattern("sls")
+                                        .pattern("l l")
+                                        .pattern("lil")
+                                        .define('s', Ingredient.of(Items.STRING))
+                                        .define('l', Ingredient.of(Items.LEATHER))
+                                        .define('i', Ingredient.of(Items.IRON_INGOT))
+                                        .unlockedBy("has_leather", has(ItemTags.bind("forge:leather")))
+                                        ::save
                         )
                         .generateAdvancement()
                         .build(consumer, beltId);
@@ -278,12 +278,12 @@ public class ToolBelt
                         .addCondition(new Conditions.EnableSewingCrafting())
                         .addRecipe(
                                 SewingRecipeBuilder.begin(ToolBelt.BELT)
-                                        .withTool(ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.WOOD.getHarvestLevel()))
-                                        .addMaterial(Ingredient.fromItems(SewingKitMod.LEATHER_STRIP.get()), 2)
-                                        .addMaterial(Ingredient.fromItems(SewingKitMod.LEATHER_SHEET.get()), 3)
-                                        .addMaterial(Ingredient.fromItems(Items.IRON_INGOT), 1)
-                                        .addMaterial(Ingredient.fromItems(Items.STRING), 2)
-                                        .addCriterion("has_leather", hasItem(ItemTags.makeWrapperTag("forge:leather")))
+                                        .withTool(ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.WOOD.getLevel()))
+                                        .addMaterial(Ingredient.of(SewingKitMod.LEATHER_STRIP.get()), 2)
+                                        .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET.get()), 3)
+                                        .addMaterial(Ingredient.of(Items.IRON_INGOT), 1)
+                                        .addMaterial(Ingredient.of(Items.STRING), 2)
+                                        .addCriterion("has_leather", has(ItemTags.bind("forge:leather")))
                                         ::build
                         )
                         .generateAdvancement()
@@ -293,15 +293,15 @@ public class ToolBelt
                 ConditionalRecipe.builder()
                         .addCondition(new Conditions.EnableNormalCrafting())
                         .addRecipe(
-                                ShapedRecipeBuilder.shapedRecipe(ToolBelt.POUCH)
-                                        .patternLine("sgs")
-                                        .patternLine("l l")
-                                        .patternLine("sls")
-                                        .key('s', Ingredient.fromItems(Items.STRING))
-                                        .key('l', Ingredient.fromItems(Items.LEATHER))
-                                        .key('g', Ingredient.fromItems(Items.GOLD_INGOT))
-                                        .addCriterion("has_leather", hasItem(ItemTags.makeWrapperTag("forge:leather")))
-                                        ::build
+                                ShapedRecipeBuilder.shaped(ToolBelt.POUCH)
+                                        .pattern("sgs")
+                                        .pattern("l l")
+                                        .pattern("sls")
+                                        .define('s', Ingredient.of(Items.STRING))
+                                        .define('l', Ingredient.of(Items.LEATHER))
+                                        .define('g', Ingredient.of(Items.GOLD_INGOT))
+                                        .unlockedBy("has_leather", has(ItemTags.bind("forge:leather")))
+                                        ::save
                         )
                         .generateAdvancement()
                         .build(consumer, pouchId);
@@ -311,25 +311,25 @@ public class ToolBelt
                         .addCondition(new Conditions.EnableSewingCrafting())
                         .addRecipe(
                                 SewingRecipeBuilder.begin(ToolBelt.POUCH)
-                                        .withTool(ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.WOOD.getHarvestLevel()))
-                                        .addMaterial(Ingredient.fromItems(SewingKitMod.LEATHER_STRIP.get()), 2)
-                                        .addMaterial(Ingredient.fromItems(SewingKitMod.LEATHER_SHEET.get()), 3)
-                                        .addMaterial(Ingredient.fromItems(Items.GOLD_INGOT))
-                                        .addMaterial(Ingredient.fromItems(Items.STRING))
-                                        .addCriterion("has_leather", hasItem(ItemTags.makeWrapperTag("forge:leather")))
+                                        .withTool(ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.WOOD.getLevel()))
+                                        .addMaterial(Ingredient.of(SewingKitMod.LEATHER_STRIP.get()), 2)
+                                        .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET.get()), 3)
+                                        .addMaterial(Ingredient.of(Items.GOLD_INGOT))
+                                        .addMaterial(Ingredient.of(Items.STRING))
+                                        .addCriterion("has_leather", has(ItemTags.bind("forge:leather")))
                                         ::build
                         )
                         .generateAdvancement()
                         .build(consumer, new ResourceLocation(pouchId.getNamespace(), pouchId.getPath() + "_via_sewing"));
 
                 ToolIngredient needleTiers[] = {
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.WOOD.getHarvestLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.BONE.getHarvestLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.IRON.getHarvestLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.IRON.getHarvestLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.DIAMOND.getHarvestLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.DIAMOND.getHarvestLevel()),
-                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.NETHERITE.getHarvestLevel()),
+                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.WOOD.getLevel()),
+                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.BONE.getLevel()),
+                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.IRON.getLevel()),
+                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.IRON.getLevel()),
+                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.DIAMOND.getLevel()),
+                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.DIAMOND.getLevel()),
+                        ToolIngredient.fromTool(NeedleItem.SEWING_NEEDLE, Needles.NETHERITE.getLevel()),
                 };
                 for (int i = 0; i < 7; i++)
                 {
@@ -343,9 +343,9 @@ public class ToolBelt
                                             ))
                                             .withTool(needleTiers[i])
                                             .addMaterial(BeltIngredient.withLevel(i))
-                                            .addMaterial(Ingredient.fromItems(POUCH))
-                                            .addMaterial(Ingredient.fromItems(Items.STRING))
-                                            .addCriterion("has_leather", hasItem(ItemTags.makeWrapperTag("forge:leather")))
+                                            .addMaterial(Ingredient.of(POUCH))
+                                            .addMaterial(Ingredient.of(Items.STRING))
+                                            .addCriterion("has_leather", has(ItemTags.bind("forge:leather")))
                                             ::build
                             )
                             .generateAdvancement()

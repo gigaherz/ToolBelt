@@ -86,13 +86,13 @@ public class VanillaLivingEquipment implements IExtensionContainer
         @Override
         public ItemStack getContents()
         {
-            return owner.getItemStackFromSlot(slot);
+            return owner.getItemBySlot(slot);
         }
 
         @Override
         public void setContents(@Nonnull ItemStack stack)
         {
-            owner.setItemStackToSlot(slot, stack);
+            owner.setItemSlot(slot, stack);
         }
 
         @Override

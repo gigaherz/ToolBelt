@@ -33,7 +33,7 @@ public class ToolBeltLayer<T extends LivingEntity, M extends BipedModel<T>> exte
 
     private void translateToBody(MatrixStack matrixStack)
     {
-        this.getEntityModel().bipedBody.translateRotate(matrixStack);
+        this.getParentModel().body.translateAndRotate(matrixStack);
     }
 
     @Override
@@ -48,9 +48,9 @@ public class ToolBeltLayer<T extends LivingEntity, M extends BipedModel<T>> exte
                 return;
 
             getter.getBelt().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent((cap) -> {
-                boolean rightHanded = player.getPrimaryHand() == HandSide.RIGHT;
+                boolean rightHanded = player.getMainArm() == HandSide.RIGHT;
 
-                matrixStack.push();
+                matrixStack.pushPose();
                 this.translateToBody(matrixStack);
 
                 ItemStack firstItem = cap.getStackInSlot(0);
@@ -61,9 +61,9 @@ public class ToolBeltLayer<T extends LivingEntity, M extends BipedModel<T>> exte
 
                 if (!leftItem.isEmpty() || !rightItem.isEmpty())
                 {
-                    matrixStack.push();
+                    matrixStack.pushPose();
 
-                    if (getEntityModel().isChild)
+                    if (getParentModel().young)
                     {
                         matrixStack.translate(0.0F, 0.75F, 0.0F);
                         matrixStack.scale(0.5F, 0.5F, 0.5F);
@@ -72,16 +72,16 @@ public class ToolBeltLayer<T extends LivingEntity, M extends BipedModel<T>> exte
                     renderHeldItem(player, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HandSide.RIGHT, matrixStack, buffer, lightness);
                     renderHeldItem(player, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HandSide.LEFT, matrixStack, buffer, lightness);
 
-                    matrixStack.pop();
+                    matrixStack.popPose();
                 }
 
                 matrixStack.translate(0.0F, 0.19F, 0.0F);
                 matrixStack.scale(0.85f, 0.6f, 0.78f);
 
-                renderCutoutModel(beltModel, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
+                renderColoredCutoutModel(beltModel, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
 
 
-                matrixStack.pop();
+                matrixStack.popPose();
             });
         });
     }
@@ -90,17 +90,17 @@ public class ToolBeltLayer<T extends LivingEntity, M extends BipedModel<T>> exte
     {
         if (stack.isEmpty())
             return;
-        matrixStack.push();
+        matrixStack.pushPose();
         if (handSide == HandSide.LEFT)
             matrixStack.translate(-4.35f / 16.0F, 0.7f, -0.1f);
         else
             matrixStack.translate(4.35f / 16.0F, 0.7f, -0.1f);
         //((IHasArm)this.getEntityModel()).translateHand(handSide, matrixStack);
-        matrixStack.rotate(Vector3f.XP.rotationDegrees(40));
+        matrixStack.mulPose(Vector3f.XP.rotationDegrees(40));
         float scale = ConfigData.beltItemScale;
         matrixStack.scale(scale, scale, scale);
-        Minecraft.getInstance().getFirstPersonRenderer().renderItemSide(player, stack, transformType, handSide == HandSide.LEFT, matrixStack, buffer, lightness);
-        matrixStack.pop();
+        Minecraft.getInstance().getItemInHandRenderer().renderItem(player, stack, transformType, handSide == HandSide.LEFT, matrixStack, buffer, lightness);
+        matrixStack.popPose();
     }
 
     private static class BeltModel<T extends LivingEntity> extends EntityModel<T>
@@ -116,27 +116,27 @@ public class ToolBeltLayer<T extends LivingEntity, M extends BipedModel<T>> exte
             buckle.addBox(-2.5f, 9.5f, -3.5f, 5, 5, 1);
 
             pocketL.addBox(-2, 12, 5, 4, 4, 1);
-            pocketL.rotateAngleY = (float) Math.toRadians(-90);
+            pocketL.yRot = (float) Math.toRadians(-90);
             pocketR.addBox(-2, 12, 5, 4, 4, 1);
-            pocketR.rotateAngleY = (float) Math.toRadians(90);
+            pocketR.yRot = (float) Math.toRadians(90);
         }
 
         @Override
-        public void setRotationAngles(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
+        public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
         {
         }
 
         @Override
-        public void render(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
+        public void renderToBuffer(MatrixStack matrixStack, IVertexBuilder vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
         {
             belt.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             pocketL.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             pocketR.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
 
-            matrixStack.push();
+            matrixStack.pushPose();
             matrixStack.scale(0.8f, 1, 1);
             buckle.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-            matrixStack.pop();
+            matrixStack.popPose();
         }
     }
 }

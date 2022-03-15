@@ -99,16 +99,16 @@ public class RadialMenuScreen extends Screen
         if (event.getType() != RenderGameOverlayEvent.ElementType.CROSSHAIRS)
             return;
 
-        if (Minecraft.getInstance().currentScreen instanceof RadialMenuScreen)
+        if (Minecraft.getInstance().screen instanceof RadialMenuScreen)
         {
             event.setCanceled(true);
         }
     }
 
     @Override // removed
-    public void onClose()
+    public void removed()
     {
-        super.onClose();
+        super.removed();
         ClientEvents.wipeOpen();
     }
 
@@ -121,7 +121,7 @@ public class RadialMenuScreen extends Screen
 
         if (menu.isClosed())
         {
-            Minecraft.getInstance().displayGuiScreen(null);
+            Minecraft.getInstance().setScreen(null);
             ClientEvents.wipeOpen();
         }
         if (!menu.isReady() || inventory == null)
@@ -129,7 +129,7 @@ public class RadialMenuScreen extends Screen
             return;
         }
 
-        ItemStack inHand = minecraft.player.getHeldItemMainhand();
+        ItemStack inHand = minecraft.player.getMainHandItem();
         if (!ConfigData.isItemStackAllowed(inHand))
         {
             inventory = null;
@@ -153,7 +153,7 @@ public class RadialMenuScreen extends Screen
 
         if (inventory == null)
         {
-            Minecraft.getInstance().displayGuiScreen(null);
+            Minecraft.getInstance().setScreen(null);
         }
         else if (!ClientEvents.isKeyDown(ClientEvents.OPEN_TOOL_MENU_KEYBIND))
         {
@@ -188,7 +188,7 @@ public class RadialMenuScreen extends Screen
         if (inventory == null)
             return;
 
-        ItemStack inHand = minecraft.player.getHeldItemMainhand();
+        ItemStack inHand = minecraft.player.getMainHandItem();
         if (!ConfigData.isItemStackAllowed(inHand))
             return;
 
@@ -254,7 +254,7 @@ public class RadialMenuScreen extends Screen
 
     private boolean trySwap(int slotNumber, ItemStack itemMouseOver)
     {
-        ItemStack inHand = minecraft.player.getHeldItemMainhand();
+        ItemStack inHand = minecraft.player.getMainHandItem();
         if (!ConfigData.isItemStackAllowed(inHand))
             return false;
 

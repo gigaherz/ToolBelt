@@ -7,6 +7,6 @@ public class CosmeticArmorIntegration
 {
     public static boolean isHidden(PlayerEntity player, String modid, String id)
     {
-        return CosArmorAPI.getCAStacksClient(player.getUniqueID()).isHidden(modid, id);
+        return CosArmorAPI.getCAStacksClient(player.getUUID()).isHidden(modid, id);
     }
 }
