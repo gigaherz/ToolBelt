@@ -5,6 +5,7 @@ import com.mojang.blaze3d.vertex.VertexConsumer;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
+import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.ArmorStandModel;
 import net.minecraft.client.model.geom.ModelLayers;
@@ -14,11 +15,13 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.HumanoidArm;
@@ -29,10 +32,11 @@ import net.minecraftforge.items.CapabilityItemHandler;
 public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> extends RenderLayer<T, M>
 {
     private static final ResourceLocation TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
+    private static final ResourceLocation TEXTURE_BELT_DYED = ToolBelt.location("textures/entity/dyed_belt.png");
 
     private final BeltModel<T> beltModel;
 
-    public ToolBeltLayer(LivingEntityRenderer<T, M> owner)
+    public ToolBeltLayer(RenderLayerParent<T, M> owner)
     {
         super(owner);
 
@@ -45,21 +49,23 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
     }
 
     @Override
-    public void render(PoseStack matrixStack, MultiBufferSource buffer, int lightness, T player, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch)
+    public void render(PoseStack matrixStack, MultiBufferSource buffer, int lightness, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch)
     {
         if (!ConfigData.showBeltOnPlayers)
             return;
 
-        BeltFinder.findBelt(player, true).ifPresent((getter) -> {
+        BeltFinder.findBelt(entity, true).ifPresent((getter) -> {
 
             if (getter.isHidden())
                 return;
 
-            getter.getBelt().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent((cap) -> {
-                boolean rightHanded = player.getMainArm() == HumanoidArm.RIGHT;
+            var stack = getter.getBelt();
 
-                matrixStack.pushPose();
-                this.translateToBody(matrixStack);
+            matrixStack.pushPose();
+            this.translateToBody(matrixStack);
+
+            stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent((cap) -> {
+                boolean rightHanded = entity.getMainArm() == HumanoidArm.RIGHT;
 
                 {
                     ItemStack firstItem = cap.getStackInSlot(0);
@@ -78,20 +84,32 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
                             matrixStack.scale(0.5F, 0.5F, 0.5F);
                         }
 
-                        renderHeldItem(player, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HumanoidArm.RIGHT, matrixStack, buffer, lightness);
-                        renderHeldItem(player, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HumanoidArm.LEFT, matrixStack, buffer, lightness);
+                        renderHeldItem(entity, rightItem, TransformType.THIRD_PERSON_RIGHT_HAND, HumanoidArm.RIGHT, matrixStack, buffer, lightness);
+                        renderHeldItem(entity, leftItem, TransformType.THIRD_PERSON_LEFT_HAND, HumanoidArm.LEFT, matrixStack, buffer, lightness);
 
                         matrixStack.popPose();
                     }
                 }
 
-                matrixStack.translate(0.0F, 0.19F, 0.0F);
-                matrixStack.scale(0.85f, 0.6f, 0.78f);
-
-                renderColoredCutoutModel(beltModel, TEXTURE_BELT, matrixStack, buffer, lightness, player, 1.0f, 1.0f, 1.0f);
-
-                matrixStack.popPose();
             });
+
+            matrixStack.translate(0.0F, 0.19F, 0.0F);
+            matrixStack.scale(0.85f, 0.6f, 0.78f);
+
+            if (stack.getItem() instanceof ToolBeltItem beltItem)
+            {
+                beltModel.hasColor = beltItem.hasCustomColor(stack);
+                if (beltModel.hasColor)
+                {
+                    var dyeColor = beltItem.getColor(stack);
+                    beltModel.dyeRed = FastColor.ARGB32.red(dyeColor) / 255.0f;
+                    beltModel.dyeGreen = FastColor.ARGB32.green(dyeColor) / 255.0f;
+                    beltModel.dyeBlue = FastColor.ARGB32.blue(dyeColor) / 255.0f;
+                }
+            }
+            renderColoredCutoutModel(beltModel, getTextureLocation(entity), matrixStack, buffer, lightness, entity, 1.0f, 1.0f, 1.0f);
+
+            matrixStack.popPose();
         });
     }
 
@@ -112,6 +130,17 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
         matrixStack.popPose();
     }
 
+    @Override
+    protected ResourceLocation getTextureLocation(T pEntity)
+    {
+        return BeltFinder.findBelt(pEntity, true).map((getter) -> {
+            var stack = getter.getBelt();
+            return stack.getItem() instanceof ToolBeltItem beltItem && beltItem.hasCustomColor(stack)
+                    ? TEXTURE_BELT_DYED
+                    : TEXTURE_BELT;
+        }).orElse(TEXTURE_BELT);
+    }
+
     public static class BeltModel<T extends LivingEntity> extends EntityModel<T>
     {
         private static final String BELT = "belt";
@@ -122,6 +151,11 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
         private final ModelPart buckle;
         private final ModelPart left_pocket;
         private final ModelPart right_pocket;
+
+        public boolean hasColor;
+        public float dyeRed;
+        public float dyeGreen;
+        public float dyeBlue;
 
         public BeltModel(ModelPart part) {
             super(RenderType::entityCutoutNoCull);
@@ -149,23 +183,33 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
             return LayerDefinition.create(meshdefinition, 64, 32);
         }
 
-
-        @Override
-        public void setupAnim(T entityIn, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch)
-        {
-        }
-
         @Override
         public void renderToBuffer(PoseStack matrixStack, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
         {
-            belt.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-            left_pocket.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
-            right_pocket.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+            var cRed = red;
+            var cGreen = green;
+            var cBlue = blue;
+            if (hasColor)
+            {
+                cRed *= dyeRed;
+                cGreen *= dyeGreen;
+                cBlue *= dyeBlue;
+            }
+
+            belt.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, cRed, cGreen, cBlue, alpha);
+            left_pocket.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, cRed, cGreen, cBlue, alpha);
+            right_pocket.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, cRed, cGreen, cBlue, alpha);
 
             matrixStack.pushPose();
             matrixStack.scale(0.8f, 1, 1);
             buckle.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
             matrixStack.popPose();
+        }
+
+        @Override
+        public void setupAnim(T pEntity, float pLimbSwing, float pLimbSwingAmount, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch)
+        {
+
         }
     }
 }

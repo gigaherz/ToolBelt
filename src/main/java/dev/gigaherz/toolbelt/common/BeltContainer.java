@@ -49,10 +49,10 @@ public class BeltContainer extends AbstractContainerMenu
             this.addSlot(new BeltSlot(playerInventory, blockedStack, blockedSlot, k, 8 + xoff + k * 18, 20));
         }
 
-        bindPlayerInventory(playerInventory, blockedSlot);
+        bindPlayerInventory(playerInventory);
     }
 
-    private void bindPlayerInventory(Container playerInventory, int blockedSlot)
+    private void bindPlayerInventory(Container playerInventory)
     {
         for (int l = 0; l < 3; ++l)
         {

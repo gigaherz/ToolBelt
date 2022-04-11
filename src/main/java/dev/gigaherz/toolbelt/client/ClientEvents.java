@@ -8,24 +8,33 @@ import dev.gigaherz.toolbelt.customslots.ExtensionSlotSlot;
 import dev.gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.*;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.renderer.entity.EntityRenderer;
+import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.InventoryMenu;
+import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.ClientRegistry;
+import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.lwjgl.glfw.GLFW;
+
+import javax.annotation.Nullable;
+import java.util.function.Function;
 
 @Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ToolBelt.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ClientEvents
@@ -125,6 +134,29 @@ public class ClientEvents
     public static class ModBusEvents
     {
         @SubscribeEvent
+        public static void clientSetup(FMLClientSetupEvent event)
+        {
+            event.enqueueWork(() -> {
+                ItemProperties.register(ToolBelt.BELT, ToolBelt.location("has_custom_color"),
+                        (ItemStack pStack, @Nullable ClientLevel pLevel, @Nullable LivingEntity pEntity, int pSeed) ->
+                                (pStack.getItem() instanceof DyeableLeatherItem dyeable) && dyeable.hasCustomColor(pStack)
+                                        ? 1 : 0
+                );
+            });
+        }
+
+        @SubscribeEvent
+        public static void colors(ColorHandlerEvent.Item event)
+        {
+            event.getItemColors().register(
+                    (ItemStack pStack, int pTintIndex) ->
+                            pTintIndex == 0 && (pStack.getItem() instanceof DyeableLeatherItem dyeable) && dyeable.hasCustomColor(pStack)
+                                    ? dyeable.getColor(pStack) : -1,
+                    ToolBelt.BELT
+            );
+        }
+
+        @SubscribeEvent
         public static void textureStitch(TextureStitchEvent.Pre event)
         {
             if (event.getAtlas().location() == InventoryMenu.BLOCK_ATLAS)
@@ -142,32 +174,37 @@ public class ClientEvents
         @SubscribeEvent
         public static void construct(EntityRenderersEvent.AddLayers event)
         {
-            addLayerToEntity(event, EntityType.ARMOR_STAND);
-            addLayerToEntity(event, EntityType.ZOMBIE);
-            addLayerToEntity(event, EntityType.SKELETON);
-            addLayerToEntity(event, EntityType.HUSK);
-            addLayerToEntity(event, EntityType.DROWNED);
-            addLayerToEntity(event, EntityType.STRAY);
+            addLayerToHumanoid(event, EntityType.ARMOR_STAND, ToolBeltLayer::new);
+            addLayerToHumanoid(event, EntityType.ZOMBIE, ToolBeltLayer::new);
+            addLayerToHumanoid(event, EntityType.SKELETON, ToolBeltLayer::new);
+            addLayerToHumanoid(event, EntityType.HUSK, ToolBeltLayer::new);
+            addLayerToHumanoid(event, EntityType.DROWNED, ToolBeltLayer::new);
+            addLayerToHumanoid(event, EntityType.STRAY, ToolBeltLayer::new);
 
-            addLayerToPlayerSkin(event, "default");
-            addLayerToPlayerSkin(event, "slim");
+            addLayerToPlayerSkin(event, "default", ToolBeltLayer::new);
+            addLayerToPlayerSkin(event, "slim", ToolBeltLayer::new);
         }
 
         @SuppressWarnings({"rawtypes", "unchecked"})
-        private static void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, String skinName)
+        private static <E extends Player, M extends HumanoidModel<E>>
+        void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, String skinName, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E,M>> factory)
         {
-            EntityRenderer<? extends Player> render = event.getSkin(skinName);
-            if (render instanceof LivingEntityRenderer livingRenderer)
-            {
-                livingRenderer.addLayer(new ToolBeltLayer<>(livingRenderer));
-            }
+            LivingEntityRenderer renderer = event.getSkin(skinName);
+            if (renderer != null) renderer.addLayer(factory.apply(renderer));
         }
 
-        private static <T extends LivingEntity, M extends HumanoidModel<T>, R extends LivingEntityRenderer<T, M>> void addLayerToEntity(
-                EntityRenderersEvent.AddLayers event, EntityType<? extends T> entityType)
+        private static <E extends LivingEntity, M extends HumanoidModel<E>>
+        void addLayerToHumanoid(EntityRenderersEvent.AddLayers event, EntityType<E> entityType, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E,M>> factory)
         {
-            R renderer = event.getRenderer(entityType);
-            if (renderer != null) renderer.addLayer(new ToolBeltLayer<>(renderer));
+            LivingEntityRenderer<E, M> renderer = event.getRenderer(entityType);
+            if (renderer != null) renderer.addLayer(factory.apply(renderer));
+        }
+
+        private static <E extends LivingEntity, M extends EntityModel<E>>
+        void addLayerToLiving(EntityRenderersEvent.AddLayers event, EntityType<E> entityType, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E,M>> factory)
+        {
+            LivingEntityRenderer<E, M> renderer = event.getRenderer(entityType);
+            if (renderer != null) renderer.addLayer(factory.apply(renderer));
         }
     }
 }
