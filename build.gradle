@@ -29,6 +29,11 @@ repositories {
     maven {
         url "https://www.cursemaven.com"
     }
+    repositories {
+        maven {
+            url "$projectDir/../CommonMaven"
+        }
+    }
     mavenLocal()
 }
 
@@ -114,8 +119,8 @@ configurations {
 dependencies {
     minecraft 'net.minecraftforge:forge:1.18.2-40.0.44'
 
-    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.18.2:1.5.5")
-    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.18.2:1.5.5")
+    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.18.2:1.5.9")
+    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.18.2:1.5.9")
 
     compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.180:api")
     runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.180")
