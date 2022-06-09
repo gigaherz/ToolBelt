@@ -55,7 +55,7 @@ public class BeltFinderDebug extends BeltFinder
         @Override
         public ItemStack getBelt()
         {
-            return new ItemStack(ToolBelt.BELT);
+            return new ItemStack(ToolBelt.BELT.get());
         }
 
         @Override

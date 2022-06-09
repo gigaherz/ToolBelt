@@ -28,14 +28,14 @@ public class BeltIngredient extends Ingredient
 
     protected BeltIngredient(int level)
     {
-        super(Stream.of(new ItemValue(ToolBelt.BELT.of(level))));
+        super(Stream.of(new ItemValue(ToolBelt.BELT.get().of(level))));
         this.level = level;
     }
 
     @Override
     public boolean test(@Nullable ItemStack stack)
     {
-        return stack != null && stack.getItem() == ToolBelt.BELT && ToolBelt.BELT.getLevel(stack) == level;
+        return stack != null && stack.getItem() == ToolBelt.BELT.get() && ToolBelt.BELT.get().getLevel(stack) == level;
     }
 
     @Override

@@ -15,6 +15,7 @@ import dev.gigaherz.toolbelt.common.BeltSlotContainer;
 import dev.gigaherz.toolbelt.common.BeltSlotScreen;
 import dev.gigaherz.toolbelt.customslots.ExtensionSlotItemCapability;
 import dev.gigaherz.toolbelt.integration.SewingKitIntegration;
+import dev.gigaherz.toolbelt.integration.SewingUpgradeRecipe;
 import dev.gigaherz.toolbelt.integration.SewingUpgradeRecipeBuilder;
 import dev.gigaherz.toolbelt.network.*;
 import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
@@ -25,6 +26,8 @@ import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.ai.village.poi.PoiType;
+import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.CreativeModeTab;
@@ -35,8 +38,11 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.nbt.IntTag;
+import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -48,7 +54,6 @@ import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.AnvilUpdateEvent;
-import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.*;
 import net.minecraftforge.fml.common.Mod;
@@ -56,12 +61,16 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
 import net.minecraftforge.fml.event.lifecycle.*;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.fml.javafmlmod.FMLModContainer;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
+import net.minecraftforge.registries.DeferredRegister;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.ObjectHolder;
+import net.minecraftforge.registries.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import top.theillusivec4.curios.api.SlotTypeMessage;
@@ -75,14 +84,16 @@ public class ToolBelt
 {
     public static final String MODID = "toolbelt";
 
-    @ObjectHolder("toolbelt:belt")
-    public static ToolBeltItem BELT;
+    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
+    private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.CONTAINERS, MODID);
 
-    @ObjectHolder("toolbelt:pouch")
-    public static Item POUCH;
+    public static RegistryObject<ToolBeltItem> BELT = ITEMS.register("belt", () -> new ToolBeltItem(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS)));
+    public static RegistryObject<Item> POUCH = ITEMS.register("pouch", () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_TOOLS)));
 
-    @ObjectHolder("toolbelt:sewing_upgrade")
-    public static RecipeSerializer<?> SEWING_UGRADE_SERIALIZER = null;
+    public static RegistryObject<RecipeSerializer<?>> SEWING_UGRADE_SERIALIZER = RegistryObject.createOptional(location("sewing_upgrade"), Registry.RECIPE_SERIALIZER_REGISTRY, MODID);
+
+    public static RegistryObject<MenuType<BeltSlotContainer>> BELT_SLOT_MENU = MENU_TYPES.register("belt_slot_container", () -> new MenuType<>(BeltSlotContainer::new));
+    public static RegistryObject<MenuType<BeltContainer>> BELT_MENU = MENU_TYPES.register("belt_container", () -> IForgeMenuType.create(BeltContainer::new));
 
     public static ToolBelt instance;
 
@@ -103,9 +114,10 @@ public class ToolBelt
         ModLoadingContext modLoadingContext = ModLoadingContext.get();
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        modEventBus.addGenericListener(Item.class, this::registerItems);
-        modEventBus.addGenericListener(RecipeSerializer.class, this::registerRecipes);
-        modEventBus.addGenericListener(MenuType.class, this::registerContainers);
+        ITEMS.register(modEventBus);
+        MENU_TYPES.register(modEventBus);
+
+        modEventBus.addListener(this::construct );
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::loadComplete);
@@ -128,6 +140,14 @@ public class ToolBelt
 
     }
 
+    private void construct(FMLConstructModEvent event)
+    {
+        event.enqueueWork(() -> {
+            CraftingHelper.register(BeltIngredient.NAME, BeltIngredient.Serializer.INSTANCE);
+            Conditions.register();
+        });
+    }
+
     public void gatherData(GatherDataEvent event)
     {
         DataGen.gatherData(event);
@@ -140,30 +160,6 @@ public class ToolBelt
             ConfigData.refreshClient();
         else if (config.getSpec() == ConfigData.SERVER_SPEC)
             ConfigData.refreshServer();
-    }
-
-    public void registerItems(RegistryEvent.Register<Item> event)
-    {
-        event.getRegistry().registerAll(
-                new ToolBeltItem(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS)).setRegistryName("belt"),
-                new Item(new Item.Properties().tab(CreativeModeTab.TAB_TOOLS)).setRegistryName("pouch")
-        );
-    }
-
-    private void registerRecipes(RegistryEvent.Register<RecipeSerializer<?>> event)
-    {
-        CraftingHelper.register(BeltIngredient.NAME, BeltIngredient.Serializer.INSTANCE);
-    }
-
-    public void registerContainers(RegistryEvent.Register<MenuType<?>> event)
-    {
-        event.getRegistry().registerAll(
-                new MenuType<>(BeltSlotContainer::new).setRegistryName("belt_slot_container"),
-                IForgeMenuType.create(BeltContainer::new).setRegistryName("belt_container")
-        );
-
-        // FIXME: Move elsewhere:
-        Conditions.register();
     }
 
     private void registerCapabilities(RegisterCapabilitiesEvent event)
@@ -195,8 +191,8 @@ public class ToolBelt
     public void clientSetup(FMLClientSetupEvent event)
     {
         event.enqueueWork(() -> {
-            MenuScreens.register(BeltContainer.TYPE, BeltScreen::new);
-            MenuScreens.register(BeltSlotContainer.TYPE, BeltSlotScreen::new);
+            MenuScreens.register(ToolBelt.BELT_MENU.get(), BeltScreen::new);
+            MenuScreens.register(ToolBelt.BELT_SLOT_MENU.get(), BeltSlotScreen::new);
         });
     }
 
@@ -219,9 +215,9 @@ public class ToolBelt
 
         ItemStack left = ev.getLeft();
         ItemStack right = ev.getRight();
-        if (left.getCount() <= 0 || left.getItem() != BELT)
+        if (left.getCount() <= 0 || left.getItem() != BELT.get())
             return;
-        if (right.getCount() <= 0 || right.getItem() != POUCH)
+        if (right.getCount() <= 0 || right.getItem() != POUCH.get())
             return;
         int cost = ToolBeltItem.getUpgradeXP(left);
         if (cost < 0)
@@ -246,23 +242,7 @@ public class ToolBelt
         {
             DataGenerator gen = event.getGenerator();
 
-            if (event.includeClient())
-            {
-                //gen.addProvider(new SewingKitDataGen.Lang(gen));
-                // Let blockstate provider see generated item models by passing its existing file helper
-                //ItemModelProvider itemModels = new SewingKitDataGen.ItemModels(gen, event.getExistingFileHelper());
-                //gen.addProvider(itemModels);
-                //gen.addProvider(new BlockStates(gen, itemModels.existingFileHelper));
-            }
-            if (event.includeServer())
-            {
-
-                //BlockTags blockTags = new BlockTags(gen);
-                //gen.addProvider(blockTags);
-                //gen.addProvider(new ItemTags(gen, blockTags));
-                gen.addProvider(new Recipes(gen));
-                //gen.addProvider(new LootTables(gen));
-            }
+            gen.addProvider(event.includeServer(), new Recipes(gen));
         }
 
         private static class Recipes extends RecipeProvider implements IConditionBuilder
@@ -275,11 +255,11 @@ public class ToolBelt
             @Override
             protected void buildCraftingRecipes(Consumer<FinishedRecipe> consumer)
             {
-                ResourceLocation beltId = Objects.requireNonNull(ToolBelt.BELT.getRegistryName());
+                ResourceLocation beltId = ToolBelt.BELT.getId();
                 ConditionalRecipe.builder()
                         .addCondition(new Conditions.EnableNormalCrafting())
                         .addRecipe(
-                                ShapedRecipeBuilder.shaped(ToolBelt.BELT)
+                                ShapedRecipeBuilder.shaped(ToolBelt.BELT.get())
                                         .pattern("sls")
                                         .pattern("l l")
                                         .pattern("lil")
@@ -296,7 +276,7 @@ public class ToolBelt
                         .addCondition(modLoaded("sewingkit"))
                         .addCondition(new Conditions.EnableSewingCrafting())
                         .addRecipe(
-                                SewingRecipeBuilder.begin(ToolBelt.BELT)
+                                SewingRecipeBuilder.begin(ToolBelt.BELT.get())
                                         .withTool(ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.WOOD.getTier()))
                                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_STRIP.get()), 2)
                                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET.get()), 3)
@@ -308,11 +288,11 @@ public class ToolBelt
                         .generateAdvancement()
                         .build(consumer, new ResourceLocation(beltId.getNamespace(), beltId.getPath() + "_via_sewing"));
 
-                ResourceLocation pouchId = Objects.requireNonNull(ToolBelt.POUCH.getRegistryName());
+                ResourceLocation pouchId = ToolBelt.POUCH.getId();
                 ConditionalRecipe.builder()
                         .addCondition(new Conditions.EnableNormalCrafting())
                         .addRecipe(
-                                ShapedRecipeBuilder.shaped(ToolBelt.POUCH)
+                                ShapedRecipeBuilder.shaped(ToolBelt.POUCH.get())
                                         .pattern("sgs")
                                         .pattern("l l")
                                         .pattern("sls")
@@ -329,7 +309,7 @@ public class ToolBelt
                         .addCondition(modLoaded("sewingkit"))
                         .addCondition(new Conditions.EnableSewingCrafting())
                         .addRecipe(
-                                SewingRecipeBuilder.begin(ToolBelt.POUCH)
+                                SewingRecipeBuilder.begin(ToolBelt.POUCH.get())
                                         .withTool(ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.WOOD.getTier()))
                                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_STRIP.get()), 2)
                                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET.get()), 3)
@@ -355,13 +335,13 @@ public class ToolBelt
                             .addCondition(modLoaded("sewingkit"))
                             .addCondition(new Conditions.EnableSewingCrafting())
                             .addRecipe(
-                                    SewingUpgradeRecipeBuilder.begin(ToolBelt.BELT,
+                                    SewingUpgradeRecipeBuilder.begin(ToolBelt.BELT.get(),
                                             compound(
                                                     Pair.of("Size", IntTag.valueOf(i + 3))
                                             ))
                                             .withTool(needleTiers[i])
                                             .addMaterial(BeltIngredient.withLevel(i))
-                                            .addMaterial(Ingredient.of(POUCH))
+                                            .addMaterial(Ingredient.of(POUCH.get()))
                                             .addMaterial(Ingredient.of(Items.STRING))
                                             .addCriterion("has_leather", has(itemTag("forge:leather")))
                                             ::build

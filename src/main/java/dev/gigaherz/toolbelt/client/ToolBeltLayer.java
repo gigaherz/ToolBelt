@@ -23,6 +23,7 @@ import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.resources.ResourceLocation;
@@ -43,9 +44,13 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
         beltModel = new BeltModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ClientEvents.BELT_LAYER));
     }
 
-    private void translateToBody(PoseStack poseStack)
+    private void translateToBody(LivingEntity entity, PoseStack poseStack)
     {
         this.getParentModel().body.translateAndRotate(poseStack);
+        if (entity.isBaby() && !(entity instanceof Villager)) {
+            poseStack.scale(0.52F, 0.52F, 0.52F);
+            poseStack.translate(0.0D, 1.4D, 0.0D);
+        }
     }
 
     @Override
@@ -62,7 +67,7 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
             var stack = getter.getBelt();
 
             matrixStack.pushPose();
-            this.translateToBody(matrixStack);
+            this.translateToBody(entity, matrixStack);
 
             stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent((cap) -> {
                 boolean rightHanded = entity.getMainArm() == HumanoidArm.RIGHT;
@@ -126,7 +131,7 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
         matrixStack.mulPose(Vector3f.XP.rotationDegrees(40));
         float scale = ConfigData.beltItemScale;
         matrixStack.scale(scale, scale, scale);
-        Minecraft.getInstance().getItemInHandRenderer().renderItem(player, stack, transformType, handSide == HumanoidArm.LEFT, matrixStack, buffer, lightness);
+        Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer().renderItem(player, stack, transformType, handSide == HumanoidArm.LEFT, matrixStack, buffer, lightness);
         matrixStack.popPose();
     }
 

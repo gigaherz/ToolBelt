@@ -17,9 +17,6 @@ import net.minecraftforge.registries.ObjectHolder;
 
 public class BeltContainer extends AbstractContainerMenu
 {
-    @ObjectHolder("toolbelt:belt_container")
-    public static MenuType<BeltContainer> TYPE;
-
     public final int beltSlots;
     private ItemStack blockedStack;
     private final int blockedSlot;
@@ -31,7 +28,7 @@ public class BeltContainer extends AbstractContainerMenu
 
     public BeltContainer(int id, Inventory playerInventory, int blockedSlot, ItemStack blockedStack)
     {
-        super(TYPE, id);
+        super(ToolBelt.BELT_MENU.get(), id);
         this.blockedStack = blockedStack;
         this.blockedSlot = blockedSlot;
         if (blockedSlot >= 0 && !stillValid(playerInventory.player))
@@ -40,7 +37,7 @@ public class BeltContainer extends AbstractContainerMenu
         }
         ToolBeltInventory beltInventory = stillValid(playerInventory.player) && blockedStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                         .orElseThrow(() -> new RuntimeException("Item handler not present.")) instanceof ToolBeltInventory inv
-                ? inv : new ToolBeltInventory(new ItemStack(ToolBelt.BELT));
+                ? inv : new ToolBeltInventory(new ItemStack(ToolBelt.BELT.get()));
 
         beltSlots = beltInventory.getSlots();
         int xoff = ((9 - beltSlots) * 18) / 2;

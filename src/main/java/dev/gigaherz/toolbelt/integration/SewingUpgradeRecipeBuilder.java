@@ -47,7 +47,7 @@ public class SewingUpgradeRecipeBuilder extends SewingRecipeBuilder
         @Override
         public RecipeSerializer<?> getType()
         {
-            return ToolBelt.SEWING_UGRADE_SERIALIZER;
+            return ToolBelt.SEWING_UGRADE_SERIALIZER.get();
         }
     }
 }

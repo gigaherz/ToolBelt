@@ -137,7 +137,7 @@ public class ClientEvents
         public static void clientSetup(FMLClientSetupEvent event)
         {
             event.enqueueWork(() -> {
-                ItemProperties.register(ToolBelt.BELT, ToolBelt.location("has_custom_color"),
+                ItemProperties.register(ToolBelt.BELT.get(), ToolBelt.location("has_custom_color"),
                         (ItemStack pStack, @Nullable ClientLevel pLevel, @Nullable LivingEntity pEntity, int pSeed) ->
                                 (pStack.getItem() instanceof DyeableLeatherItem dyeable) && dyeable.hasCustomColor(pStack)
                                         ? 1 : 0
@@ -152,7 +152,7 @@ public class ClientEvents
                     (ItemStack pStack, int pTintIndex) ->
                             pTintIndex == 0 && (pStack.getItem() instanceof DyeableLeatherItem dyeable) && dyeable.hasCustomColor(pStack)
                                     ? dyeable.getColor(pStack) : -1,
-                    ToolBelt.BELT
+                    ToolBelt.BELT.get()
             );
         }
 

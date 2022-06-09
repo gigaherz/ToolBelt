@@ -1,9 +1,9 @@
 package dev.gigaherz.toolbelt.integration;
 
-import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraftforge.event.RegistryEvent;
+import net.minecraft.core.Registry;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.minecraftforge.registries.RegisterEvent;
 
 public class SewingKitIntegration
 {
@@ -11,13 +11,12 @@ public class SewingKitIntegration
     {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
-        modEventBus.addGenericListener(RecipeSerializer.class, SewingKitIntegration::registerRecipes);
+        modEventBus.addListener(SewingKitIntegration::registerRecipes);
     }
 
-    private static void registerRecipes(RegistryEvent.Register<RecipeSerializer<?>> event)
+    private static void registerRecipes(RegisterEvent event)
     {
-        event.getRegistry().registerAll(
-                new SewingUpgradeRecipe.Serializer().setRegistryName("sewing_upgrade")
-        );
+        event.register(Registry.RECIPE_SERIALIZER_REGISTRY, helper ->
+                helper.register("sewing_upgrade", new SewingUpgradeRecipe.Serializer()));
     }
 }

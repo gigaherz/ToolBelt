@@ -31,9 +31,6 @@ import java.util.List;
 
 public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
 {
-    @ObjectHolder("toolbelt:belt_slot_container")
-    public static MenuType<BeltSlotContainer> TYPE;
-
     private final ExtensionSlotSlot slotBelt;
     private final IExtensionSlot extensionSlot;
 
@@ -48,7 +45,7 @@ public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
 
     public BeltSlotContainer(int id, Inventory playerInventory)
     {
-        super(TYPE, id);
+        super(ToolBelt.BELT_SLOT_MENU.get(), id);
         this.player = playerInventory.player;
         this.addSlot(new ResultSlot(playerInventory.player, this.craftingInventory, this.craftResultInventory, 0, 154, 28));
 

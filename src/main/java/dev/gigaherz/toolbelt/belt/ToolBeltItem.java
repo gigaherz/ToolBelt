@@ -12,7 +12,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -111,7 +111,7 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem, DyeableLea
 
         int size = getSlotsCount(stack);
 
-        tooltip.add(new TranslatableComponent("text.toolbelt.tooltip", size - 2, size));
+        tooltip.add(Component.translatable("text.toolbelt.tooltip", size - 2, size));
     }
 
     @Nonnull

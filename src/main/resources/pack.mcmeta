@@ -1,6 +1,8 @@
 {
   "pack":{
-    "pack_format":9,
-    "description":"Tool Belt Mod"
+    "description":"Tool Belt Mod",
+    "pack_format": 9,
+    "forge:assets_pack_format": 9,
+    "forge:data_pack_format": 10
   }
 }

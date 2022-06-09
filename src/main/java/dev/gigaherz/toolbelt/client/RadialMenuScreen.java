@@ -11,9 +11,9 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.chat.TextComponent;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGameOverlayEvent;
 import net.minecraftforge.client.gui.ForgeIngameGui;
@@ -46,7 +46,7 @@ public class RadialMenuScreen extends Screen
 
     public RadialMenuScreen(BeltFinder.BeltGetter getter)
     {
-        super(new TextComponent("RADIAL MENU"));
+        super(Component.literal("RADIAL MENU"));
 
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
@@ -84,7 +84,7 @@ public class RadialMenuScreen extends Screen
                 close();
             }
         };
-        insertMenuItem = new TextRadialMenuItem(menu, new TranslatableComponent("text.toolbelt.insert"))
+        insertMenuItem = new TextRadialMenuItem(menu, Component.translatable("text.toolbelt.insert"))
         {
             @Override
             public boolean onClick()
@@ -201,7 +201,7 @@ public class RadialMenuScreen extends Screen
             for (int i = 0; i < inventory.getSlots(); i++)
             {
                 ItemStack inSlot = inventory.getStackInSlot(i);
-                ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(menu, i, inSlot, new TranslatableComponent("text.toolbelt.empty"))
+                ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(menu, i, inSlot, Component.translatable("text.toolbelt.empty"))
                 {
                     @Override
                     public boolean onClick()
@@ -213,16 +213,16 @@ public class RadialMenuScreen extends Screen
                 if (inHand.getCount() > 0)
                 {
                     if (inSlot.getCount() > 0)
-                        item.setCentralText(new TranslatableComponent("text.toolbelt.swap"));
+                        item.setCentralText(Component.translatable("text.toolbelt.swap"));
                     else
-                        item.setCentralText(new TranslatableComponent("text.toolbelt.insert"));
+                        item.setCentralText(Component.translatable("text.toolbelt.insert"));
                 }
                 else
                 {
                     if (inSlot.getCount() > 0)
-                        item.setCentralText(new TranslatableComponent("text.toolbelt.extract"));
+                        item.setCentralText(Component.translatable("text.toolbelt.extract"));
                     else
-                        item.setCentralText(new TranslatableComponent("text.toolbelt.empty"));
+                        item.setCentralText(Component.translatable("text.toolbelt.empty"));
                 }
                 cachedMenuItems.add(item);
             }
@@ -243,7 +243,7 @@ public class RadialMenuScreen extends Screen
 
         if (cachedMenuItems.stream().noneMatch(RadialMenuItem::isVisible))
         {
-            menu.setCentralText(new TranslatableComponent("text.toolbelt.empty"));
+            menu.setCentralText(Component.translatable("text.toolbelt.empty"));
         }
         else
         {

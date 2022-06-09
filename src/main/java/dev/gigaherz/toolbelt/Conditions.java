@@ -26,7 +26,7 @@ public class Conditions
         }
 
         @Override
-        public boolean test()
+        public boolean test(IContext context)
         {
             return ConfigData.enableNormalCrafting;
         }
@@ -63,7 +63,7 @@ public class Conditions
         }
 
         @Override
-        public boolean test()
+        public boolean test(IContext context)
         {
             return ConfigData.enableSewingKitSupport;
         }

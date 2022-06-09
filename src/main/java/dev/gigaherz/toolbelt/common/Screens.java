@@ -1,10 +1,11 @@
 package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.chat.TranslatableComponent;
+
 import net.minecraftforge.network.NetworkHooks;
 
 public class Screens
@@ -28,7 +29,7 @@ public class Screens
     {
         player.openMenu(new SimpleMenuProvider(
                 (i, playerInventory, playerEntity) -> new BeltSlotContainer(i, playerInventory),
-                new TranslatableComponent("container.crafting")
+                Component.translatable("container.crafting")
         ));
     }
 }
