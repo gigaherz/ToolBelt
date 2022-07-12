@@ -15,7 +15,7 @@ public class Screens
         final ItemStack heldItem = player.getInventory().getItem(slot).copy();
         if (heldItem.getCount() > 0 && heldItem.getItem() instanceof ToolBeltItem)
         {
-            NetworkHooks.openGui(player, new SimpleMenuProvider(
+            NetworkHooks.openScreen(player, new SimpleMenuProvider(
                     (i, playerInventory, playerEntity) -> new BeltContainer(i, playerInventory, slot, heldItem),
                     heldItem.getHoverName()
             ), (data) -> {

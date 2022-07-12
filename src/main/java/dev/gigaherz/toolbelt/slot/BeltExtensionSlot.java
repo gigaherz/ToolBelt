@@ -136,7 +136,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         {
             if (!ConfigData.customBeltSlotEnabled)
                 return;
-            Player target = event.getPlayer();
+            Player target = event.getEntity();
             if (target.level.isClientSide)
                 return;
             get(target).ifPresent(BeltExtensionSlot::syncToSelf);
@@ -147,7 +147,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         {
             if (!ConfigData.customBeltSlotEnabled)
                 return;
-            Player target = event.getPlayer();
+            Player target = event.getEntity();
             if (target.level.isClientSide)
                 return;
             get(target).ifPresent(BeltExtensionSlot::syncToSelf);
@@ -184,7 +184,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
         {
             if (!ConfigData.customBeltSlotEnabled)
                 return;
-            LivingEntity entity = event.getEntityLiving();
+            LivingEntity entity = event.getEntity();
 
             get(entity).ifPresent((instance) -> {
                 printDebugLog("Processing belt slot data for entity death {}({})", entity.getScoreboardName(), entity.getUUID());
@@ -228,7 +228,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             // at this time it's only needed when returning from the end alive
             oldPlayer.revive();
 
-            Player newPlayer = event.getPlayer();
+            Player newPlayer = event.getEntity();
 
             printDebugLog("Processing respawn for entity {}({})", newPlayer.getScoreboardName(), newPlayer.getUUID());
             get(oldPlayer).ifPresent((oldBelt) -> {

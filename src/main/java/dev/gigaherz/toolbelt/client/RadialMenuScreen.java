@@ -15,8 +15,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGameOverlayEvent;
-import net.minecraftforge.client.gui.ForgeIngameGui;
+import net.minecraftforge.client.event.RenderGuiOverlayEvent;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -95,9 +95,9 @@ public class RadialMenuScreen extends Screen
     }
 
     @SubscribeEvent
-    public static void overlayEvent(RenderGameOverlayEvent.PreLayer event)
+    public static void overlayEvent(RenderGuiOverlayEvent.Pre event)
     {
-        if (event.getOverlay() != ForgeIngameGui.CROSSHAIR_ELEMENT)
+        if (event.getOverlay() != VanillaGuiOverlay.CROSSHAIR.type())
             return;
 
         if (Minecraft.getInstance().screen instanceof RadialMenuScreen)

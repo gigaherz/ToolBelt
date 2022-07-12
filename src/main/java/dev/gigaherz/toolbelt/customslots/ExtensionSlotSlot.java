@@ -63,6 +63,16 @@ public class ExtensionSlotSlot extends Slot
     }
 
     /**
+     * Helper method to put a stack in the slot.
+     */
+    @Override
+    public void initialize(@Nonnull ItemStack stack)
+    {
+        slot.setContents(stack);
+        this.setChanged();
+    }
+
+    /**
      * if par2 has more items than par1, onCrafting(item,countIncrease) is called
      */
     @Override

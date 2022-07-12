@@ -8,7 +8,6 @@ import dev.gigaherz.sewingkit.needle.NeedleItem;
 import dev.gigaherz.sewingkit.needle.Needles;
 import dev.gigaherz.toolbelt.belt.BeltIngredient;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
-import dev.gigaherz.toolbelt.client.ClientEvents;
 import dev.gigaherz.toolbelt.common.BeltContainer;
 import dev.gigaherz.toolbelt.common.BeltScreen;
 import dev.gigaherz.toolbelt.common.BeltSlotContainer;
@@ -37,7 +36,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -47,6 +45,7 @@ import net.minecraftforge.common.crafting.ConditionalRecipe;
 import net.minecraftforge.common.crafting.CraftingHelper;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
@@ -55,10 +54,11 @@ import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLConstructModEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.fml.loading.FMLEnvironment;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
@@ -78,7 +78,7 @@ public class ToolBelt
     public static final String MODID = "toolbelt";
 
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, MODID);
-    private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.CONTAINERS, MODID);
+    private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, MODID);
 
     public static RegistryObject<ToolBeltItem> BELT = ITEMS.register("belt", () -> new ToolBeltItem(new Item.Properties().stacksTo(1).tab(CreativeModeTab.TAB_TOOLS)));
     public static RegistryObject<Item> POUCH = ITEMS.register("pouch", () -> new Item(new Item.Properties().tab(CreativeModeTab.TAB_TOOLS)));
@@ -113,7 +113,6 @@ public class ToolBelt
         modEventBus.addListener(this::construct );
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
-        modEventBus.addListener(this::loadComplete);
         modEventBus.addListener(this::modConfig);
         modEventBus.addListener(this::imcEnqueue);
         modEventBus.addListener(this::gatherData);
@@ -162,11 +161,11 @@ public class ToolBelt
     public void commonSetup(FMLCommonSetupEvent event)
     {
         int messageNumber = 0;
-        channel.messageBuilder(SwapItems.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(SwapItems::encode).decoder(SwapItems::new).consumer(SwapItems::handle).add();
-        channel.messageBuilder(BeltContentsChange.class, messageNumber++, NetworkDirection.PLAY_TO_CLIENT).encoder(BeltContentsChange::encode).decoder(BeltContentsChange::new).consumer(BeltContentsChange::handle).add();
-        channel.messageBuilder(OpenBeltSlotInventory.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(OpenBeltSlotInventory::encode).decoder(OpenBeltSlotInventory::new).consumer(OpenBeltSlotInventory::handle).add();
-        channel.messageBuilder(ContainerSlotsHack.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(ContainerSlotsHack::encode).decoder(ContainerSlotsHack::new).consumer(ContainerSlotsHack::handle).add();
-        channel.messageBuilder(SyncBeltSlotContents.class, messageNumber++, NetworkDirection.PLAY_TO_CLIENT).encoder(SyncBeltSlotContents::encode).decoder(SyncBeltSlotContents::new).consumer(SyncBeltSlotContents::handle).add();
+        channel.messageBuilder(SwapItems.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(SwapItems::encode).decoder(SwapItems::new).consumerNetworkThread(SwapItems::handle).add();
+        channel.messageBuilder(BeltContentsChange.class, messageNumber++, NetworkDirection.PLAY_TO_CLIENT).encoder(BeltContentsChange::encode).decoder(BeltContentsChange::new).consumerNetworkThread(BeltContentsChange::handle).add();
+        channel.messageBuilder(OpenBeltSlotInventory.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(OpenBeltSlotInventory::encode).decoder(OpenBeltSlotInventory::new).consumerNetworkThread(OpenBeltSlotInventory::handle).add();
+        channel.messageBuilder(ContainerSlotsHack.class, messageNumber++, NetworkDirection.PLAY_TO_SERVER).encoder(ContainerSlotsHack::encode).decoder(ContainerSlotsHack::new).consumerNetworkThread(ContainerSlotsHack::handle).add();
+        channel.messageBuilder(SyncBeltSlotContents.class, messageNumber++, NetworkDirection.PLAY_TO_CLIENT).encoder(SyncBeltSlotContents::encode).decoder(SyncBeltSlotContents::new).consumerNetworkThread(SyncBeltSlotContents::handle).add();
         logger.debug("Final message number: " + messageNumber);
 
         //TODO File configurationFile = event.getSuggestedConfigurationFile();
@@ -190,13 +189,6 @@ public class ToolBelt
     private void imcEnqueue(InterModEnqueueEvent event)
     {
         InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> new SlotTypeMessage.Builder("belt").size(1).build());
-    }
-
-    public void loadComplete(FMLLoadCompleteEvent event)
-    {
-        event.enqueueWork(() -> {
-            if (FMLEnvironment.dist == Dist.CLIENT) ClientEvents.initKeybinds();
-        });
     }
 
     public void anvilChange(AnvilUpdateEvent ev)

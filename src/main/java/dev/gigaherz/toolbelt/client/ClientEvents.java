@@ -11,7 +11,6 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.*;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -23,9 +22,9 @@ import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.ClientRegistry;
-import net.minecraftforge.client.event.ColorHandlerEvent;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -53,18 +52,19 @@ public class ClientEvents
         }
     }
 
-    public static void initKeybinds()
+    @SubscribeEvent
+    public static void initKeybinds(RegisterKeyMappingsEvent event)
     {
-        ClientRegistry.registerKeyBinding(OPEN_TOOL_MENU_KEYBIND =
+        event.register(OPEN_TOOL_MENU_KEYBIND =
                 new KeyMapping("key.toolbelt.open", GLFW.GLFW_KEY_R, "key.toolbelt.category"));
 
-        ClientRegistry.registerKeyBinding(CYCLE_TOOL_MENU_LEFT_KEYBIND =
+        event.register(CYCLE_TOOL_MENU_LEFT_KEYBIND =
                 new KeyMapping("key.toolbelt.cycle.left", InputConstants.UNKNOWN.getValue(), "key.toolbelt.category"));
 
-        ClientRegistry.registerKeyBinding(CYCLE_TOOL_MENU_RIGHT_KEYBIND =
+        event.register(CYCLE_TOOL_MENU_RIGHT_KEYBIND =
                 new KeyMapping("key.toolbelt.cycle.right", InputConstants.UNKNOWN.getValue(), "key.toolbelt.category"));
 
-        ClientRegistry.registerKeyBinding(OPEN_BELT_SLOT_KEYBIND =
+        event.register(OPEN_BELT_SLOT_KEYBIND =
                 new KeyMapping("key.toolbelt.slot", GLFW.GLFW_KEY_V, "key.toolbelt.category"));
     }
 
@@ -146,9 +146,9 @@ public class ClientEvents
         }
 
         @SubscribeEvent
-        public static void colors(ColorHandlerEvent.Item event)
+        public static void colors(RegisterColorHandlersEvent.Item event)
         {
-            event.getItemColors().register(
+            event.register(
                     (ItemStack pStack, int pTintIndex) ->
                             pTintIndex == 0 && (pStack.getItem() instanceof DyeableLeatherItem dyeable) && dyeable.hasCustomColor(pStack)
                                     ? dyeable.getColor(pStack) : -1,

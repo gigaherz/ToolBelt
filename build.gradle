@@ -27,7 +27,10 @@ repositories {
         url 'https://www.dogforce-games.com/maven/'
     }
     maven {
-        url "https://www.cursemaven.com"
+        url "https://cursemaven.com"
+        content {
+            includeGroup "curse.maven"
+        }
     }
     repositories {
         maven {
@@ -37,7 +40,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.19.0"
+version = "1.19.5"
 group = "dev.gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
@@ -64,7 +67,8 @@ minecraft {
             property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
 
-            ideaModule "${project.name}.main"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
                 thismod {
@@ -84,7 +88,8 @@ minecraft {
             property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
 
-            ideaModule "${project.name}.main"
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             mods {
                 thismod {
@@ -98,6 +103,9 @@ minecraft {
 
             property 'forge.logging.markers', ''
             property 'forge.logging.console.level', 'debug'
+
+            property 'mixin.env.remapRefMap', 'true'
+            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
 
             args '--mod', 'toolbelt', '--all', '--output', file('src/main/generated_resources/'), '--existing', file('src/main/resources/')
 
@@ -116,16 +124,20 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19-41.0.4'
+    minecraft 'net.minecraftforge:forge:1.19-41.0.94'
 
-    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19:1.6.0")
-    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19:1.6.0")
+    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19:1.6.5.1")
+    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19:1.6.5.1")
 
-    //compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.180:api")
-    //runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.7.0.180")
+    compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:11.0.0.206")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.19-common:11.0.0.206")
+    compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:11.0.0.206")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:11.0.0.206")
 
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19-5.1.0.0")
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19-5.1.0.0")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19-5.1.0.4")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19-5.1.0.4")
+
+    //runtimeOnly fg.deobf("curse.maven:corail-tombstone-243707:3836552")
 }
 
 project.afterEvaluate {

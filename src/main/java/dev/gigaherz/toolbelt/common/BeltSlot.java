@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 public class BeltSlot extends Slot
 {
     private static final Logger LOGGER = LogManager.getLogger();
+
     public BeltSlot(Container playerInventory, ItemStack heldItem, int blockedSlot, int index, int xPosition, int yPosition)
     {
         super(new Container()
