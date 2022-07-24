@@ -52,22 +52,6 @@ public class ClientEvents
         }
     }
 
-    @SubscribeEvent
-    public static void initKeybinds(RegisterKeyMappingsEvent event)
-    {
-        event.register(OPEN_TOOL_MENU_KEYBIND =
-                new KeyMapping("key.toolbelt.open", GLFW.GLFW_KEY_R, "key.toolbelt.category"));
-
-        event.register(CYCLE_TOOL_MENU_LEFT_KEYBIND =
-                new KeyMapping("key.toolbelt.cycle.left", InputConstants.UNKNOWN.getValue(), "key.toolbelt.category"));
-
-        event.register(CYCLE_TOOL_MENU_RIGHT_KEYBIND =
-                new KeyMapping("key.toolbelt.cycle.right", InputConstants.UNKNOWN.getValue(), "key.toolbelt.category"));
-
-        event.register(OPEN_BELT_SLOT_KEYBIND =
-                new KeyMapping("key.toolbelt.slot", GLFW.GLFW_KEY_V, "key.toolbelt.category"));
-    }
-
     private static boolean toolMenuKeyWasDown = false;
 
     @SubscribeEvent
@@ -133,6 +117,22 @@ public class ClientEvents
     @Mod.EventBusSubscriber(modid = ToolBelt.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
     public static class ModBusEvents
     {
+        @SubscribeEvent
+        public static void initKeybinds(RegisterKeyMappingsEvent event)
+        {
+            event.register(OPEN_TOOL_MENU_KEYBIND =
+                    new KeyMapping("key.toolbelt.open", GLFW.GLFW_KEY_R, "key.toolbelt.category"));
+
+            event.register(CYCLE_TOOL_MENU_LEFT_KEYBIND =
+                    new KeyMapping("key.toolbelt.cycle.left", InputConstants.UNKNOWN.getValue(), "key.toolbelt.category"));
+
+            event.register(CYCLE_TOOL_MENU_RIGHT_KEYBIND =
+                    new KeyMapping("key.toolbelt.cycle.right", InputConstants.UNKNOWN.getValue(), "key.toolbelt.category"));
+
+            event.register(OPEN_BELT_SLOT_KEYBIND =
+                    new KeyMapping("key.toolbelt.slot", GLFW.GLFW_KEY_V, "key.toolbelt.category"));
+        }
+
         @SubscribeEvent
         public static void clientSetup(FMLClientSetupEvent event)
         {

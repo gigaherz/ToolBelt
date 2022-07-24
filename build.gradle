@@ -40,7 +40,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.19.5"
+version = "1.19.6"
 group = "dev.gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
@@ -130,9 +130,9 @@ dependencies {
     runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19:1.6.5.1")
 
     compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:11.0.0.206")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.19-common:11.0.0.206")
+    //runtimeOnly fg.deobf("mezz.jei:jei-1.19-common:11.0.0.206")
     compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:11.0.0.206")
-    runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:11.0.0.206")
+    //runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:11.0.0.206")
 
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19-5.1.0.4")
     runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19-5.1.0.4")
