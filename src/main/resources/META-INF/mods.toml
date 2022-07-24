@@ -1,6 +1,7 @@
 modLoader="javafml"
 loaderVersion="[38,)"
 license="BSD (3 clause)"
+issueTrackerURL="https://github.com/gigaherz/ToolBelt/issues"
 
 [[mods]]
 modId="toolbelt"
@@ -9,10 +10,8 @@ displayName="Tool Belt"
 description='''
 Declutter your inventory of tools
 '''
-issueTrackerURL="https://github.com/gigaherz/ToolBelt/issues"
 displayURL="https://github.com/gigaherz/ToolBelt"
 logoFile="logo.png"
-credits="Thanks for this example mod goes to Java"
 authors="gigaherz"
 
 [[dependencies.toolbelt]]

@@ -115,8 +115,8 @@ public class ConfigData
             builder.push("general");
             enableSewingKitSupport = builder
                     .comment("If set to FALSE, support for sewing recipes will not be enabled regardless of the mod's presence.")
-                    .translation("text.toolbelt.config.disable_anvil_update")
-                    .define("disableAnvilUpgrading", false);
+                    .translation("text.toolbelt.config.enable_sewing_kit_support")
+                    .define("enableSewingKitSupport", true);
             anvilUpgrading = builder
                     .comment("If AUTO, the crafting and upgrade recipes will use the Sewing mechanics if the Sewing Kit mod is present. Off disables anvil upgrading regardless.")
                     .translation("text.toolbelt.config.anvil_upgrading")
