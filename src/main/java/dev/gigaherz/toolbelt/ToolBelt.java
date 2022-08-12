@@ -303,7 +303,7 @@ public class ToolBelt
                         )
                         .generateAdvancement()
                         .build(consumer, new ResourceLocation(pouchId.getNamespace(), pouchId.getPath() + "_via_sewing"));
-                ToolActionIngredient needleTiers[] = {
+                ToolActionIngredient[] needleTiers = {
                         ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.WOOD.getTier()),
                         ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.BONE.getTier()),
                         ToolActionIngredient.fromTool(NeedleItem.SEW, Needles.IRON.getTier()),

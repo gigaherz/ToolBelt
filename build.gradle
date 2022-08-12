@@ -55,7 +55,7 @@ sourceSets {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.19'
+    mappings channel: 'official', version: '1.19.1'
     //mappings channel: 'parchment', version: '2022.03.13-1.18.2'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
@@ -124,18 +124,18 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19-41.0.94'
+    minecraft 'net.minecraftforge:forge:1.19.2-43.0.8'
 
-    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19:1.6.5.1")
-    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19:1.6.5.1")
+    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19.2:1.6.9")
+    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19.2:1.6.9")
 
-    compileOnly fg.deobf("mezz.jei:jei-1.19-common-api:11.0.0.206")
-    //runtimeOnly fg.deobf("mezz.jei:jei-1.19-common:11.0.0.206")
-    compileOnly fg.deobf("mezz.jei:jei-1.19-forge-api:11.0.0.206")
-    //runtimeOnly fg.deobf("mezz.jei:jei-1.19-forge:11.0.0.206")
+    compileOnly fg.deobf("mezz.jei:jei-1.19.1-common-api:11.2.0.244")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.19.1-common:11.2.0.244")
+    compileOnly fg.deobf("mezz.jei:jei-1.19.1-forge-api:11.2.0.244")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.19.1-forge:11.2.0.244")
 
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19-5.1.0.4")
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19-5.1.0.4")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0")
 
     //runtimeOnly fg.deobf("curse.maven:corail-tombstone-243707:3836552")
 }
