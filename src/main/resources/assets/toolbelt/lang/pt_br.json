@@ -1,0 +1,15 @@
+{
+    "item.toolbelt.belt": "Cinto de ferramentas",
+    "item.toolbelt.pouch": "Bolsa de Cinto",
+    "key.toolbelt.open": "Ferramenta de Troca",
+    "key.toolbelt.category": "Cinto de ferramentas",
+    "key.toolbelt.slot": "Inventário de slot de cinto aberto",
+    "key.toolbelt.cycle.left": "Ferramenta de Ciclo Esquerda",
+    "key.toolbelt.cycle.right": "Ferramenta de Ciclo Direita",
+    "text.toolbelt.empty": "VAZIO",
+    "text.toolbelt.swap": "TROCA",
+    "text.toolbelt.insert": "INSERIR",
+    "text.toolbelt.extract": "EXTRAIR",
+    "text.toolbelt.tooltip": "Atualizações: %s (%s slots)",
+    "text.toolbelt": "Cinto de ferramentas"
+  }
