@@ -35,7 +35,7 @@ repositories {
     }
 }
 
-version = "1.16.2"
+version = "1.16.3"
 group = "dev.gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
@@ -50,8 +50,8 @@ sourceSets {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.16.5'
-    //mappings channel: 'parchment', version: '2022.03.06-1.16.5'
+    //mappings channel: 'official', version: '1.16.5'
+    mappings channel: 'parchment', version: '2022.03.06-1.16.5'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 

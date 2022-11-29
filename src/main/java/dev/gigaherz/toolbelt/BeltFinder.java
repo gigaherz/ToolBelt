@@ -19,6 +19,12 @@ public abstract class BeltFinder
         instances.add(0, finder);
     }
 
+    // Introduced for backward compatibility.
+    public static Optional<? extends BeltGetter> findBelt(PlayerEntity player)
+    {
+        return findBelt((LivingEntity)player);
+    }
+
     public static Optional<? extends BeltGetter> findBelt(LivingEntity player)
     {
         return findBelt(player, false);
