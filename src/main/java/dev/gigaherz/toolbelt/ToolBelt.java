@@ -24,19 +24,19 @@ import net.minecraft.data.DataGenerator;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.IntTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.CreativeModeTab;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.nbt.IntTag;
+import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.Capability;
@@ -50,17 +50,22 @@ import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.*;
+import net.minecraftforge.fml.InterModComms;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.fml.event.lifecycle.*;
+import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
+import net.minecraftforge.fml.event.lifecycle.InterModEnqueueEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.minecraftforge.forge.event.lifecycle.GatherDataEvent;
 import net.minecraftforge.registries.ObjectHolder;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -124,8 +129,6 @@ public class ToolBelt
         {
             SewingKitIntegration.init();
         }
-
-
     }
 
     public void gatherData(GatherDataEvent event)
@@ -138,6 +141,8 @@ public class ToolBelt
         ModConfig config = event.getConfig();
         if (config.getSpec() == ConfigData.CLIENT_SPEC)
             ConfigData.refreshClient();
+        else if (config.getSpec() == ConfigData.COMMON_SPEC)
+            ConfigData.refreshCommon();
         else if (config.getSpec() == ConfigData.SERVER_SPEC)
             ConfigData.refreshServer();
     }
@@ -190,7 +195,9 @@ public class ToolBelt
         CURIOS.addListener(cap -> BeltFinderCurios.initCurios());
     }
 
-    private static final Capability<ICuriosItemHandler> CURIOS = CapabilityManager.get(new CapabilityToken<>(){});
+    private static final Capability<ICuriosItemHandler> CURIOS = CapabilityManager.get(new CapabilityToken<>()
+    {
+    });
 
     public void clientSetup(FMLClientSetupEvent event)
     {
@@ -356,9 +363,9 @@ public class ToolBelt
                             .addCondition(new Conditions.EnableSewingCrafting())
                             .addRecipe(
                                     SewingUpgradeRecipeBuilder.begin(ToolBelt.BELT,
-                                            compound(
-                                                    Pair.of("Size", IntTag.valueOf(i + 3))
-                                            ))
+                                                    compound(
+                                                            Pair.of("Size", IntTag.valueOf(i + 3))
+                                                    ))
                                             .withTool(needleTiers[i])
                                             .addMaterial(BeltIngredient.withLevel(i))
                                             .addMaterial(Ingredient.of(POUCH))
@@ -369,7 +376,6 @@ public class ToolBelt
                             .generateAdvancement()
                             .build(consumer, new ResourceLocation(pouchId.getNamespace(), pouchId.getPath() + "_upgrade_" + (i + 1) + "_via_sewing"));
                 }
-
             }
 
             public final ItemStack stack(ItemLike item, CompoundTag tag)
@@ -392,7 +398,8 @@ public class ToolBelt
         }
     }
 
-    private static TagKey<Item> itemTag(String name) {
+    private static TagKey<Item> itemTag(String name)
+    {
         return TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(name));
     }
 }

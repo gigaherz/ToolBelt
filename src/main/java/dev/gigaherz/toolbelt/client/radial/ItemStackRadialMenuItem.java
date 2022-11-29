@@ -1,10 +1,9 @@
 package dev.gigaherz.toolbelt.client.radial;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.ItemStack;
 
 public class ItemStackRadialMenuItem extends TextRadialMenuItem
 {

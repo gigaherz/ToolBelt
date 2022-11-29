@@ -42,9 +42,13 @@ import java.util.List;
 
 public class ToolBeltItem extends Item implements IExtensionSlotItem, DyeableLeatherItem
 {
-    public static Capability<IItemHandler> ITEM_HANDLER = CapabilityManager.get(new CapabilityToken<>(){});
+    public static Capability<IItemHandler> ITEM_HANDLER = CapabilityManager.get(new CapabilityToken<>()
+    {
+    });
 
-    public static Capability<IExtensionSlotItem> EXTENSION_SLOT_ITEM = CapabilityManager.get(new CapabilityToken<>(){});
+    public static Capability<IExtensionSlotItem> EXTENSION_SLOT_ITEM = CapabilityManager.get(new CapabilityToken<>()
+    {
+    });
 
     public static final ImmutableSet<ResourceLocation> BELT_SLOT_LIST = ImmutableSet.of(RpgEquipment.BELT);
 

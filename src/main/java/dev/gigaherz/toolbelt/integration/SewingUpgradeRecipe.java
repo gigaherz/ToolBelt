@@ -2,16 +2,14 @@ package dev.gigaherz.toolbelt.integration;
 
 import dev.gigaherz.sewingkit.api.SewingRecipe;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
+import net.minecraft.core.NonNullList;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.core.NonNullList;
-import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nullable;
-
-import dev.gigaherz.sewingkit.api.SewingRecipe.Material;
 
 public class SewingUpgradeRecipe extends SewingRecipe
 {

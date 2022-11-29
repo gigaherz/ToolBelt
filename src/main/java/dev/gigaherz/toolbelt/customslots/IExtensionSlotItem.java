@@ -1,10 +1,10 @@
 package dev.gigaherz.toolbelt.customslots;
 
 import com.google.common.collect.ImmutableSet;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.resources.ResourceLocation;
 
 import javax.annotation.Nonnull;
 

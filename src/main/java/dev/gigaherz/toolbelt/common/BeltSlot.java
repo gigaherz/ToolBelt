@@ -1,8 +1,8 @@
 package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.ConfigData;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -14,6 +14,7 @@ import org.apache.logging.log4j.Logger;
 public class BeltSlot extends Slot
 {
     private static final Logger LOGGER = LogManager.getLogger();
+
     public BeltSlot(Container playerInventory, ItemStack heldItem, int blockedSlot, int index, int xPosition, int yPosition)
     {
         super(new Container()
@@ -35,8 +36,8 @@ public class BeltSlot extends Slot
                     inventory = (IItemHandlerModifiable) (
                             stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
                                     .orElseGet(() -> {
-                                            LOGGER.error("No Inventory!!");
-                                            return new ItemStackHandler(9);
+                                        LOGGER.error("No Inventory!!");
+                                        return new ItemStackHandler(9);
                                     })
                     );
                 }

@@ -3,15 +3,15 @@ package dev.gigaherz.toolbelt.common;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.belt.ToolBeltInventory;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Inventory;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.registries.ObjectHolder;
 
@@ -39,7 +39,7 @@ public class BeltContainer extends AbstractContainerMenu
             blockedStack = ItemStack.EMPTY;
         }
         ToolBeltInventory beltInventory = stillValid(playerInventory.player) && blockedStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-                        .orElseThrow(() -> new RuntimeException("Item handler not present.")) instanceof ToolBeltInventory inv
+                .orElseThrow(() -> new RuntimeException("Item handler not present.")) instanceof ToolBeltInventory inv
                 ? inv : new ToolBeltInventory(new ItemStack(ToolBelt.BELT));
 
         beltSlots = beltInventory.getSlots();

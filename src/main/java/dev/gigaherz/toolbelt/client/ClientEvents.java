@@ -8,10 +8,10 @@ import dev.gigaherz.toolbelt.customslots.ExtensionSlotSlot;
 import dev.gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.*;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -187,21 +187,21 @@ public class ClientEvents
 
         @SuppressWarnings({"rawtypes", "unchecked"})
         private static <E extends Player, M extends HumanoidModel<E>>
-        void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, String skinName, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E,M>> factory)
+        void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, String skinName, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E, M>> factory)
         {
             LivingEntityRenderer renderer = event.getSkin(skinName);
             if (renderer != null) renderer.addLayer(factory.apply(renderer));
         }
 
         private static <E extends LivingEntity, M extends HumanoidModel<E>>
-        void addLayerToHumanoid(EntityRenderersEvent.AddLayers event, EntityType<E> entityType, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E,M>> factory)
+        void addLayerToHumanoid(EntityRenderersEvent.AddLayers event, EntityType<E> entityType, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E, M>> factory)
         {
             LivingEntityRenderer<E, M> renderer = event.getRenderer(entityType);
             if (renderer != null) renderer.addLayer(factory.apply(renderer));
         }
 
         private static <E extends LivingEntity, M extends EntityModel<E>>
-        void addLayerToLiving(EntityRenderersEvent.AddLayers event, EntityType<E> entityType, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E,M>> factory)
+        void addLayerToLiving(EntityRenderersEvent.AddLayers event, EntityType<E> entityType, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E, M>> factory)
         {
             LivingEntityRenderer<E, M> renderer = event.getRenderer(entityType);
             if (renderer != null) renderer.addLayer(factory.apply(renderer));
