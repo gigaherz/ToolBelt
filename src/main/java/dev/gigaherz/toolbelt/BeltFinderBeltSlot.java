@@ -1,7 +1,5 @@
 package dev.gigaherz.toolbelt;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonPrimitive;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
 import dev.gigaherz.toolbelt.integration.CosmeticArmorIntegration;
@@ -17,8 +15,6 @@ import net.minecraftforge.fml.network.PacketDistributor;
 
 import java.util.Optional;
 
-import dev.gigaherz.toolbelt.BeltFinder.BeltGetter;
-
 public class BeltFinderBeltSlot extends BeltFinder
 {
     public static final String FINDER_ID = "belt_slot";
@@ -30,13 +26,13 @@ public class BeltFinderBeltSlot extends BeltFinder
     }
 
     @Override
-    protected Optional<BeltGetter> getSlotFromId(PlayerEntity player, JsonElement packetData)
+    protected Optional<BeltGetter> getSlotFromId(PlayerEntity player, int slotId)
     {
         return BeltExtensionSlot.get(player)
                 .resolve()
                 .map(BeltExtensionSlot::getSlots)
-                .map(slots -> slots.get(packetData.getAsInt()))
-                .map(slot -> new ExtensionSlotBeltGetter(player,  slot));
+                .map(slots -> slots.get(slotId))
+                .map(slot -> new ExtensionSlotBeltGetter(player, slot));
     }
 
     @Override
@@ -93,7 +89,7 @@ public class BeltFinderBeltSlot extends BeltFinder
             LivingEntity thePlayer = slot.getContainer().getOwner();
             if (thePlayer.level.isClientSide)
                 return;
-            BeltContentsChange message = new BeltContentsChange(thePlayer, FINDER_ID, new JsonPrimitive(0), slot.getContents());
+            BeltContentsChange message = new BeltContentsChange(thePlayer, FINDER_ID, 0, slot.getContents());
             ToolBelt.channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> thePlayer), message);
         }
     }

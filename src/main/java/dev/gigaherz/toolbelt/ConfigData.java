@@ -115,8 +115,8 @@ public class ConfigData
             builder.push("general");
             enableSewingKitSupport = builder
                     .comment("If set to FALSE, support for sewing recipes will not be enabled regardless of the mod's presence.")
-                    .translation("text.toolbelt.config.disable_anvil_update")
-                    .define("disableAnvilUpgrading", false);
+                    .translation("text.toolbelt.config.enable_sewing_kit_support")
+                    .define("enableSewingKitSupport", true);
             anvilUpgrading = builder
                     .comment("If AUTO, the crafting and upgrade recipes will use the Sewing mechanics if the Sewing Kit mod is present. Off disables anvil upgrading regardless.")
                     .translation("text.toolbelt.config.anvil_upgrading")
@@ -187,7 +187,7 @@ public class ConfigData
         displayEmptySlots = CLIENT.displayEmptySlots.get();
     }
 
-    public static void refreshServer()
+    public static void refreshCommon()
     {
         enableSewingKitSupport = COMMON.enableSewingKitSupport.get();
 
@@ -202,7 +202,10 @@ public class ConfigData
         customBeltSlotMode = COMMON.customBeltSlotMode.get();
         customBeltSlotEnabled = customBeltSlotMode == ThreeWayChoice.ON ||
                 (customBeltSlotMode == ThreeWayChoice.AUTO && !curiosPresent());
+    }
 
+    public static void refreshServer()
+    {
         blackList = SERVER.blacklist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
         whiteList = SERVER.whitelist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
     }

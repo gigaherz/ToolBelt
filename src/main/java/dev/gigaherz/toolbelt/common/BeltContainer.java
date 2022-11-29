@@ -41,7 +41,7 @@ public class BeltContainer extends Container
         ToolBeltInventory beltInventory = stillValid(playerInventory.player)
                 ? ((ToolBeltInventory) blockedStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
                 .orElseThrow(() -> new RuntimeException("Item handler not present.")))
-            : new ToolBeltInventory(new ItemStack(ToolBelt.BELT));
+                : new ToolBeltInventory(new ItemStack(ToolBelt.BELT));
 
         beltSlots = beltInventory.getSlots();
         int xoff = ((9 - beltSlots) * 18) / 2;

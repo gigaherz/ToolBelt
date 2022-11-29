@@ -45,7 +45,9 @@ import net.minecraftforge.common.extensions.IForgeContainerType;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.*;
+import net.minecraftforge.fml.InterModComms;
+import net.minecraftforge.fml.ModList;
+import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.*;
@@ -127,6 +129,8 @@ public class ToolBelt
         ModConfig config = event.getConfig();
         if (config.getSpec() == ConfigData.CLIENT_SPEC)
             ConfigData.refreshClient();
+        else if (config.getSpec() == ConfigData.COMMON_SPEC)
+            ConfigData.refreshCommon();
         else if (config.getSpec() == ConfigData.SERVER_SPEC)
             ConfigData.refreshServer();
     }
@@ -338,9 +342,9 @@ public class ToolBelt
                             .addCondition(new Conditions.EnableSewingCrafting())
                             .addRecipe(
                                     SewingUpgradeRecipeBuilder.begin(ToolBelt.BELT,
-                                            compound(
-                                                    Pair.of("Size", IntNBT.valueOf(i + 3))
-                                            ))
+                                                    compound(
+                                                            Pair.of("Size", IntNBT.valueOf(i + 3))
+                                                    ))
                                             .withTool(needleTiers[i])
                                             .addMaterial(BeltIngredient.withLevel(i))
                                             .addMaterial(Ingredient.of(POUCH))

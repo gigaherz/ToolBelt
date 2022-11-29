@@ -1,6 +1,5 @@
 package dev.gigaherz.toolbelt;
 
-import com.google.gson.JsonElement;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.item.ArmorStandEntity;
 import net.minecraft.entity.player.PlayerEntity;
@@ -12,9 +11,7 @@ import net.minecraftforge.fml.loading.FMLEnvironment;
 
 import java.util.Optional;
 
-import dev.gigaherz.toolbelt.BeltFinder.BeltGetter;
-
-@Mod.EventBusSubscriber(modid=ToolBelt.MODID, bus= Mod.EventBusSubscriber.Bus.MOD)
+@Mod.EventBusSubscriber(modid = ToolBelt.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class BeltFinderDebug extends BeltFinder
 {
     @SubscribeEvent
@@ -39,12 +36,6 @@ public class BeltFinderDebug extends BeltFinder
             return Optional.empty();
 
         return Optional.of(new DebugBeltGetter());
-    }
-
-    @Override
-    protected Optional<BeltGetter> getSlotFromId(PlayerEntity player, JsonElement slot)
-    {
-        return Optional.empty();
     }
 
     private static class DebugBeltGetter implements BeltGetter

@@ -11,8 +11,6 @@ import net.minecraft.util.ResourceLocation;
 
 import javax.annotation.Nullable;
 
-import dev.gigaherz.sewingkit.api.SewingRecipe.Material;
-
 public class SewingUpgradeRecipe extends SewingRecipe
 {
     public SewingUpgradeRecipe(ResourceLocation id, String group, NonNullList<Material> materials, @Nullable Ingredient pattern, @Nullable Ingredient tool, ItemStack output)

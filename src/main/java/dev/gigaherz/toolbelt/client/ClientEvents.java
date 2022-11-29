@@ -20,7 +20,6 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.Map;
@@ -80,8 +79,8 @@ public class ClientEvents
         EntityRenderer<?> renderer = Minecraft.getInstance().getEntityRenderDispatcher().renderers.get(entityType);
         if (!rendererClass.isInstance(renderer))
             throw new IllegalStateException("Mismatched renderer class?!");
-        if (!(((LivingRenderer<?,?>)renderer).getModel() instanceof BipedModel))
-            throw new IllegalStateException("Wrong model type, renderer for entity "+entityType.getRegistryName()+" needs to use a BipedModel.");
+        if (!(((LivingRenderer<?, ?>) renderer).getModel() instanceof BipedModel))
+            throw new IllegalStateException("Wrong model type, renderer for entity " + entityType.getRegistryName() + " needs to use a BipedModel.");
         @SuppressWarnings("unchecked")
         LivingRenderer<T, M> bipedRenderer = (LivingRenderer<T, M>) renderer;
         bipedRenderer.addLayer(new ToolBeltLayer<>(bipedRenderer));

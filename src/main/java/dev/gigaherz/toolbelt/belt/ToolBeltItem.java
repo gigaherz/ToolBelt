@@ -30,13 +30,10 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import top.theillusivec4.curios.api.type.capability.ICurio;
-import top.theillusivec4.curios.api.type.capability.ICurioItem;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
-
-import net.minecraft.item.Item.Properties;
 
 public class ToolBeltItem extends Item implements IExtensionSlotItem
 {

@@ -5,8 +5,6 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.container.Slot;
 import net.minecraft.item.ItemStack;
 
-import java.util.Optional;
-
 class LockedSlot extends Slot
 {
     public LockedSlot(IInventory inventoryIn, int index, int xPosition, int yPosition)

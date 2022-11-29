@@ -13,8 +13,6 @@ import net.minecraftforge.common.crafting.IIngredientSerializer;
 import javax.annotation.Nullable;
 import java.util.stream.Stream;
 
-import net.minecraft.item.crafting.Ingredient.SingleItemList;
-
 public class BeltIngredient extends Ingredient
 {
     public static final ResourceLocation NAME = ToolBelt.location("belt_upgrade_level");
