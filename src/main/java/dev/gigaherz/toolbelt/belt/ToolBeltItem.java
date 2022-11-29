@@ -12,7 +12,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
-
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -42,9 +41,13 @@ import java.util.List;
 
 public class ToolBeltItem extends Item implements IExtensionSlotItem, DyeableLeatherItem
 {
-    public static Capability<IItemHandler> ITEM_HANDLER = CapabilityManager.get(new CapabilityToken<>(){});
+    public static Capability<IItemHandler> ITEM_HANDLER = CapabilityManager.get(new CapabilityToken<>()
+    {
+    });
 
-    public static Capability<IExtensionSlotItem> EXTENSION_SLOT_ITEM = CapabilityManager.get(new CapabilityToken<>(){});
+    public static Capability<IExtensionSlotItem> EXTENSION_SLOT_ITEM = CapabilityManager.get(new CapabilityToken<>()
+    {
+    });
 
     public static final ImmutableSet<ResourceLocation> BELT_SLOT_LIST = ImmutableSet.of(RpgEquipment.BELT);
 

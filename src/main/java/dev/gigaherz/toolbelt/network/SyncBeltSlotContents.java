@@ -3,10 +3,10 @@ package dev.gigaherz.toolbelt.network;
 import dev.gigaherz.toolbelt.client.ClientPacketHandlers;
 import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
 import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
+import net.minecraft.core.NonNullList;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.core.NonNullList;
 import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;

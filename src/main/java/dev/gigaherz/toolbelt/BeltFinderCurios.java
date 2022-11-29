@@ -1,13 +1,9 @@
 package dev.gigaherz.toolbelt;
 
-import com.google.gson.JsonElement;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.items.IItemHandler;
 import top.theillusivec4.curios.api.CuriosCapability;
-import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
@@ -51,12 +47,6 @@ public class BeltFinderCurios extends BeltFinder
     private Optional<? extends BeltGetter> findBeltInInventory(LivingEntity entity, String slotName, boolean isCosmetic, IItemHandler inventory)
     {
         return findBeltInInventory(inventory, i -> new CuriosBeltGetter(entity, slotName, isCosmetic, i));
-    }
-
-    @Override
-    protected Optional<BeltGetter> getSlotFromId(Player entity, JsonElement slot)
-    {
-        return Optional.empty();
     }
 
     private static class CuriosBeltGetter implements BeltGetter

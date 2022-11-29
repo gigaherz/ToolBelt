@@ -30,7 +30,9 @@ public class RpgEquipment implements IExtensionContainer, INBTSerializable<Compo
 
     private static final ResourceLocation CAPABILITY_ID = new ResourceLocation("examplemod", "rpg_inventory");
 
-    public static Capability<RpgEquipment> CAPABILITY = CapabilityManager.get(new CapabilityToken<>(){});
+    public static Capability<RpgEquipment> CAPABILITY = CapabilityManager.get(new CapabilityToken<>()
+    {
+    });
 
     public static void register(RegisterCapabilitiesEvent event)
     {

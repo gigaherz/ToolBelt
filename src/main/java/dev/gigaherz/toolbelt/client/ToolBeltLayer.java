@@ -2,32 +2,31 @@ package dev.gigaherz.toolbelt.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.math.Vector3f;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.model.ArmorStandModel;
-import net.minecraft.client.model.geom.ModelLayers;
+import net.minecraft.client.model.EntityModel;
+import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
-import net.minecraft.client.model.geom.builders.*;
+import net.minecraft.client.model.geom.builders.CubeListBuilder;
+import net.minecraft.client.model.geom.builders.LayerDefinition;
+import net.minecraft.client.model.geom.builders.MeshDefinition;
+import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.model.HumanoidModel;
-import net.minecraft.client.model.EntityModel;
-import net.minecraft.client.renderer.block.model.ItemTransforms.TransformType;
-import net.minecraft.client.model.geom.ModelPart;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.resources.ResourceLocation;
-import com.mojang.math.Vector3f;
 import net.minecraftforge.items.CapabilityItemHandler;
 
 public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> extends RenderLayer<T, M>
@@ -47,7 +46,8 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
     private void translateToBody(LivingEntity entity, PoseStack poseStack)
     {
         this.getParentModel().body.translateAndRotate(poseStack);
-        if (entity.isBaby() && !(entity instanceof Villager)) {
+        if (entity.isBaby() && !(entity instanceof Villager))
+        {
             poseStack.scale(0.52F, 0.52F, 0.52F);
             poseStack.translate(0.0D, 1.4D, 0.0D);
         }
@@ -95,7 +95,6 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
                         matrixStack.popPose();
                     }
                 }
-
             });
 
             matrixStack.translate(0.0F, 0.19F, 0.0F);
@@ -162,7 +161,8 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
         public float dyeGreen;
         public float dyeBlue;
 
-        public BeltModel(ModelPart part) {
+        public BeltModel(ModelPart part)
+        {
             super(RenderType::entityCutoutNoCull);
             this.belt = part.getChild(BELT);
             this.buckle = part.getChild(BUCKLE);
@@ -170,7 +170,8 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
             this.right_pocket = part.getChild(RIGHT_POCKET);
         }
 
-        public static LayerDefinition createBodyLayer() {
+        public static LayerDefinition createBodyLayer()
+        {
             MeshDefinition meshdefinition = new MeshDefinition();
             PartDefinition partdefinition = meshdefinition.getRoot();
             partdefinition.addOrReplaceChild(BELT, CubeListBuilder.create()
@@ -181,10 +182,10 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
                     .addBox(-2.5f, 9.5f, -3.5f, 5, 5, 1), PartPose.ZERO);
             partdefinition.addOrReplaceChild(LEFT_POCKET, CubeListBuilder.create()
                     .texOffs(0, 10)
-                    .addBox(-2, 12, 5, 4, 4, 1), PartPose.rotation(0,-90,0));
+                    .addBox(-2, 12, 5, 4, 4, 1), PartPose.rotation(0, -90, 0));
             partdefinition.addOrReplaceChild(RIGHT_POCKET, CubeListBuilder.create()
                     .texOffs(0, 10)
-                    .addBox(-2, 12, 5, 4, 4, 1), PartPose.rotation(0,90,0));
+                    .addBox(-2, 12, 5, 4, 4, 1), PartPose.rotation(0, 90, 0));
             return LayerDefinition.create(meshdefinition, 64, 32);
         }
 

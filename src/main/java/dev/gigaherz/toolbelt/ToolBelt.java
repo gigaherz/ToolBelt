@@ -110,7 +110,7 @@ public class ToolBelt
         ITEMS.register(modEventBus);
         MENU_TYPES.register(modEventBus);
 
-        modEventBus.addListener(this::construct );
+        modEventBus.addListener(this::construct);
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::clientSetup);
         modEventBus.addListener(this::modConfig);
@@ -148,6 +148,8 @@ public class ToolBelt
         ModConfig config = event.getConfig();
         if (config.getSpec() == ConfigData.CLIENT_SPEC)
             ConfigData.refreshClient();
+        else if (config.getSpec() == ConfigData.COMMON_SPEC)
+            ConfigData.refreshCommon();
         else if (config.getSpec() == ConfigData.SERVER_SPEC)
             ConfigData.refreshServer();
     }
@@ -176,7 +178,9 @@ public class ToolBelt
         CURIOS.addListener(cap -> BeltFinderCurios.initCurios());
     }
 
-    private static final Capability<ICuriosItemHandler> CURIOS = CapabilityManager.get(new CapabilityToken<>(){});
+    private static final Capability<ICuriosItemHandler> CURIOS = CapabilityManager.get(new CapabilityToken<>()
+    {
+    });
 
     public void clientSetup(FMLClientSetupEvent event)
     {
@@ -319,9 +323,9 @@ public class ToolBelt
                             .addCondition(new Conditions.EnableSewingCrafting())
                             .addRecipe(
                                     SewingUpgradeRecipeBuilder.begin(ToolBelt.BELT.get(),
-                                            compound(
-                                                    Pair.of("Size", IntTag.valueOf(i + 3))
-                                            ))
+                                                    compound(
+                                                            Pair.of("Size", IntTag.valueOf(i + 3))
+                                                    ))
                                             .withTool(needleTiers[i])
                                             .addMaterial(BeltIngredient.withLevel(i))
                                             .addMaterial(Ingredient.of(POUCH.get()))
@@ -332,7 +336,6 @@ public class ToolBelt
                             .generateAdvancement()
                             .build(consumer, new ResourceLocation(pouchId.getNamespace(), pouchId.getPath() + "_upgrade_" + (i + 1) + "_via_sewing"));
                 }
-
             }
 
             public final ItemStack stack(ItemLike item, CompoundTag tag)
@@ -355,7 +358,8 @@ public class ToolBelt
         }
     }
 
-    private static TagKey<Item> itemTag(String name) {
+    private static TagKey<Item> itemTag(String name)
+    {
         return TagKey.create(Registry.ITEM_REGISTRY, new ResourceLocation(name));
     }
 }

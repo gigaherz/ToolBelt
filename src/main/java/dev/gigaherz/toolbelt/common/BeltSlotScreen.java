@@ -1,23 +1,23 @@
 package dev.gigaherz.toolbelt.common;
 
 import com.mojang.blaze3d.platform.Lighting;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
 import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
-import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
-import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
 import net.minecraft.client.gui.components.ImageButton;
+import net.minecraft.client.gui.screens.inventory.EffectRenderingInventoryScreen;
+import net.minecraft.client.gui.screens.recipebook.RecipeBookComponent;
+import net.minecraft.client.gui.screens.recipebook.RecipeUpdateListener;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.entity.EntityRenderDispatcher;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 
@@ -177,31 +177,32 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotConta
         return this.recipeBookComponent;
     }
 
-    public static void renderEntityInInventory(int p_98851_, int p_98852_, int p_98853_, float p_98854_, float p_98855_, LivingEntity p_98856_) {
-        float f = (float)Math.atan((double)(p_98854_ / 40.0F));
-        float f1 = (float)Math.atan((double)(p_98855_ / 40.0F));
+    public static void renderEntityInInventory(int pPosX, int pPosY, int pScale, float pMouseX, float pMouseY, LivingEntity pLivingEntity)
+    {
+        float f = (float) Math.atan((double) (pMouseX / 40.0F));
+        float f1 = (float) Math.atan((double) (pMouseY / 40.0F));
         PoseStack posestack = RenderSystem.getModelViewStack();
         posestack.pushPose();
-        posestack.translate((double)p_98851_, (double)p_98852_, 1050.0D);
+        posestack.translate((double) pPosX, (double) pPosY, 1050.0D);
         posestack.scale(1.0F, 1.0F, -1.0F);
         RenderSystem.applyModelViewMatrix();
         PoseStack posestack1 = new PoseStack();
         posestack1.translate(0.0D, 0.0D, 1000.0D);
-        posestack1.scale((float)p_98853_, (float)p_98853_, (float)p_98853_);
+        posestack1.scale((float) pScale, (float) pScale, (float) pScale);
         Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
         Quaternion quaternion1 = Vector3f.XP.rotationDegrees(f1 * 20.0F);
         quaternion.mul(quaternion1);
         posestack1.mulPose(quaternion);
-        float f2 = p_98856_.yBodyRot;
-        float f3 = p_98856_.getYRot();
-        float f4 = p_98856_.getXRot();
-        float f5 = p_98856_.yHeadRotO;
-        float f6 = p_98856_.yHeadRot;
-        p_98856_.yBodyRot = 180.0F + f * 20.0F;
-        p_98856_.setYRot(180.0F + f * 40.0F);
-        p_98856_.setXRot(-f1 * 20.0F);
-        p_98856_.yHeadRot = p_98856_.getYRot();
-        p_98856_.yHeadRotO = p_98856_.getYRot();
+        float f2 = pLivingEntity.yBodyRot;
+        float f3 = pLivingEntity.getYRot();
+        float f4 = pLivingEntity.getXRot();
+        float f5 = pLivingEntity.yHeadRotO;
+        float f6 = pLivingEntity.yHeadRot;
+        pLivingEntity.yBodyRot = 180.0F + f * 20.0F;
+        pLivingEntity.setYRot(180.0F + f * 40.0F);
+        pLivingEntity.setXRot(-f1 * 20.0F);
+        pLivingEntity.yHeadRot = pLivingEntity.getYRot();
+        pLivingEntity.yHeadRotO = pLivingEntity.getYRot();
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
         quaternion1.conj();
@@ -209,15 +210,15 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotConta
         entityrenderdispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
         RenderSystem.runAsFancy(() -> {
-            entityrenderdispatcher.render(p_98856_, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, posestack1, multibuffersource$buffersource, 15728880);
+            entityrenderdispatcher.render(pLivingEntity, 0.0D, 0.0D, 0.0D, 0.0F, 1.0F, posestack1, multibuffersource$buffersource, 15728880);
         });
         multibuffersource$buffersource.endBatch();
         entityrenderdispatcher.setRenderShadow(true);
-        p_98856_.yBodyRot = f2;
-        p_98856_.setYRot(f3);
-        p_98856_.setXRot(f4);
-        p_98856_.yHeadRotO = f5;
-        p_98856_.yHeadRot = f6;
+        pLivingEntity.yBodyRot = f2;
+        pLivingEntity.setYRot(f3);
+        pLivingEntity.setXRot(f4);
+        pLivingEntity.yHeadRotO = f5;
+        pLivingEntity.yHeadRot = f6;
         posestack.popPose();
         RenderSystem.applyModelViewMatrix();
         Lighting.setupFor3DItems();

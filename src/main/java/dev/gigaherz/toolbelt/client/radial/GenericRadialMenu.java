@@ -1,20 +1,19 @@
 package dev.gigaherz.toolbelt.client.radial;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.*;
-import com.mojang.blaze3d.systems.RenderSystem;
-import dev.gigaherz.toolbelt.ConfigData;
 import com.mojang.blaze3d.platform.Window;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
+import dev.gigaherz.toolbelt.ConfigData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.entity.ItemRenderer;
-import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.lwjgl.glfw.GLFW;
-import org.lwjgl.opengl.GL11;
 
 import javax.annotation.Nullable;
 import java.util.Collection;

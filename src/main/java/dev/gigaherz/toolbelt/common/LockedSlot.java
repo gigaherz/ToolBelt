@@ -1,7 +1,7 @@
 package dev.gigaherz.toolbelt.common;
 
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
@@ -33,13 +33,13 @@ class LockedSlot extends Slot
     }
 
     @Override
-    public Optional<ItemStack> tryRemove(int p_150642_, int p_150643_, Player player)
+    public Optional<ItemStack> tryRemove(int pCount, int pDecrement, Player player)
     {
         return Optional.empty();
     }
 
     @Override
-    public ItemStack safeTake(int p_150648_, int p_150649_, Player player)
+    public ItemStack safeTake(int pCount, int pDecrement, Player player)
     {
         return ItemStack.EMPTY;
     }

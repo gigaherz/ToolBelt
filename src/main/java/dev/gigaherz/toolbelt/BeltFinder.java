@@ -1,11 +1,10 @@
 package dev.gigaherz.toolbelt;
 
-import com.google.gson.JsonElement;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
+import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.core.NonNullList;
 import net.minecraftforge.items.IItemHandler;
 
 import java.util.Optional;
@@ -39,7 +38,7 @@ public abstract class BeltFinder
         findBelt(player).ifPresent(BeltGetter::syncToClients);
     }
 
-    public static void setBeltFromPacket(Player player, String where, JsonElement slot, ItemStack stack)
+    public static void setBeltFromPacket(Player player, String where, int slot, ItemStack stack)
     {
         for (BeltFinder finder : instances)
         {
@@ -54,7 +53,10 @@ public abstract class BeltFinder
 
     public abstract Optional<? extends BeltGetter> findStack(LivingEntity player, boolean allowCosmetic);
 
-    protected abstract Optional<BeltGetter> getSlotFromId(Player player, JsonElement slot);
+    protected Optional<BeltGetter> getSlotFromId(Player player, int slotId)
+    {
+        return Optional.empty();
+    }
 
     protected final Optional<? extends BeltGetter> findBeltInInventory(IItemHandler inventory, IntFunction<? extends BeltGetter> getterFactory)
     {

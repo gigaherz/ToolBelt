@@ -3,11 +3,11 @@ package dev.gigaherz.toolbelt;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.util.StringRepresentable;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -187,7 +187,7 @@ public class ConfigData
         displayEmptySlots = CLIENT.displayEmptySlots.get();
     }
 
-    public static void refreshServer()
+    public static void refreshCommon()
     {
         enableSewingKitSupport = COMMON.enableSewingKitSupport.get();
 
@@ -202,7 +202,10 @@ public class ConfigData
         customBeltSlotMode = COMMON.customBeltSlotMode.get();
         customBeltSlotEnabled = customBeltSlotMode == ThreeWayChoice.ON ||
                 (customBeltSlotMode == ThreeWayChoice.AUTO && !curiosPresent());
+    }
 
+    public static void refreshServer()
+    {
         blackList = SERVER.blacklist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
         whiteList = SERVER.whitelist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
     }

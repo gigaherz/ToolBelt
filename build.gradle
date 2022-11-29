@@ -40,7 +40,7 @@ repositories {
     mavenLocal()
 }
 
-version = "1.19.6"
+version = "1.19.7"
 group = "dev.gigaherz.toolbelt"
 archivesBaseName = "ToolBelt-UNKNOWN"
 
@@ -55,8 +55,7 @@ sourceSets {
 }
 
 minecraft {
-    mappings channel: 'official', version: '1.19.1'
-    //mappings channel: 'parchment', version: '2022.03.13-1.18.2'
+    mappings channel: 'parchment', version: '2022.11.27-1.19.2'
 
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -124,7 +123,7 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.2-43.0.8'
+    minecraft 'net.minecraftforge:forge:1.19.2-43.1.3'
 
     compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19.2:1.6.9")
     runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19.2:1.6.9")
@@ -135,7 +134,7 @@ dependencies {
     runtimeOnly fg.deobf("mezz.jei:jei-1.19.1-forge:11.2.0.244")
 
     compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0")
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0")
+    //runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.2-5.1.1.0")
 
     //runtimeOnly fg.deobf("curse.maven:corail-tombstone-243707:3836552")
 }

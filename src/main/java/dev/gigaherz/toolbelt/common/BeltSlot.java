@@ -1,8 +1,8 @@
 package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.ConfigData;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.Container;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.CapabilityItemHandler;
@@ -36,8 +36,8 @@ public class BeltSlot extends Slot
                     inventory = (IItemHandlerModifiable) (
                             stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
                                     .orElseGet(() -> {
-                                            LOGGER.error("No Inventory!!");
-                                            return new ItemStackHandler(9);
+                                        LOGGER.error("No Inventory!!");
+                                        return new ItemStackHandler(9);
                                     })
                     );
                 }
