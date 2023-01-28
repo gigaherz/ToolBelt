@@ -1,7 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "toolbelt:items/dyed_belt",
-    "layer1": "toolbelt:items/belt_buckle"
+    "layer0": "toolbelt:item/dyed_belt",
+    "layer1": "toolbelt:item/belt_buckle"
   }
 }

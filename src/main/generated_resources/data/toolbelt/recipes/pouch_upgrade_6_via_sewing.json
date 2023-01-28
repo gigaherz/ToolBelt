@@ -4,8 +4,8 @@
     {
       "conditions": [
         {
-          "modid": "sewingkit",
-          "type": "forge:mod_loaded"
+          "type": "forge:mod_loaded",
+          "modid": "sewingkit"
         },
         {
           "type": "toolbelt:enable_sewing_crafting"
@@ -15,35 +15,35 @@
         "type": "toolbelt:sewing_upgrade",
         "materials": [
           {
+            "count": 1,
             "ingredient": {
               "type": "toolbelt:belt_upgrade_level",
               "upgrade_level": 5
-            },
-            "count": 1
+            }
           },
           {
+            "count": 1,
             "ingredient": {
               "item": "toolbelt:pouch"
-            },
-            "count": 1
+            }
           },
           {
+            "count": 1,
             "ingredient": {
               "item": "minecraft:string"
-            },
-            "count": 1
+            }
           }
         ],
-        "tool": {
-          "type": "sewingkit:tool_ingredient",
-          "tool_type": "sewingkit_sew",
-          "tool_level": "minecraft:diamond"
-        },
         "result": {
           "item": "toolbelt:belt",
           "nbt": {
             "Size": 8
           }
+        },
+        "tool": {
+          "type": "sewingkit:tool_ingredient",
+          "tool_level": "minecraft:diamond",
+          "tool_type": "sewingkit_sew"
         }
       }
     }

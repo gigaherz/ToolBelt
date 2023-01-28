@@ -47,7 +47,7 @@ public class ClientEvents
 
     public static void wipeOpen()
     {
-        Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(false);
+        // Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(false);
         while (OPEN_TOOL_MENU_KEYBIND.consumeClick())
         {
         }
@@ -155,15 +155,6 @@ public class ClientEvents
                                     ? dyeable.getColor(pStack) : -1,
                     ToolBelt.BELT.get()
             );
-        }
-
-        @SubscribeEvent
-        public static void textureStitch(TextureStitchEvent.Pre event)
-        {
-            if (event.getAtlas().location() == InventoryMenu.BLOCK_ATLAS)
-            {
-                event.addSprite(ExtensionSlotSlot.SLOT_BACKGROUND);
-            }
         }
 
         @SubscribeEvent

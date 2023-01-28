@@ -2,7 +2,7 @@ package dev.gigaherz.toolbelt.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
@@ -27,7 +27,7 @@ import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> extends RenderLayer<T, M>
 {
@@ -69,7 +69,7 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
             matrixStack.pushPose();
             this.translateToBody(entity, matrixStack);
 
-            stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null).ifPresent((cap) -> {
+            stack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent((cap) -> {
                 boolean rightHanded = entity.getMainArm() == HumanoidArm.RIGHT;
 
                 {
@@ -127,7 +127,7 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
         else
             matrixStack.translate(4.35f / 16.0F, 0.7f, -0.1f);
         //((IHasArm)this.getEntityModel()).translateHand(handSide, matrixStack);
-        matrixStack.mulPose(Vector3f.XP.rotationDegrees(40));
+        matrixStack.mulPose(Axis.XP.rotationDegrees(40));
         float scale = ConfigData.beltItemScale;
         matrixStack.scale(scale, scale, scale);
         Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer().renderItem(player, stack, transformType, handSide == HumanoidArm.LEFT, matrixStack, buffer, lightness);

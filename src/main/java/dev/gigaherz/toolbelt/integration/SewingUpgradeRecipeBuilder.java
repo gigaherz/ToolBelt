@@ -5,6 +5,7 @@ import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
 import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.advancements.Advancement;
 import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -28,7 +29,7 @@ public class SewingUpgradeRecipeBuilder extends SewingRecipeBuilder
 
     protected SewingUpgradeRecipeBuilder(Item result, int count, @Nullable CompoundTag tag)
     {
-        super(result, count, tag);
+        super(RecipeCategory.MISC, result, count, tag);
     }
 
     @Override

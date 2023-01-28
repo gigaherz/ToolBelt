@@ -1,0 +1,5 @@
+{
+  "sources": [
+    {"type": "single", "resource": "toolbelt:gui/empty_belt_slot_background" }
+  ]
+}

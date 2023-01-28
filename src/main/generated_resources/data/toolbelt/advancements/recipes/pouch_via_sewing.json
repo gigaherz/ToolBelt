@@ -1,38 +1,24 @@
 {
   "advancements": [
     {
-      "conditions": [
-        {
-          "modid": "sewingkit",
-          "type": "forge:mod_loaded"
-        },
-        {
-          "type": "toolbelt:enable_sewing_crafting"
-        }
-      ],
       "advancement": {
         "parent": "minecraft:recipes/root",
-        "rewards": {
-          "recipes": [
-            "toolbelt:pouch"
-          ]
-        },
         "criteria": {
           "has_leather": {
-            "trigger": "minecraft:inventory_changed",
             "conditions": {
               "items": [
                 {
                   "tag": "forge:leather"
                 }
               ]
-            }
+            },
+            "trigger": "minecraft:inventory_changed"
           },
           "has_the_recipe": {
-            "trigger": "minecraft:recipe_unlocked",
             "conditions": {
               "recipe": "toolbelt:pouch"
-            }
+            },
+            "trigger": "minecraft:recipe_unlocked"
           }
         },
         "requirements": [
@@ -40,8 +26,22 @@
             "has_leather",
             "has_the_recipe"
           ]
-        ]
-      }
+        ],
+        "rewards": {
+          "recipes": [
+            "toolbelt:pouch"
+          ]
+        }
+      },
+      "conditions": [
+        {
+          "type": "forge:mod_loaded",
+          "modid": "sewingkit"
+        },
+        {
+          "type": "toolbelt:enable_sewing_crafting"
+        }
+      ]
     }
   ]
 }

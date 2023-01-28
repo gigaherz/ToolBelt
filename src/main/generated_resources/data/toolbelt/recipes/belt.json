@@ -9,22 +9,23 @@
       ],
       "recipe": {
         "type": "minecraft:crafting_shaped",
+        "category": "equipment",
+        "key": {
+          "i": {
+            "item": "minecraft:iron_ingot"
+          },
+          "l": {
+            "item": "minecraft:leather"
+          },
+          "s": {
+            "item": "minecraft:string"
+          }
+        },
         "pattern": [
           "sls",
           "l l",
           "lil"
         ],
-        "key": {
-          "s": {
-            "item": "minecraft:string"
-          },
-          "l": {
-            "item": "minecraft:leather"
-          },
-          "i": {
-            "item": "minecraft:iron_ingot"
-          }
-        },
         "result": {
           "item": "toolbelt:belt"
         }

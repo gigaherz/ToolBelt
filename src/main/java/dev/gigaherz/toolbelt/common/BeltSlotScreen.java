@@ -3,8 +3,7 @@ package dev.gigaherz.toolbelt.common;
 import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Quaternion;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.ImageButton;
@@ -20,6 +19,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
+import org.joml.Quaternionf;
 
 public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotContainer> implements RecipeUpdateListener
 {
@@ -161,17 +161,6 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotConta
     }
 
     @Override
-    public void removed()
-    {
-        if (this.removeRecipeBookGui)
-        {
-            this.recipeBookComponent.removed();
-        }
-
-        super.removed();
-    }
-
-    @Override
     public RecipeBookComponent getRecipeBookComponent()
     {
         return this.recipeBookComponent;
@@ -189,8 +178,8 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotConta
         PoseStack posestack1 = new PoseStack();
         posestack1.translate(0.0D, 0.0D, 1000.0D);
         posestack1.scale((float) pScale, (float) pScale, (float) pScale);
-        Quaternion quaternion = Vector3f.ZP.rotationDegrees(180.0F);
-        Quaternion quaternion1 = Vector3f.XP.rotationDegrees(f1 * 20.0F);
+        Quaternionf quaternion = Axis.ZP.rotationDegrees(180.0F);
+        Quaternionf quaternion1 = Axis.XP.rotationDegrees(f1 * 20.0F);
         quaternion.mul(quaternion1);
         posestack1.mulPose(quaternion);
         float f2 = pLivingEntity.yBodyRot;
@@ -205,7 +194,7 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotConta
         pLivingEntity.yHeadRotO = pLivingEntity.getYRot();
         Lighting.setupForEntityInInventory();
         EntityRenderDispatcher entityrenderdispatcher = Minecraft.getInstance().getEntityRenderDispatcher();
-        quaternion1.conj();
+        quaternion1.conjugate();
         entityrenderdispatcher.overrideCameraOrientation(quaternion1);
         entityrenderdispatcher.setRenderShadow(false);
         MultiBufferSource.BufferSource multibuffersource$buffersource = Minecraft.getInstance().renderBuffers().bufferSource();
