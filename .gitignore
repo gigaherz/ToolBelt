@@ -8,13 +8,8 @@
 /LICENSE-fml.txt
 /MinecraftForge-Credits.txt
 /MinecraftForge-License.txt
-/README.txt
 /forge-1.8-11.14.0.1281-1.8-changelog.txt
 /forge.iml
-/gradle/wrapper/gradle-wrapper.jar
-/gradle/wrapper/gradle-wrapper.properties
-/gradlew
-/gradlew.bat
 
 *.bak
 *.rhl
