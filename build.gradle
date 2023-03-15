@@ -1,8 +1,9 @@
 buildscript {
     repositories {
+        jcenter()
         maven {
             name = "forge"
-            url = "https://maven.minecraftforge.net/"
+            url = "http://files.minecraftforge.net/maven"
         }
     }
     dependencies {
@@ -32,6 +33,10 @@ repositories {
     }
     maven {
         url 'https://maven.mcmoddev.com'
+    }
+    maven {
+        name = "Cursemaven"
+        url "https://cursemaven.com"
     }
 }
 
@@ -80,7 +85,7 @@ dependencies {
     deobfCompile "mezz.jei:jei_1.12.2:4.15.0.283:api"
     runtime "mezz.jei:jei_1.12.2:4.15.0.283"
 
-    deobfCompile "com.azanor:Baubles:1.12-1.5.2"
+    deobfCompile "curse.maven:baubles-227083:2518667"
 }
 
 sourceCompatibility = JavaVersion.VERSION_1_8
