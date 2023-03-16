@@ -3,6 +3,7 @@ package dev.gigaherz.toolbelt.integration;
 import dev.gigaherz.sewingkit.api.SewingRecipe;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
@@ -19,7 +20,7 @@ public class SewingUpgradeRecipe extends SewingRecipe
     }
 
     @Override
-    public ItemStack assemble(Container inv)
+    public ItemStack assemble(Container inv, RegistryAccess registryAccess)
     {
         ItemStack inputBelt = ItemStack.EMPTY;
         for (int i = 2; i < 6; i++)
@@ -30,7 +31,7 @@ public class SewingUpgradeRecipe extends SewingRecipe
                 break;
             }
         }
-        ItemStack upgradedBelt = super.assemble(inv);
+        ItemStack upgradedBelt = super.assemble(inv, registryAccess);
         if (inputBelt.getCount() > 0)
         {
             CompoundTag inputTag = inputBelt.getTag();

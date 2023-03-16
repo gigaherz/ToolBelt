@@ -26,6 +26,8 @@ import net.minecraft.nbt.IntTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.flag.FeatureFlagSet;
+import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
@@ -44,6 +46,7 @@ import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.AnvilUpdateEvent;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
@@ -62,6 +65,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import top.theillusivec4.curios.api.SlotTypeMessage;
 import top.theillusivec4.curios.api.type.capability.ICuriosItemHandler;
 
 import java.util.function.Consumer;
@@ -79,7 +83,7 @@ public class ToolBelt
 
     public static RegistryObject<RecipeSerializer<?>> SEWING_UGRADE_SERIALIZER = RegistryObject.createOptional(location("sewing_upgrade"), Registries.RECIPE_SERIALIZER, MODID);
 
-    public static RegistryObject<MenuType<BeltSlotContainer>> BELT_SLOT_MENU = MENU_TYPES.register("belt_slot_container", () -> new MenuType<>(BeltSlotContainer::new));
+    public static RegistryObject<MenuType<BeltSlotContainer>> BELT_SLOT_MENU = MENU_TYPES.register("belt_slot_container", () -> new MenuType<>(BeltSlotContainer::new, FeatureFlags.DEFAULT_FLAGS));
     public static RegistryObject<MenuType<BeltContainer>> BELT_MENU = MENU_TYPES.register("belt_container", () -> IForgeMenuType.create(BeltContainer::new));
 
     public static ToolBelt instance;
@@ -196,7 +200,7 @@ public class ToolBelt
 
     private void imcEnqueue(InterModEnqueueEvent event)
     {
-        // TODO InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> new SlotTypeMessage.Builder("belt").size(1).build());
+        InterModComms.sendTo("curios", SlotTypeMessage.REGISTER_TYPE, () -> new SlotTypeMessage.Builder("belt").size(1).build());
     }
 
     public void anvilChange(AnvilUpdateEvent ev)

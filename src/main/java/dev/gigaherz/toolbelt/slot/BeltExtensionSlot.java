@@ -279,7 +279,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
     protected void syncTo(Player target)
     {
         SyncBeltSlotContents message = new SyncBeltSlotContents((Player) owner, this);
-        ToolBelt.channel.sendTo(message, ((ServerPlayer) target).connection.getConnection(), NetworkDirection.PLAY_TO_CLIENT);
+        ToolBelt.channel.sendTo(message, ((ServerPlayer) target).connection.connection, NetworkDirection.PLAY_TO_CLIENT);
     }
 
     protected void syncTo(PacketDistributor.PacketTarget target)
