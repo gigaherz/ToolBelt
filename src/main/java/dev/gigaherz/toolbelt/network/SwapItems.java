@@ -6,7 +6,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.minecraftforge.network.NetworkEvent;
@@ -51,7 +51,7 @@ public class SwapItems
                 return;
 
             IItemHandlerModifiable cap = (IItemHandlerModifiable) (
-                    stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
+                    stack.getCapability(ForgeCapabilities.ITEM_HANDLER, null)
                             .orElseThrow(() -> new RuntimeException("No inventory!")));
             if (swapWith < 0)
             {

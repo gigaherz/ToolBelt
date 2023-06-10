@@ -44,7 +44,7 @@ import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.event.AnvilUpdateEvent;
-import net.minecraftforge.event.CreativeModeTabEvent;
+import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.InterModComms;
 import net.minecraftforge.fml.ModList;
@@ -129,9 +129,9 @@ public class ToolBelt
         }
     }
 
-    private void addItemsToTabs(CreativeModeTabEvent.BuildContents event)
+    private void addItemsToTabs(BuildCreativeModeTabContentsEvent event)
     {
-        if (event.getTab() == CreativeModeTabs.TOOLS_AND_UTILITIES)
+        if (event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES)
         {
             event.accept(BELT);
             event.accept(POUCH);

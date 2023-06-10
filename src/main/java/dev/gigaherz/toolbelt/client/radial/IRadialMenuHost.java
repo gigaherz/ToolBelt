@@ -9,6 +9,4 @@ public interface IRadialMenuHost extends IDrawingHelper
     Screen getScreen();
 
     Font getFontRenderer();
-
-    ItemRenderer getItemRenderer();
 }

@@ -35,9 +35,9 @@ public class TextRadialMenuItem extends RadialMenuItem
     public void draw(DrawingContext context)
     {
         String textString = text.getString();
-        float x = context.x - context.fontRenderer.width(textString) / 2.0f;
-        float y = context.y - context.fontRenderer.lineHeight / 2.0f;
-        context.fontRenderer.drawShadow(context.matrixStack, textString, x, y, color);
+        float x = context.x - context.font.width(textString) / 2.0f;
+        float y = context.y - context.font.lineHeight / 2.0f;
+        context.graphics.drawString(context.font, textString, x, y, color, true);
     }
 
     @Override

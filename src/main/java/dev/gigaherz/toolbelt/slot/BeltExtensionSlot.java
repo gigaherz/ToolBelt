@@ -12,6 +12,7 @@ import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Unit;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -97,7 +98,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                         {
                             if (!ConfigData.customBeltSlotEnabled)
                                 return;
-                            if (!getOwner().level.isClientSide)
+                            if (!getOwner().level().isClientSide)
                                 syncTo(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getOwner));
                         }
                     };
@@ -139,7 +140,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             if (!ConfigData.customBeltSlotEnabled)
                 return;
             Player target = event.getEntity();
-            if (target.level.isClientSide)
+            if (target.level().isClientSide)
                 return;
             get(target).ifPresent(BeltExtensionSlot::syncToSelf);
         }
@@ -150,7 +151,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             if (!ConfigData.customBeltSlotEnabled)
                 return;
             Player target = event.getEntity();
-            if (target.level.isClientSide)
+            if (target.level().isClientSide)
                 return;
             get(target).ifPresent(BeltExtensionSlot::syncToSelf);
         }
@@ -161,7 +162,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
             if (!ConfigData.customBeltSlotEnabled)
                 return;
             Entity target = event.getTarget();
-            if (target.level.isClientSide)
+            if (target.level().isClientSide)
                 return;
             if (target instanceof Player)
             {
@@ -201,7 +202,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                 {
                     if (entity instanceof Player player)
                     {
-                        if (!entity.level.getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
+                        if (!entity.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
                         {
                             printDebugLog("Entity is player, and keepInventory is not set. Spilling...");
                             Collection<ItemEntity> old = entity.captureDrops(event.getDrops());

@@ -169,7 +169,7 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem, DyeableLea
     @Override
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
     {
-        return !ItemStack.isSame(oldStack, newStack); // super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
+        return !ItemStack.isSameItem(oldStack, newStack); // super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
     }
 
     public static int getSlotsCount(ItemStack stack)

@@ -30,7 +30,7 @@ public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
     private final ExtensionSlotSlot slotBelt;
     private final IExtensionSlot extensionSlot;
 
-    private final CraftingContainer craftingInventory = new CraftingContainer(this, 2, 2);
+    private final CraftingContainer craftingInventory = new TransientCraftingContainer(this, 2, 2);
     private final ResultContainer craftResultInventory = new ResultContainer();
     private final Player player;
 
@@ -120,7 +120,7 @@ public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
 
         this.addSlot(slotBelt = new ExtensionSlotSlot(BeltSlotContainer.this.extensionSlot, 77, 44));
 
-        if (playerInventory.player.level.isClientSide)
+        if (playerInventory.player.level().isClientSide)
         {
             ToolBelt.channel.sendToServer(new ContainerSlotsHack());
         }
@@ -160,13 +160,13 @@ public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
     @Override
     public boolean recipeMatches(Recipe<? super CraftingContainer> recipeIn)
     {
-        return recipeIn.matches(this.craftingInventory, this.player.level);
+        return recipeIn.matches(this.craftingInventory, this.player.level());
     }
 
     @Override
     public void slotsChanged(Container inventoryIn)
     {
-        Bridge.slotChangedCraftingGridAccessor(this, this.player.level, this.player, this.craftingInventory, this.craftResultInventory);
+        Bridge.slotChangedCraftingGridAccessor(this, this.player.level(), this.player, this.craftingInventory, this.craftResultInventory);
     }
 
     private static class Bridge extends CraftingMenu
@@ -190,7 +190,7 @@ public class BeltSlotContainer extends RecipeBookMenu<CraftingContainer>
 
         this.craftResultInventory.clearContent();
 
-        if (!playerIn.level.isClientSide)
+        if (!playerIn.level().isClientSide)
         {
             this.clearContainer(playerIn, this.craftingInventory);
             BeltFinder.sendSync(playerIn);

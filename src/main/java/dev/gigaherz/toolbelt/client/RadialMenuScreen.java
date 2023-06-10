@@ -9,6 +9,7 @@ import dev.gigaherz.toolbelt.client.radial.*;
 import dev.gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.network.chat.Component;
@@ -16,9 +17,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 import java.util.List;
@@ -38,11 +39,6 @@ public class RadialMenuScreen extends Screen
     private final TextRadialMenuItem insertMenuItem;
     private final GenericRadialMenu menu;
 
-    private ItemRenderer getItemRenderer()
-    {
-        return itemRenderer;
-    }
-
     public RadialMenuScreen(BeltFinder.BeltGetter getter)
     {
         super(Component.literal("RADIAL MENU"));
@@ -50,13 +46,13 @@ public class RadialMenuScreen extends Screen
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
 
-        inventory = stackEquipped.getCount() > 0 ? stackEquipped.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(null) : null;
+        inventory = stackEquipped.getCount() > 0 ? stackEquipped.getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(null) : null;
         menu = new GenericRadialMenu(Minecraft.getInstance(), new IRadialMenuHost()
         {
             @Override
-            public void renderTooltip(PoseStack matrixStack, ItemStack stack, int mouseX, int mouseY)
+            public void renderTooltip(GuiGraphics graphics, ItemStack stack, int mouseX, int mouseY)
             {
-                RadialMenuScreen.this.renderTooltip(matrixStack, stack, mouseX, mouseY);
+                graphics.renderTooltip(font, stack, mouseX, mouseY);
             }
 
             @Override
@@ -69,12 +65,6 @@ public class RadialMenuScreen extends Screen
             public Font getFontRenderer()
             {
                 return font;
-            }
-
-            @Override
-            public ItemRenderer getItemRenderer()
-            {
-                return RadialMenuScreen.this.getItemRenderer();
             }
         })
         {
@@ -147,7 +137,7 @@ public class RadialMenuScreen extends Screen
             else if (stackEquipped != stack)
             {
                 stackEquipped = stack;
-                inventory = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElseThrow(() -> new RuntimeException("No inventory?"));
+                inventory = stack.getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(() -> new RuntimeException("No inventory?"));
                 needsRecheckStacks = true;
             }
         }
@@ -182,11 +172,12 @@ public class RadialMenuScreen extends Screen
     }
 
     @Override
-    public void render(PoseStack matrixStack, int mouseX, int mouseY, float partialTicks)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
-        matrixStack.pushPose();
-        super.render(matrixStack, mouseX, mouseY, partialTicks);
-        matrixStack.popPose();
+        var poseStack = graphics.pose();
+        poseStack.pushPose();
+        super.render(graphics, mouseX, mouseY, partialTicks);
+        poseStack.popPose();
 
         if (inventory == null)
             return;
@@ -252,7 +243,7 @@ public class RadialMenuScreen extends Screen
 
         checkCycleKeybinds();
 
-        menu.draw(matrixStack, partialTicks, mouseX, mouseY);
+        menu.draw(graphics, partialTicks, mouseX, mouseY);
     }
 
     private boolean trySwap(int slotNumber, ItemStack itemMouseOver)

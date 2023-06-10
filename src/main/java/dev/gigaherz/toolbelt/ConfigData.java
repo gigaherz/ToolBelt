@@ -227,10 +227,10 @@ public class ConfigData
         if (stack.getCount() <= 0)
             return true;
 
-        if (whiteList.stream().anyMatch((s) -> ItemStack.isSame(s, stack)))
+        if (whiteList.stream().anyMatch((s) -> ItemStack.isSameItem(s, stack)))
             return true;
 
-        if (blackList.stream().anyMatch((s) -> ItemStack.isSame(s, stack)))
+        if (blackList.stream().anyMatch((s) -> ItemStack.isSameItem(s, stack)))
             return false;
 
         if (stack.getItem() instanceof ToolBeltItem)

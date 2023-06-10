@@ -34,11 +34,11 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
         {
             PoseStack viewModelPose = RenderSystem.getModelViewStack();
             viewModelPose.pushPose();
-            viewModelPose.mulPoseMatrix(context.matrixStack.last().pose());
+            viewModelPose.mulPoseMatrix(context.graphics.pose().last().pose());
             viewModelPose.translate(-8, -8, context.z);
             RenderSystem.applyModelViewMatrix();
-            context.itemRenderer.renderAndDecorateItem(context.matrixStack, stack, (int) context.x, (int) context.y);
-            context.itemRenderer.renderGuiItemDecorations(context.matrixStack, context.fontRenderer, stack, (int) context.x, (int) context.y, "");
+            context.graphics.renderItem(stack, (int) context.x, (int) context.y);
+            context.graphics.renderItemDecorations(context.font, stack, (int) context.x, (int) context.y, "");
             viewModelPose.popPose();
             RenderSystem.applyModelViewMatrix();
         }
@@ -53,7 +53,7 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
     {
         if (stack.getCount() > 0)
         {
-            context.drawingHelper.renderTooltip(context.matrixStack, stack, (int) context.x, (int) context.y);
+            context.graphics.renderTooltip(context.font, stack, (int) context.x, (int) context.y);
         }
         else
         {

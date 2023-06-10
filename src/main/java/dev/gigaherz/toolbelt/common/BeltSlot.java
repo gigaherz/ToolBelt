@@ -5,7 +5,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import org.apache.logging.log4j.LogManager;
@@ -34,7 +34,7 @@ public class BeltSlot extends Slot
                 {
                     beltStack = stack;
                     inventory = (IItemHandlerModifiable) (
-                            stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, null)
+                            stack.getCapability(ForgeCapabilities.ITEM_HANDLER, null)
                                     .orElseGet(() -> {
                                         LOGGER.error("No Inventory!!");
                                         return new ItemStackHandler(9);

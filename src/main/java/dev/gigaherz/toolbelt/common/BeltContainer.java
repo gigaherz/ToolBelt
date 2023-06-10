@@ -11,7 +11,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 public class BeltContainer extends AbstractContainerMenu
 {
@@ -33,7 +33,7 @@ public class BeltContainer extends AbstractContainerMenu
         {
             blockedStack = ItemStack.EMPTY;
         }
-        ToolBeltInventory beltInventory = stillValid(playerInventory.player) && blockedStack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
+        ToolBeltInventory beltInventory = stillValid(playerInventory.player) && blockedStack.getCapability(ForgeCapabilities.ITEM_HANDLER)
                 .orElseThrow(() -> new RuntimeException("Item handler not present.")) instanceof ToolBeltInventory inv
                 ? inv : new ToolBeltInventory(new ItemStack(ToolBelt.BELT.get()));
 
@@ -76,7 +76,7 @@ public class BeltContainer extends AbstractContainerMenu
     public void removed(Player playerIn)
     {
         super.removed(playerIn);
-        if (!playerIn.level.isClientSide)
+        if (!playerIn.level().isClientSide)
             BeltFinder.sendSync(playerIn);
     }
 
