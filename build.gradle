@@ -126,18 +126,18 @@ configurations {
 }
 
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.19.4-45.0.9'
+    minecraft 'net.minecraftforge:forge:1.19.4-45.0.66'
 
     compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19.4:1.8.0")
     runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.19.4:1.8.0")
 
-    compileOnly fg.deobf("mezz.jei:jei-1.19.3-common-api:12.3.0.21")
+    compileOnly fg.deobf("mezz.jei:jei-1.19.4-common-api:13.1.0.11")
     //runtimeOnly fg.deobf("mezz.jei:jei-1.19.3-common:12.3.0.21")
-    compileOnly fg.deobf("mezz.jei:jei-1.19.3-forge-api:12.3.0.21")
+    compileOnly fg.deobf("mezz.jei:jei-1.19.4-forge-api:13.1.0.11")
     //runtimeOnly fg.deobf("mezz.jei:jei-1.19.3-forge:12.3.0.21")
 
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.4-5.1.4.2")
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.4-5.1.4.2")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.4-5.1.5.3")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.19.4-5.1.5.3")
 
     //runtimeOnly fg.deobf("curse.maven:corail-tombstone-243707:3836552")
 }
