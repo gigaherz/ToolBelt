@@ -2,7 +2,7 @@ package dev.gigaherz.toolbelt;
 
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
@@ -25,23 +25,27 @@ public class BeltFinderCurios extends BeltFinder
     @Override
     public Optional<? extends BeltGetter> findStack(LivingEntity entity, boolean allowCosmetic)
     {
-        return entity.getCapability(CuriosCapability.INVENTORY).resolve()
-                .flatMap(curios -> curios.getCurios().entrySet().stream()
-                        .map(pair -> {
-                            String slotName = pair.getKey();
-                            ICurioStacksHandler handler = pair.getValue();
-                            if (allowCosmetic)
-                            {
-                                Optional<? extends BeltGetter> result = findBeltInInventory(entity, slotName, true, handler.getCosmeticStacks());
-                                if (result.isPresent())
-                                    return result;
-                            }
+        var curios = entity.getCapability(CuriosCapability.INVENTORY);
+        if (curios != null)
+        {
+            return curios.getCurios().entrySet().stream()
+                    .map(pair -> {
+                        String slotName = pair.getKey();
+                        ICurioStacksHandler handler = pair.getValue();
+                        if (allowCosmetic)
+                        {
+                            Optional<? extends BeltGetter> result = findBeltInInventory(entity, slotName, true, handler.getCosmeticStacks());
+                            if (result.isPresent())
+                                return result;
+                        }
 
-                            return findBeltInInventory(entity, slotName, false, handler.getStacks());
-                        })
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .findFirst());
+                        return findBeltInInventory(entity, slotName, false, handler.getStacks());
+                    })
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .findFirst();
+        }
+        return Optional.empty();
     }
 
     private Optional<? extends BeltGetter> findBeltInInventory(LivingEntity entity, String slotName, boolean isCosmetic, IItemHandler inventory)
@@ -72,8 +76,8 @@ public class BeltFinderCurios extends BeltFinder
 
         private Optional<ICurioStacksHandler> getCuriosHandler()
         {
-            return entity.getCapability(CuriosCapability.INVENTORY).resolve()
-                    .flatMap((curios) -> curios.getStacksHandler(slotKind));
+            var curios = entity.getCapability(CuriosCapability.INVENTORY);
+            return curios != null ? curios.getStacksHandler(slotKind) : Optional.empty();
         }
 
         @Override

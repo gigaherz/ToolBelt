@@ -1,14 +1,10 @@
 package dev.gigaherz.toolbelt.belt;
 
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
+import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.common.Screens;
-import dev.gigaherz.toolbelt.customslots.ExtensionSlotItemHandler;
-import dev.gigaherz.toolbelt.customslots.IExtensionContainer;
-import dev.gigaherz.toolbelt.customslots.IExtensionSlot;
-import dev.gigaherz.toolbelt.customslots.IExtensionSlotItem;
-import dev.gigaherz.toolbelt.customslots.example.RpgEquipment;
-import net.minecraft.core.Direction;
+import dev.gigaherz.toolbelt.slot.BeltAttachment;
+import dev.gigaherz.toolbelt.slot.IBeltSlotItem;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
@@ -28,28 +24,30 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.List;
+import java.util.Objects;
 
-public class ToolBeltItem extends Item implements IExtensionSlotItem, DyeableLeatherItem
+public class ToolBeltItem extends Item implements IBeltSlotItem, DyeableLeatherItem
 {
-    public static Capability<IItemHandler> ITEM_HANDLER = CapabilityManager.get(new CapabilityToken<>()
+    public static void register(RegisterCapabilitiesEvent event)
     {
-    });
+        event.registerItem(
+                Capabilities.ItemHandler.ITEM,
+                (stack, context) -> new ToolBeltInventory(stack),
+                ToolBelt.BELT
+        );
+        event.registerItem(
+                IBeltSlotItem.CAPABILITY,
+                (stack, context) -> (IBeltSlotItem)stack.getItem(),
+                ToolBelt.BELT
+        );
+    }
 
-    public static Capability<IExtensionSlotItem> EXTENSION_SLOT_ITEM = CapabilityManager.get(new CapabilityToken<>()
-    {
-    });
-
-    public static final ImmutableSet<ResourceLocation> BELT_SLOT_LIST = ImmutableSet.of(RpgEquipment.BELT);
+    public static final ImmutableSet<ResourceLocation> BELT_SLOT_LIST = ImmutableSet.of(ToolBelt.location("belt"));
 
     public ToolBeltItem(Properties properties)
     {
@@ -117,17 +115,10 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem, DyeableLea
         tooltip.add(Component.translatable("text.toolbelt.tooltip", size - 2, size));
     }
 
-    @Nonnull
     @Override
-    public ImmutableSet<ResourceLocation> getAcceptableSlots(@Nonnull ItemStack stack)
+    public void onWornTick(ItemStack itemstack, BeltAttachment slot)
     {
-        return BELT_SLOT_LIST;
-    }
-
-    @Override
-    public void onWornTick(ItemStack itemstack, IExtensionSlot slot)
-    {
-        tickAllSlots(itemstack, slot.getContainer().getOwner());
+        tickAllSlots(itemstack);
     }
 
     @Override
@@ -135,35 +126,8 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem, DyeableLea
     {
         if (entityIn instanceof LivingEntity)
         {
-            tickAllSlots(stack, (LivingEntity) entityIn);
+            tickAllSlots(stack);
         }
-    }
-
-    @Override
-    public ICapabilityProvider initCapabilities(final ItemStack stack, CompoundTag nbt)
-    {
-        return new ICapabilityProvider()
-        {
-            final ItemStack owner = stack;
-            final ToolBeltInventory itemHandler = new ToolBeltInventory(stack);
-
-            final LazyOptional<IItemHandler> itemHandlerInstance = LazyOptional.of(() -> itemHandler);
-            final LazyOptional<IExtensionSlotItem> extensionSlotInstance = LazyOptional.of(() -> ToolBeltItem.this);
-            //final LazyOptional<ICurio> curioItemInstance = CURIO_ITEM != null ? LazyOptional.of(CURIO_ITEM::getDefaultInstance) : LazyOptional.empty();
-
-            @Override
-            @Nonnull
-            public <T> LazyOptional<T> getCapability(@Nonnull final Capability<T> cap, final @Nullable Direction side)
-            {
-                if (cap == ITEM_HANDLER)
-                    return itemHandlerInstance.cast();
-                if (cap == EXTENSION_SLOT_ITEM)
-                    return extensionSlotInstance.cast();
-                //if (cap == CURIO_ITEM && CURIO_ITEM != null)
-                //    return curioItemInstance.cast();
-                return LazyOptional.empty();
-            }
-        };
     }
 
     @Override
@@ -239,62 +203,19 @@ public class ToolBeltItem extends Item implements IExtensionSlotItem, DyeableLea
         return getSlotsCount(stack) - 2;
     }
 
-    private void tickAllSlots(ItemStack source, LivingEntity player)
+    private void tickAllSlots(ItemStack source)
     {
-        BeltExtensionContainer container = new BeltExtensionContainer(source, player);
-        for (IExtensionSlot slot : container.getSlots())
+        var inventory = Objects.requireNonNull(source.getCapability(Capabilities.ItemHandler.ITEM), "No inventory!");
+
+        for (int i = 0; i < inventory.getSlots(); i++)
         {
-            ((ExtensionSlotItemHandler) slot).onWornTick();
-        }
-    }
-
-    public static class BeltExtensionContainer implements IExtensionContainer
-    {
-        private static final ResourceLocation SLOT_TYPE = new ResourceLocation("toolbelt", "pocket");
-        private final ToolBeltInventory inventory;
-        private final LivingEntity owner;
-        private final ImmutableList<IExtensionSlot> slots;
-
-        public BeltExtensionContainer(ItemStack source, LivingEntity owner)
-        {
-            this.inventory = (ToolBeltInventory) source.getCapability(ITEM_HANDLER, null).orElseThrow(() -> new RuntimeException("No inventory!"));
-            this.owner = owner;
-
-            ExtensionSlotItemHandler[] slots = new ExtensionSlotItemHandler[inventory.getSlots()];
-
-            for (int i = 0; i < inventory.getSlots(); i++)
-            {
-                slots[i] = new ExtensionSlotItemHandler(this, SLOT_TYPE, inventory, i)
-                {
-                    @Override
-                    public boolean canEquip(@Nonnull ItemStack stack)
-                    {
-                        return BeltExtensionContainer.this.inventory.canInsertItem(this.slot, stack);
-                    }
-                };
+            ItemStack stack = inventory.getStackInSlot(i);
+            if (stack.isEmpty())
+                return;
+            var extItem = stack.getCapability(IItemInBelt.CAPABILITY);
+            if (extItem != null) {
+                extItem.onWornTick(stack, source);
             }
-
-            this.slots = ImmutableList.copyOf(slots);
-        }
-
-        @Nonnull
-        @Override
-        public LivingEntity getOwner()
-        {
-            return owner;
-        }
-
-        @Nonnull
-        @Override
-        public ImmutableList<IExtensionSlot> getSlots()
-        {
-            return slots;
-        }
-
-        @Override
-        public void onContentsChanged(IExtensionSlot slot)
-        {
-
         }
     }
 }

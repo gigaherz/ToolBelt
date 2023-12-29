@@ -1,29 +1,16 @@
 package dev.gigaherz.toolbelt;
 
-import com.google.gson.JsonObject;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.crafting.CraftingHelper;
-import net.minecraftforge.common.crafting.conditions.ICondition;
-import net.minecraftforge.common.crafting.conditions.IConditionSerializer;
+import com.mojang.serialization.Codec;
+import net.neoforged.neoforge.common.conditions.ICondition;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public class Conditions
 {
-    public static final ResourceLocation ENABLE_NORMAL_CRAFTING = ToolBelt.location("enable_normal_crafting");
-    public static final ResourceLocation ENABLE_SEWING_CRAFTING = ToolBelt.location("enable_sewing_crafting");
-
-    public static void register()
-    {
-        CraftingHelper.register(EnableNormalCrafting.Serializer.INSTANCE);
-        CraftingHelper.register(EnableSewingCrafting.Serializer.INSTANCE);
-    }
-
     public static class EnableNormalCrafting implements ICondition
     {
-        @Override
-        public ResourceLocation getID()
-        {
-            return ENABLE_NORMAL_CRAFTING;
-        }
+        public static final Codec<EnableNormalCrafting> CODEC = Codec.unit(EnableNormalCrafting::new);
 
         @Override
         public boolean test(IContext context)
@@ -31,36 +18,16 @@ public class Conditions
             return ConfigData.enableNormalCrafting;
         }
 
-        public static class Serializer implements IConditionSerializer<EnableNormalCrafting>
+        @Override
+        public Codec<? extends ICondition> codec()
         {
-            public static Serializer INSTANCE = new Serializer();
-
-            @Override
-            public void write(JsonObject json, EnableNormalCrafting value)
-            {
-            }
-
-            @Override
-            public EnableNormalCrafting read(JsonObject json)
-            {
-                return new EnableNormalCrafting();
-            }
-
-            @Override
-            public ResourceLocation getID()
-            {
-                return ENABLE_NORMAL_CRAFTING;
-            }
+            return CODEC;
         }
     }
 
     public static class EnableSewingCrafting implements ICondition
     {
-        @Override
-        public ResourceLocation getID()
-        {
-            return ENABLE_SEWING_CRAFTING;
-        }
+        public static final Codec<EnableSewingCrafting> CODEC = Codec.unit(EnableSewingCrafting::new);
 
         @Override
         public boolean test(IContext context)
@@ -68,26 +35,10 @@ public class Conditions
             return ConfigData.enableSewingKitSupport;
         }
 
-        public static class Serializer implements IConditionSerializer<EnableSewingCrafting>
+        @Override
+        public Codec<? extends ICondition> codec()
         {
-            public static Serializer INSTANCE = new Serializer();
-
-            @Override
-            public void write(JsonObject json, EnableSewingCrafting value)
-            {
-            }
-
-            @Override
-            public EnableSewingCrafting read(JsonObject json)
-            {
-                return new EnableSewingCrafting();
-            }
-
-            @Override
-            public ResourceLocation getID()
-            {
-                return ENABLE_SEWING_CRAFTING;
-            }
+            return CODEC;
         }
     }
 }

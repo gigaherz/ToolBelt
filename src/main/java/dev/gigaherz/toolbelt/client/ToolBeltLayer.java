@@ -27,7 +27,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
 
 public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> extends RenderLayer<T, M>
 {
@@ -69,7 +69,9 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
             matrixStack.pushPose();
             this.translateToBody(entity, matrixStack);
 
-            stack.getCapability(ForgeCapabilities.ITEM_HANDLER, null).ifPresent((cap) -> {
+            var cap = stack.getCapability(Capabilities.ItemHandler.ITEM);
+            if (cap != null)
+            {
                 boolean rightHanded = entity.getMainArm() == HumanoidArm.RIGHT;
 
                 {
@@ -95,7 +97,7 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
                         matrixStack.popPose();
                     }
                 }
-            });
+            }
 
             matrixStack.translate(0.0F, 0.19F, 0.0F);
             matrixStack.scale(0.85f, 0.6f, 0.78f);

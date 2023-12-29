@@ -1,5 +1,5 @@
 modLoader="javafml"
-loaderVersion="[46,)"
+loaderVersion="[1,)"
 license="BSD (3 clause)"
 issueTrackerURL="https://github.com/gigaherz/ToolBelt/issues"
 
@@ -15,20 +15,20 @@ logoFile="logo.png"
 authors="gigaherz"
 
 [[dependencies.toolbelt]]
-   modId="forge"
-   mandatory=true
-   versionRange="[46.0.12,)"
+   modId="neoforge"
+   type="required"
+   versionRange="[20.4.16-beta,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
    modId="minecraft"
-   mandatory=true
-   versionRange="[1.20,1.21)"
+   type="required"
+   versionRange="[1.20.4,1.21)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
    modId="sewingkit"
-   mandatory=false
-   versionRange="[1.8.0,)"
+   type="optional"
+   versionRange="[1.8.5,)"
    ordering="NONE"
    side="BOTH"

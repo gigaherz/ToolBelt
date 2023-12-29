@@ -1,9 +1,7 @@
 package dev.gigaherz.toolbelt.network;
 
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.neoforged.neoforge.network.NetworkEvent;
 
 public class ContainerSlotsHack
 {
@@ -19,9 +17,9 @@ public class ContainerSlotsHack
     {
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> context)
+    public boolean handle(NetworkEvent.Context context)
     {
-        context.get().getSender().containerMenu.sendAllDataToRemote();
+        context.getSender().containerMenu.sendAllDataToRemote();
         return true;
     }
 }

@@ -11,7 +11,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.neoforged.neoforge.capabilities.Capabilities;
+
+import java.util.Objects;
 
 public class BeltContainer extends AbstractContainerMenu
 {
@@ -33,8 +35,8 @@ public class BeltContainer extends AbstractContainerMenu
         {
             blockedStack = ItemStack.EMPTY;
         }
-        ToolBeltInventory beltInventory = stillValid(playerInventory.player) && blockedStack.getCapability(ForgeCapabilities.ITEM_HANDLER)
-                .orElseThrow(() -> new RuntimeException("Item handler not present.")) instanceof ToolBeltInventory inv
+        ToolBeltInventory beltInventory = stillValid(playerInventory.player) &&
+                Objects.requireNonNull(blockedStack.getCapability(Capabilities.ItemHandler.ITEM), "Item handler not present.") instanceof ToolBeltInventory inv
                 ? inv : new ToolBeltInventory(new ItemStack(ToolBelt.BELT.get()));
 
         beltSlots = beltInventory.getSlots();
@@ -90,7 +92,7 @@ public class BeltContainer extends AbstractContainerMenu
     public boolean stillValid(Player playerIn)
     {
         ItemStack held = playerIn.getInventory().getItem(blockedSlot);
-        var equal = blockedSlot < 0 || held == blockedStack || held.equals(blockedStack, false);
+        var equal = blockedSlot < 0 || held == blockedStack || ItemStack.isSameItemSameTags(held, blockedStack);
         blockedStack = held;
         return equal;
     }

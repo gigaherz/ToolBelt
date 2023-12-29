@@ -1,20 +1,19 @@
 package dev.gigaherz.toolbelt.integration;
 
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.RegisterEvent;
+import dev.gigaherz.toolbelt.ToolBelt;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.world.item.crafting.RecipeSerializer;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredHolder;
+import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class SewingKitIntegration
 {
+    private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, ToolBelt.MODID);
+    public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>> SEWING_UGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("sewing_upgrade", () -> new SewingUpgradeRecipe.Serializer());
+
     public static void init(IEventBus modEventBus)
     {
-        modEventBus.addListener(SewingKitIntegration::register);
-    }
-
-    private static void register(RegisterEvent event)
-    {
-        event.register(Registries.RECIPE_SERIALIZER, helper ->
-                helper.register("sewing_upgrade", new SewingUpgradeRecipe.Serializer()));
+        RECIPE_SERIALIZERS.register(modEventBus);
     }
 }

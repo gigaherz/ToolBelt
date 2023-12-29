@@ -2,16 +2,18 @@ package dev.gigaherz.toolbelt;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Sets;
+import com.mojang.logging.LogUtils;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.apache.commons.lang3.tuple.Pair;
+import org.slf4j.Logger;
 
 import java.util.Arrays;
 import java.util.List;
@@ -20,32 +22,34 @@ import java.util.stream.Collectors;
 
 public class ConfigData
 {
+    private static final Logger LOGGER = LogUtils.getLogger();
+
     public static final ServerConfig SERVER;
-    public static final ForgeConfigSpec SERVER_SPEC;
+    public static final ModConfigSpec SERVER_SPEC;
 
     static
     {
-        final Pair<ServerConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ServerConfig::new);
+        final Pair<ServerConfig, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(ServerConfig::new);
         SERVER_SPEC = specPair.getRight();
         SERVER = specPair.getLeft();
     }
 
     public static final ClientConfig CLIENT;
-    public static final ForgeConfigSpec CLIENT_SPEC;
+    public static final ModConfigSpec CLIENT_SPEC;
 
     static
     {
-        final Pair<ClientConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(ClientConfig::new);
+        final Pair<ClientConfig, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(ClientConfig::new);
         CLIENT_SPEC = specPair.getRight();
         CLIENT = specPair.getLeft();
     }
 
     public static final CommonConfig COMMON;
-    public static final ForgeConfigSpec COMMON_SPEC;
+    public static final ModConfigSpec COMMON_SPEC;
 
     static
     {
-        final Pair<CommonConfig, ForgeConfigSpec> specPair = new ForgeConfigSpec.Builder().configure(CommonConfig::new);
+        final Pair<CommonConfig, ModConfigSpec> specPair = new ModConfigSpec.Builder().configure(CommonConfig::new);
         COMMON_SPEC = specPair.getRight();
         COMMON = specPair.getLeft();
     }
@@ -84,10 +88,10 @@ public class ConfigData
 
     public static class ServerConfig
     {
-        public final ForgeConfigSpec.ConfigValue<List<? extends String>> whitelist;
-        public final ForgeConfigSpec.ConfigValue<List<? extends String>> blacklist;
+        public final ModConfigSpec.ConfigValue<List<? extends String>> whitelist;
+        public final ModConfigSpec.ConfigValue<List<? extends String>> blacklist;
 
-        ServerConfig(ForgeConfigSpec.Builder builder)
+        ServerConfig(ModConfigSpec.Builder builder)
         {
             builder.push("general");
             whitelist = builder
@@ -105,12 +109,12 @@ public class ConfigData
     // Any config that has to deal with datapack stuffs
     public static class CommonConfig
     {
-        public final ForgeConfigSpec.EnumValue<ThreeWayChoice> customBeltSlotMode;
-        public final ForgeConfigSpec.EnumValue<ThreeWayChoice> anvilUpgrading;
-        public final ForgeConfigSpec.EnumValue<ThreeWayChoice> gridCrafting;
-        public final ForgeConfigSpec.BooleanValue enableSewingKitSupport;
+        public final ModConfigSpec.EnumValue<ThreeWayChoice> customBeltSlotMode;
+        public final ModConfigSpec.EnumValue<ThreeWayChoice> anvilUpgrading;
+        public final ModConfigSpec.EnumValue<ThreeWayChoice> gridCrafting;
+        public final ModConfigSpec.BooleanValue enableSewingKitSupport;
 
-        CommonConfig(ForgeConfigSpec.Builder builder)
+        CommonConfig(ModConfigSpec.Builder builder)
         {
             builder.push("general");
             enableSewingKitSupport = builder
@@ -135,14 +139,14 @@ public class ConfigData
 
     public static class ClientConfig
     {
-        public final ForgeConfigSpec.BooleanValue showBeltOnPlayers;
-        public final ForgeConfigSpec.DoubleValue beltItemScale;
-        public final ForgeConfigSpec.BooleanValue releaseToSwap;
-        public final ForgeConfigSpec.BooleanValue clipMouseToCircle;
-        public final ForgeConfigSpec.BooleanValue allowClickOutsideBounds;
-        public final ForgeConfigSpec.BooleanValue displayEmptySlots;
+        public final ModConfigSpec.BooleanValue showBeltOnPlayers;
+        public final ModConfigSpec.DoubleValue beltItemScale;
+        public final ModConfigSpec.BooleanValue releaseToSwap;
+        public final ModConfigSpec.BooleanValue clipMouseToCircle;
+        public final ModConfigSpec.BooleanValue allowClickOutsideBounds;
+        public final ModConfigSpec.BooleanValue displayEmptySlots;
 
-        ClientConfig(ForgeConfigSpec.Builder builder)
+        ClientConfig(ModConfigSpec.Builder builder)
         {
             builder.comment("Options for customizing the display of tools on the player")
                     .push("display");
@@ -212,10 +216,10 @@ public class ConfigData
 
     private static ItemStack parseItemStack(String itemString)
     {
-        Item item = ForgeRegistries.ITEMS.getValue(new ResourceLocation(itemString));
-        if (item == null || item == Items.AIR)
+        Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(itemString));
+        if (item == Items.AIR)
         {
-            ToolBelt.logger.warn("Could not find item " + itemString);
+            LOGGER.warn("Could not find item " + itemString);
             return ItemStack.EMPTY;
         }
 

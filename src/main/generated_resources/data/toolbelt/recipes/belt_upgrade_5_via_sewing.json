@@ -1,0 +1,41 @@
+{
+  "neoforge:conditions": [
+    {
+      "type": "neoforge:mod_loaded",
+      "modid": "sewingkit"
+    },
+    {
+      "type": "toolbelt:enable_sewing_crafting"
+    }
+  ],
+  "type": "sewingkit:sewing",
+  "materials": [
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "toolbelt:belt"
+      }
+    },
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "toolbelt:pouch"
+      }
+    },
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "minecraft:string"
+      }
+    }
+  ],
+  "result": {
+    "item": "toolbelt:belt",
+    "nbt": "{Size:7}"
+  },
+  "tool": {
+    "type": "sewingkit:tool_ingredient",
+    "tool_level": "minecraft:diamond",
+    "tool_type": "sewingkit_sew"
+  }
+}

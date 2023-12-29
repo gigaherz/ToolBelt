@@ -4,9 +4,7 @@ import dev.gigaherz.toolbelt.client.ClientPacketHandlers;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
+import net.neoforged.neoforge.network.NetworkEvent;
 
 public class BeltContentsChange
 {
@@ -39,9 +37,8 @@ public class BeltContentsChange
         buf.writeItem(stack);
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> context)
+    public void handle(NetworkEvent.Context context)
     {
         ClientPacketHandlers.handleBeltContentsChange(this);
-        return true;
     }
 }

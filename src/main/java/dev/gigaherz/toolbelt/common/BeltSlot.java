@@ -5,11 +5,13 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemStackHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.ItemStackHandler;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.util.Objects;
 
 public class BeltSlot extends Slot
 {
@@ -33,13 +35,7 @@ public class BeltSlot extends Slot
                 if (stack != beltStack)
                 {
                     beltStack = stack;
-                    inventory = (IItemHandlerModifiable) (
-                            stack.getCapability(ForgeCapabilities.ITEM_HANDLER, null)
-                                    .orElseGet(() -> {
-                                        LOGGER.error("No Inventory!!");
-                                        return new ItemStackHandler(9);
-                                    })
-                    );
+                    inventory = (IItemHandlerModifiable)Objects.requireNonNullElse(stack.getCapability(Capabilities.ItemHandler.ITEM), new ItemStackHandler(9));
                 }
                 return inventory;
             }

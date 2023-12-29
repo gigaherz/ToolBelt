@@ -6,12 +6,12 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.ItemHandlerHelper;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandlerModifiable;
+import net.neoforged.neoforge.items.ItemHandlerHelper;
+import net.neoforged.neoforge.network.NetworkEvent;
 
-import java.util.function.Supplier;
+import java.util.Objects;
 
 public class SwapItems
 {
@@ -32,10 +32,9 @@ public class SwapItems
         buf.writeInt(swapWith);
     }
 
-    public boolean handle(Supplier<NetworkEvent.Context> context)
+    public void handle(NetworkEvent.Context context)
     {
-        context.get().enqueueWork(() -> swapItem(swapWith, context.get().getSender()));
-        return true;
+        context.enqueueWork(() -> swapItem(swapWith, context.getSender()));
     }
 
     public static void swapItem(int swapWith, Player player)
@@ -50,9 +49,7 @@ public class SwapItems
             if (!ConfigData.isItemStackAllowed(inHand))
                 return;
 
-            IItemHandlerModifiable cap = (IItemHandlerModifiable) (
-                    stack.getCapability(ForgeCapabilities.ITEM_HANDLER, null)
-                            .orElseThrow(() -> new RuntimeException("No inventory!")));
+            IItemHandlerModifiable cap = (IItemHandlerModifiable)Objects.requireNonNull(stack.getCapability(Capabilities.ItemHandler.ITEM),"No inventory!");
             if (swapWith < 0)
             {
                 player.setItemInHand(InteractionHand.MAIN_HAND, ItemHandlerHelper.insertItem(cap, inHand, false));

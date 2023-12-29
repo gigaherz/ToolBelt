@@ -1,53 +1,46 @@
 {
-  "type": "forge:conditional",
-  "recipes": [
+  "neoforge:conditions": [
     {
-      "conditions": [
-        {
-          "type": "forge:mod_loaded",
-          "modid": "sewingkit"
-        },
-        {
-          "type": "toolbelt:enable_sewing_crafting"
-        }
-      ],
-      "recipe": {
-        "type": "sewingkit:sewing",
-        "materials": [
-          {
-            "count": 2,
-            "ingredient": {
-              "item": "sewingkit:leather_strip"
-            }
-          },
-          {
-            "count": 3,
-            "ingredient": {
-              "item": "sewingkit:leather_sheet"
-            }
-          },
-          {
-            "count": 1,
-            "ingredient": {
-              "item": "minecraft:gold_ingot"
-            }
-          },
-          {
-            "count": 1,
-            "ingredient": {
-              "item": "minecraft:string"
-            }
-          }
-        ],
-        "result": {
-          "item": "toolbelt:pouch"
-        },
-        "tool": {
-          "type": "sewingkit:tool_ingredient",
-          "tool_level": "minecraft:wood",
-          "tool_type": "sewingkit_sew"
-        }
+      "type": "neoforge:mod_loaded",
+      "modid": "sewingkit"
+    },
+    {
+      "type": "toolbelt:enable_sewing_crafting"
+    }
+  ],
+  "type": "sewingkit:sewing",
+  "materials": [
+    {
+      "count": 2,
+      "ingredient": {
+        "item": "sewingkit:leather_strip"
+      }
+    },
+    {
+      "count": 3,
+      "ingredient": {
+        "item": "sewingkit:leather_sheet"
+      }
+    },
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "minecraft:gold_ingot"
+      }
+    },
+    {
+      "count": 1,
+      "ingredient": {
+        "item": "minecraft:string"
       }
     }
-  ]
+  ],
+  "result": {
+    "item": "toolbelt:pouch"
+  },
+  "tool": {
+    "type": "sewingkit:tool_ingredient",
+    "tool_level": "minecraft:wood",
+    "tool_type": "sewingkit_sew"
+  }
 }

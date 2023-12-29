@@ -1,35 +1,28 @@
 {
-  "type": "forge:conditional",
-  "recipes": [
+  "neoforge:conditions": [
     {
-      "conditions": [
-        {
-          "type": "toolbelt:enable_normal_crafting"
-        }
-      ],
-      "recipe": {
-        "type": "minecraft:crafting_shaped",
-        "category": "equipment",
-        "key": {
-          "g": {
-            "item": "minecraft:gold_ingot"
-          },
-          "l": {
-            "item": "minecraft:leather"
-          },
-          "s": {
-            "item": "minecraft:string"
-          }
-        },
-        "pattern": [
-          "sgs",
-          "l l",
-          "sls"
-        ],
-        "result": {
-          "item": "toolbelt:pouch"
-        }
-      }
+      "type": "toolbelt:enable_normal_crafting"
     }
-  ]
+  ],
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "g": {
+      "item": "minecraft:gold_ingot"
+    },
+    "l": {
+      "item": "minecraft:leather"
+    },
+    "s": {
+      "item": "minecraft:string"
+    }
+  },
+  "pattern": [
+    "sgs",
+    "l l",
+    "sls"
+  ],
+  "result": {
+    "item": "toolbelt:pouch"
+  }
 }

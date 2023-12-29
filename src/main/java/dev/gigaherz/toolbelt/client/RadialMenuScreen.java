@@ -1,7 +1,6 @@
 package dev.gigaherz.toolbelt.client;
 
 import com.google.common.collect.Lists;
-import com.mojang.blaze3d.vertex.PoseStack;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
@@ -11,18 +10,18 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderGuiOverlayEvent;
-import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.client.event.RenderGuiOverlayEvent;
+import net.neoforged.neoforge.client.gui.overlay.VanillaGuiOverlay;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.List;
+import java.util.Objects;
 
 @Mod.EventBusSubscriber(Dist.CLIENT)
 public class RadialMenuScreen extends Screen
@@ -46,7 +45,7 @@ public class RadialMenuScreen extends Screen
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
 
-        inventory = stackEquipped.getCount() > 0 ? stackEquipped.getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(null) : null;
+        inventory = stackEquipped.getCount() > 0 ? stackEquipped.getCapability(Capabilities.ItemHandler.ITEM) : null;
         menu = new GenericRadialMenu(Minecraft.getInstance(), new IRadialMenuHost()
         {
             @Override
@@ -137,7 +136,7 @@ public class RadialMenuScreen extends Screen
             else if (stackEquipped != stack)
             {
                 stackEquipped = stack;
-                inventory = stack.getCapability(ForgeCapabilities.ITEM_HANDLER).orElseThrow(() -> new RuntimeException("No inventory?"));
+                inventory = Objects.requireNonNull(stack.getCapability(Capabilities.ItemHandler.ITEM));
                 needsRecheckStacks = true;
             }
         }

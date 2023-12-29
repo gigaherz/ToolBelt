@@ -4,33 +4,34 @@ import com.mojang.blaze3d.platform.InputConstants;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
-import dev.gigaherz.toolbelt.customslots.ExtensionSlotSlot;
 import dev.gigaherz.toolbelt.network.OpenBeltSlotInventory;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.Options;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.multiplayer.ClientLevel;
+import net.minecraft.client.player.Input;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
-import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
+import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
+import net.neoforged.neoforge.event.TickEvent;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
@@ -97,6 +98,42 @@ public class ClientEvents
                 }
             }
         }
+    }
+
+    @SubscribeEvent
+    public static void updateInputEvent(MovementInputUpdateEvent event) {
+        if (Minecraft.getInstance().screen instanceof RadialMenuScreen) {
+            Options settings = Minecraft.getInstance().options;
+            Input eInput = event.getInput();
+            eInput.up = isKeyDown0(settings.keyUp);
+            eInput.down = isKeyDown0(settings.keyDown);
+            eInput.left = isKeyDown0(settings.keyLeft);
+            eInput.right = isKeyDown0(settings.keyRight);
+
+            eInput.forwardImpulse = eInput.up == eInput.down ? 0.0F : (eInput.up ? 1.0F : -1.0F);
+            eInput.leftImpulse = eInput.left == eInput.right ? 0.0F : (eInput.left ? 1.0F : -1.0F);
+            eInput.jumping = isKeyDown0(settings.keyJump);
+            eInput.shiftKeyDown = isKeyDown0(settings.keyShift);
+            if (Minecraft.getInstance().player.isMovingSlowly()) {
+                eInput.leftImpulse = (float) ((double) eInput.leftImpulse * 0.3D);
+                eInput.forwardImpulse = (float) ((double) eInput.forwardImpulse * 0.3D);
+            }
+        }
+    }
+
+    public static boolean isKeyDown0(KeyMapping keybind)
+    {
+        if (keybind.isUnbound())
+            return false;
+
+        return switch (keybind.getKey().getType())
+        {
+            case KEYSYM ->
+                    InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue());
+            case MOUSE ->
+                    GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue()) == GLFW.GLFW_PRESS;
+            default -> false;
+        };
     }
 
     public static boolean isKeyDown(KeyMapping keybind)
@@ -173,13 +210,13 @@ public class ClientEvents
             addLayerToHumanoid(event, EntityType.DROWNED, ToolBeltLayer::new);
             addLayerToHumanoid(event, EntityType.STRAY, ToolBeltLayer::new);
 
-            addLayerToPlayerSkin(event, "default", ToolBeltLayer::new);
-            addLayerToPlayerSkin(event, "slim", ToolBeltLayer::new);
+            addLayerToPlayerSkin(event, PlayerSkin.Model.WIDE, ToolBeltLayer::new);
+            addLayerToPlayerSkin(event, PlayerSkin.Model.SLIM, ToolBeltLayer::new);
         }
 
         @SuppressWarnings({"rawtypes", "unchecked"})
         private static <E extends Player, M extends HumanoidModel<E>>
-        void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, String skinName, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E, M>> factory)
+        void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, PlayerSkin.Model skinName, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E, M>> factory)
         {
             LivingEntityRenderer renderer = event.getSkin(skinName);
             if (renderer != null) renderer.addLayer(factory.apply(renderer));

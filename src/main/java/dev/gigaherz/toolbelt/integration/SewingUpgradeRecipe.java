@@ -1,22 +1,38 @@
 package dev.gigaherz.toolbelt.integration;
 
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.sewingkit.api.SewingRecipe;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.ExtraCodecs;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import javax.annotation.Nullable;
+import java.util.Optional;
 
 public class SewingUpgradeRecipe extends SewingRecipe
 {
-    public SewingUpgradeRecipe(ResourceLocation id, String group, NonNullList<Material> materials, @Nullable Ingredient pattern, @Nullable Ingredient tool, ItemStack output)
+    public static final Codec<SewingUpgradeRecipe> CODEC = RecordCodecBuilder.create((instance) -> {
+        return SewingRecipe.defaultSewingFields(instance)
+                .apply(instance, SewingUpgradeRecipe::new);
+    });
+
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
+    public SewingUpgradeRecipe(String group, NonNullList<Material> materials, Optional<Ingredient> pattern, Optional<Ingredient> tool, ItemStack output, boolean showNotification)
     {
-        super(id, group, materials, pattern, tool, output);
+        super(group, materials, pattern, tool, output, showNotification);
+    }
+
+    public SewingUpgradeRecipe(String group, NonNullList<Material> materials, @Nullable Ingredient pattern, @Nullable Ingredient tool, ItemStack output, boolean showNotification)
+    {
+        super(group, materials, pattern, tool, output, showNotification);
     }
 
     @Override
@@ -44,12 +60,18 @@ public class SewingUpgradeRecipe extends SewingRecipe
         return upgradedBelt;
     }
 
-    public static class Serializer extends SewingRecipe.Serializer
+    public static class Serializer extends SewingRecipe.SerializerBase<SewingUpgradeRecipe>
     {
         @Override
-        protected SewingRecipe createRecipe(ResourceLocation recipeId, String group, NonNullList<Material> materials, Ingredient pattern, Ingredient tool, ItemStack result)
+        public Codec<SewingUpgradeRecipe> codec()
         {
-            return new SewingUpgradeRecipe(recipeId, group, materials, pattern, tool, result);
+            return CODEC;
+        }
+
+        @Override
+        protected SewingUpgradeRecipe makeRecipe(FriendlyByteBuf buffer, String group, NonNullList<Material> materials, Ingredient pattern, Ingredient tool, ItemStack result, boolean showNotification)
+        {
+            return new SewingUpgradeRecipe(group, materials, pattern, tool, result, showNotification);
         }
     }
 }

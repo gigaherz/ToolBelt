@@ -3,7 +3,7 @@ package dev.gigaherz.toolbelt.client;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.network.BeltContentsChange;
 import dev.gigaherz.toolbelt.network.SyncBeltSlotContents;
-import dev.gigaherz.toolbelt.slot.BeltExtensionSlot;
+import dev.gigaherz.toolbelt.slot.BeltAttachment;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -30,7 +30,7 @@ public class ClientPacketHandlers
             Entity entity = minecraft.level.getEntity(message.entityId);
             if (entity instanceof Player)
             {
-                BeltExtensionSlot.get((LivingEntity) entity).ifPresent((slot) -> slot.setAll(message.stacks));
+                BeltAttachment.get((LivingEntity) entity).setContents(message.stack);
             }
         });
     }

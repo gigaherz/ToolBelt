@@ -1,17 +1,61 @@
-buildscript {
-    repositories {
-        maven { url = 'https://maven.minecraftforge.net/' }
-        maven { url = 'https://maven.parchmentmc.org' }
-        mavenCentral()
+plugins {
+    id 'java-library'
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.neoforged.gradle.userdev' version '7.0.72'
+}
+
+version = "2.0.0"
+group = "dev.gigaherz.toolbelt"
+
+Provider<String> minecraftVersion(Transformer<String, String> mapper) {
+    return project.userDevRuntime.runtimes.map(r -> r.values().first().specification.minecraftVersion).map(mapper)
+}
+
+base {
+    archivesName = minecraftVersion { "ToolBelt-${it}" }
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+sourceSets {
+    main.resources.srcDirs += 'src/main/generated_resources'
+}
+
+minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
+
+runs {
+    // applies to all the run configs below
+    configureEach {
+        systemProperty 'forge.logging.markers', '' // 'REGISTRIES'
+        systemProperty 'forge.logging.console.level', 'debug'
+
+        //ideaModule "${project.name}.main"
+
+        workingDirectory project.file('run')
+
+        //programArguments.addAll "--mixin=jsonthings.mixins.json"
+
+        modSource project.sourceSets.main
     }
-    dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
-        classpath 'org.parchmentmc:librarian:1.+'
+
+    client {
+    }
+
+    client2 {
+        configure ("client")
+
+        programArguments.addAll '--username', 'Dev2'
+    }
+
+    server {
+    }
+
+    data {
+        programArguments.addAll '--mod', 'toolbelt', '--all', '--output', file('src/main/generated_resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
 }
-apply plugin: 'net.minecraftforge.gradle'
-apply plugin: 'org.parchmentmc.librarian.forgegradle'
-apply plugin: 'maven-publish'
 
 repositories {
     maven {
@@ -20,15 +64,19 @@ repositories {
         url = "https://maven.blamejared.com/"
     }
     maven {
+        name = "Tterrag maven"
         url "https://maven.tterrag.com/"
     }
     maven { // CURIOS
+        name = "C4 maven"
         url "https://maven.theillusivec4.top/"
     }
     maven {
+        name = "Dogforce Games maven"
         url 'https://www.dogforce-games.com/maven/'
     }
     maven {
+        name = "Cursemaven"
         url "https://cursemaven.com"
         content {
             includeGroup "curse.maven"
@@ -42,115 +90,21 @@ repositories {
     mavenLocal()
 }
 
-version = "1.20.0"
-group = "dev.gigaherz.toolbelt"
-archivesBaseName = "ToolBelt-UNKNOWN"
-
-project.afterEvaluate {
-    archivesBaseName = "ToolBelt-${project.MC_VERSION}"
-}
-
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
-
-sourceSets {
-    main.resources.srcDirs += 'src/main/generated_resources'
-}
-
-minecraft {
-    //mappings channel: 'official', version: '1.19.4'
-    mappings channel: 'parchment', version: '1.19.3-2023.03.12-1.20.1'
-
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
-
-    runs {
-        client {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', ''
-            property 'forge.logging.console.level', 'debug'
-
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-
-            mods {
-                thismod {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        client2 {
-            parent runs.client
-            args '--username', 'Dev2'
-        }
-
-        server {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', ''
-            property 'forge.logging.console.level', 'debug'
-
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-
-            mods {
-                thismod {
-                    source sourceSets.main
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('run')
-
-            property 'forge.logging.markers', ''
-            property 'forge.logging.console.level', 'debug'
-
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${projectDir}/build/createSrgToMcp/output.srg"
-
-            args '--mod', 'toolbelt', '--all', '--output', file('src/main/generated_resources/'), '--existing', file('src/main/resources/')
-
-            mods {
-                thismod {
-                    source sourceSets.main
-                }
-            }
-        }
-    }
-}
-
-configurations {
-    runtimeMod { transitive = false }
-    runtimeOnly.extendsFrom(runtimeMod)
-}
-
 dependencies {
-    minecraft 'net.minecraftforge:forge:1.20.1-47.1.3'
+    implementation 'net.neoforged:neoforge:20.4.60-beta'
 
-    compileOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.20.1:1.8.0")
-    runtimeOnly fg.deobf("dev.gigaherz.sewingkit:SewingKit-1.20.1:1.8.0")
+    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.20.4:1.8.6"
+    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.20.4:1.8.6"
 
-    compileOnly fg.deobf("mezz.jei:jei-1.20-common-api:14.0.0.4")
-    //runtimeOnly fg.deobf("mezz.jei:jei-1.20-common:14.0.0.4")
-    compileOnly fg.deobf("mezz.jei:jei-1.20-forge-api:14.0.0.4")
-    //runtimeOnly fg.deobf("mezz.jei:jei-1.20-forge:14.0.0.4")
+    //compileOnly "mezz.jei:jei-1.20-common-api:14.0.0.4"
+    //runtimeOnly "mezz.jei:jei-1.20-common:14.0.0.4"
+    //compileOnly "mezz.jei:jei-1.20-forge-api:14.0.0.4"
+    //runtimeOnly "mezz.jei:jei-1.20-forge:14.0.0.4"
 
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.2.0-beta.2+1.20")
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:5.2.0-beta.2+1.20")
+    compileOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4"
 
     //runtimeOnly fg.deobf("curse.maven:corail-tombstone-243707:3836552")
-}
-
-project.afterEvaluate {
-    task copyMods(type:Copy) {
-        from configurations.runtimeMod.files
-        into file("run/mods")
-    }
-    tasks.forEach {
-        if (it.name.startsWith("prepareRun"))
-            it.dependsOn copyMods
-    }
 }
 
 jar {
@@ -164,7 +118,7 @@ jar {
                 "Specification-Vendor": "gigaherz",
                 "Specification-Version": "1", // We are version 1 of ourselves
                 "Implementation-Title": project.name,
-                "Implementation-Version": "${version}",
+                "Implementation-Version": project.version,
                 "Implementation-Vendor" :"gigaherz",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
