@@ -57,9 +57,8 @@ import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.AnvilUpdateEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
-import net.neoforged.neoforge.network.NetworkRegistry;
-import net.neoforged.neoforge.network.PlayNetworkDirection;
-import net.neoforged.neoforge.network.simple.SimpleChannel;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
+import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -93,16 +92,6 @@ public class ToolBelt
 
     public static DeferredHolder<IngredientType<?>, IngredientType<BeltIngredient>> BELT_INGREDIENT = INGREDIENT_TYPES.register("belt_upgrade_level", () -> new IngredientType<BeltIngredient>(BeltIngredient.CODEC));
 
-    private static final Logger LOGGER = LogUtils.getLogger();
-
-    private static final String PROTOCOL_VERSION = "1.0";
-    public static SimpleChannel channel = NetworkRegistry.ChannelBuilder
-            .named(location("general"))
-            .clientAcceptedVersions(PROTOCOL_VERSION::equals)
-            .serverAcceptedVersions(PROTOCOL_VERSION::equals)
-            .networkProtocolVersion(() -> PROTOCOL_VERSION)
-            .simpleChannel();
-
     public ToolBelt(IEventBus modEventBus)
     {
         ITEMS.register(modEventBus);
@@ -115,6 +104,7 @@ public class ToolBelt
         modEventBus.addListener(this::modConfig);
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(this::addItemsToTabs);
+        modEventBus.addListener(this::registerPackets);
         modEventBus.addListener(ToolBeltItem::register);
 
         NeoForge.EVENT_BUS.addListener(this::anvilChange);
@@ -158,19 +148,18 @@ public class ToolBelt
             ConfigData.refreshServer();
     }
 
+    private void registerPackets(RegisterPayloadHandlerEvent event)
+    {
+        final IPayloadRegistrar registrar = event.registrar(MODID).versioned("1.0");
+        registrar.play(SwapItems.ID, SwapItems::new, play -> play.server(SwapItems::handle));
+        registrar.play(OpenBeltSlotInventory.ID, OpenBeltSlotInventory::new, play -> play.server(OpenBeltSlotInventory::handle));
+        registrar.play(ContainerSlotsHack.ID, ContainerSlotsHack::new, play -> play.server(ContainerSlotsHack::handle));
+        registrar.play(BeltContentsChange.ID, BeltContentsChange::new, play -> play.client(BeltContentsChange::handle));
+        registrar.play(SyncBeltSlotContents.ID, SyncBeltSlotContents::new, play -> play.client(SyncBeltSlotContents::handle));
+    }
+
     public void commonSetup(FMLCommonSetupEvent event)
     {
-        int messageNumber = 0;
-        channel.messageBuilder(SwapItems.class, messageNumber++, PlayNetworkDirection.PLAY_TO_SERVER).encoder(SwapItems::encode).decoder(SwapItems::new).consumerNetworkThread(SwapItems::handle).add();
-        channel.messageBuilder(BeltContentsChange.class, messageNumber++, PlayNetworkDirection.PLAY_TO_CLIENT).encoder(BeltContentsChange::encode).decoder(BeltContentsChange::new).consumerNetworkThread(BeltContentsChange::handle).add();
-        channel.messageBuilder(OpenBeltSlotInventory.class, messageNumber++, PlayNetworkDirection.PLAY_TO_SERVER).encoder(OpenBeltSlotInventory::encode).decoder(OpenBeltSlotInventory::new).consumerNetworkThread(OpenBeltSlotInventory::handle).add();
-        channel.messageBuilder(ContainerSlotsHack.class, messageNumber++, PlayNetworkDirection.PLAY_TO_SERVER).encoder(ContainerSlotsHack::encode).decoder(ContainerSlotsHack::new).consumerNetworkThread(ContainerSlotsHack::handle).add();
-        channel.messageBuilder(SyncBeltSlotContents.class, messageNumber++, PlayNetworkDirection.PLAY_TO_CLIENT).encoder(SyncBeltSlotContents::encode).decoder(SyncBeltSlotContents::new).consumerNetworkThread(SyncBeltSlotContents::handle).add();
-        LOGGER.debug("Final message number: " + messageNumber);
-
-        //TODO File configurationFile = event.getSuggestedConfigurationFile();
-        //Config.loadConfig(configurationFile);
-
         BeltFinderBeltSlot.initBaubles();
 
         if (ModList.get().isLoaded("curios"))

@@ -19,6 +19,7 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.client.event.RenderGuiOverlayEvent;
 import net.neoforged.neoforge.client.gui.overlay.VanillaGuiOverlay;
 import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 import java.util.Objects;
@@ -254,7 +255,7 @@ public class RadialMenuScreen extends Screen
         if (inHand.getCount() > 0 || itemMouseOver.getCount() > 0)
         {
             SwapItems.swapItem(slotNumber, minecraft.player);
-            ToolBelt.channel.sendToServer(new SwapItems(slotNumber));
+            PacketDistributor.SERVER.noArg().send(new SwapItems(slotNumber));
         }
 
         menu.close();

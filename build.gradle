@@ -3,10 +3,10 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.72'
+    id 'net.neoforged.gradle.userdev' version '7.0.76'
 }
 
-version = "2.0.0"
+version = "2.0.1"
 group = "dev.gigaherz.toolbelt"
 
 Provider<String> minecraftVersion(Transformer<String, String> mapper) {
@@ -23,6 +23,13 @@ sourceSets {
     main.resources.srcDirs += 'src/main/generated_resources'
 }
 
+subsystems {
+    parchment {
+        minecraftVersion="1.20.3"
+        mappingsVersion="2023.12.31"
+    }
+}
+
 minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
 
 runs {
@@ -31,11 +38,7 @@ runs {
         systemProperty 'forge.logging.markers', '' // 'REGISTRIES'
         systemProperty 'forge.logging.console.level', 'debug'
 
-        //ideaModule "${project.name}.main"
-
         workingDirectory project.file('run')
-
-        //programArguments.addAll "--mixin=jsonthings.mixins.json"
 
         modSource project.sourceSets.main
     }
@@ -91,7 +94,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:20.4.60-beta'
+    implementation 'net.neoforged:neoforge:20.4.72-beta'
 
     compileOnly "dev.gigaherz.sewingkit:SewingKit-1.20.4:1.8.6"
     runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.20.4:1.8.6"

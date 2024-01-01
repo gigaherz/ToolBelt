@@ -1,10 +1,15 @@
 package dev.gigaherz.toolbelt.network;
 
+import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.network.FriendlyByteBuf;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
-public class ContainerSlotsHack
+public class ContainerSlotsHack implements CustomPacketPayload
 {
+    public static final ResourceLocation ID = ToolBelt.location("container_slots_hack");
+
     public ContainerSlotsHack()
     {
     }
@@ -13,13 +18,18 @@ public class ContainerSlotsHack
     {
     }
 
-    public void encode(FriendlyByteBuf buf)
+    public void write(FriendlyByteBuf buf)
     {
     }
 
-    public boolean handle(NetworkEvent.Context context)
+    @Override
+    public ResourceLocation id()
     {
-        context.getSender().containerMenu.sendAllDataToRemote();
-        return true;
+        return ID;
+    }
+
+    public void handle(PlayPayloadContext context)
+    {
+        context.player().ifPresent(player -> player.containerMenu.sendAllDataToRemote());
     }
 }

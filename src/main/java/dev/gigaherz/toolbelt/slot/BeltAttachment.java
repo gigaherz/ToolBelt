@@ -27,7 +27,6 @@ import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.PlayNetworkDirection;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
@@ -206,14 +205,12 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
 
     protected void syncTo(Player target)
     {
-        SyncBeltSlotContents message = new SyncBeltSlotContents((Player) owner, this);
-        ToolBelt.channel.sendTo(message, ((ServerPlayer) target).connection.connection, PlayNetworkDirection.PLAY_TO_CLIENT);
+        PacketDistributor.PLAYER.with((ServerPlayer) target).send(new SyncBeltSlotContents((Player) owner, this));
     }
 
     protected void syncTo(PacketDistributor.PacketTarget target)
     {
-        SyncBeltSlotContents message = new SyncBeltSlotContents((Player) owner, this);
-        ToolBelt.channel.send(target, message);
+        target.send(new SyncBeltSlotContents((Player) owner, this));
     }
 
     ////////////////////////////////////////////////////////////
@@ -247,7 +244,7 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
         if (!ConfigData.customBeltSlotEnabled)
             return;
         if (getOwner() != null && !getOwner().level().isClientSide)
-            syncTo(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(this::getOwner));
+            syncTo(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(getOwner()));
     }
 
     @Override

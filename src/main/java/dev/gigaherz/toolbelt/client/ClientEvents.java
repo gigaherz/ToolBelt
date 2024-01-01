@@ -32,6 +32,7 @@ import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
 import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
 import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
@@ -94,7 +95,7 @@ public class ClientEvents
             {
                 if (mc.screen == null)
                 {
-                    ToolBelt.channel.sendToServer(new OpenBeltSlotInventory());
+                    PacketDistributor.SERVER.noArg().send(new OpenBeltSlotInventory());
                 }
             }
         }

@@ -2,19 +2,24 @@ package dev.gigaherz.toolbelt.network;
 
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
+import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 import java.util.Objects;
 
-public class SwapItems
+public class SwapItems implements CustomPacketPayload
 {
+    public static final ResourceLocation ID = ToolBelt.location("update_spell_sequence");
+
     public int swapWith;
 
     public SwapItems(int windowId)
@@ -27,14 +32,20 @@ public class SwapItems
         swapWith = buf.readInt();
     }
 
-    public void encode(FriendlyByteBuf buf)
+    public void write(FriendlyByteBuf buf)
     {
         buf.writeInt(swapWith);
     }
 
-    public void handle(NetworkEvent.Context context)
+    @Override
+    public ResourceLocation id()
     {
-        context.enqueueWork(() -> swapItem(swapWith, context.getSender()));
+        return ID;
+    }
+
+    public void handle(PlayPayloadContext context)
+    {
+        context.workHandler().execute(() -> swapItem(swapWith, context.player().orElseThrow()));
     }
 
     public static void swapItem(int swapWith, Player player)

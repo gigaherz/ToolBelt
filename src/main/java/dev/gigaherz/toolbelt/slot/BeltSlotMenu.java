@@ -19,6 +19,7 @@ import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
@@ -111,7 +112,7 @@ public class BeltSlotMenu extends RecipeBookMenu<CraftingContainer>
 
         if (playerInventory.player.level().isClientSide)
         {
-            ToolBelt.channel.sendToServer(new ContainerSlotsHack());
+            PacketDistributor.SERVER.noArg().send(new ContainerSlotsHack());
         }
     }
 

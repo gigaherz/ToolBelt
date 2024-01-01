@@ -1,13 +1,18 @@
 package dev.gigaherz.toolbelt.network;
 
+import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.client.ClientPacketHandlers;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
-public class BeltContentsChange
+public class BeltContentsChange implements CustomPacketPayload
 {
+    public static final ResourceLocation ID = ToolBelt.location("belt_contents_change");
+
     public int player;
     public String where;
     public int slot;
@@ -29,7 +34,7 @@ public class BeltContentsChange
         stack = buf.readItem();
     }
 
-    public void encode(FriendlyByteBuf buf)
+    public void write(FriendlyByteBuf buf)
     {
         buf.writeVarInt(player);
         buf.writeUtf(where);
@@ -37,7 +42,13 @@ public class BeltContentsChange
         buf.writeItem(stack);
     }
 
-    public void handle(NetworkEvent.Context context)
+    @Override
+    public ResourceLocation id()
+    {
+        return ID;
+    }
+
+    public void handle(PlayPayloadContext context)
     {
         ClientPacketHandlers.handleBeltContentsChange(this);
     }

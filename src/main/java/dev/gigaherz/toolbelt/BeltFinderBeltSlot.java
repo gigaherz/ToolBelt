@@ -74,8 +74,7 @@ public class BeltFinderBeltSlot extends BeltFinder
             LivingEntity thePlayer = slot.getOwner();
             if (thePlayer.level().isClientSide)
                 return;
-            BeltContentsChange message = new BeltContentsChange(thePlayer, FINDER_ID, 0, slot.getContents());
-            ToolBelt.channel.send(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(() -> thePlayer), message);
+            PacketDistributor.TRACKING_ENTITY_AND_SELF.with(thePlayer).send(new BeltContentsChange(thePlayer, FINDER_ID, 0, slot.getContents()));
         }
     }
 }

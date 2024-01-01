@@ -1,12 +1,17 @@
 package dev.gigaherz.toolbelt.network;
 
 import dev.gigaherz.toolbelt.ConfigData;
+import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.common.Screens;
 import net.minecraft.network.FriendlyByteBuf;
-import net.neoforged.neoforge.network.NetworkEvent;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
-public class OpenBeltSlotInventory
+public class OpenBeltSlotInventory implements CustomPacketPayload
 {
+    public static final ResourceLocation ID = ToolBelt.location("update_spell_sequence");
+
     public OpenBeltSlotInventory()
     {
     }
@@ -15,18 +20,21 @@ public class OpenBeltSlotInventory
     {
     }
 
-    public void encode(FriendlyByteBuf buf)
+    public void write(FriendlyByteBuf buf)
     {
     }
 
-    public boolean handle(NetworkEvent.Context context)
+    @Override
+    public ResourceLocation id()
+    {
+        return ID;
+    }
+
+    public void handle(PlayPayloadContext context)
     {
         if (ConfigData.customBeltSlotEnabled)
         {
-            context.enqueueWork(() -> {
-                Screens.openSlotScreen(context.getSender());
-            });
+            context.workHandler().execute(() -> Screens.openSlotScreen(context.player().orElseThrow()));
         }
-        return true;
     }
 }
