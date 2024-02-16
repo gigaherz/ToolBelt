@@ -13,7 +13,7 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 public class SyncBeltSlotContents implements CustomPacketPayload
 {
-    public static final ResourceLocation ID = ToolBelt.location("update_spell_sequence");
+    public static final ResourceLocation ID = ToolBelt.location("sync_slot_contents");
 
     public ItemStack stack;
     public int entityId;

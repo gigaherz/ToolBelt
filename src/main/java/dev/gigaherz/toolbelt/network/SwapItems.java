@@ -18,7 +18,7 @@ import java.util.Objects;
 
 public class SwapItems implements CustomPacketPayload
 {
-    public static final ResourceLocation ID = ToolBelt.location("update_spell_sequence");
+    public static final ResourceLocation ID = ToolBelt.location("swap_items");
 
     public int swapWith;
 

@@ -13,6 +13,7 @@ import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.Input;
+import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ItemProperties;
@@ -219,15 +220,16 @@ public class ClientEvents
         private static <E extends Player, M extends HumanoidModel<E>>
         void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, PlayerSkin.Model skinName, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E, M>> factory)
         {
-            LivingEntityRenderer renderer = event.getSkin(skinName);
-            if (renderer != null) renderer.addLayer(factory.apply(renderer));
+            EntityRenderer renderer = event.getSkin(skinName);
+            if (renderer instanceof LivingEntityRenderer ler) ler.addLayer(factory.apply(ler));
         }
 
+        @SuppressWarnings({"rawtypes", "unchecked"})
         private static <E extends LivingEntity, M extends HumanoidModel<E>>
         void addLayerToHumanoid(EntityRenderersEvent.AddLayers event, EntityType<E> entityType, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E, M>> factory)
         {
-            LivingEntityRenderer<E, M> renderer = event.getRenderer(entityType);
-            if (renderer != null) renderer.addLayer(factory.apply(renderer));
+            EntityRenderer<E> renderer = event.getRenderer(entityType);
+            if (renderer instanceof LivingEntityRenderer ler) ler.addLayer(factory.apply(ler));
         }
 
         private static <E extends LivingEntity, M extends EntityModel<E>>

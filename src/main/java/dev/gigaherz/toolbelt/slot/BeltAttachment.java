@@ -18,6 +18,7 @@ import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.attachment.AttachmentType;
+import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.INBTSerializable;
 import net.neoforged.neoforge.event.TickEvent;
@@ -89,7 +90,6 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
             Player target = event.getEntity();
             if (target.level().isClientSide)
                 return;
-            get(target).setOwner(target);
             get(target).syncToSelf();
         }
 
@@ -213,12 +213,7 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
         target.send(new SyncBeltSlotContents((Player) owner, this));
     }
 
-    ////////////////////////////////////////////////////////////
-    // Equipment container implementation
-    //
-    public static final ResourceLocation BELT = new ResourceLocation("examplemod", "belt");
-
-    private LivingEntity owner;
+    private final LivingEntity owner;
     private final ItemStackHandler inventory = new ItemStackHandler(1)
     {
         @Override
@@ -228,9 +223,9 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
         }
     };
 
-    private void setOwner(LivingEntity owner)
+    public BeltAttachment(IAttachmentHolder holder)
     {
-        this.owner = owner;
+        this.owner = (LivingEntity)holder;
     }
 
     @Nullable

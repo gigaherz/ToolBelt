@@ -3,10 +3,10 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.76'
+    id 'net.neoforged.gradle.userdev' version '7.0.93'
 }
 
-version = "2.0.1"
+version = "2.0.3"
 group = "dev.gigaherz.toolbelt"
 
 Provider<String> minecraftVersion(Transformer<String, String> mapper) {
@@ -94,7 +94,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:20.4.72-beta'
+    implementation 'net.neoforged:neoforge:20.4.160-beta'
 
     compileOnly "dev.gigaherz.sewingkit:SewingKit-1.20.4:1.8.6"
     runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.20.4:1.8.6"
@@ -104,8 +104,8 @@ dependencies {
     //compileOnly "mezz.jei:jei-1.20-forge-api:14.0.0.4"
     //runtimeOnly "mezz.jei:jei-1.20-forge:14.0.0.4"
 
-    compileOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4"
-    runtimeOnly "top.theillusivec4.curios:curios-neoforge:7.0.0-beta.3+1.20.4"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:7.3.0+1.20.4"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:7.3.0+1.20.4"
 
     //runtimeOnly fg.deobf("curse.maven:corail-tombstone-243707:3836552")
 }

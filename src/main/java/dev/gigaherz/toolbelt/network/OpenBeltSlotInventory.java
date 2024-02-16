@@ -10,7 +10,7 @@ import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 public class OpenBeltSlotInventory implements CustomPacketPayload
 {
-    public static final ResourceLocation ID = ToolBelt.location("update_spell_sequence");
+    public static final ResourceLocation ID = ToolBelt.location("open_belt_slot_inventory");
 
     public OpenBeltSlotInventory()
     {

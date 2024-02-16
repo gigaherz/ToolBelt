@@ -17,7 +17,7 @@ authors="gigaherz"
 [[dependencies.toolbelt]]
    modId="neoforge"
    type="required"
-   versionRange="[20.4.72-beta,)"
+   versionRange="[20.4.100-beta,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
