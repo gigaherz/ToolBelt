@@ -78,9 +78,9 @@ public class ToolBeltItem extends Item implements IBeltSlotItem, DyeableLeatherI
         if (slot == -1)
             return InteractionResult.FAIL;
 
-        if (!world.isClientSide && player instanceof ServerPlayer)
+        if (!world.isClientSide && player instanceof ServerPlayer serverPlayer)
         {
-            Screens.openBeltScreen((ServerPlayer) player, slot);
+            Screens.openBeltScreen(serverPlayer, slot);
         }
 
         return InteractionResult.SUCCESS;

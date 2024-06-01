@@ -138,31 +138,35 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
             LivingEntity entity = event.getEntity();
 
             var attachment = get(entity);
-            printDebugLog("Processing belt slot data for entity death {}({})", entity.getScoreboardName(), entity.getUUID());
 
             ItemStack stack = attachment.getContents();
-            if (EnchantmentHelper.hasVanishingCurse(stack))
-            {
-                stack = ItemStack.EMPTY;
-                attachment.setContents(stack);
-            }
             if (stack.getCount() > 0)
             {
-                if (entity instanceof Player player)
+                printDebugLog("Processing belt slot data for entity death {}({})", entity.getScoreboardName(), entity.getUUID());
+
+                if (EnchantmentHelper.hasVanishingCurse(stack))
                 {
-                    if (!entity.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
-                    {
-                        printDebugLog("Entity is player, and keepInventory is not set. Spilling...");
-                        Collection<ItemEntity> old = entity.captureDrops(event.getDrops());
-                        player.drop(stack, true, false);
-                        entity.captureDrops(old);
-                        attachment.setContents(ItemStack.EMPTY);
-                    }
+                    stack = ItemStack.EMPTY;
+                    attachment.setContents(stack);
                 }
                 else
                 {
-                    entity.spawnAtLocation(stack);
-                    attachment.setContents(ItemStack.EMPTY);
+                    if (entity instanceof Player player)
+                    {
+                        if (!entity.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
+                        {
+                            printDebugLog("Entity is player, and keepInventory is not set. Spilling...");
+                            Collection<ItemEntity> old = entity.captureDrops(event.getDrops());
+                            player.drop(stack, true, false);
+                            entity.captureDrops(old);
+                            attachment.setContents(ItemStack.EMPTY);
+                        }
+                    }
+                    else
+                    {
+                        entity.spawnAtLocation(stack);
+                        attachment.setContents(ItemStack.EMPTY);
+                    }
                 }
             }
         }
@@ -189,7 +193,7 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
         ItemStack stack = getContents();
         if (stack.getCount() > 0)
         {
-            printDebugLog("Player {}({}) has item in the belt slot, but the belt is disabled. Dropping to the ground.", owner.getScoreboardName(), owner.getUUID());
+            printDebugLog("Entity {}({}) has item in the belt slot, but the belt is disabled. Dropping to the ground.", owner.getScoreboardName(), owner.getUUID());
             if (owner instanceof Player)
                 ItemHandlerHelper.giveItemToPlayer((Player) owner, stack);
             else
