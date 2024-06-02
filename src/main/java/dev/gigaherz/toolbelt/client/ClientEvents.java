@@ -18,28 +18,24 @@ import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
-import net.neoforged.neoforge.client.event.EntityRenderersEvent;
-import net.neoforged.neoforge.client.event.MovementInputUpdateEvent;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
-import net.neoforged.neoforge.client.event.RegisterKeyMappingsEvent;
-import net.neoforged.neoforge.event.TickEvent;
+import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
 import java.util.function.Function;
 
-@Mod.EventBusSubscriber(value = Dist.CLIENT, modid = ToolBelt.MODID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(value = Dist.CLIENT, modid = ToolBelt.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class ClientEvents
 {
     public static KeyMapping OPEN_TOOL_MENU_KEYBIND;
@@ -59,11 +55,8 @@ public class ClientEvents
     private static boolean toolMenuKeyWasDown = false;
 
     @SubscribeEvent
-    public static void handleKeys(TickEvent.ClientTickEvent ev)
+    public static void handleKeys(ClientTickEvent.Pre ev)
     {
-        if (ev.phase != TickEvent.Phase.START)
-            return;
-
         Minecraft mc = Minecraft.getInstance();
 
         if (mc.screen == null)
@@ -96,7 +89,7 @@ public class ClientEvents
             {
                 if (mc.screen == null)
                 {
-                    PacketDistributor.SERVER.noArg().send(new OpenBeltSlotInventory());
+                    PacketDistributor.sendToServer(OpenBeltSlotInventory.INSTANCE);
                 }
             }
         }
@@ -154,7 +147,7 @@ public class ClientEvents
 
     public static ModelLayerLocation BELT_LAYER = new ModelLayerLocation(new ResourceLocation("minecraft:player"), "toolbelt_belt");
 
-    @Mod.EventBusSubscriber(modid = ToolBelt.MODID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = ToolBelt.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
     public static class ModBusEvents
     {
         @SubscribeEvent
@@ -179,7 +172,7 @@ public class ClientEvents
             event.enqueueWork(() -> {
                 ItemProperties.register(ToolBelt.BELT.get(), ToolBelt.location("has_custom_color"),
                         (ItemStack pStack, @Nullable ClientLevel pLevel, @Nullable LivingEntity pEntity, int pSeed) ->
-                                (pStack.getItem() instanceof DyeableLeatherItem dyeable) && dyeable.hasCustomColor(pStack)
+                                pStack.has(DataComponents.DYED_COLOR)
                                         ? 1 : 0
                 );
             });
@@ -190,8 +183,8 @@ public class ClientEvents
         {
             event.register(
                     (ItemStack pStack, int pTintIndex) ->
-                            pTintIndex == 0 && (pStack.getItem() instanceof DyeableLeatherItem dyeable) && dyeable.hasCustomColor(pStack)
-                                    ? dyeable.getColor(pStack) : -1,
+                            pTintIndex == 0 && pStack.has(DataComponents.DYED_COLOR)
+                                    ? (0xFF000000 | pStack.get(DataComponents.DYED_COLOR).rgb()) : -1,
                     ToolBelt.BELT.get()
             );
         }

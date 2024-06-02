@@ -112,7 +112,7 @@ public class BeltSlotMenu extends RecipeBookMenu<CraftingContainer>
 
         if (playerInventory.player.level().isClientSide)
         {
-            PacketDistributor.SERVER.noArg().send(new ContainerSlotsHack());
+            PacketDistributor.sendToServer(ContainerSlotsHack.INSTANCE);
         }
     }
 

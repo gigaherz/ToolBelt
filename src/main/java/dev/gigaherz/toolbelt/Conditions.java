@@ -1,16 +1,13 @@
 package dev.gigaherz.toolbelt;
 
-import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
 import net.neoforged.neoforge.common.conditions.ICondition;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 public class Conditions
 {
     public static class EnableNormalCrafting implements ICondition
     {
-        public static final Codec<EnableNormalCrafting> CODEC = Codec.unit(EnableNormalCrafting::new);
+        public static final MapCodec<EnableNormalCrafting> CODEC = MapCodec.unit(EnableNormalCrafting::new);
 
         @Override
         public boolean test(IContext context)
@@ -19,7 +16,7 @@ public class Conditions
         }
 
         @Override
-        public Codec<? extends ICondition> codec()
+        public MapCodec<? extends ICondition> codec()
         {
             return CODEC;
         }
@@ -27,7 +24,7 @@ public class Conditions
 
     public static class EnableSewingCrafting implements ICondition
     {
-        public static final Codec<EnableSewingCrafting> CODEC = Codec.unit(EnableSewingCrafting::new);
+        public static final MapCodec<EnableSewingCrafting> CODEC = MapCodec.unit(EnableSewingCrafting::new);
 
         @Override
         public boolean test(IContext context)
@@ -36,7 +33,7 @@ public class Conditions
         }
 
         @Override
-        public Codec<? extends ICondition> codec()
+        public MapCodec<? extends ICondition> codec()
         {
             return CODEC;
         }

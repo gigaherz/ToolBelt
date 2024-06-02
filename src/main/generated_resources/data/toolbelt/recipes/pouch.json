@@ -23,6 +23,7 @@
     "sls"
   ],
   "result": {
-    "item": "toolbelt:pouch"
+    "count": 1,
+    "id": "toolbelt:pouch"
   }
 }

@@ -20,7 +20,7 @@ public class Screens
                     heldItem.getHoverName()
             ), (data) -> {
                 data.writeVarInt(slot);
-                data.writeItem(heldItem);
+                ItemStack.OPTIONAL_STREAM_CODEC.encode(data, heldItem);
             });
         }
     }

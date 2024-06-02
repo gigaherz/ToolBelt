@@ -3,7 +3,9 @@ package dev.gigaherz.toolbelt.network;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
-import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
@@ -12,40 +14,26 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandlerModifiable;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 import java.util.Objects;
 
-public class SwapItems implements CustomPacketPayload
+public record SwapItems(int swapWith) implements CustomPacketPayload
 {
     public static final ResourceLocation ID = ToolBelt.location("swap_items");
+    public static final Type<SwapItems> TYPE = new Type<>(ID);
 
-    public int swapWith;
-
-    public SwapItems(int windowId)
-    {
-        this.swapWith = windowId;
-    }
-
-    public SwapItems(FriendlyByteBuf buf)
-    {
-        swapWith = buf.readInt();
-    }
-
-    public void write(FriendlyByteBuf buf)
-    {
-        buf.writeInt(swapWith);
-    }
+    public static final StreamCodec<ByteBuf, SwapItems> STREAM_CODEC = ByteBufCodecs.VAR_INT.map(SwapItems::new, SwapItems::swapWith);
 
     @Override
-    public ResourceLocation id()
+    public Type<? extends CustomPacketPayload> type()
     {
-        return ID;
+        return TYPE;
     }
 
-    public void handle(PlayPayloadContext context)
+    public void handle(IPayloadContext context)
     {
-        context.workHandler().execute(() -> swapItem(swapWith, context.player().orElseThrow()));
+        context.enqueueWork(() -> swapItem(swapWith, context.player()));
     }
 
     public static void swapItem(int swapWith, Player player)

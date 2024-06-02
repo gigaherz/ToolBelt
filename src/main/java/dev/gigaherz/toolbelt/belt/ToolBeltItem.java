@@ -1,16 +1,12 @@
 package dev.gigaherz.toolbelt.belt;
 
-import com.google.common.collect.ImmutableSet;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.common.Screens;
 import dev.gigaherz.toolbelt.slot.BeltAttachment;
 import dev.gigaherz.toolbelt.slot.IBeltSlotItem;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.Mth;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -18,26 +14,29 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.DyeableLeatherItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
+import net.neoforged.neoforge.items.ComponentItemHandler;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-public class ToolBeltItem extends Item implements IBeltSlotItem, DyeableLeatherItem
+public class ToolBeltItem extends Item implements IBeltSlotItem
 {
     public static void register(RegisterCapabilitiesEvent event)
     {
         event.registerItem(
                 Capabilities.ItemHandler.ITEM,
-                (stack, context) -> new ToolBeltInventory(stack),
+                (stack, context) -> getComponentItemHandler(stack),
                 ToolBelt.BELT
         );
         event.registerItem(
@@ -47,11 +46,10 @@ public class ToolBeltItem extends Item implements IBeltSlotItem, DyeableLeatherI
         );
     }
 
-    public static final ImmutableSet<ResourceLocation> BELT_SLOT_LIST = ImmutableSet.of(ToolBelt.location("belt"));
-
-    public ToolBeltItem(Properties properties)
+    public static @NotNull ComponentItemHandler getComponentItemHandler(ItemStack stack)
     {
-        super(properties);
+        var size = stack.get(ToolBelt.BELT_SIZE);
+        return new ComponentItemHandler(stack, DataComponents.CONTAINER, size != null ? size : 2);
     }
 
     private static int getSlotFor(Inventory inv, ItemStack stack)
@@ -70,6 +68,50 @@ public class ToolBeltItem extends Item implements IBeltSlotItem, DyeableLeatherI
 
         // Couldn't find the exact instance, can not ensure we have the right slot.
         return -1;
+    }
+
+    public static ItemStack of(int level)
+    {
+        return ToolBelt.BELT.get().forSize(level);
+    }
+
+    public ItemStack forSize(int size)
+    {
+        return setSlotsCount(new ItemStack(this), Math.clamp(size,2,9));
+    }
+
+    public static int getSlotsCount(ItemStack stack)
+    {
+        var actualSize = stack.get(ToolBelt.BELT_SIZE);
+        return Math.clamp(Objects.requireNonNullElse(actualSize,2), 2, 9);
+    }
+
+    public static ItemStack setSlotsCount(ItemStack stack, int newSize)
+    {
+        var oldCount = stack.get(ToolBelt.BELT_SIZE);
+        var oldSize = oldCount != null ? oldCount : 2;
+        if (newSize != oldSize)
+        {
+            var oldInv = stack.get(DataComponents.CONTAINER);
+            if (oldInv != null)
+            {
+                List<ItemStack> newItems = new ArrayList<>();
+                int fill = Math.min(oldInv.getSlots(), Math.min(oldSize, newSize));
+                for (int i = 0; i < fill; i++)
+                    newItems.add(oldInv.getStackInSlot(i));
+                var newInv = ItemContainerContents.fromItems(newItems);
+                stack.set(DataComponents.CONTAINER, newInv);
+            }
+            stack.set(ToolBelt.BELT_SIZE, newSize);
+        }
+        return stack;
+    }
+
+    // ----------- Begin implementation ----------
+
+    public ToolBeltItem(Properties properties)
+    {
+        super(properties);
     }
 
     private InteractionResult openBeltScreen(@Nullable Player player, ItemStack stack, Level world)
@@ -106,10 +148,8 @@ public class ToolBeltItem extends Item implements IBeltSlotItem, DyeableLeatherI
     }
 
     @Override
-    public void appendHoverText(ItemStack stack, @Nullable Level worldIn, List<Component> tooltip, TooltipFlag flagIn)
+    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltip, TooltipFlag flagIn)
     {
-        super.appendHoverText(stack, worldIn, tooltip, flagIn);
-
         int size = getSlotsCount(stack);
 
         tooltip.add(Component.translatable("text.toolbelt.tooltip", size - 2, size));
@@ -134,73 +174,6 @@ public class ToolBeltItem extends Item implements IBeltSlotItem, DyeableLeatherI
     public boolean shouldCauseReequipAnimation(ItemStack oldStack, ItemStack newStack, boolean slotChanged)
     {
         return !ItemStack.isSameItem(oldStack, newStack); // super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
-    }
-
-    public static int getSlotsCount(ItemStack stack)
-    {
-        int size = 2;
-
-        CompoundTag nbt = stack.getTag();
-        if (nbt != null)
-        {
-            size = Mth.clamp(nbt.getInt("Size"), 2, 9);
-        }
-        return size;
-    }
-
-    public static void setSlotsCount(ItemStack stack, int newSize)
-    {
-        CompoundTag nbt = stack.getTag();
-        if (nbt == null)
-        {
-            nbt = new CompoundTag();
-            nbt.put("Items", new ListTag());
-        }
-
-        nbt.putInt("Size", newSize);
-        stack.setTag(nbt);
-    }
-
-    public static int[] xpCost = {3, 5, 8, 12, 15, 20, 30};
-
-    public static int getUpgradeXP(ItemStack stack)
-    {
-        int slots = getSlotsCount(stack);
-
-        if (slots >= 9)
-            return -1;
-
-        if (slots < 2)
-            return 1;
-
-        return xpCost[slots - 2];
-    }
-
-    public static ItemStack upgrade(ItemStack stack)
-    {
-        int slots = getSlotsCount(stack);
-
-        if (slots >= 9)
-            return stack.copy();
-
-        stack = stack.copy();
-        setSlotsCount(stack, slots + 1);
-        return stack;
-    }
-
-    public ItemStack of(int upgradeLevel)
-    {
-        if (upgradeLevel < 0 || upgradeLevel >= 9)
-            return ItemStack.EMPTY;
-
-        ItemStack stack = new ItemStack(this);
-        setSlotsCount(stack, upgradeLevel + 2);
-        return stack;
-    }
-
-    public int getLevel(ItemStack stack)
-    {
-        return getSlotsCount(stack) - 2;
     }
 
     private void tickAllSlots(ItemStack source)

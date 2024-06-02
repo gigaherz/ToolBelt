@@ -3,9 +3,8 @@ package dev.gigaherz.toolbelt.slot;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.network.SyncBeltSlotContents;
-import net.minecraft.core.NonNullList;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -21,10 +20,10 @@ import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.INBTSerializable;
-import net.neoforged.neoforge.event.TickEvent;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
+import net.neoforged.neoforge.event.tick.PlayerTickEvent;
 import net.neoforged.neoforge.items.ItemHandlerHelper;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -37,7 +36,6 @@ import org.apache.logging.log4j.Logger;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
-import java.util.List;
 
 public class BeltAttachment implements INBTSerializable<CompoundTag>
 {
@@ -119,15 +117,12 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
         }
 
         @SubscribeEvent
-        public void entityTick(TickEvent.PlayerTickEvent event)
+        public void entityTick(PlayerTickEvent.Post event)
         {
-            if (event.phase != TickEvent.Phase.END)
-                return;
-
             if (ConfigData.customBeltSlotEnabled)
-                get(event.player).onWornTick();
+                get(event.getEntity()).onWornTick();
             else
-                get(event.player).dropContents();
+                get(event.getEntity()).dropContents();
         }
 
         @SubscribeEvent
@@ -209,12 +204,12 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
 
     protected void syncTo(Player target)
     {
-        PacketDistributor.PLAYER.with((ServerPlayer) target).send(new SyncBeltSlotContents((Player) owner, this));
+        PacketDistributor.sendToPlayer((ServerPlayer) target, new SyncBeltSlotContents(owner, this));
     }
 
-    protected void syncTo(PacketDistributor.PacketTarget target)
+    protected void syncToTracking(Entity target)
     {
-        target.send(new SyncBeltSlotContents((Player) owner, this));
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(target, new SyncBeltSlotContents(owner, this));
     }
 
     private final LivingEntity owner;
@@ -243,19 +238,19 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
         if (!ConfigData.customBeltSlotEnabled)
             return;
         if (getOwner() != null && !getOwner().level().isClientSide)
-            syncTo(PacketDistributor.TRACKING_ENTITY_AND_SELF.with(getOwner()));
+            syncToTracking(getOwner());
     }
 
     @Override
-    public CompoundTag serializeNBT()
+    public CompoundTag serializeNBT(HolderLookup.Provider lookup)
     {
-        return inventory.serializeNBT();
+        return inventory.serializeNBT(lookup);
     }
 
     @Override
-    public void deserializeNBT(CompoundTag nbt)
+    public void deserializeNBT(HolderLookup.Provider lookup, CompoundTag nbt)
     {
-        inventory.deserializeNBT(nbt);
+        inventory.deserializeNBT(lookup, nbt);
     }
 
     /**

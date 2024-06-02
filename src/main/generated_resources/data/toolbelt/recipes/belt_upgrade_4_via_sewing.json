@@ -8,12 +8,13 @@
       "type": "toolbelt:enable_sewing_crafting"
     }
   ],
-  "type": "sewingkit:sewing",
+  "type": "toolbelt:sewing_upgrade",
   "materials": [
     {
       "count": 1,
       "ingredient": {
-        "item": "toolbelt:belt"
+        "type": "toolbelt:belt_upgrade_level",
+        "size": 5
       }
     },
     {
@@ -30,12 +31,13 @@
     }
   ],
   "result": {
-    "item": "toolbelt:belt",
-    "nbt": "{Size:6}"
+    "components": {
+      "toolbelt:belt_size": 6
+    },
+    "count": 1,
+    "id": "toolbelt:belt"
   },
   "tool": {
-    "type": "sewingkit:tool_ingredient",
-    "tool_level": "minecraft:iron",
-    "tool_type": "sewingkit_sew"
+    "tag": "sewingkit:needles/iron_or_higher"
   }
 }

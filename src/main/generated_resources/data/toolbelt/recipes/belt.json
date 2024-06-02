@@ -23,6 +23,7 @@
     "lil"
   ],
   "result": {
-    "item": "toolbelt:belt"
+    "count": 1,
+    "id": "toolbelt:belt"
   }
 }

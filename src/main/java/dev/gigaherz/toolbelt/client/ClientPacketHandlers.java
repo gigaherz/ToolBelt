@@ -15,11 +15,11 @@ public class ClientPacketHandlers
     {
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
-            Entity entity = minecraft.level.getEntity(message.player);
+            Entity entity = minecraft.level.getEntity(message.player());
             if (!(entity instanceof Player))
                 return;
             Player player = (Player) entity;
-            BeltFinder.setBeltFromPacket(player, message.where, message.slot, message.stack);
+            BeltFinder.setBeltFromPacket(player, message.where(), message.slot(), message.stack());
         });
     }
 
@@ -27,10 +27,10 @@ public class ClientPacketHandlers
     {
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
-            Entity entity = minecraft.level.getEntity(message.entityId);
+            Entity entity = minecraft.level.getEntity(message.entityId());
             if (entity instanceof Player)
             {
-                BeltAttachment.get((LivingEntity) entity).setContents(message.stack);
+                BeltAttachment.get((LivingEntity) entity).setContents(message.stack());
             }
         });
     }

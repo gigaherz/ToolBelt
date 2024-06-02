@@ -6,7 +6,6 @@ import com.mojang.math.Axis;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
-import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -20,6 +19,7 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.entity.HumanoidArm;
@@ -102,17 +102,16 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
             matrixStack.translate(0.0F, 0.19F, 0.0F);
             matrixStack.scale(0.85f, 0.6f, 0.78f);
 
-            if (stack.getItem() instanceof ToolBeltItem beltItem)
+            var dyeInfo = stack.get(DataComponents.DYED_COLOR);
+            beltModel.hasColor = dyeInfo != null;
+            if (beltModel.hasColor)
             {
-                beltModel.hasColor = beltItem.hasCustomColor(stack);
-                if (beltModel.hasColor)
-                {
-                    var dyeColor = beltItem.getColor(stack);
-                    beltModel.dyeRed = FastColor.ARGB32.red(dyeColor) / 255.0f;
-                    beltModel.dyeGreen = FastColor.ARGB32.green(dyeColor) / 255.0f;
-                    beltModel.dyeBlue = FastColor.ARGB32.blue(dyeColor) / 255.0f;
-                }
+                var dyeColor = dyeInfo.rgb();
+                beltModel.dyeRed = FastColor.ARGB32.red(dyeColor) / 255.0f;
+                beltModel.dyeGreen = FastColor.ARGB32.green(dyeColor) / 255.0f;
+                beltModel.dyeBlue = FastColor.ARGB32.blue(dyeColor) / 255.0f;
             }
+
             renderColoredCutoutModel(beltModel, getTextureLocation(entity), matrixStack, buffer, lightness, entity, 1.0f, 1.0f, 1.0f);
 
             matrixStack.popPose();
@@ -141,7 +140,7 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
     {
         return BeltFinder.findBelt(pEntity, true).map((getter) -> {
             var stack = getter.getBelt();
-            return stack.getItem() instanceof ToolBeltItem beltItem && beltItem.hasCustomColor(stack)
+            return stack.has(DataComponents.DYED_COLOR)
                     ? TEXTURE_BELT_DYED
                     : TEXTURE_BELT;
         }).orElse(TEXTURE_BELT);

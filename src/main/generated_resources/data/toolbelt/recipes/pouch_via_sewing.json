@@ -36,11 +36,10 @@
     }
   ],
   "result": {
-    "item": "toolbelt:pouch"
+    "count": 1,
+    "id": "toolbelt:pouch"
   },
   "tool": {
-    "type": "sewingkit:tool_ingredient",
-    "tool_level": "minecraft:wood",
-    "tool_type": "sewingkit_sew"
+    "tag": "sewingkit:needles/wood_or_higher"
   }
 }

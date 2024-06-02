@@ -3,7 +3,6 @@ package dev.gigaherz.toolbelt.client;
 import com.google.common.collect.Lists;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
-import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.client.radial.*;
 import dev.gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
@@ -14,17 +13,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.client.event.RenderGuiOverlayEvent;
-import net.neoforged.neoforge.client.gui.overlay.VanillaGuiOverlay;
+import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
+import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 import java.util.Objects;
 
-@Mod.EventBusSubscriber(Dist.CLIENT)
+@EventBusSubscriber(Dist.CLIENT)
 public class RadialMenuScreen extends Screen
 {
     private final BeltFinder.BeltGetter getter;
@@ -85,9 +84,9 @@ public class RadialMenuScreen extends Screen
     }
 
     @SubscribeEvent
-    public static void overlayEvent(RenderGuiOverlayEvent.Pre event)
+    public static void overlayEvent(RenderGuiLayerEvent.Pre event)
     {
-        if (event.getOverlay() != VanillaGuiOverlay.CROSSHAIR.type())
+        if (!event.getName().equals(VanillaGuiLayers.CROSSHAIR))
             return;
 
         if (Minecraft.getInstance().screen instanceof RadialMenuScreen)
@@ -255,7 +254,7 @@ public class RadialMenuScreen extends Screen
         if (inHand.getCount() > 0 || itemMouseOver.getCount() > 0)
         {
             SwapItems.swapItem(slotNumber, minecraft.player);
-            PacketDistributor.SERVER.noArg().send(new SwapItems(slotNumber));
+            PacketDistributor.sendToServer(new SwapItems(slotNumber));
         }
 
         menu.close();

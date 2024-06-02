@@ -3,38 +3,34 @@ package dev.gigaherz.toolbelt.network;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.common.Screens;
-import net.minecraft.network.FriendlyByteBuf;
+import io.netty.buffer.ByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public class OpenBeltSlotInventory implements CustomPacketPayload
 {
     public static final ResourceLocation ID = ToolBelt.location("open_belt_slot_inventory");
+    public static final Type<OpenBeltSlotInventory> TYPE = new Type<>(ID);
+    public static final OpenBeltSlotInventory INSTANCE = new OpenBeltSlotInventory();
+    public static final StreamCodec<ByteBuf, OpenBeltSlotInventory> STREAM_CODEC = StreamCodec.unit(INSTANCE);
 
-    public OpenBeltSlotInventory()
-    {
-    }
-
-    public OpenBeltSlotInventory(FriendlyByteBuf buf)
-    {
-    }
-
-    public void write(FriendlyByteBuf buf)
+    private OpenBeltSlotInventory()
     {
     }
 
     @Override
-    public ResourceLocation id()
+    public Type<? extends CustomPacketPayload> type()
     {
-        return ID;
+        return TYPE;
     }
 
-    public void handle(PlayPayloadContext context)
+    public void handle(IPayloadContext context)
     {
         if (ConfigData.customBeltSlotEnabled)
         {
-            context.workHandler().execute(() -> Screens.openSlotScreen(context.player().orElseThrow()));
+            context.enqueueWork(() -> Screens.openSlotScreen(context.player()));
         }
     }
 }

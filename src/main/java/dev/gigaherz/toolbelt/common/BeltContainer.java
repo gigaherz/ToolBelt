@@ -2,8 +2,8 @@ package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ToolBelt;
-import dev.gigaherz.toolbelt.belt.ToolBeltInventory;
-import net.minecraft.network.FriendlyByteBuf;
+import dev.gigaherz.toolbelt.belt.ToolBeltItem;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -12,6 +12,7 @@ import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.Objects;
 
@@ -21,9 +22,9 @@ public class BeltContainer extends AbstractContainerMenu
     private ItemStack blockedStack;
     private final int blockedSlot;
 
-    public BeltContainer(int id, Inventory inventory, FriendlyByteBuf extraData)
+    public BeltContainer(int id, Inventory inventory, RegistryFriendlyByteBuf extraData)
     {
-        this(id, inventory, extraData.readVarInt(), extraData.readItem());
+        this(id, inventory, extraData.readVarInt(), ItemStack.OPTIONAL_STREAM_CODEC.decode(extraData));
     }
 
     public BeltContainer(int id, Inventory playerInventory, int blockedSlot, ItemStack blockedStack)
@@ -35,9 +36,11 @@ public class BeltContainer extends AbstractContainerMenu
         {
             blockedStack = ItemStack.EMPTY;
         }
-        ToolBeltInventory beltInventory = stillValid(playerInventory.player) &&
-                Objects.requireNonNull(blockedStack.getCapability(Capabilities.ItemHandler.ITEM), "Item handler not present.") instanceof ToolBeltInventory inv
-                ? inv : new ToolBeltInventory(new ItemStack(ToolBelt.BELT.get()));
+
+        IItemHandler beltInventory = Objects.requireNonNullElseGet(
+                stillValid(playerInventory.player) ? blockedStack.getCapability(Capabilities.ItemHandler.ITEM) : null,
+                () -> ToolBeltItem.getComponentItemHandler(new ItemStack(ToolBelt.BELT.get()))
+        );
 
         beltSlots = beltInventory.getSlots();
         int xoff = ((9 - beltSlots) * 18) / 2;
@@ -92,7 +95,7 @@ public class BeltContainer extends AbstractContainerMenu
     public boolean stillValid(Player playerIn)
     {
         ItemStack held = playerIn.getInventory().getItem(blockedSlot);
-        var equal = blockedSlot < 0 || held == blockedStack || ItemStack.isSameItemSameTags(held, blockedStack);
+        var equal = blockedSlot < 0 || held == blockedStack || ItemStack.isSameItemSameComponents(held, blockedStack);
         blockedStack = held;
         return equal;
     }

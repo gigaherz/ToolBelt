@@ -1,26 +1,23 @@
 package dev.gigaherz.toolbelt.integration;
 
+import dev.gigaherz.sewingkit.api.SewingRecipe;
 import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
+import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.RecipeCategory;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.item.Item;
-
-import javax.annotation.Nullable;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.Ingredient;
 
 public class SewingUpgradeRecipeBuilder extends SewingRecipeBuilder
 {
-    public static SewingRecipeBuilder begin(Item result, CompoundTag tag)
+    protected SewingUpgradeRecipeBuilder(ItemStack result)
     {
-        return begin(result, 1, tag);
+        super(RecipeCategory.MISC, result);
     }
 
-    public static SewingRecipeBuilder begin(Item result, int count, @Nullable CompoundTag tag)
+    @Override
+    protected SewingRecipe build(String group, NonNullList<SewingRecipe.Material> materials, Ingredient pattern, Ingredient tool, ItemStack result, boolean showNotification)
     {
-        return new SewingUpgradeRecipeBuilder(result, count, tag);
-    }
-
-    protected SewingUpgradeRecipeBuilder(Item result, int count, @Nullable CompoundTag tag)
-    {
-        super(RecipeCategory.MISC, result, count, tag);
+        return new SewingUpgradeRecipe(group, materials, pattern, tool, result, showNotification);
     }
 }

@@ -10,7 +10,8 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 public class SewingKitIntegration
 {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, ToolBelt.MODID);
-    public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>> SEWING_UGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("sewing_upgrade", () -> new SewingUpgradeRecipe.Serializer());
+    public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<?>>
+            SEWING_UGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("sewing_upgrade", () -> new SewingUpgradeRecipe.Serializer());
 
     public static void init(IEventBus modEventBus)
     {

@@ -5,13 +5,13 @@ import net.minecraft.world.entity.decoration.ArmorStand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 
 import java.util.Optional;
 
-@Mod.EventBusSubscriber(modid = ToolBelt.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = ToolBelt.MODID, bus = EventBusSubscriber.Bus.MOD)
 public class BeltFinderDebug extends BeltFinder
 {
     @SubscribeEvent
