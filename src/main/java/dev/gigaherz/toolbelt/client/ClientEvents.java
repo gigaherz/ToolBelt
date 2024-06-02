@@ -104,11 +104,18 @@ public class ClientEvents
         if (keybind.isUnbound())
             return false;
 
+        if (ToolBelt.controllableEnabled)
+        {
+            Boolean triStateDown = ControllableSupport.isButtonDown(keybind);
+            if (Boolean.TRUE.equals(triStateDown))
+                return true;
+        }
+
         boolean isDown = switch (keybind.getKey().getType())
                 {
                     case KEYSYM -> InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue());
                     case MOUSE -> GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue()) == GLFW.GLFW_PRESS;
-                    default -> false;
+                    default -> keybind.isDown();
                 };
         return isDown && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }

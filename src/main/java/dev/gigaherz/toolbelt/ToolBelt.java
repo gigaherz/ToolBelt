@@ -8,6 +8,7 @@ import dev.gigaherz.sewingkit.needle.NeedleItem;
 import dev.gigaherz.sewingkit.needle.Needles;
 import dev.gigaherz.toolbelt.belt.BeltIngredient;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
+import dev.gigaherz.toolbelt.client.ControllableSupport;
 import dev.gigaherz.toolbelt.common.BeltContainer;
 import dev.gigaherz.toolbelt.common.BeltScreen;
 import dev.gigaherz.toolbelt.common.BeltSlotContainer;
@@ -97,6 +98,7 @@ public class ToolBelt
             .serverAcceptedVersions(PROTOCOL_VERSION::equals)
             .networkProtocolVersion(() -> PROTOCOL_VERSION)
             .simpleChannel();
+    public static boolean controllableEnabled;
 
     public ToolBelt()
     {
@@ -126,6 +128,12 @@ public class ToolBelt
         if (ModList.get().isLoaded("sewingkit"))
         {
             SewingKitIntegration.init(modEventBus);
+        }
+
+        if (ModList.get().isLoaded("controllable"))
+        {
+            controllableEnabled = true;
+            ControllableSupport.init();
         }
     }
 
