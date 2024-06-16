@@ -161,10 +161,10 @@ public class ToolBelt
     {
         BeltFinderBeltSlot.initBaubles();
 
-        if (ModList.get().isLoaded("curios"))
+        /*if (ModList.get().isLoaded("curios"))
         {
             BeltFinderCurios.initCurios();
-        }
+        }*/
     }
 
     @EventBusSubscriber(value= Dist.CLIENT, modid = MODID, bus= EventBusSubscriber.Bus.MOD)
@@ -180,7 +180,7 @@ public class ToolBelt
 
     public static ResourceLocation location(String path)
     {
-        return new ResourceLocation(MODID, path);
+        return ResourceLocation.fromNamespaceAndPath(MODID, path);
     }
 
     public static class DataGen
@@ -271,7 +271,7 @@ public class ToolBelt
                             .save(consumer.withConditions(
                                     modLoaded("sewingkit"),
                                     new Conditions.EnableSewingCrafting()
-                            ), new ResourceLocation(beltId.getNamespace(), beltId.getPath() + "_upgrade_" + (i - 1) + "_via_sewing"));
+                            ), ResourceLocation.fromNamespaceAndPath(beltId.getNamespace(), beltId.getPath() + "_upgrade_" + (i - 1) + "_via_sewing"));
                 }
             }
 
@@ -282,13 +282,13 @@ public class ToolBelt
 
             private ResourceLocation sewingRecipeId(ResourceLocation item)
             {
-                return  new ResourceLocation(item.getNamespace(), item.getPath() + "_via_sewing");
+                return  ResourceLocation.fromNamespaceAndPath(item.getNamespace(), item.getPath() + "_via_sewing");
             }
         }
     }
 
     private static TagKey<Item> itemTag(String name)
     {
-        return TagKey.create(Registries.ITEM, new ResourceLocation(name));
+        return TagKey.create(Registries.ITEM, ResourceLocation.parse(name));
     }
 }

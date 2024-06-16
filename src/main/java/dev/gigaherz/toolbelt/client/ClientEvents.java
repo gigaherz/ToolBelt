@@ -145,7 +145,7 @@ public class ClientEvents
         return isDown && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }
 
-    public static ModelLayerLocation BELT_LAYER = new ModelLayerLocation(new ResourceLocation("minecraft:player"), "toolbelt_belt");
+    public static ModelLayerLocation BELT_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("minecraft","player"), "toolbelt_belt");
 
     @EventBusSubscriber(modid = ToolBelt.MODID, value = Dist.CLIENT, bus = EventBusSubscriber.Bus.MOD)
     public static class ModBusEvents

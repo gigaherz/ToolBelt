@@ -216,7 +216,7 @@ public class ConfigData
 
     private static ItemStack parseItemStack(String itemString)
     {
-        Item item = BuiltInRegistries.ITEM.get(new ResourceLocation(itemString));
+        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemString));
         if (item == Items.AIR)
         {
             LOGGER.warn("Could not find item " + itemString);

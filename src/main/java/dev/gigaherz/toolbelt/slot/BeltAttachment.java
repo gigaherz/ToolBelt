@@ -4,6 +4,7 @@ import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.network.SyncBeltSlotContents;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
@@ -12,6 +13,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -139,7 +141,8 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
             {
                 printDebugLog("Processing belt slot data for entity death {}({})", entity.getScoreboardName(), entity.getUUID());
 
-                if (EnchantmentHelper.hasVanishingCurse(stack))
+                var ench = entity.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.VANISHING_CURSE);
+                if (stack.getEnchantmentLevel(ench) > 0)
                 {
                     stack = ItemStack.EMPTY;
                     attachment.setContents(stack);
@@ -227,7 +230,6 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
         this.owner = (LivingEntity)holder;
     }
 
-    @Nullable
     public LivingEntity getOwner()
     {
         return owner;

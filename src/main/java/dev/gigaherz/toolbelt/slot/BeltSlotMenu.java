@@ -6,6 +6,7 @@ import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.network.ContainerSlotsHack;
 import net.minecraft.client.RecipeBookCategories;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -15,15 +16,17 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
 import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.crafting.Recipe;
+import net.minecraft.world.item.crafting.CraftingInput;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
 
-public class BeltSlotMenu extends RecipeBookMenu<CraftingContainer>
+public class BeltSlotMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe>
 {
     private final BeltSlot slotBelt;
 
@@ -72,12 +75,12 @@ public class BeltSlotMenu extends RecipeBookMenu<CraftingContainer>
                 public boolean mayPickup(Player playerIn)
                 {
                     ItemStack itemstack = this.getItem();
-                    return !itemstack.isEmpty() && !playerIn.isCreative() && EnchantmentHelper.hasBindingCurse(itemstack) ? false : super.mayPickup(playerIn);
+                    return !itemstack.isEmpty() && !playerIn.isCreative() && hasBindingCurse(itemstack) ? false : super.mayPickup(playerIn);
                 }
 
                 @Override
                 public Pair<ResourceLocation, ResourceLocation> getNoItemIcon() {
-                    return Pair.of(InventoryMenu.BLOCK_ATLAS, InventoryMenu.TEXTURE_EMPTY_SLOTS[equipmentslot.getIndex()]);
+                    return Pair.of(InventoryMenu.BLOCK_ATLAS, InventoryMenu.TEXTURE_EMPTY_SLOTS.get(equipmentslot));
                 }
             });
         }
@@ -116,6 +119,12 @@ public class BeltSlotMenu extends RecipeBookMenu<CraftingContainer>
         }
     }
 
+    private boolean hasBindingCurse(ItemStack itemstack)
+    {
+        var ench = this.player.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.BINDING_CURSE);
+        return itemstack.getEnchantmentLevel(ench) > 0;
+    }
+
     @Override
     public List<RecipeBookCategories> getRecipeBookCategories()
     {
@@ -148,15 +157,15 @@ public class BeltSlotMenu extends RecipeBookMenu<CraftingContainer>
     }
 
     @Override
-    public boolean recipeMatches(RecipeHolder<? extends Recipe<CraftingContainer>> recipeIn)
+    public boolean recipeMatches(RecipeHolder<CraftingRecipe> recipe)
     {
-        return recipeIn.value().matches(this.craftingInventory, this.player.level());
+        return recipe.value().matches(this.craftingInventory.asCraftInput(), this.player.level());
     }
 
     @Override
     public void slotsChanged(Container inventoryIn)
     {
-        Bridge.slotChangedCraftingGridAccessor(this, this.player.level(), this.player, this.craftingInventory, this.craftResultInventory);
+        Bridge.slotChangedCraftingGridAccessor(this, this.player.level(), this.player, this.craftingInventory, this.craftResultInventory, null);
     }
 
     private static class Bridge extends CraftingMenu
@@ -167,9 +176,9 @@ public class BeltSlotMenu extends RecipeBookMenu<CraftingContainer>
             throw new IllegalStateException("Not instantiable.");
         }
 
-        public static void slotChangedCraftingGridAccessor(AbstractContainerMenu container, Level level, Player player, CraftingContainer craftingInventory, ResultContainer craftResultInventory)
+        public static void slotChangedCraftingGridAccessor(AbstractContainerMenu container, Level level, Player player, CraftingContainer craftingInventory, ResultContainer craftResultInventory, RecipeHolder<CraftingRecipe> recipeHolder)
         {
-            CraftingMenu.slotChangedCraftingGrid(container, level, player, craftingInventory, craftResultInventory);
+            CraftingMenu.slotChangedCraftingGrid(container, level, player, craftingInventory, craftResultInventory, recipeHolder);
         }
     }
 
@@ -239,7 +248,7 @@ public class BeltSlotMenu extends RecipeBookMenu<CraftingContainer>
         {
             ItemStack slotContents = slot.getItem();
             remaining = slotContents.copy();
-            EquipmentSlot equipmentslot = Mob.getEquipmentSlotForItem(remaining);
+            EquipmentSlot equipmentslot = player.getEquipmentSlotForItem(remaining);
 
             if (index == slotBelt.index) // allow removing belts from the belt slot
             {
@@ -271,7 +280,7 @@ public class BeltSlotMenu extends RecipeBookMenu<CraftingContainer>
                     return ItemStack.EMPTY;
                 }
             }
-            else if (equipmentslot.getType() == EquipmentSlot.Type.ARMOR && !this.slots.get(8 - equipmentslot.getIndex()).hasItem())
+            else if (equipmentslot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !this.slots.get(8 - equipmentslot.getIndex()).hasItem())
             {
                 int i = 8 - equipmentslot.getIndex();
                 if (!this.moveItemStackTo(remaining, i, i + 1, false))

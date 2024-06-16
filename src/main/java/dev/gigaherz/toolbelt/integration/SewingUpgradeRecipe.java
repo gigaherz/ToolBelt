@@ -5,6 +5,7 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.sewingkit.SewingKitMod;
 import dev.gigaherz.sewingkit.api.SewingRecipe;
 import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
+import dev.gigaherz.sewingkit.table.SewingInput;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.core.HolderLookup;
@@ -66,7 +67,7 @@ public class SewingUpgradeRecipe extends SewingRecipe
     }
 
     @Override
-    public ItemStack assemble(Container inv, HolderLookup.Provider provider)
+    public ItemStack assemble(SewingInput inv, HolderLookup.Provider provider)
     {
         ItemStack inputBelt = ItemStack.EMPTY;
         for (int i = 2; i < 6; i++)

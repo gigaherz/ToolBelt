@@ -112,7 +112,7 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
                 beltModel.dyeBlue = FastColor.ARGB32.blue(dyeColor) / 255.0f;
             }
 
-            renderColoredCutoutModel(beltModel, getTextureLocation(entity), matrixStack, buffer, lightness, entity, 1.0f, 1.0f, 1.0f);
+            renderColoredCutoutModel(beltModel, getTextureLocation(entity), matrixStack, buffer, lightness, entity, 0xFFFFFFFF);
 
             matrixStack.popPose();
         });
@@ -191,25 +191,23 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
         }
 
         @Override
-        public void renderToBuffer(PoseStack matrixStack, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, float red, float green, float blue, float alpha)
+        public void renderToBuffer(PoseStack matrixStack, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, int color)
         {
-            var cRed = red;
-            var cGreen = green;
-            var cBlue = blue;
+            var color2 = color;
+
             if (hasColor)
             {
-                cRed *= dyeRed;
-                cGreen *= dyeGreen;
-                cBlue *= dyeBlue;
+                var dye = FastColor.ARGB32.colorFromFloat(dyeRed, dyeGreen, dyeBlue, 1.0f);
+                color2 = FastColor.ARGB32.multiply(color, dye);
             }
 
-            belt.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, cRed, cGreen, cBlue, alpha);
-            left_pocket.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, cRed, cGreen, cBlue, alpha);
-            right_pocket.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, cRed, cGreen, cBlue, alpha);
+            belt.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, color2);
+            left_pocket.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, color2);
+            right_pocket.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, color2);
 
             matrixStack.pushPose();
             matrixStack.scale(0.8f, 1, 1);
-            buckle.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, red, green, blue, alpha);
+            buckle.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, color);
             matrixStack.popPose();
         }
 

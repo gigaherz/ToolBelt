@@ -1,6 +1,8 @@
 package dev.gigaherz.toolbelt.slot;
 
 import dev.gigaherz.toolbelt.ToolBelt;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.neoforged.neoforge.capabilities.ItemCapability;
@@ -64,6 +66,7 @@ public interface IBeltSlotItem
      */
     default boolean canUnequip(@Nonnull ItemStack stack, @Nonnull BeltAttachment slot)
     {
-        return stack.getEnchantmentLevel(Enchantments.BINDING_CURSE) <= 0;
+        var provider = slot.getOwner().registryAccess();
+        return stack.getEnchantmentLevel(provider.lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.BINDING_CURSE)) <= 0;
     }
 }
