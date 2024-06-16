@@ -6,7 +6,7 @@ plugins {
     id 'net.neoforged.gradle.userdev' version '7.0.142'
 }
 
-version = "2.1.0"
+version = "2.2.0"
 group = "dev.gigaherz.toolbelt"
 
 Provider<String> minecraftVersion(Transformer<String, String> mapper) {
