@@ -71,6 +71,8 @@ public class SwapItems implements CustomPacketPayload
                 player.setItemInHand(InteractionHand.MAIN_HAND, inSlot);
                 cap.setStackInSlot(swapWith, inHand);
             }
+
+            getter.setBelt(stack);
             getter.syncToClients();
         });
     }

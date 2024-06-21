@@ -20,27 +20,32 @@ public class ToolBeltInventory implements IItemHandlerModifiable
         this.itemStack = itemStack;
     }
 
-    private CompoundTag getTag()
+    private CompoundTag getTagOrDummy()
     {
         CompoundTag tag;
         tag = itemStack.getTag();
         if (tag == null)
-            itemStack.setTag(tag = new CompoundTag());
+            tag = new CompoundTag();
         return tag;
+    }
+
+    private CompoundTag getOrCreateTag()
+    {
+        return itemStack.getOrCreateTag();
     }
 
     // Ensure that the serialization is always compatible, even if it were to change upstream
     @Override
     public int getSlots()
     {
-        return Mth.clamp(getTag().getInt("Size"), 2, 9);
+        return Mth.clamp(getTagOrDummy().getInt("Size"), 2, 9);
     }
 
     @Override
     public ItemStack getStackInSlot(int slot)
     {
         validateSlotIndex(slot);
-        ListTag tagList = getTag().getList("Items", Tag.TAG_COMPOUND);
+        ListTag tagList = getTagOrDummy().getList("Items", Tag.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++)
         {
             CompoundTag itemTags = tagList.getCompound(i);
@@ -67,7 +72,7 @@ public class ToolBeltInventory implements IItemHandlerModifiable
             stack.save(itemTag);
         }
 
-        ListTag tagList = getTag().getList("Items", Tag.TAG_COMPOUND);
+        ListTag tagList = getTagOrDummy().getList("Items", Tag.TAG_COMPOUND);
         for (int i = 0; i < tagList.size(); i++)
         {
             CompoundTag existing = tagList.getCompound(i);
@@ -84,7 +89,9 @@ public class ToolBeltInventory implements IItemHandlerModifiable
         if (hasStack)
             tagList.add(itemTag);
 
-        getTag().put("Items", tagList);
+        var tag0 = getOrCreateTag();
+        tag0.put("Items", tagList);
+        itemStack.setTag(tag0);
     }
 
     @Override

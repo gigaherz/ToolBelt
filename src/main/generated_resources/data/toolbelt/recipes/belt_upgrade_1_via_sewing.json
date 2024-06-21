@@ -8,7 +8,7 @@
       "type": "toolbelt:enable_sewing_crafting"
     }
   ],
-  "type": "sewingkit:sewing",
+  "type": "toolbelt:sewing_upgrade",
   "materials": [
     {
       "count": 1,

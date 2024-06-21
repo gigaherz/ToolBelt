@@ -12,6 +12,7 @@ import dev.gigaherz.toolbelt.belt.BeltIngredient;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import dev.gigaherz.toolbelt.common.BeltContainer;
 import dev.gigaherz.toolbelt.common.BeltScreen;
+import dev.gigaherz.toolbelt.integration.SewingUpgradeRecipe;
 import dev.gigaherz.toolbelt.slot.BeltSlotMenu;
 import dev.gigaherz.toolbelt.slot.BeltSlotScreen;
 import dev.gigaherz.toolbelt.integration.SewingKitIntegration;
@@ -284,7 +285,7 @@ public class ToolBelt
                 {
 
                     var beltId = ToolBelt.BELT.getId();
-                    SewingUpgradeRecipeBuilder.begin(ToolBelt.BELT.get(),
+                    SewingUpgradeRecipe.builder(ToolBelt.BELT.get(),
                                     compound(
                                             Pair.of("Size", IntTag.valueOf(i + 3))
                                     ))

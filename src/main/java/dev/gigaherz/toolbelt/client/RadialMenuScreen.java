@@ -254,8 +254,8 @@ public class RadialMenuScreen extends Screen
 
         if (inHand.getCount() > 0 || itemMouseOver.getCount() > 0)
         {
-            SwapItems.swapItem(slotNumber, minecraft.player);
             PacketDistributor.SERVER.noArg().send(new SwapItems(slotNumber));
+            //SwapItems.swapItem(slotNumber, minecraft.player);
         }
 
         menu.close();
