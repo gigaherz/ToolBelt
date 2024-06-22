@@ -176,6 +176,18 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
         return !ItemStack.isSameItem(oldStack, newStack); // super.shouldCauseReequipAnimation(oldStack, newStack, slotChanged);
     }
 
+    public static ItemStack makeUpgradedStack(ItemStack stack)
+    {
+        int slots = getSlotsCount(stack);
+
+        if (slots >= 9)
+            return stack.copy();
+
+        stack = stack.copy();
+        setSlotsCount(stack, slots + 1);
+        return stack;
+    }
+
     private void tickAllSlots(ItemStack source)
     {
         var inventory = Objects.requireNonNull(source.getCapability(Capabilities.ItemHandler.ITEM), "No inventory!");

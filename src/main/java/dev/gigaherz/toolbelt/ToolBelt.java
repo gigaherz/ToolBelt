@@ -31,6 +31,7 @@ import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.CreativeModeTabs;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.api.distmarker.Dist;
@@ -44,11 +45,13 @@ import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
+import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import net.neoforged.neoforge.common.crafting.IngredientType;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.event.AnvilUpdateEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -109,6 +112,8 @@ public class ToolBelt
         modEventBus.addListener(this::addItemsToTabs);
         modEventBus.addListener(this::registerPackets);
         modEventBus.addListener(ToolBeltItem::register);
+
+        NeoForge.EVENT_BUS.addListener(this::anvilChange);
 
         container.registerConfig(ModConfig.Type.SERVER, ConfigData.SERVER_SPEC);
         container.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
@@ -176,6 +181,45 @@ public class ToolBelt
             event.register(ToolBelt.BELT_MENU.get(), BeltScreen::new);
             event.register(ToolBelt.BELT_SLOT_MENU.get(), BeltSlotScreen::new);
         }
+    }
+
+
+    public static final int[] XP_COSTS = {3, 5, 8, 12, 15, 20, 30};
+
+    public static int getUpgradeXP(ItemStack stack)
+    {
+        int slots = ToolBeltItem.getSlotsCount(stack);
+
+        if (slots >= 9)
+            return -1;
+
+        if (slots < 2)
+            return 1;
+
+        return XP_COSTS[slots - 2];
+    }
+
+    public void anvilChange(AnvilUpdateEvent ev)
+    {
+        if (!ConfigData.enableAnvilUpgrading)
+            return;
+
+        ItemStack left = ev.getLeft();
+        ItemStack right = ev.getRight();
+        if (left.getCount() <= 0 || left.getItem() != BELT.get())
+            return;
+        if (right.getCount() <= 0 || right.getItem() != POUCH.get())
+            return;
+        int cost = getUpgradeXP(left);
+        if (cost < 0)
+        {
+            ev.setCanceled(true);
+            return;
+        }
+        ev.setCost(cost);
+        ev.setMaterialCost(1);
+
+        ev.setOutput(ToolBeltItem.makeUpgradedStack(left));
     }
 
     public static ResourceLocation location(String path)
@@ -267,6 +311,7 @@ public class ToolBelt
                             .addMaterial(BeltIngredient.withLevel(i).toVanilla())
                             .addMaterial(Ingredient.of(POUCH.get()))
                             .addMaterial(Ingredient.of(Items.STRING))
+                            .setGroup("toolbelt_belt_upgrade")
                             .addCriterion("has_leather", has(itemTag("forge:leather")))
                             .save(consumer.withConditions(
                                     modLoaded("sewingkit"),
