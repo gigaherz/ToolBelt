@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.138'
+    id 'net.neoforged.gradle.userdev' version '7.0.145'
 }
 
 version = "2.1.0"
@@ -94,7 +94,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:20.6.100-beta'
+    implementation 'net.neoforged:neoforge:20.6.119'
 
     compileOnly "dev.gigaherz.sewingkit:SewingKit-1.20.6:2.0.0"
     runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.20.6:2.0.0"
