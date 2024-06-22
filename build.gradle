@@ -6,7 +6,7 @@ plugins {
     id 'net.neoforged.gradle.userdev' version '7.0.145'
 }
 
-version = "2.1.0"
+version = "2.1.1"
 group = "dev.gigaherz.toolbelt"
 
 Provider<String> minecraftVersion(Transformer<String, String> mapper) {
@@ -96,16 +96,16 @@ repositories {
 dependencies {
     implementation 'net.neoforged:neoforge:20.6.119'
 
-    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.20.6:2.0.0"
-    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.20.6:2.0.0"
+    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.20.6:2.0.3"
+    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.20.6:2.0.3"
 
-    //compileOnly "mezz.jei:jei-1.20-common-api:14.0.0.4"
-    //runtimeOnly "mezz.jei:jei-1.20-common:14.0.0.4"
-    //compileOnly "mezz.jei:jei-1.20-forge-api:14.0.0.4"
-    //runtimeOnly "mezz.jei:jei-1.20-forge:14.0.0.4"
+    compileOnly "mezz.jei:jei-1.20.6-common-api:18.0.0.64"
+    runtimeOnly "mezz.jei:jei-1.20.6-common:18.0.0.64"
+    compileOnly "mezz.jei:jei-1.20.6-neoforge-api:18.0.0.64"
+    runtimeOnly "mezz.jei:jei-1.20.6-neoforge:18.0.0.64"
 
-    compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
-    runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.1+1.20.6"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.1+1.20.6"
 
     //runtimeOnly fg.deobf("curse.maven:corail-tombstone-243707:3836552")
 }

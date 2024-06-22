@@ -9,6 +9,7 @@
     }
   ],
   "type": "toolbelt:sewing_upgrade",
+  "group": "toolbelt_belt_upgrade",
   "materials": [
     {
       "count": 1,
