@@ -3,10 +3,10 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.145'
+    id 'net.neoforged.gradle.userdev' version '7.0.153'
 }
 
-version = "2.2.1"
+version = "2.2.2"
 group = "dev.gigaherz.toolbelt"
 
 Provider<String> minecraftVersion(Transformer<String, String> mapper) {
@@ -25,8 +25,8 @@ sourceSets {
 
 subsystems {
     parchment {
-        minecraftVersion="1.20.6"
-        mappingsVersion="2024.05.01"
+        minecraftVersion="1.21"
+        mappingsVersion="2024.07.07"
     }
 }
 
@@ -94,15 +94,15 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:21.0.21-beta'
+    implementation 'net.neoforged:neoforge:21.0.86-beta'
 
-    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.3"
-    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.3"
+    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.6"
+    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.6"
 
-    compileOnly "mezz.jei:jei-1.21-common-api:19.0.0.9"
-    runtimeOnly "mezz.jei:jei-1.21-common:19.0.0.9"
-    compileOnly "mezz.jei:jei-1.21-neoforge-api:19.0.0.9"
-    runtimeOnly "mezz.jei:jei-1.21-neoforge:19.0.0.9"
+    compileOnly "mezz.jei:jei-1.21-common-api:19.3.1.25"
+    runtimeOnly "mezz.jei:jei-1.21-common:19.3.1.25"
+    compileOnly "mezz.jei:jei-1.21-neoforge-api:19.3.1.25"
+    runtimeOnly "mezz.jei:jei-1.21-neoforge:19.3.1.25"
 
     //compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
     //runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"

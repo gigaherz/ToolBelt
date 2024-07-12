@@ -107,7 +107,8 @@ public class ToolBelt
         DATA_COMPONENT_TYPES.register(modEventBus);
 
         modEventBus.addListener(this::commonSetup);
-        modEventBus.addListener(this::modConfig);
+        modEventBus.addListener(this::modConfigLoad);
+        modEventBus.addListener(this::modConfigReload);
         modEventBus.addListener(this::gatherData);
         modEventBus.addListener(this::addItemsToTabs);
         modEventBus.addListener(this::registerPackets);
@@ -141,9 +142,18 @@ public class ToolBelt
         DataGen.gatherData(event);
     }
 
-    public void modConfig(ModConfigEvent event)
+    public void modConfigLoad(ModConfigEvent.Loading event)
     {
-        ModConfig config = event.getConfig();
+        reloadConfigs(event.getConfig());
+    }
+
+    public void modConfigReload(ModConfigEvent.Reloading event)
+    {
+        reloadConfigs(event.getConfig());
+    }
+
+    private void reloadConfigs(ModConfig config)
+    {
         if (config.getSpec() == ConfigData.CLIENT_SPEC)
             ConfigData.refreshClient();
         else if (config.getSpec() == ConfigData.COMMON_SPEC)

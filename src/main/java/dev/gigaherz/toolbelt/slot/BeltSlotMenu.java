@@ -6,11 +6,9 @@ import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.network.ContainerSlotsHack;
 import net.minecraft.client.RecipeBookCategories;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.player.StackedContents;
@@ -19,8 +17,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.enchantment.EnchantmentEffectComponents;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.network.PacketDistributor;
 
@@ -75,7 +73,7 @@ public class BeltSlotMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe>
                 public boolean mayPickup(Player playerIn)
                 {
                     ItemStack itemstack = this.getItem();
-                    return !itemstack.isEmpty() && !playerIn.isCreative() && hasBindingCurse(itemstack) ? false : super.mayPickup(playerIn);
+                    return !itemstack.isEmpty() && !playerIn.isCreative() && preventArmorChange(itemstack) ? false : super.mayPickup(playerIn);
                 }
 
                 @Override
@@ -119,10 +117,9 @@ public class BeltSlotMenu extends RecipeBookMenu<CraftingInput, CraftingRecipe>
         }
     }
 
-    private boolean hasBindingCurse(ItemStack itemstack)
+    private boolean preventArmorChange(ItemStack stack)
     {
-        var ench = this.player.registryAccess().lookupOrThrow(Registries.ENCHANTMENT).getOrThrow(Enchantments.BINDING_CURSE);
-        return itemstack.getEnchantmentLevel(ench) > 0;
+        return EnchantmentHelper.has(stack, EnchantmentEffectComponents.PREVENT_ARMOR_CHANGE);
     }
 
     @Override
