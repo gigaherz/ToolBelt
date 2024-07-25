@@ -6,7 +6,7 @@ plugins {
     id 'net.neoforged.gradle.userdev' version '7.0.153'
 }
 
-version = "2.2.2"
+version = "2.2.3"
 group = "dev.gigaherz.toolbelt"
 
 Provider<String> minecraftVersion(Transformer<String, String> mapper) {
@@ -94,15 +94,15 @@ repositories {
 }
 
 dependencies {
-    implementation 'net.neoforged:neoforge:21.0.86-beta'
+    implementation 'net.neoforged:neoforge:21.0.133-beta'
 
-    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.6"
-    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.6"
+    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.8"
+    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.8"
 
-    compileOnly "mezz.jei:jei-1.21-common-api:19.3.1.25"
-    runtimeOnly "mezz.jei:jei-1.21-common:19.3.1.25"
-    compileOnly "mezz.jei:jei-1.21-neoforge-api:19.3.1.25"
-    runtimeOnly "mezz.jei:jei-1.21-neoforge:19.3.1.25"
+    compileOnly "mezz.jei:jei-1.21-common-api:19.5.0.56"
+    runtimeOnly "mezz.jei:jei-1.21-common:19.5.0.56"
+    compileOnly "mezz.jei:jei-1.21-neoforge-api:19.5.0.56"
+    runtimeOnly "mezz.jei:jei-1.21-neoforge:19.5.0.56"
 
     //compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
     //runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
@@ -125,5 +125,14 @@ jar {
                 "Implementation-Vendor" :"gigaherz",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
         ])
+    }
+}
+
+
+// IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
+idea {
+    module {
+        downloadSources = true
+        downloadJavadoc = true
     }
 }

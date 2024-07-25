@@ -34,10 +34,12 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 import java.util.Collection;
+import java.util.Objects;
 
 public class BeltAttachment implements INBTSerializable<CompoundTag>
 {
@@ -112,9 +114,9 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
             Entity target = event.getTarget();
             if (target.level().isClientSide)
                 return;
-            if (target instanceof Player)
+            if (target instanceof Player playerTarget)
             {
-                get((LivingEntity) target).syncToSelf();
+                get(playerTarget).syncTo(event.getEntity());
             }
         }
 
@@ -205,14 +207,19 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
         syncTo((Player) owner);
     }
 
-    protected void syncTo(Player target)
+    public void syncTo(Player target)
     {
-        PacketDistributor.sendToPlayer((ServerPlayer) target, new SyncBeltSlotContents(owner, this));
+        PacketDistributor.sendToPlayer((ServerPlayer) target, getSyncPacket());
     }
 
-    protected void syncToTracking(Entity target)
+    public void syncToTracking(Entity target)
     {
-        PacketDistributor.sendToPlayersTrackingEntityAndSelf(target, new SyncBeltSlotContents(owner, this));
+        PacketDistributor.sendToPlayersTrackingEntityAndSelf(target, getSyncPacket());
+    }
+
+    private SyncBeltSlotContents getSyncPacket()
+    {
+        return new SyncBeltSlotContents(owner, this);
     }
 
     private final LivingEntity owner;
@@ -227,7 +234,7 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
 
     public BeltAttachment(IAttachmentHolder holder)
     {
-        this.owner = (LivingEntity)holder;
+        this.owner = (LivingEntity) Objects.requireNonNull(holder);
     }
 
     public LivingEntity getOwner()
@@ -239,7 +246,7 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
     {
         if (!ConfigData.customBeltSlotEnabled)
             return;
-        if (getOwner() != null && !getOwner().level().isClientSide)
+        if (!getOwner().level().isClientSide)
             syncToTracking(getOwner());
     }
 
