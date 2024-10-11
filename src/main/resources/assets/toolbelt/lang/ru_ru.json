@@ -1,15 +1,15 @@
 {
   "item.toolbelt.belt": "Пояс с инструментами",
   "item.toolbelt.pouch": "Поясная сумка",
-  "key.toolbelt.open": "Заменить инструмент",
+  "key.toolbelt.open": "Поменять инструмент",
   "key.toolbelt.category": "Пояс с инструментами",
-  "key.toolbelt.slot": "Открыть слот инвентарь Пояса",
-  "key.toolbelt.cycle.left": "Циклический инструмент слева",
-  "key.toolbelt.cycle.right": "Циклический инструмент справа",
+  "key.toolbelt.slot": "Открыть инвентарь слота для Пояса",
+  "key.toolbelt.cycle.left": "Сменить инструмент влево",
+  "key.toolbelt.cycle.right": "Сменить инструмент вправо",
   "text.toolbelt.empty": "ПУСТО",
-  "text.toolbelt.swap": "ЗАМЕНИТЬ",
+  "text.toolbelt.swap": "ОБМЕНЯТЬ",
   "text.toolbelt.insert": "ВСТАВИТЬ",
   "text.toolbelt.extract": "ИЗВЛЕЧЬ",
-  "text.toolbelt.tooltip": "Улучшения: %s (%s слотов)",
+  "text.toolbelt.tooltip": "Улучшений: %s (%s слотов).",
   "text.toolbelt": "Пояс с инструментами"
 }
