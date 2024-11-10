@@ -10,6 +10,7 @@ import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
@@ -18,6 +19,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 
@@ -26,21 +28,22 @@ import java.util.Optional;
 
 public class SewingUpgradeRecipe extends SewingRecipe
 {
-    public static SewingUpgradeRecipeBuilder builder(Item result, int count)
+    public static SewingUpgradeRecipeBuilder builder(HolderLookup.RegistryLookup<Item> items, Item result, int count)
     {
-        return new SewingUpgradeRecipeBuilder(new ItemStack(result, count));
+        return new SewingUpgradeRecipeBuilder(items, new ItemStack(result, count));
     }
 
-    public static SewingUpgradeRecipeBuilder builder(ItemStack result)
+    public static SewingUpgradeRecipeBuilder builder(HolderLookup.RegistryLookup<Item> items, ItemStack result)
     {
-        return new SewingUpgradeRecipeBuilder(result);
+        return new SewingUpgradeRecipeBuilder(items, result);
     }
 
     public static final MapCodec<SewingUpgradeRecipe> CODEC =
             RecordCodecBuilder.mapCodec((instance) -> defaultSewingFields(instance).apply(instance, SewingUpgradeRecipe::new));
 
     public static final StreamCodec<RegistryFriendlyByteBuf, SewingUpgradeRecipe> STREAM_CODEC = StreamCodec.composite(
-            SewingKitMod.nullable(ByteBufCodecs.STRING_UTF8), SewingRecipe::getGroup,
+            SewingKitMod.nullable(ByteBufCodecs.STRING_UTF8), SewingRecipe::group,
+            ByteBufCodecs.registry(Registries.RECIPE_BOOK_CATEGORY), SewingRecipe::recipeBookCategory,
             ByteBufCodecs.collection(NonNullList::createWithCapacity, Material.STREAM_CODEC), SewingRecipe::getMaterials,
             ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC), SewingRecipe::getPattern,
             ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC), SewingRecipe::getTool,
@@ -50,18 +53,20 @@ public class SewingUpgradeRecipe extends SewingRecipe
     );
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public SewingUpgradeRecipe(String group, NonNullList<Material> materials, Optional<Ingredient> pattern, Optional<Ingredient> tool, ItemStack output, boolean showNotification)
+    public SewingUpgradeRecipe(String group, RecipeBookCategory recipeBookCategory, NonNullList<Material> materials, Optional<Ingredient> pattern, Optional<Ingredient> tool, ItemStack output, boolean showNotification)
     {
-        super(group, materials, pattern, tool, output, showNotification);
+        super(group, recipeBookCategory, materials, pattern, tool, output, showNotification);
     }
 
-    public SewingUpgradeRecipe(String group, NonNullList<Material> materials, @Nullable Ingredient pattern, @Nullable Ingredient tool, ItemStack output, boolean showNotification)
+    public SewingUpgradeRecipe(String group, RecipeBookCategory recipeBookCategory, NonNullList<Material> materials, @Nullable Ingredient pattern, @Nullable Ingredient tool, ItemStack output, boolean showNotification)
     {
-        super(group, materials, pattern, tool, output, showNotification);
+        super(group, recipeBookCategory, materials, pattern, tool, output, showNotification);
     }
+
+
 
     @Override
-    public RecipeSerializer<?> getSerializer()
+    public RecipeSerializer<SewingUpgradeRecipe> getSerializer()
     {
         return SewingKitIntegration.SEWING_UGRADE_SERIALIZER.get();
     }

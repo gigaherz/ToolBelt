@@ -9,7 +9,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.apache.logging.log4j.util.TriConsumer;
@@ -174,7 +174,7 @@ public class GenericRadialMenu
     public void close()
     {
         state = State.CLOSING;
-        startAnimation = minecraft.level.getGameTime() + (double) minecraft.getTimer().getGameTimeDeltaPartialTick(false);
+        startAnimation = minecraft.level.getGameTime() + (double) minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
         animProgress = 1.0f;
         setHovered(-1);
     }
@@ -183,7 +183,7 @@ public class GenericRadialMenu
     {
         if (state == State.INITIALIZING)
         {
-            startAnimation = minecraft.level.getGameTime() + (double) minecraft.getTimer().getGameTimeDeltaPartialTick(false);
+            startAnimation = minecraft.level.getGameTime() + (double) minecraft.getDeltaTracker().getGameTimeDeltaPartialTick(false);
             state = State.OPENING;
             animProgress = 0;
         }
@@ -324,24 +324,19 @@ public class GenericRadialMenu
     {
         if (visibleItems.size() > 0)
         {
-            RenderSystem.enableBlend();
-            RenderSystem.defaultBlendFunc();
-            RenderSystem.setShader(GameRenderer::getPositionColorShader);
-            RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+            var bufferSource = Minecraft.getInstance().renderBuffers().bufferSource();
+            VertexConsumer builder = bufferSource.getBuffer(RenderType.gui());
 
-            var builder = Tesselator.getInstance().begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_COLOR);
             iterateVisible((item, s, e) -> {
                 int color = item.isHovered() ? backgroundColorHover : backgroundColor;
                 drawPieArc(builder, x, y, z, radiusIn, radiusOut, s, e, color);
             });
-            BufferUploader.drawWithShader(builder.buildOrThrow());
-            RenderSystem.disableBlend();
         }
     }
 
     private static final float PRECISION = 2.5f / 360.0f;
 
-    private void drawPieArc(BufferBuilder buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int color)
+    private void drawPieArc(VertexConsumer buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int color)
     {
         float angle = endAngle - startAngle;
         int sections = Math.max(1, Mth.ceil(angle / PRECISION));

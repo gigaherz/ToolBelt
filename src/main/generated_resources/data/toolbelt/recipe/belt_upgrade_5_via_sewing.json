@@ -9,26 +9,23 @@
     }
   ],
   "type": "toolbelt:sewing_upgrade",
+  "category": "sewingkit:sewing_misc",
   "group": "toolbelt_belt_upgrade",
   "materials": [
     {
       "count": 1,
       "ingredient": {
-        "type": "toolbelt:belt_upgrade_level",
+        "neoforge:ingredient_type": "toolbelt:belt_upgrade_level",
         "size": 6
       }
     },
     {
       "count": 1,
-      "ingredient": {
-        "item": "toolbelt:pouch"
-      }
+      "ingredient": "toolbelt:pouch"
     },
     {
       "count": 1,
-      "ingredient": {
-        "item": "minecraft:string"
-      }
+      "ingredient": "minecraft:string"
     }
   ],
   "result": {
@@ -38,7 +35,5 @@
     "count": 1,
     "id": "toolbelt:belt"
   },
-  "tool": {
-    "tag": "sewingkit:needles/diamond_or_higher"
-  }
+  "tool": "#sewingkit:needles/diamond_or_higher"
 }

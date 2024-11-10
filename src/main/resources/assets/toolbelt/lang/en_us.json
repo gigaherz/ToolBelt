@@ -11,5 +11,21 @@
   "text.toolbelt.insert": "INSERT",
   "text.toolbelt.extract": "EXTRACT",
   "text.toolbelt.tooltip": "Upgrades: %s (%s slots)",
-  "text.toolbelt": "Tool Belt"
+  "text.toolbelt": "Tool Belt",
+
+
+
+  "text.toolbelt.config.category.common_general": "General settings",
+  "text.toolbelt.config.category.client_display": "Display settings",
+  "text.toolbelt.config.category.client_menu": "Radial Menu settings",
+  "text.toolbelt.config.enable_sewing_kit_support": "Enable SewingKit recipes",
+  "text.toolbelt.config.anvil_upgrading": "Enable anvil upgrade recipes",
+  "text.toolbelt.config.enable_grid_crafting": "Enable crafting grid recipes",
+  "text.toolbelt.config.custom_belt_slot_mode": "Custom belt slot",
+  "text.toolbelt.config.show_belt_on_players": "Show belt on players",
+  "text.toolbelt.config.belt_item_scale": "Belt item scale",
+  "text.toolbelt.config.release_to_swap": "Release to Swap",
+  "text.toolbelt.config.clip_mouse_to_circle": "Clip mouse to circle",
+  "text.toolbelt.config.click_outside_bounds": "Allow clicking outside bounds",
+  "text.toolbelt.config.display_empty_slots" : "Display empty slots"
 }

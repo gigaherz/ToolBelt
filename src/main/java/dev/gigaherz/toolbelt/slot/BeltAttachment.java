@@ -6,6 +6,7 @@ import dev.gigaherz.toolbelt.network.SyncBeltSlotContents;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
@@ -151,9 +152,9 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
                 }
                 else
                 {
-                    if (entity instanceof Player player)
+                    if (entity instanceof ServerPlayer player)
                     {
-                        if (!entity.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
+                        if (!player.serverLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
                         {
                             printDebugLog("Entity is player, and keepInventory is not set. Spilling...");
                             Collection<ItemEntity> old = entity.captureDrops(event.getDrops());
@@ -162,9 +163,9 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
                             attachment.setContents(ItemStack.EMPTY);
                         }
                     }
-                    else
+                    else if(entity.level() instanceof ServerLevel level)
                     {
-                        entity.spawnAtLocation(stack);
+                        entity.spawnAtLocation(level, stack);
                         attachment.setContents(ItemStack.EMPTY);
                     }
                 }
@@ -196,8 +197,8 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
             printDebugLog("Entity {}({}) has item in the belt slot, but the belt is disabled. Dropping to the ground.", owner.getScoreboardName(), owner.getUUID());
             if (owner instanceof Player)
                 ItemHandlerHelper.giveItemToPlayer((Player) owner, stack);
-            else
-                owner.spawnAtLocation(stack, 0.1f);
+            else if (owner.level() instanceof ServerLevel level)
+                owner.spawnAtLocation(level, stack, 0.1f);
             setContents(ItemStack.EMPTY);
         }
     }

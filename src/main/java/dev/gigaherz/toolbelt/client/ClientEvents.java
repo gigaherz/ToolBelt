@@ -12,16 +12,18 @@ import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.multiplayer.ClientLevel;
-import net.minecraft.client.player.Input;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
@@ -99,16 +101,18 @@ public class ClientEvents
     public static void updateInputEvent(MovementInputUpdateEvent event) {
         if (Minecraft.getInstance().screen instanceof RadialMenuScreen) {
             Options settings = Minecraft.getInstance().options;
-            Input eInput = event.getInput();
-            eInput.up = isKeyDown0(settings.keyUp);
-            eInput.down = isKeyDown0(settings.keyDown);
-            eInput.left = isKeyDown0(settings.keyLeft);
-            eInput.right = isKeyDown0(settings.keyRight);
-
-            eInput.forwardImpulse = eInput.up == eInput.down ? 0.0F : (eInput.up ? 1.0F : -1.0F);
-            eInput.leftImpulse = eInput.left == eInput.right ? 0.0F : (eInput.left ? 1.0F : -1.0F);
-            eInput.jumping = isKeyDown0(settings.keyJump);
-            eInput.shiftKeyDown = isKeyDown0(settings.keyShift);
+            var eInput = event.getInput();
+            eInput.keyPresses = new Input(
+                    isKeyDown0(settings.keyUp),
+                    isKeyDown0(settings.keyDown),
+                    isKeyDown0(settings.keyLeft),
+                    isKeyDown0(settings.keyRight),
+                    isKeyDown0(settings.keyJump),
+                    isKeyDown0(settings.keyShift),
+                    isKeyDown0(settings.keySprint)
+            );
+            eInput.forwardImpulse = eInput.keyPresses.forward() == eInput.keyPresses.backward() ? 0.0F : (eInput.keyPresses.forward() ? 1.0F : -1.0F);
+            eInput.leftImpulse = eInput.keyPresses.left() == eInput.keyPresses.right() ? 0.0F : (eInput.keyPresses.left() ? 1.0F : -1.0F);
             if (Minecraft.getInstance().player.isMovingSlowly()) {
                 eInput.leftImpulse = (float) ((double) eInput.leftImpulse * 0.3D);
                 eInput.forwardImpulse = (float) ((double) eInput.forwardImpulse * 0.3D);
@@ -196,7 +200,7 @@ public class ClientEvents
         }
 
         @SubscribeEvent
-        public static void construct(EntityRenderersEvent.AddLayers event)
+        public static void addLayers(EntityRenderersEvent.AddLayers event)
         {
             addLayerToHumanoid(event, EntityType.ARMOR_STAND, ToolBeltLayer::new);
             addLayerToHumanoid(event, EntityType.ZOMBIE, ToolBeltLayer::new);
@@ -210,26 +214,19 @@ public class ClientEvents
         }
 
         @SuppressWarnings({"rawtypes", "unchecked"})
-        private static <E extends Player, M extends HumanoidModel<E>>
-        void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, PlayerSkin.Model skinName, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E, M>> factory)
+        private static <E extends Player, S extends HumanoidRenderState, M extends HumanoidModel<S>>
+        void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, PlayerSkin.Model skinName, Function<LivingEntityRenderer<E, S, M>, ? extends RenderLayer<S, M>> factory)
         {
             EntityRenderer renderer = event.getSkin(skinName);
             if (renderer instanceof LivingEntityRenderer ler) ler.addLayer(factory.apply(ler));
         }
 
         @SuppressWarnings({"rawtypes", "unchecked"})
-        private static <E extends LivingEntity, M extends HumanoidModel<E>>
-        void addLayerToHumanoid(EntityRenderersEvent.AddLayers event, EntityType<E> entityType, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E, M>> factory)
+        private static <E extends LivingEntity, S extends HumanoidRenderState, M extends HumanoidModel<S>>
+        void addLayerToHumanoid(EntityRenderersEvent.AddLayers event, EntityType<E> entityType, Function<LivingEntityRenderer<E, S, M>, ? extends RenderLayer<S, M>> factory)
         {
-            EntityRenderer<E> renderer = event.getRenderer(entityType);
+            EntityRenderer<E, S> renderer = event.getRenderer(entityType);
             if (renderer instanceof LivingEntityRenderer ler) ler.addLayer(factory.apply(ler));
-        }
-
-        private static <E extends LivingEntity, M extends EntityModel<E>>
-        void addLayerToLiving(EntityRenderersEvent.AddLayers event, EntityType<E> entityType, Function<LivingEntityRenderer<E, M>, ? extends RenderLayer<E, M>> factory)
-        {
-            LivingEntityRenderer<E, M> renderer = event.getRenderer(entityType);
-            if (renderer != null) renderer.addLayer(factory.apply(renderer));
         }
     }
 }

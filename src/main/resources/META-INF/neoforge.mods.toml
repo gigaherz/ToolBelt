@@ -13,22 +13,26 @@ Declutter your inventory of tools
 displayURL="https://github.com/gigaherz/ToolBelt"
 logoFile="logo.png"
 authors="gigaherz"
+enumExtensions="META-INF/enumextensions.json"
+
+[[mixins]]
+config="toolbelt.mixins.json"
 
 [[dependencies.toolbelt]]
    modId="neoforge"
    type="required"
-   versionRange="[21.0.10-beta,)"
+   versionRange="[21.3.19-beta,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
    modId="minecraft"
    type="required"
-   versionRange="[1.21,1.22)"
+   versionRange="[1.21.3,1.22)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
    modId="sewingkit"
    type="optional"
-   versionRange="[2.0.1,)"
+   versionRange="[2.1.0,)"
    ordering="NONE"
    side="BOTH"

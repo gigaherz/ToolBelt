@@ -9,7 +9,6 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
@@ -138,13 +137,12 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand)
+    public InteractionResult use(Level world, Player player, InteractionHand hand)
     {
         ItemStack stack = player.getItemInHand(hand);
         if (hand != InteractionHand.MAIN_HAND)
-            return new InteractionResultHolder<>(InteractionResult.PASS, stack);
-        InteractionResult result = openBeltScreen(player, stack, world);
-        return new InteractionResultHolder<>(result, stack);
+            return InteractionResult.PASS;
+        return openBeltScreen(player, stack, world);
     }
 
     @Override

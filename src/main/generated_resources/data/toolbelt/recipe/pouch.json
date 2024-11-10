@@ -7,15 +7,9 @@
   "type": "minecraft:crafting_shaped",
   "category": "equipment",
   "key": {
-    "g": {
-      "item": "minecraft:gold_ingot"
-    },
-    "l": {
-      "item": "minecraft:leather"
-    },
-    "s": {
-      "item": "minecraft:string"
-    }
+    "g": "minecraft:gold_ingot",
+    "l": "minecraft:leather",
+    "s": "minecraft:string"
   },
   "pattern": [
     "sgs",

@@ -9,37 +9,28 @@
     }
   ],
   "type": "sewingkit:sewing",
+  "category": "sewingkit:sewing_misc",
   "materials": [
     {
       "count": 2,
-      "ingredient": {
-        "item": "sewingkit:leather_strip"
-      }
+      "ingredient": "sewingkit:leather_strip"
     },
     {
       "count": 3,
-      "ingredient": {
-        "item": "sewingkit:leather_sheet"
-      }
+      "ingredient": "sewingkit:leather_sheet"
     },
     {
       "count": 1,
-      "ingredient": {
-        "item": "minecraft:iron_ingot"
-      }
+      "ingredient": "minecraft:iron_ingot"
     },
     {
       "count": 2,
-      "ingredient": {
-        "item": "minecraft:string"
-      }
+      "ingredient": "minecraft:string"
     }
   ],
   "result": {
     "count": 1,
     "id": "toolbelt:belt"
   },
-  "tool": {
-    "tag": "sewingkit:needles/wood_or_higher"
-  }
+  "tool": "#sewingkit:needles/wood_or_higher"
 }

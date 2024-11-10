@@ -1,9 +1,7 @@
 package dev.gigaherz.toolbelt.client;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.math.Axis;
-import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.Minecraft;
@@ -16,37 +14,41 @@ import net.minecraft.client.model.geom.builders.LayerDefinition;
 import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.util.FastColor;
+import net.minecraft.util.ARGB;
 import net.minecraft.world.entity.HumanoidArm;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.npc.Villager;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 
-public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> extends RenderLayer<T, M>
+public class ToolBeltLayer<S extends HumanoidRenderState, M extends HumanoidModel<? super S>> extends RenderLayer<S, M>
 {
     private static final ResourceLocation TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
     private static final ResourceLocation TEXTURE_BELT_DYED = ToolBelt.location("textures/entity/dyed_belt.png");
 
-    private final BeltModel<T> beltModel;
+    private static ItemDisplayContext LEFTSIDE = Enum.valueOf(ItemDisplayContext.class, "TOOLBELT_LEFTSIDE");
+    private static ItemDisplayContext RIGHTSIDE = Enum.valueOf(ItemDisplayContext.class, "TOOLBELT_RIGHTSIDE");
 
-    public ToolBeltLayer(RenderLayerParent<T, M> owner)
+
+    private final BeltModel beltModel;
+
+    public ToolBeltLayer(RenderLayerParent<S, M> owner)
     {
         super(owner);
 
         beltModel = new BeltModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ClientEvents.BELT_LAYER));
     }
 
-    private void translateToBody(LivingEntity entity, PoseStack poseStack)
+    private void translateToBody(S renderState, PoseStack poseStack)
     {
         this.getParentModel().body.translateAndRotate(poseStack);
-        if (entity.isBaby() && !(entity instanceof Villager))
+        if (renderState.isBaby)
         {
             poseStack.scale(0.52F, 0.52F, 0.52F);
             poseStack.translate(0.0D, 1.4D, 0.0D);
@@ -54,76 +56,79 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
     }
 
     @Override
-    public void render(PoseStack matrixStack, MultiBufferSource buffer, int lightness, T entity, float limbSwing, float limbSwingAmount, float partialTicks, float ageInTicks, float netHeadYaw, float headPitch)
+    public void render(PoseStack poseStack, MultiBufferSource buffer, int lightness, S renderState, float v, float v1)
     {
         if (!ConfigData.showBeltOnPlayers)
             return;
 
-        BeltFinder.findBelt(entity, true).ifPresent((getter) -> {
+        if (!(renderState instanceof EntityRenderStateToolBeltContext beltState) )
+            return;
 
-            if (getter.isHidden())
-                return;
+        var getter = beltState.toolbelt_getBelt();
+        if (getter == null || getter.isHidden())
+            return;
 
-            var stack = getter.getBelt();
+        var stack = getter.getBelt();
 
-            matrixStack.pushPose();
-            this.translateToBody(entity, matrixStack);
+        poseStack.pushPose();
+        this.translateToBody(renderState, poseStack);
 
-            var cap = stack.getCapability(Capabilities.ItemHandler.ITEM);
-            if (cap != null)
+        var cap = stack.getCapability(Capabilities.ItemHandler.ITEM);
+        if (cap != null)
+        {
+            boolean rightHanded = renderState.attackArm == HumanoidArm.RIGHT;
+
             {
-                boolean rightHanded = entity.getMainArm() == HumanoidArm.RIGHT;
+                ItemStack firstItem = cap.getStackInSlot(0);
+                ItemStack secondItem = cap.getStackInSlot(1);
 
+                ItemStack leftItem = rightHanded ? firstItem : secondItem;
+                ItemStack rightItem = rightHanded ? secondItem : firstItem;
+
+                if (!leftItem.isEmpty() || !rightItem.isEmpty())
                 {
-                    ItemStack firstItem = cap.getStackInSlot(0);
-                    ItemStack secondItem = cap.getStackInSlot(1);
+                    poseStack.pushPose();
 
-                    ItemStack leftItem = rightHanded ? firstItem : secondItem;
-                    ItemStack rightItem = rightHanded ? secondItem : firstItem;
-
-                    if (!leftItem.isEmpty() || !rightItem.isEmpty())
+                    if (renderState.isBaby)
                     {
-                        matrixStack.pushPose();
-
-                        if (getParentModel().young)
-                        {
-                            matrixStack.translate(0.0F, 0.75F, 0.0F);
-                            matrixStack.scale(0.5F, 0.5F, 0.5F);
-                        }
-
-                        renderHeldItem(entity, rightItem, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, HumanoidArm.RIGHT, matrixStack, buffer, lightness);
-                        renderHeldItem(entity, leftItem, ItemDisplayContext.THIRD_PERSON_LEFT_HAND, HumanoidArm.LEFT, matrixStack, buffer, lightness);
-
-                        matrixStack.popPose();
+                        poseStack.translate(0.0F, 0.75F, 0.0F);
+                        poseStack.scale(0.5F, 0.5F, 0.5F);
                     }
+
+                    renderHeldItem(rightItem, RIGHTSIDE, false, poseStack, buffer, lightness);
+                    renderHeldItem(leftItem, LEFTSIDE, true, poseStack, buffer, lightness);
+
+                    poseStack.popPose();
                 }
             }
+        }
 
-            matrixStack.translate(0.0F, 0.19F, 0.0F);
-            matrixStack.scale(0.85f, 0.6f, 0.78f);
+        poseStack.translate(0.0F, 0.19F, 0.0F);
+        poseStack.scale(0.85f, 0.6f, 0.78f);
 
-            var dyeInfo = stack.get(DataComponents.DYED_COLOR);
-            beltModel.hasColor = dyeInfo != null;
-            if (beltModel.hasColor)
-            {
-                var dyeColor = dyeInfo.rgb();
-                beltModel.dyeRed = FastColor.ARGB32.red(dyeColor) / 255.0f;
-                beltModel.dyeGreen = FastColor.ARGB32.green(dyeColor) / 255.0f;
-                beltModel.dyeBlue = FastColor.ARGB32.blue(dyeColor) / 255.0f;
-            }
+        var dyeInfo = stack.get(DataComponents.DYED_COLOR);
+        beltModel.hasColor = dyeInfo != null;
+        if (beltModel.hasColor)
+        {
+            var dyeColor = dyeInfo.rgb();
+            beltModel.dyeRed = ARGB.red(dyeColor) / 255.0f;
+            beltModel.dyeGreen = ARGB.green(dyeColor) / 255.0f;
+            beltModel.dyeBlue = ARGB.blue(dyeColor) / 255.0f;
+        }
 
-            renderColoredCutoutModel(beltModel, getTextureLocation(entity), matrixStack, buffer, lightness, entity, 0xFFFFFFFF);
+        renderColoredCutoutModel(beltModel, getTextureLocation(stack), poseStack, buffer, lightness, renderState, 0xFFFFFFFF);
 
-            matrixStack.popPose();
-        });
+        poseStack.popPose();
     }
 
-    private static void renderHeldItem(LivingEntity player, ItemStack stack, ItemDisplayContext transformType, HumanoidArm handSide, PoseStack matrixStack, MultiBufferSource buffer, int lightness)
+    private static void renderHeldItem(ItemStack stack, ItemDisplayContext transformType,
+                                       boolean leftHand, PoseStack matrixStack,
+                                       MultiBufferSource buffer, int lightmapCoords)
     {
         if (stack.isEmpty())
             return;
         matrixStack.pushPose();
-        if (handSide == HumanoidArm.LEFT)
+        if (leftHand)
             matrixStack.translate(-4.35f / 16.0F, 0.7f, -0.1f);
         else
             matrixStack.translate(4.35f / 16.0F, 0.7f, -0.1f);
@@ -131,31 +136,28 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
         matrixStack.mulPose(Axis.XP.rotationDegrees(40));
         float scale = ConfigData.beltItemScale;
         matrixStack.scale(scale, scale, scale);
-        Minecraft.getInstance().getEntityRenderDispatcher().getItemInHandRenderer().renderItem(player, stack, transformType, handSide == HumanoidArm.LEFT, matrixStack, buffer, lightness);
+        var model = Minecraft.getInstance().getItemRenderer().getModel(stack, Minecraft.getInstance().level, null, 42);
+        Minecraft.getInstance().getItemRenderer().render(stack, transformType,leftHand,
+                matrixStack, buffer, lightmapCoords, OverlayTexture.NO_OVERLAY, model);
         matrixStack.popPose();
     }
 
-    @Override
-    protected ResourceLocation getTextureLocation(T pEntity)
+    protected ResourceLocation getTextureLocation(ItemStack stack)
     {
-        return BeltFinder.findBelt(pEntity, true).map((getter) -> {
-            var stack = getter.getBelt();
-            return stack.has(DataComponents.DYED_COLOR)
-                    ? TEXTURE_BELT_DYED
-                    : TEXTURE_BELT;
-        }).orElse(TEXTURE_BELT);
+        return stack.isEmpty() ? TEXTURE_BELT : (stack.has(DataComponents.DYED_COLOR)
+                    ? TEXTURE_BELT_DYED : TEXTURE_BELT);
     }
 
-    public static class BeltModel<T extends LivingEntity> extends EntityModel<T>
+    public static class BeltModel<T extends LivingEntityRenderState> extends EntityModel<T>
     {
         private static final String BELT = "belt";
         private static final String BUCKLE = "buckle";
         private static final String LEFT_POCKET = "left_pocket";
         private static final String RIGHT_POCKET = "right_pocket";
-        private final ModelPart belt;
-        private final ModelPart buckle;
-        private final ModelPart left_pocket;
-        private final ModelPart right_pocket;
+        //private final ModelPart belt;
+        //private final ModelPart buckle;
+        //private final ModelPart left_pocket;
+        //private final ModelPart right_pocket;
 
         public boolean hasColor;
         public float dyeRed;
@@ -164,11 +166,11 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
 
         public BeltModel(ModelPart part)
         {
-            super(RenderType::entityCutoutNoCull);
-            this.belt = part.getChild(BELT);
-            this.buckle = part.getChild(BUCKLE);
-            this.left_pocket = part.getChild(LEFT_POCKET);
-            this.right_pocket = part.getChild(RIGHT_POCKET);
+            super(part);
+            //this.belt = part.getChild(BELT);
+            //this.buckle = part.getChild(BUCKLE);
+            //this.left_pocket = part.getChild(LEFT_POCKET);
+            //this.right_pocket = part.getChild(RIGHT_POCKET);
         }
 
         public static LayerDefinition createBodyLayer()
@@ -190,15 +192,15 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
             return LayerDefinition.create(meshdefinition, 64, 32);
         }
 
-        @Override
+        /*@Override
         public void renderToBuffer(PoseStack matrixStack, VertexConsumer vertexBuilder, int packedLightIn, int packedOverlayIn, int color)
         {
             var color2 = color;
 
             if (hasColor)
             {
-                var dye = FastColor.ARGB32.colorFromFloat(dyeRed, dyeGreen, dyeBlue, 1.0f);
-                color2 = FastColor.ARGB32.multiply(color, dye);
+                var dye = ARGB.colorFromFloat(dyeRed, dyeGreen, dyeBlue, 1.0f);
+                color2 = ARGB.multiply(color, dye);
             }
 
             belt.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, color2);
@@ -209,12 +211,6 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
             matrixStack.scale(0.8f, 1, 1);
             buckle.render(matrixStack, vertexBuilder, packedLightIn, packedOverlayIn, color);
             matrixStack.popPose();
-        }
-
-        @Override
-        public void setupAnim(T pEntity, float pLimbSwing, float pLimbSwingAmount, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch)
-        {
-
-        }
+        }*/
     }
 }

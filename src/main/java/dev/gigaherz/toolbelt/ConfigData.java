@@ -6,12 +6,15 @@ import com.mojang.logging.LogUtils;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.item.BundleItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.common.Tags;
 import org.apache.commons.lang3.tuple.Pair;
 import org.slf4j.Logger;
 
@@ -116,7 +119,9 @@ public class ConfigData
 
         CommonConfig(ModConfigSpec.Builder builder)
         {
-            builder.push("general");
+            builder
+                    .translation("text.toolbelt.config.category.common_general")
+                    .push("general");
             enableSewingKitSupport = builder
                     .comment("If set to FALSE, support for sewing recipes will not be enabled regardless of the mod's presence.")
                     .translation("text.toolbelt.config.enable_sewing_kit_support")
@@ -149,6 +154,7 @@ public class ConfigData
         ClientConfig(ModConfigSpec.Builder builder)
         {
             builder.comment("Options for customizing the display of tools on the player")
+                    .translation("text.toolbelt.config.category.client_display")
                     .push("display");
             showBeltOnPlayers = builder
                     .comment("If set to FALSE, the belts and tools will NOT draw on players.")
@@ -160,6 +166,7 @@ public class ConfigData
                     .defineInRange("beltItemScale", 0.5, 0.1, 2.0);
             builder.pop();
             builder.comment("Options for customizing the radial menu")
+                    .translation("text.toolbelt.config.category.client_menu")
                     .push("menu");
             releaseToSwap = builder
                     .comment("If set to TRUE, releasing the menu key (R) will activate the swap. Requires a click otherwise (default).")
@@ -216,10 +223,11 @@ public class ConfigData
 
     private static ItemStack parseItemStack(String itemString)
     {
-        Item item = BuiltInRegistries.ITEM.get(ResourceLocation.parse(itemString));
+        var item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(itemString)).orElse(Items.AIR);
+
         if (item == Items.AIR)
         {
-            LOGGER.warn("Could not find item " + itemString);
+            LOGGER.warn("Could not find item {}", itemString);
             return ItemStack.EMPTY;
         }
 
@@ -235,6 +243,9 @@ public class ConfigData
             return true;
 
         if (blackList.stream().anyMatch((s) -> ItemStack.isSameItem(s, stack)))
+            return false;
+
+        if (stack.getItem() instanceof BundleItem)
             return false;
 
         if (stack.getItem() instanceof ToolBeltItem)

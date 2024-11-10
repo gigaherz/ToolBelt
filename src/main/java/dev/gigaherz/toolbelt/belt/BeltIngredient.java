@@ -4,7 +4,10 @@ import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.toolbelt.ToolBelt;
+import net.minecraft.core.Holder;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import net.neoforged.neoforge.common.crafting.IngredientType;
 
@@ -35,9 +38,15 @@ public class BeltIngredient implements ICustomIngredient
     }
 
     @Override
-    public Stream<ItemStack> getItems()
+    public Stream<Holder<Item>> items()
     {
-        return Stream.of(ToolBelt.BELT.get().forSize(size));
+        return Stream.of(ToolBelt.BELT); // RIP -- can't show the ingredient including the required components?!?!?!
+    }
+
+    @Override
+    public SlotDisplay display()
+    {
+        return new SlotDisplay.ItemStackSlotDisplay(ToolBelt.BELT.get().forSize(size));
     }
 
     @Override

@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "dev.gigaherz.toolbelt.mixins",
+  "compatibilityLevel": "JAVA_8",
+  "refmap": "configurablecane.refmap.json",
+  "mixins": [],
+  "client": [
+    "EntityRenderStateMixin",
+    "EntityRenderDispatcherMixin"
+  ],
+  "server": [],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
