@@ -176,10 +176,10 @@ public class ToolBelt
     {
         BeltFinderBeltSlot.initBaubles();
 
-        /*if (ModList.get().isLoaded("curios"))
+        if (ModList.get().isLoaded("curios"))
         {
             BeltFinderCurios.initCurios();
-        }*/
+        }
     }
 
     @EventBusSubscriber(value= Dist.CLIENT, modid = MODID, bus= EventBusSubscriber.Bus.MOD)

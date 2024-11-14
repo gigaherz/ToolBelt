@@ -3,61 +3,23 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.153'
+    id 'net.neoforged.moddev' version '2.0.42-beta'
 }
 
-version = "2.2.3"
+version = "2.2.4"
 group = "dev.gigaherz.toolbelt"
 
-Provider<String> minecraftVersion(Transformer<String, String> mapper) {
-    return project.userDevRuntime.runtimes.map(r -> r.values().first().specification.minecraftVersion).map(mapper)
-}
-
+var minecraftVersionResolver = project.neoForge.version.map { "1." + (it =~ /^(\d+(?:\.[1-9]\d*|))\./)[0][1] }
 base {
-    archivesName = minecraftVersion { "ToolBelt-${it}" }
+    archivesName = minecraftVersionResolver.map { "ToolBelt-${it}" }
 }
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+java.withSourcesJar()
+
 sourceSets {
     main.resources.srcDirs += 'src/main/generated_resources'
-}
-
-subsystems {
-    parchment {
-        minecraftVersion="1.21"
-        mappingsVersion="2024.07.07"
-    }
-}
-
-minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
-
-runs {
-    // applies to all the run configs below
-    configureEach {
-        systemProperty 'forge.logging.markers', '' // 'REGISTRIES'
-        systemProperty 'forge.logging.console.level', 'debug'
-
-        workingDirectory project.file('run')
-
-        modSource project.sourceSets.main
-    }
-
-    client {
-    }
-
-    client2 {
-        configure ("client")
-
-        programArguments.addAll '--username', 'Dev2'
-    }
-
-    server {
-    }
-
-    data {
-        programArguments.addAll '--mod', 'toolbelt', '--all', '--output', file('src/main/generated_resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
-    }
 }
 
 repositories {
@@ -85,17 +47,65 @@ repositories {
             includeGroup "curse.maven"
         }
     }
-    repositories {
-        maven {
-            url "$projectDir/../CommonMaven"
-        }
+    maven {
+        // Accessories
+        name = "Wispforest maven"
+        url 'https://maven.wispforest.io/releases'
+    }
+    //maven { url 'https://maven.su5ed.dev/releases' }
+    //maven { url 'https://maven.fabricmc.net' }
+    maven { url 'https://maven.shedaniel.me/' }
+    maven {
+        url "$projectDir/../CommonMaven"
     }
     mavenLocal()
 }
 
-dependencies {
-    implementation 'net.neoforged:neoforge:21.0.133-beta'
+neoForge {
+    version = "21.1.77"
 
+    runs {
+        // applies to all the run configs below
+        configureEach {
+            gameDirectory = project.file('run')
+            logLevel = org.slf4j.event.Level.DEBUG
+            //jvmArgument "-Dmixin.debug.export=true"
+            //jvmArgument "-Dmixin.debug.verbose=true"
+        }
+
+        client {
+            client()
+        }
+
+        client2 {
+            client()
+
+            programArguments.addAll '--username', 'Dev2'
+        }
+
+        server {
+            server()
+        }
+
+        data {
+            data()
+            programArguments.addAll '--mod', 'toolbelt', '--all', '--output', file('src/main/generated_resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        }
+    }
+
+    mods {
+        thismod {
+            sourceSet(sourceSets.main)
+        }
+    }
+
+    parchment {
+        minecraftVersion = "1.21"
+        mappingsVersion = "2024.11.10"
+    }
+}
+
+dependencies {
     compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.8"
     runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.8"
 
@@ -104,6 +114,13 @@ dependencies {
     compileOnly "mezz.jei:jei-1.21-neoforge-api:19.5.0.56"
     runtimeOnly "mezz.jei:jei-1.21-neoforge:19.5.0.56"
 
+    compileOnly "curse.maven:adorned-1036809:5740650"
+    //runtimeOnly "curse.maven:adorned-1036809:5740650"
+
+    runtimeOnly "curse.maven:accessories-938917:5848473"
+    runtimeOnly "curse.maven:accessories-cc-layer-1005683:5823562"
+    runtimeOnly "curse.maven:owo-lib-532610:5900556"
+
     //compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
     //runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
 
@@ -111,16 +128,14 @@ dependencies {
 }
 
 jar {
-    from('/') {
-        include 'LICENSE.txt'
-    }
+    from(files('LICENSE.txt'))
 
     manifest {
         attributes([
                 "Specification-Title": "toolbelt",
                 "Specification-Vendor": "gigaherz",
                 "Specification-Version": "1", // We are version 1 of ourselves
-                "Implementation-Title": project.name,
+                "Implementation-Title": "toolbelt",
                 "Implementation-Version": project.version,
                 "Implementation-Vendor" :"gigaherz",
                 "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
@@ -128,6 +143,14 @@ jar {
     }
 }
 
+tasks.named('sourcesJar') {
+    from(files('LICENSE.txt'))
+}
+
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+}
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
 idea {
