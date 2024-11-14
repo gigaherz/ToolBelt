@@ -6,7 +6,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.42-beta'
 }
 
-version = "2.2.4"
+version = "2.2.5"
 group = "dev.gigaherz.toolbelt"
 
 var minecraftVersionResolver = project.neoForge.version.map { "1." + (it =~ /^(\d+(?:\.[1-9]\d*|))\./)[0][1] }

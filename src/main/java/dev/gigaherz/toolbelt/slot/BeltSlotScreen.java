@@ -42,10 +42,8 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotMenu>
         this.widthTooNarrow = this.width < 379;
         this.recipeBookComponent.init(this.width, this.height, this.minecraft, this.widthTooNarrow, this.menu);
         this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
-        this.addRenderableWidget(new ImageButton(
-                this.leftPos + 104, this.height / 2 - 22, 20, 18,
-                RecipeBookComponent.RECIPE_BUTTON_SPRITES,
-                (button) -> {
+        this.addRenderableWidget(
+                new ImageButton(this.leftPos + 104, this.height / 2 - 22, 20, 18, RecipeBookComponent.RECIPE_BUTTON_SPRITES, (button) -> {
                     this.recipeBookComponent.toggleVisibility();
                     this.leftPos = this.recipeBookComponent.updateScreenPosition(this.width, this.imageWidth);
                     button.setPosition(this.leftPos + 104, this.height / 2 - 22);
@@ -59,22 +57,22 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotMenu>
     @Override
     protected void renderLabels(GuiGraphics graphics, int mouseX, int mouseY)
     {
-        graphics.drawString(font, this.title, this.titleLabelX, this.titleLabelY, 4210752, false);
+        graphics.drawString(this.font, this.title, this.titleLabelX, this.titleLabelY, 4210752, false);
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTick)
     {
         if (this.recipeBookComponent.isVisible() && this.widthTooNarrow)
         {
-            this.renderBg(graphics, partialTicks, mouseX, mouseY);
-            this.recipeBookComponent.render(graphics, mouseX, mouseY, partialTicks);
+            this.renderBackground(graphics, mouseX, mouseY, partialTick);
+            this.recipeBookComponent.render(graphics, mouseX, mouseY, partialTick);
         }
         else
         {
-            super.render(graphics, mouseX, mouseY, partialTicks);
-            this.recipeBookComponent.render(graphics, mouseX, mouseY, partialTicks);
-            this.recipeBookComponent.renderGhostRecipe(graphics, this.leftPos, this.topPos, false, partialTicks);
+            super.render(graphics, mouseX, mouseY, partialTick);
+            this.recipeBookComponent.render(graphics, mouseX, mouseY, partialTick);
+            this.recipeBookComponent.renderGhostRecipe(graphics, this.leftPos, this.topPos, false, partialTick);
         }
 
         this.renderTooltip(graphics, mouseX, mouseY);
@@ -92,9 +90,19 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotMenu>
         int j = this.topPos;
         graphics.blit(SCREEN_BACKGROUND, i, j, 0, 0, this.imageWidth, this.imageHeight);
         InventoryScreen.renderEntityInInventoryFollowsMouse(graphics, i + 26, j + 8, i + 75, j + 78, 30, 0.0625F, this.oldMouseX, this.oldMouseY, this.minecraft.player);
-
     }
 
+    @Override
+    public boolean keyPressed(int keyCode, int scanCode, int modifiers)
+    {
+        return this.recipeBookComponent.keyPressed(keyCode, scanCode, modifiers) ? true : super.keyPressed(keyCode, scanCode, modifiers);
+    }
+
+    @Override
+    public boolean charTyped(char codePoint, int modifiers)
+    {
+        return this.recipeBookComponent.charTyped(codePoint, modifiers) ? true : super.charTyped(codePoint, modifiers);
+    }
 
     @Override
     protected boolean isHovering(int x, int y, int width, int height, double mouseX, double mouseY)
@@ -112,7 +120,8 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotMenu>
         }
         else
         {
-            return (!this.widthTooNarrow || !this.recipeBookComponent.isVisible()) && super.mouseClicked(mouseX, mouseY, button);
+            return !(this.widthTooNarrow && this.recipeBookComponent.isVisible())
+                    && super.mouseClicked(mouseX, mouseY, button);
         }
     }
 
@@ -141,10 +150,10 @@ public class BeltSlotScreen extends EffectRenderingInventoryScreen<BeltSlotMenu>
     }
 
     @Override
-    protected void slotClicked(Slot slotIn, int slotId, int mouseButton, ClickType type)
+    protected void slotClicked(Slot slot, int slotId, int mouseButton, ClickType type)
     {
-        super.slotClicked(slotIn, slotId, mouseButton, type);
-        this.recipeBookComponent.slotClicked(slotIn);
+        super.slotClicked(slot, slotId, mouseButton, type);
+        this.recipeBookComponent.slotClicked(slot);
     }
 
     @Override
