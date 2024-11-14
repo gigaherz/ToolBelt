@@ -21,8 +21,7 @@ public class BeltSlotMenu extends AbstractCraftingMenu
 {
     private final BeltSlot slotBelt;
 
-    private final CraftingContainer craftingInventory = new TransientCraftingContainer(this, 2, 2);
-    private final ResultContainer craftResultInventory = new ResultContainer();
+    //private final CraftingContainer craftingInventory = new TransientCraftingContainer(this, 2, 2);
     private final Player owner;
 
     public BeltSlotMenu(int id, Inventory playerInventory)
@@ -65,20 +64,15 @@ public class BeltSlotMenu extends AbstractCraftingMenu
         }
     }
 
-    public static boolean isHotbarSlot(int index)
-    {
-        return index >= 36 && index < 45 || index == 45;
-    }
-
     /**
      * Callback for when the crafting matrix is changed.
      */
     @Override
     public void slotsChanged(Container inventory)
     {
-        if (this.owner != null && this.owner.level() instanceof ServerLevel serverLevel)
+        if (this.owner.level() instanceof ServerLevel serverLevel)
         {
-            Bridge.slotChangedCraftingGridAccessor(this, serverLevel, this.owner, this.craftingInventory, this.craftResultInventory, null);
+            Bridge.slotChangedCraftingGridAccessor(this, serverLevel, this.owner, this.craftSlots, this.resultSlots, null);
         }
     }
 
@@ -96,9 +90,6 @@ public class BeltSlotMenu extends AbstractCraftingMenu
         }
     }
 
-    /**
-     * Called when the container is closed.
-     */
     @Override
     public void removed(Player player)
     {
@@ -110,18 +101,12 @@ public class BeltSlotMenu extends AbstractCraftingMenu
         }
     }
 
-    /**
-     * Determines whether supplied player can use this container
-     */
     @Override
     public boolean stillValid(Player player)
     {
         return true;
     }
 
-    /**
-     * Handle when the stack in slot {@code index} is shift-clicked. Normally this moves the stack between the player inventory and the other inventory(s).
-     */
     @Override
     public ItemStack quickMoveStack(Player player, int index)
     {
@@ -144,23 +129,23 @@ public class BeltSlotMenu extends AbstractCraftingMenu
             else
             if (index == 0)
             {
-                if (!this.moveItemStackTo(remaining, 9, 45, true))
+                if (!this.moveItemStackTo(slotContents, 9, 45, true))
                 {
                     return ItemStack.EMPTY;
                 }
 
-                slot.onQuickCraft(remaining, remaining);
+                slot.onQuickCraft(slotContents, remaining);
             }
             else if (index >= 1 && index < 5)
             {
-                if (!this.moveItemStackTo(remaining, 9, 45, false))
+                if (!this.moveItemStackTo(slotContents, 9, 45, false))
                 {
                     return ItemStack.EMPTY;
                 }
             }
             else if (index >= 5 && index < 9)
             {
-                if (!this.moveItemStackTo(remaining, 9, 45, false))
+                if (!this.moveItemStackTo(slotContents, 9, 45, false))
                 {
                     return ItemStack.EMPTY;
                 }
@@ -168,14 +153,14 @@ public class BeltSlotMenu extends AbstractCraftingMenu
             else if (equipmentslot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR && !this.slots.get(8 - equipmentslot.getIndex()).hasItem())
             {
                 int i = 8 - equipmentslot.getIndex();
-                if (!this.moveItemStackTo(remaining, i, i + 1, false))
+                if (!this.moveItemStackTo(slotContents, i, i + 1, false))
                 {
                     return ItemStack.EMPTY;
                 }
             }
             else if (equipmentslot == EquipmentSlot.OFFHAND && !this.slots.get(45).hasItem())
             {
-                if (!this.moveItemStackTo(remaining, 45, 46, false))
+                if (!this.moveItemStackTo(slotContents, 45, 46, false))
                 {
                     return ItemStack.EMPTY;
                 }
@@ -189,24 +174,24 @@ public class BeltSlotMenu extends AbstractCraftingMenu
             }
             else if (index >= 9 && index < 36)
             {
-                if (!this.moveItemStackTo(remaining, 36, 45, false))
+                if (!this.moveItemStackTo(slotContents, 36, 45, false))
                 {
                     return ItemStack.EMPTY;
                 }
             }
             else if (index >= 36 && index < 45)
             {
-                if (!this.moveItemStackTo(remaining, 9, 36, false))
+                if (!this.moveItemStackTo(slotContents, 9, 36, false))
                 {
                     return ItemStack.EMPTY;
                 }
             }
-            else if (!this.moveItemStackTo(remaining, 9, 45, false))
+            else if (!this.moveItemStackTo(slotContents, 9, 45, false))
             {
                 return ItemStack.EMPTY;
             }
 
-            if (remaining.isEmpty())
+            if (slotContents.isEmpty())
             {
                 slot.setByPlayer(ItemStack.EMPTY, remaining);
             }
@@ -215,24 +200,21 @@ public class BeltSlotMenu extends AbstractCraftingMenu
                 slot.setChanged();
             }
 
-            if (remaining.getCount() == remaining.getCount())
+            if (slotContents.getCount() == remaining.getCount())
             {
                 return ItemStack.EMPTY;
             }
 
-            slot.onTake(player, remaining);
+            slot.onTake(player, slotContents);
             if (index == 0)
             {
-                player.drop(remaining, false);
+                player.drop(slotContents, false);
             }
         }
 
         return remaining;
     }
 
-    /**
-     * Called to determine if the current slot is valid for the stack merging (double-click) code. The stack passed in is null for the initial slot that was double-clicked.
-     */
     @Override
     public boolean canTakeItemForPickAll(ItemStack stack, Slot slot)
     {
