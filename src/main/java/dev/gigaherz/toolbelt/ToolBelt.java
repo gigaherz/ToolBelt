@@ -131,8 +131,6 @@ public class ToolBelt
         }
 
         BeltAttachment.register(modEventBus);
-
-        container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
     }
 
     private void addItemsToTabs(BuildCreativeModeTabContentsEvent event)

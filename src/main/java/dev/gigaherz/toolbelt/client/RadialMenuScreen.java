@@ -99,7 +99,7 @@ public class RadialMenuScreen extends Screen
     public void removed()
     {
         super.removed();
-        ClientEvents.wipeOpen();
+        ToolBeltClient.wipeOpen();
     }
 
     @Override // tick
@@ -112,7 +112,7 @@ public class RadialMenuScreen extends Screen
         if (menu.isClosed())
         {
             Minecraft.getInstance().setScreen(null);
-            ClientEvents.wipeOpen();
+            ToolBeltClient.wipeOpen();
         }
         if (!menu.isReady() || inventory == null)
         {
@@ -145,7 +145,7 @@ public class RadialMenuScreen extends Screen
         {
             Minecraft.getInstance().setScreen(null);
         }
-        else if (!ClientEvents.isKeyDown(ClientEvents.OPEN_TOOL_MENU_KEYBIND))
+        else if (!ToolBeltClient.isKeyDown(ToolBeltClient.OPEN_TOOL_MENU_KEYBIND))
         {
             if (ConfigData.releaseToSwap)
             {
@@ -263,7 +263,7 @@ public class RadialMenuScreen extends Screen
 
     private void checkCycleKeybinds()
     {
-        if (ClientEvents.isKeyDown(ClientEvents.CYCLE_TOOL_MENU_LEFT_KEYBIND))
+        if (ToolBeltClient.isKeyDown(ToolBeltClient.CYCLE_TOOL_MENU_LEFT_KEYBIND))
         {
             if (!keyCycleBeforeL)
             {
@@ -276,7 +276,7 @@ public class RadialMenuScreen extends Screen
             keyCycleBeforeL = false;
         }
 
-        if (ClientEvents.isKeyDown(ClientEvents.CYCLE_TOOL_MENU_RIGHT_KEYBIND))
+        if (ToolBeltClient.isKeyDown(ToolBeltClient.CYCLE_TOOL_MENU_RIGHT_KEYBIND))
         {
             if (!keyCycleBeforeR)
             {

@@ -42,7 +42,7 @@ public class ToolBeltLayer<S extends HumanoidRenderState, M extends HumanoidMode
     {
         super(owner);
 
-        beltModel = new BeltModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ClientEvents.BELT_LAYER));
+        beltModel = new BeltModel<>(Minecraft.getInstance().getEntityModels().bakeLayer(ToolBeltClient.BELT_LAYER));
     }
 
     private void translateToBody(S renderState, PoseStack poseStack)
