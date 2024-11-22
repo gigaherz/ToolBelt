@@ -102,6 +102,13 @@ public class RadialMenuScreen extends Screen
         ToolBeltClient.wipeOpen();
     }
 
+    @Override
+    public void onClose()
+    {
+        ToolBeltClient.wipeOpen();
+        super.onClose();
+    }
+
     @Override // tick
     public void tick()
     {
@@ -111,8 +118,7 @@ public class RadialMenuScreen extends Screen
 
         if (menu.isClosed())
         {
-            Minecraft.getInstance().setScreen(null);
-            ToolBeltClient.wipeOpen();
+            this.onClose();
         }
         if (!menu.isReady() || inventory == null)
         {
@@ -143,7 +149,7 @@ public class RadialMenuScreen extends Screen
 
         if (inventory == null)
         {
-            Minecraft.getInstance().setScreen(null);
+            menu.close();
         }
         else if (!ToolBeltClient.isKeyDown(ToolBeltClient.OPEN_TOOL_MENU_KEYBIND))
         {
@@ -178,69 +184,66 @@ public class RadialMenuScreen extends Screen
         super.render(graphics, mouseX, mouseY, partialTicks);
         poseStack.popPose();
 
-        if (inventory == null)
-            return;
-
         ItemStack inHand = minecraft.player.getMainHandItem();
-        if (!ConfigData.isItemStackAllowed(inHand))
-            return;
-
-        if (needsRecheckStacks)
+        if (ConfigData.isItemStackAllowed(inHand) && menu.isReady() && inventory != null)
         {
-            cachedMenuItems.clear();
-            for (int i = 0; i < inventory.getSlots(); i++)
+            if (needsRecheckStacks)
             {
-                ItemStack inSlot = inventory.getStackInSlot(i);
-                ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(menu, i, inSlot, Component.translatable("text.toolbelt.empty"))
+                cachedMenuItems.clear();
+                for (int i = 0; i < inventory.getSlots(); i++)
                 {
-                    @Override
-                    public boolean onClick()
+                    ItemStack inSlot = inventory.getStackInSlot(i);
+                    ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(menu, i, inSlot, Component.translatable("text.toolbelt.empty"))
                     {
-                        return RadialMenuScreen.this.trySwap(getSlot(), getStack());
+                        @Override
+                        public boolean onClick()
+                        {
+                            return RadialMenuScreen.this.trySwap(getSlot(), getStack());
+                        }
+                    };
+                    item.setVisible(inSlot.getCount() > 0 || ConfigData.displayEmptySlots);
+                    if (inHand.getCount() > 0)
+                    {
+                        if (inSlot.getCount() > 0)
+                            item.setCentralText(Component.translatable("text.toolbelt.swap"));
+                        else
+                            item.setCentralText(Component.translatable("text.toolbelt.insert"));
                     }
-                };
-                item.setVisible(inSlot.getCount() > 0 || ConfigData.displayEmptySlots);
-                if (inHand.getCount() > 0)
-                {
-                    if (inSlot.getCount() > 0)
-                        item.setCentralText(Component.translatable("text.toolbelt.swap"));
                     else
-                        item.setCentralText(Component.translatable("text.toolbelt.insert"));
+                    {
+                        if (inSlot.getCount() > 0)
+                            item.setCentralText(Component.translatable("text.toolbelt.extract"));
+                        else
+                            item.setCentralText(Component.translatable("text.toolbelt.empty"));
+                    }
+                    cachedMenuItems.add(item);
                 }
-                else
-                {
-                    if (inSlot.getCount() > 0)
-                        item.setCentralText(Component.translatable("text.toolbelt.extract"));
-                    else
-                        item.setCentralText(Component.translatable("text.toolbelt.empty"));
-                }
-                cachedMenuItems.add(item);
+
+                menu.clear();
+                menu.addAll(cachedMenuItems);
+                menu.add(insertMenuItem);
+
+                needsRecheckStacks = false;
             }
 
-            menu.clear();
-            menu.addAll(cachedMenuItems);
-            menu.add(insertMenuItem);
+            boolean hasAddButton = false;
+            if (!ConfigData.displayEmptySlots && !cachedMenuItems.stream().allMatch(RadialMenuItem::isVisible) && inHand.getCount() > 0)
+            {
+                hasAddButton = true;
+            }
+            insertMenuItem.setVisible(hasAddButton);
 
-            needsRecheckStacks = false;
-        }
+            if (cachedMenuItems.stream().noneMatch(RadialMenuItem::isVisible))
+            {
+                menu.setCentralText(Component.translatable("text.toolbelt.empty"));
+            }
+            else
+            {
+                menu.setCentralText(null);
+            }
 
-        boolean hasAddButton = false;
-        if (!ConfigData.displayEmptySlots && !cachedMenuItems.stream().allMatch(RadialMenuItem::isVisible) && inHand.getCount() > 0)
-        {
-            hasAddButton = true;
+            checkCycleKeybinds();
         }
-        insertMenuItem.setVisible(hasAddButton);
-
-        if (cachedMenuItems.stream().noneMatch(RadialMenuItem::isVisible))
-        {
-            menu.setCentralText(Component.translatable("text.toolbelt.empty"));
-        }
-        else
-        {
-            menu.setCentralText(null);
-        }
-
-        checkCycleKeybinds();
 
         menu.draw(graphics, partialTicks, mouseX, mouseY);
     }
@@ -248,7 +251,7 @@ public class RadialMenuScreen extends Screen
     private boolean trySwap(int slotNumber, ItemStack itemMouseOver)
     {
         ItemStack inHand = minecraft.player.getMainHandItem();
-        if (!ConfigData.isItemStackAllowed(inHand))
+        if (!ConfigData.isItemStackAllowed(inHand) || !menu.isReady())
             return false;
 
         if (inHand.getCount() > 0 || itemMouseOver.getCount() > 0)
