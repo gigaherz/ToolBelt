@@ -52,6 +52,7 @@ public class ConfigData
 
     private static Set<ItemStack> blackList = Sets.newHashSet();
     private static Set<ItemStack> whiteList = Sets.newHashSet();
+    private static boolean allowAllNonStackableItems = true;
 
     public static boolean showBeltOnPlayers = true;
     public static float beltItemScale = 0.5f;
@@ -86,6 +87,7 @@ public class ConfigData
     {
         public final ForgeConfigSpec.ConfigValue<List<? extends String>> whitelist;
         public final ForgeConfigSpec.ConfigValue<List<? extends String>> blacklist;
+        public final ForgeConfigSpec.BooleanValue allowAllNonStackableItems;
 
         ServerConfig(ForgeConfigSpec.Builder builder)
         {
@@ -98,6 +100,10 @@ public class ConfigData
                     .comment("List of items to disallow from placing in the belt. (whitelist takes precedence)")
                     .translation("text.toolbelt.config.blacklist")
                     .defineList("blacklist", Lists.newArrayList(), o -> o instanceof String);
+            allowAllNonStackableItems = builder
+                    .comment("When set to false, stackable items will no longer be allowed by default.")
+                    .translation("text.toolbelt.config.allownonstackable")
+                    .define("allowAllNonStackableItems", true);
             builder.pop();
         }
     }
@@ -208,6 +214,7 @@ public class ConfigData
     {
         blackList = SERVER.blacklist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
         whiteList = SERVER.whitelist.get().stream().map(ConfigData::parseItemStack).collect(Collectors.toSet());
+        allowAllNonStackableItems = SERVER.allowAllNonStackableItems.get();
     }
 
     private static ItemStack parseItemStack(String itemString)
@@ -236,10 +243,7 @@ public class ConfigData
         if (stack.getItem() instanceof ToolBeltItem)
             return false;
 
-        if (stack.getMaxStackSize() != 1)
-            return false;
-
-        return true;
+        return allowAllNonStackableItems && stack.getMaxStackSize() == 1;
     }
 
     public enum ThreeWayChoice implements StringRepresentable

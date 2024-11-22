@@ -103,6 +103,13 @@ public class RadialMenuScreen extends Screen
         ClientEvents.wipeOpen();
     }
 
+    @Override
+    public void onClose()
+    {
+        ClientEvents.wipeOpen();
+        super.onClose();
+    }
+
     @Override // tick
     public void tick()
     {
@@ -112,8 +119,7 @@ public class RadialMenuScreen extends Screen
 
         if (menu.isClosed())
         {
-            Minecraft.getInstance().setScreen(null);
-            ClientEvents.wipeOpen();
+            this.onClose();
         }
         if (!menu.isReady() || inventory == null)
         {
@@ -144,7 +150,7 @@ public class RadialMenuScreen extends Screen
 
         if (inventory == null)
         {
-            Minecraft.getInstance().setScreen(null);
+            menu.close();
         }
         else if (!ClientEvents.isKeyDown(ClientEvents.OPEN_TOOL_MENU_KEYBIND))
         {
@@ -179,13 +185,9 @@ public class RadialMenuScreen extends Screen
         super.render(graphics, mouseX, mouseY, partialTicks);
         poseStack.popPose();
 
-        if (inventory == null)
-            return;
-
         ItemStack inHand = minecraft.player.getMainHandItem();
-        if (!ConfigData.isItemStackAllowed(inHand))
-            return;
-
+        if (ConfigData.isItemStackAllowed(inHand) && menu.isReady() && inventory != null)
+        {
         if (needsRecheckStacks)
         {
             cachedMenuItems.clear();
@@ -242,6 +244,7 @@ public class RadialMenuScreen extends Screen
         }
 
         checkCycleKeybinds();
+        }
 
         menu.draw(graphics, partialTicks, mouseX, mouseY);
     }
@@ -249,7 +252,7 @@ public class RadialMenuScreen extends Screen
     private boolean trySwap(int slotNumber, ItemStack itemMouseOver)
     {
         ItemStack inHand = minecraft.player.getMainHandItem();
-        if (!ConfigData.isItemStackAllowed(inHand))
+        if (!ConfigData.isItemStackAllowed(inHand) || !menu.isReady())
             return false;
 
         if (inHand.getCount() > 0 || itemMouseOver.getCount() > 0)
