@@ -6,7 +6,7 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.42-beta'
 }
 
-version = "2.2.5"
+version = "2.2.6"
 group = "dev.gigaherz.toolbelt"
 
 var minecraftVersionResolver = project.neoForge.version.map { "1." + (it =~ /^(\d+(?:\.[1-9]\d*|))\./)[0][1] }
@@ -62,7 +62,7 @@ repositories {
 }
 
 neoForge {
-    version = "21.1.77"
+    version = "21.1.80"
 
     runs {
         // applies to all the run configs below
