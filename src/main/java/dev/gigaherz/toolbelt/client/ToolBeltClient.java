@@ -10,14 +10,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.PlayerSkin;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -28,7 +25,6 @@ import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
@@ -36,7 +32,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.lwjgl.glfw.GLFW;
 
-import javax.annotation.Nullable;
 import java.util.function.Function;
 
 @Mod(value=ToolBelt.MODID, dist =Dist.CLIENT)
@@ -45,8 +40,7 @@ public class ToolBeltClient
     public ToolBeltClient(ModContainer container, IEventBus modEventBus)
     {
         modEventBus.addListener(this::initKeybinds);
-        modEventBus.addListener(this::clientSetup);
-        modEventBus.addListener(this::colors);
+        modEventBus.addListener(this::registerModelProperties);
         modEventBus.addListener(this::registerLayer);
         modEventBus.addListener(this::addLayers);
 
@@ -54,6 +48,12 @@ public class ToolBeltClient
         NeoForge.EVENT_BUS.addListener(this::updateInputEvent);
 
         container.registerExtensionPoint(IConfigScreenFactory.class, ConfigurationScreen::new);
+
+    }
+
+    public void registerModelProperties(RegisterConditionalItemModelPropertyEvent event)
+    {
+        event.register(ToolBelt.location("has_custom_color"), HasCustomColor.CODEC);
     }
 
     public void initKeybinds(RegisterKeyMappingsEvent event)
@@ -71,30 +71,10 @@ public class ToolBeltClient
                 new KeyMapping("key.toolbelt.slot", GLFW.GLFW_KEY_V, "key.toolbelt.category"));
     }
 
-    public void clientSetup(FMLClientSetupEvent event)
-    {
-        event.enqueueWork(() -> {
-            ItemProperties.register(ToolBelt.BELT.get(), ToolBelt.location("has_custom_color"),
-                    (ItemStack pStack, @Nullable ClientLevel pLevel, @Nullable LivingEntity pEntity, int pSeed) ->
-                            pStack.has(DataComponents.DYED_COLOR)
-                                    ? 1 : 0
-            );
-        });
-    }
-
-    public void colors(RegisterColorHandlersEvent.Item event)
-    {
-        event.register(
-                (ItemStack pStack, int pTintIndex) ->
-                        pTintIndex == 0 && pStack.has(DataComponents.DYED_COLOR)
-                                ? (0xFF000000 | pStack.get(DataComponents.DYED_COLOR).rgb()) : -1,
-                ToolBelt.BELT.get()
-        );
-    }
-
     public void registerLayer(EntityRenderersEvent.RegisterLayerDefinitions event)
     {
         event.registerLayerDefinition(ToolBeltClient.BELT_LAYER, ToolBeltLayer.BeltModel::createBodyLayer);
+        event.registerLayerDefinition(ToolBeltClient.BUCKLE_LAYER, ToolBeltLayer.BeltModel::createBuckleLayer);
     }
 
     public void addLayers(EntityRenderersEvent.AddLayers event)
@@ -240,4 +220,5 @@ public class ToolBeltClient
     }
 
     public static ModelLayerLocation BELT_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("minecraft", "player"), "toolbelt_belt");
+    public static ModelLayerLocation BUCKLE_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("minecraft", "player"), "toolbelt_belt_buckle");
 }

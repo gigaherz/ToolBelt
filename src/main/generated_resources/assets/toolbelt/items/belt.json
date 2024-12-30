@@ -1,0 +1,20 @@
+{
+  "model": {
+    "type": "minecraft:condition",
+    "on_false": {
+      "type": "minecraft:model",
+      "model": "toolbelt:item/belt"
+    },
+    "on_true": {
+      "type": "minecraft:model",
+      "model": "toolbelt:item/dyed_belt",
+      "tints": [
+        {
+          "type": "minecraft:dye",
+          "default": -1
+        }
+      ]
+    },
+    "property": "toolbelt:has_custom_color"
+  }
+}

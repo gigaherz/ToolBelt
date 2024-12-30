@@ -1,11 +1,14 @@
 package dev.gigaherz.toolbelt;
 
+import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
+import dev.gigaherz.sewingkit.SewingKitDataGen;
 import dev.gigaherz.sewingkit.SewingKitMod;
 import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
 import dev.gigaherz.toolbelt.belt.BeltIngredient;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
+import dev.gigaherz.toolbelt.client.HasCustomColor;
 import dev.gigaherz.toolbelt.common.BeltContainer;
 import dev.gigaherz.toolbelt.common.BeltScreen;
 import dev.gigaherz.toolbelt.integration.SewingKitIntegration;
@@ -14,8 +17,18 @@ import dev.gigaherz.toolbelt.network.*;
 import dev.gigaherz.toolbelt.slot.BeltAttachment;
 import dev.gigaherz.toolbelt.slot.BeltSlotMenu;
 import dev.gigaherz.toolbelt.slot.BeltSlotScreen;
+import net.minecraft.Util;
+import net.minecraft.client.color.item.Dye;
+import net.minecraft.client.data.models.BlockModelGenerators;
+import net.minecraft.client.data.models.ItemModelGenerators;
+import net.minecraft.client.data.models.ModelProvider;
+import net.minecraft.client.data.models.model.ItemModelUtils;
+import net.minecraft.client.data.models.model.ModelLocationUtils;
+import net.minecraft.client.data.models.model.ModelTemplates;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
@@ -23,17 +36,17 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
-import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.packs.VanillaRecipeProvider;
+import net.minecraft.data.registries.VanillaRegistries;
+import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
-import net.minecraft.world.item.CreativeModeTabs;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
@@ -44,13 +57,13 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
-import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ICondition;
-import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import net.neoforged.neoforge.common.crafting.IngredientType;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
@@ -63,8 +76,8 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 
+import javax.annotation.Nullable;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -142,7 +155,7 @@ public class ToolBelt
         }
     }
 
-    public void gatherData(GatherDataEvent event)
+    public void gatherData(GatherDataEvent.Client event)
     {
         DataGen.gatherData(event);
     }
@@ -244,11 +257,54 @@ public class ToolBelt
 
     public static class DataGen
     {
-        public static void gatherData(GatherDataEvent event)
+        public static void gatherData(GatherDataEvent.Client event)
         {
             DataGenerator gen = event.getGenerator();
 
-            gen.addProvider(event.includeServer(), new Recipes(gen.getPackOutput(), event.getLookupProvider()));
+            gen.addProvider(true, new Recipes(gen.getPackOutput(), event.getLookupProvider()));
+            gen.addProvider(true, new ModelsAndClientItems(gen.getPackOutput()));
+            gen.addProvider(true, new ItemTagGen(gen.getPackOutput()));
+        }
+
+        private static class ModelsAndClientItems extends ModelProvider
+        {
+            public ModelsAndClientItems(PackOutput output)
+            {
+                super(output, MODID);
+            }
+
+            @Override
+            protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels)
+            {
+                itemModels.generateLayeredItem(BELT.get(), location("item/belt"), location("item/belt_buckle"));
+                itemModels.generateLayeredItem(location("item/dyed_belt"), location("item/dyed_belt"), location("item/belt_buckle"));
+                itemModels.itemModelOutput.accept(BELT.get(),
+                        ItemModelUtils.conditional(
+                                HasCustomColor.INSTANCE,
+                                ItemModelUtils.tintedModel(location("item/dyed_belt"), new Dye(-1)),
+                                ItemModelUtils.plainModel(ModelLocationUtils.getModelLocation(BELT.get()))
+                        ));
+
+                itemModels.createFlatItemModel(POUCH.get(), ModelTemplates.FLAT_ITEM);
+                itemModels.itemModelOutput.accept(POUCH.get(),
+                        ItemModelUtils.plainModel(ModelLocationUtils.getModelLocation(POUCH.get())));
+            }
+        }
+
+        private static class ItemTagGen extends IntrinsicHolderTagsProvider<Item>
+        {
+            public ItemTagGen(PackOutput packOutput)
+            {
+                super(packOutput, Registries.ITEM, CompletableFuture.supplyAsync(VanillaRegistries::createLookup, Util.backgroundExecutor()),
+                        (item) -> BuiltInRegistries.ITEM.getResourceKey(item).orElseThrow(), SewingKitMod.MODID);
+            }
+
+            @Override
+            protected void addTags(HolderLookup.Provider lookup)
+            {
+                tag(ItemTags.DYEABLE)
+                        .add(BELT.get());
+            }
         }
 
         private static class Recipes extends RecipeProvider.Runner

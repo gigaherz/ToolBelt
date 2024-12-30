@@ -3,10 +3,10 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.42-beta'
+    id 'net.neoforged.moddev' version '2.0.63-beta'
 }
 
-version = "2.3.3"
+version = "2.4.0"
 group = "dev.gigaherz.toolbelt"
 
 var minecraftVersionResolver = project.neoForge.version.map { "1." + (it =~ /^(\d+(?:\.[1-9]\d*|))\./)[0][1] }
@@ -62,7 +62,7 @@ repositories {
 }
 
 neoForge {
-    version = "21.3.38-beta"
+    version = "21.4.47-beta"
 
     runs {
         // applies to all the run configs below
@@ -87,8 +87,8 @@ neoForge {
             server()
         }
 
-        data {
-            data()
+        clientData {
+            clientData()
             programArguments.addAll '--mod', 'toolbelt', '--all', '--output', file('src/main/generated_resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
         }
     }
@@ -100,14 +100,14 @@ neoForge {
     }
 
     parchment {
-        minecraftVersion = "1.21"
-        mappingsVersion = "2024.11.10"
+        minecraftVersion = "1.21.4"
+        mappingsVersion = "2024.12.29"
     }
 }
 
 dependencies {
-    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21.3:2.1.0"
-    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21.3:2.1.0"
+    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21.4:2.2.1"
+    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21.4:2.2.1"
 
     //compileOnly "mezz.jei:jei-1.21-common-api:19.5.0.56"
     //runtimeOnly "mezz.jei:jei-1.21-common:19.5.0.56"
@@ -141,6 +141,37 @@ jar {
 
 tasks.named('sourcesJar') {
     from(files('LICENSE.txt'))
+}
+
+project.afterEvaluate {
+    publish.dependsOn('build')
+    publishing {
+        publications {
+            mavenJava(MavenPublication) {
+                artifactId project.archivesBaseName
+                from components.java
+            }
+        }
+
+        repositories {
+            if (findProperty("RELEASE") && System.env.giga_maven_host != null) {
+                System.out.println("Remote publish enabled on " + System.env.giga_maven_host)
+                maven {
+                    url System.env.giga_maven_host
+                    credentials {
+                        username System.env.giga_maven_user
+                        password System.env.giga_maven_password
+                    }
+                }
+            }
+            else {
+                System.out.println("Remote publish disabled.")
+                maven {
+                    url "$projectDir/../CommonMaven"
+                }
+            }
+        }
+    }
 }
 
 

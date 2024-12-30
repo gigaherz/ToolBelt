@@ -50,9 +50,9 @@ public class BeltSlotMenu extends AbstractCraftingMenu
             }
 
             @Override
-            public Pair<ResourceLocation, ResourceLocation> getNoItemIcon()
+            public ResourceLocation getNoItemIcon()
             {
-                return Pair.of(InventoryMenu.BLOCK_ATLAS, InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD);
+                return InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD;
             }
         });
 

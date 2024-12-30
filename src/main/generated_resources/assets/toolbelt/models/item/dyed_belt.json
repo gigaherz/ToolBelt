@@ -1,5 +1,5 @@
 {
-  "parent": "item/generated",
+  "parent": "minecraft:item/generated",
   "textures": {
     "layer0": "toolbelt:item/dyed_belt",
     "layer1": "toolbelt:item/belt_buckle"
