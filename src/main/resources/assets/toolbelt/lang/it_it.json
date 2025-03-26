@@ -1,0 +1,15 @@
+{
+  "item.toolbelt.belt": "Cintura porta attrezzi",
+  "item.toolbelt.pouch": "Marsupio da cintura",
+  "key.toolbelt.open": "Scambia attrezzo",
+  "key.toolbelt.category": "Cintura porta attrezzi",
+  "key.toolbelt.slot": "Apri inventario cintura porta attrezzi",
+  "key.toolbelt.cycle.left": "Cicla attrezzo a sinistra",
+  "key.toolbelt.cycle.right": "Cicla attrezzo a destra",
+  "text.toolbelt.empty": "VUOTO",
+  "text.toolbelt.swap": "SCAMBIA",
+  "text.toolbelt.insert": "INSERISCI",
+  "text.toolbelt.extract": "ESTRAI",
+  "text.toolbelt.tooltip": "Migliorie: %s (%s slot)",
+  "text.toolbelt": "Cintura porta attrezzi"
+}
