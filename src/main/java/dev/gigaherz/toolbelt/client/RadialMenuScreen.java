@@ -19,6 +19,7 @@ import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Objects;
@@ -193,29 +194,7 @@ public class RadialMenuScreen extends Screen
                 for (int i = 0; i < inventory.getSlots(); i++)
                 {
                     ItemStack inSlot = inventory.getStackInSlot(i);
-                    ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(menu, i, inSlot, Component.translatable("text.toolbelt.empty"))
-                    {
-                        @Override
-                        public boolean onClick()
-                        {
-                            return RadialMenuScreen.this.trySwap(getSlot(), getStack());
-                        }
-                    };
-                    item.setVisible(inSlot.getCount() > 0 || ConfigData.displayEmptySlots);
-                    if (inHand.getCount() > 0)
-                    {
-                        if (inSlot.getCount() > 0)
-                            item.setCentralText(Component.translatable("text.toolbelt.swap"));
-                        else
-                            item.setCentralText(Component.translatable("text.toolbelt.insert"));
-                    }
-                    else
-                    {
-                        if (inSlot.getCount() > 0)
-                            item.setCentralText(Component.translatable("text.toolbelt.extract"));
-                        else
-                            item.setCentralText(Component.translatable("text.toolbelt.empty"));
-                    }
+                    ItemStackRadialMenuItem item = getMenuItemForStack(i, inSlot, inHand);
                     cachedMenuItems.add(item);
                 }
 
@@ -246,6 +225,34 @@ public class RadialMenuScreen extends Screen
         }
 
         menu.draw(graphics, partialTicks, mouseX, mouseY);
+    }
+
+    private @NotNull ItemStackRadialMenuItem getMenuItemForStack(int i, ItemStack inSlot, ItemStack inHand)
+    {
+        ItemStackRadialMenuItem item = new ItemStackRadialMenuItem(menu, i, inSlot, Component.translatable("text.toolbelt.empty"))
+        {
+            @Override
+            public boolean onClick()
+            {
+                return RadialMenuScreen.this.trySwap(getSlot(), getStack());
+            }
+        };
+        item.setVisible(inSlot.getCount() > 0 || ConfigData.displayEmptySlots);
+        if (inHand.getCount() > 0)
+        {
+            if (inSlot.getCount() > 0)
+                item.setCentralText(Component.translatable("text.toolbelt.swap"));
+            else
+                item.setCentralText(Component.translatable("text.toolbelt.insert"));
+        }
+        else
+        {
+            if (inSlot.getCount() > 0)
+                item.setCentralText(Component.translatable("text.toolbelt.extract"));
+            else
+                item.setCentralText(Component.translatable("text.toolbelt.empty"));
+        }
+        return item;
     }
 
     private boolean trySwap(int slotNumber, ItemStack itemMouseOver)

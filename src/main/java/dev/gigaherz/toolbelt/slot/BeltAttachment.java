@@ -81,11 +81,6 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
     private static class EventHandlers
     {
         @SubscribeEvent
-        public void attachCapabilities(EntityJoinLevelEvent event)
-        {
-        }
-
-        @SubscribeEvent
         public void joinWorld(PlayerEvent.PlayerLoggedInEvent event)
         {
             if (!ConfigData.customBeltSlotEnabled)
