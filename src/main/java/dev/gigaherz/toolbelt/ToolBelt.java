@@ -195,7 +195,7 @@ public class ToolBelt
         }
     }
 
-    @EventBusSubscriber(value= Dist.CLIENT, modid = MODID, bus= EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(value= Dist.CLIENT, modid = MODID)
     public static class ClientModBusEvents
     {
         @SubscribeEvent
@@ -239,7 +239,7 @@ public class ToolBelt
             ev.setCanceled(true);
             return;
         }
-        ev.setCost(cost);
+        ev.setXpCost(cost);
         ev.setMaterialCost(1);
 
         ev.setOutput(ToolBeltItem.makeUpgradedStack(left));
@@ -301,7 +301,7 @@ public class ToolBelt
                 tag(ItemTags.DYEABLE)
                         .add(BELT.get());
                 tag(CuriosTags.BELT)
-                        .add(BELT.getKey());
+                        .add(BELT.get());
             }
         }
 

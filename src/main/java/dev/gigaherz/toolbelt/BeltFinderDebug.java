@@ -11,7 +11,7 @@ import net.neoforged.fml.loading.FMLEnvironment;
 
 import java.util.Optional;
 
-@EventBusSubscriber(modid = ToolBelt.MODID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = ToolBelt.MODID)
 public class BeltFinderDebug extends BeltFinder
 {
     @SubscribeEvent

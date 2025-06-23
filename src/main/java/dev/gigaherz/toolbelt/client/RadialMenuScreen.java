@@ -27,7 +27,7 @@ import java.util.Objects;
 
 public class RadialMenuScreen extends Screen
 {
-    @EventBusSubscriber(value=Dist.CLIENT, modid= ToolBelt.MODID, bus= EventBusSubscriber.Bus.GAME)
+    @EventBusSubscriber(value=Dist.CLIENT, modid= ToolBelt.MODID)
     public static class Client
     {
 
@@ -69,7 +69,7 @@ public class RadialMenuScreen extends Screen
             @Override
             public void renderTooltip(GuiGraphics graphics, ItemStack stack, int mouseX, int mouseY)
             {
-                graphics.renderTooltip(font, stack, mouseX, mouseY);
+                graphics.setTooltipForNextFrame(font, stack, mouseX, mouseY);
             }
 
             @Override
@@ -186,9 +186,9 @@ public class RadialMenuScreen extends Screen
     public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
     {
         var poseStack = graphics.pose();
-        poseStack.pushPose();
+        poseStack.pushMatrix();
         super.render(graphics, mouseX, mouseY, partialTicks);
-        poseStack.popPose();
+        poseStack.popMatrix();
 
         ItemStack inHand = minecraft.player.getMainHandItem();
         if (ConfigData.isItemStackAllowed(inHand) && menu.isReady() && inventory != null)

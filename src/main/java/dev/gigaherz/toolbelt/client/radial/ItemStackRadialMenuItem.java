@@ -46,7 +46,7 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
     {
         if (stack.getCount() > 0)
         {
-            context.graphics.renderTooltip(context.font, stack, (int) context.x, (int) context.y);
+            context.graphics.setTooltipForNextFrame(context.font, stack, (int) context.x, (int) context.y);
         }
         else
         {

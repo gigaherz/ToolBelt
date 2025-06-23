@@ -16,13 +16,15 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.common.util.INBTSerializable;
+import net.neoforged.neoforge.common.util.ValueIOSerializable;
 import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
@@ -42,7 +44,7 @@ import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Objects;
 
-public class BeltAttachment implements INBTSerializable<CompoundTag>
+public class BeltAttachment implements ValueIOSerializable
 {
     private static final Logger LOGGER = LogManager.getLogger();
     private static final boolean ENABLE_DEBUG_LOGGING = "true".equals(System.getProperty("toolbelt.debug", FMLEnvironment.production ? "false" : "true"));
@@ -147,21 +149,24 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
                 }
                 else
                 {
-                    if (entity instanceof ServerPlayer player)
+                    if(entity.level() instanceof ServerLevel level)
                     {
-                        if (!player.serverLevel().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
+                        if (entity instanceof ServerPlayer player)
                         {
-                            printDebugLog("Entity is player, and keepInventory is not set. Spilling...");
-                            Collection<ItemEntity> old = entity.captureDrops(event.getDrops());
-                            player.drop(stack, true, false);
-                            entity.captureDrops(old);
+                            if (!player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
+                            {
+                                printDebugLog("Entity is player, and keepInventory is not set. Spilling...");
+                                Collection<ItemEntity> old = entity.captureDrops(event.getDrops());
+                                player.drop(stack, true, false);
+                                entity.captureDrops(old);
+                                attachment.setContents(ItemStack.EMPTY);
+                            }
+                        }
+                        else
+                        {
+                            entity.spawnAtLocation(level, stack);
                             attachment.setContents(ItemStack.EMPTY);
                         }
-                    }
-                    else if(entity.level() instanceof ServerLevel level)
-                    {
-                        entity.spawnAtLocation(level, stack);
-                        attachment.setContents(ItemStack.EMPTY);
                     }
                 }
             }
@@ -247,15 +252,15 @@ public class BeltAttachment implements INBTSerializable<CompoundTag>
     }
 
     @Override
-    public CompoundTag serializeNBT(HolderLookup.Provider lookup)
+    public void serialize(ValueOutput valueOutput)
     {
-        return inventory.serializeNBT(lookup);
+        inventory.serialize(valueOutput);
     }
 
     @Override
-    public void deserializeNBT(HolderLookup.Provider lookup, CompoundTag nbt)
+    public void deserialize(ValueInput valueInput)
     {
-        inventory.deserializeNBT(lookup, nbt);
+        inventory.deserialize(valueInput);
     }
 
     /**
