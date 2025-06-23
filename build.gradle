@@ -3,16 +3,13 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.63-beta'
+    id 'net.neoforged.moddev' version '2.0.88'
 }
 
-version = "2.4.0"
+neoForge.version = "21.5.66-beta"
+version = "2.5.0"
 group = "dev.gigaherz.toolbelt"
-
-var minecraftVersionResolver = project.neoForge.version.map { "1." + (it =~ /^(\d+(?:\.[1-9]\d*|))\./)[0][1] }
-base {
-    archivesName = minecraftVersionResolver.map { "ToolBelt-${it}" }
-}
+base.archivesName = "ToolBelt-${neoForge.minecraftVersion}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
@@ -62,8 +59,6 @@ repositories {
 }
 
 neoForge {
-    version = "21.4.47-beta"
-
     runs {
         // applies to all the run configs below
         configureEach {
@@ -103,13 +98,13 @@ neoForge {
 
     parchment {
         minecraftVersion = "1.21.4"
-        mappingsVersion = "2024.12.29"
+        mappingsVersion = "2025.03.23"
     }
 }
 
 dependencies {
-    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21.4:2.2.1"
-    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21.4:2.2.1"
+    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21.5:2.3.1"
+    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21.5:2.3.1"
 
     //compileOnly "mezz.jei:jei-1.21-common-api:19.5.0.56"
     //runtimeOnly "mezz.jei:jei-1.21-common:19.5.0.56"
@@ -119,8 +114,8 @@ dependencies {
 
     //implementation("io.wispforest:accessories-neoforge:1.0.0-beta.9+1.21")
 
-    //compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
-    //runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:11.0.1+1.21.5"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:11.0.1+1.21.5"
 
     //runtimeOnly fg.deobf("curse.maven:corail-tombstone-243707:3836552")
 }

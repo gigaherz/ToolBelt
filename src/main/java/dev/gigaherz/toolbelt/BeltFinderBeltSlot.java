@@ -14,7 +14,7 @@ public class BeltFinderBeltSlot extends BeltFinder
 {
     public static final String FINDER_ID = "belt_slot";
 
-    public static void initBaubles()
+    public static void initBeltSlot()
     {
         BeltFinder.addFinder(new BeltFinderBeltSlot());
     }

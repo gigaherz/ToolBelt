@@ -2,7 +2,6 @@ package dev.gigaherz.toolbelt.client.radial;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import dev.gigaherz.toolbelt.ConfigData;
 import net.minecraft.client.Minecraft;
@@ -329,15 +328,17 @@ public class GenericRadialMenu
 
             iterateVisible((item, s, e) -> {
                 int color = item.isHovered() ? backgroundColorHover : backgroundColor;
-                drawPieArc(builder, x, y, z, radiusIn, radiusOut, s, e, color);
+                drawPieArc(builder, matrixStack, x, y, z, radiusIn, radiusOut, s, e, color);
             });
         }
     }
 
     private static final float PRECISION = 2.5f / 360.0f;
 
-    private void drawPieArc(VertexConsumer buffer, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int color)
+    private void drawPieArc(VertexConsumer buffer, PoseStack matrixStack, float x, float y, float z, float radiusIn, float radiusOut, float startAngle, float endAngle, int color)
     {
+        var matrix = matrixStack.last().pose();
+
         float angle = endAngle - startAngle;
         int sections = Math.max(1, Mth.ceil(angle / PRECISION));
 
@@ -364,10 +365,10 @@ public class GenericRadialMenu
             float pos2InX = x + radiusIn * (float) Math.cos(angle2);
             float pos2InY = y + radiusIn * (float) Math.sin(angle2);
 
-            buffer.addVertex(pos1OutX, pos1OutY, z).setColor(r, g, b, a);
-            buffer.addVertex(pos1InX, pos1InY, z).setColor(r, g, b, a);
-            buffer.addVertex(pos2InX, pos2InY, z).setColor(r, g, b, a);
-            buffer.addVertex(pos2OutX, pos2OutY, z).setColor(r, g, b, a);
+            buffer.addVertex(matrix, pos1OutX, pos1OutY, z).setColor(r, g, b, a);
+            buffer.addVertex(matrix, pos1InX, pos1InY, z).setColor(r, g, b, a);
+            buffer.addVertex(matrix, pos2InX, pos2InY, z).setColor(r, g, b, a);
+            buffer.addVertex(matrix, pos2OutX, pos2OutY, z).setColor(r, g, b, a);
         }
     }
 

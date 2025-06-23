@@ -1,9 +1,7 @@
 package dev.gigaherz.toolbelt;
 
-import com.mojang.datafixers.util.Pair;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
-import dev.gigaherz.sewingkit.SewingKitDataGen;
 import dev.gigaherz.sewingkit.SewingKitMod;
 import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
 import dev.gigaherz.toolbelt.belt.BeltIngredient;
@@ -25,10 +23,8 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.ModelTemplates;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.component.DataComponentType;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.data.DataGenerator;
@@ -43,7 +39,7 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
@@ -57,9 +53,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.neoforged.neoforge.client.event.RegisterColorHandlersEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.Tags;
@@ -76,8 +70,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import top.theillusivec4.curios.api.CuriosDataProvider;
+import top.theillusivec4.curios.api.CuriosTags;
 
-import javax.annotation.Nullable;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 
@@ -192,12 +187,12 @@ public class ToolBelt
 
     public void commonSetup(FMLCommonSetupEvent event)
     {
-        BeltFinderBeltSlot.initBaubles();
+        BeltFinderBeltSlot.initBeltSlot();
 
-        /*if (ModList.get().isLoaded("curios"))
+        if (ModList.get().isLoaded("curios"))
         {
             BeltFinderCurios.initCurios();
-        }*/
+        }
     }
 
     @EventBusSubscriber(value= Dist.CLIENT, modid = MODID, bus= EventBusSubscriber.Bus.MOD)
@@ -264,6 +259,7 @@ public class ToolBelt
             gen.addProvider(true, new Recipes(gen.getPackOutput(), event.getLookupProvider()));
             gen.addProvider(true, new ModelsAndClientItems(gen.getPackOutput()));
             gen.addProvider(true, new ItemTagGen(gen.getPackOutput()));
+            gen.addProvider(true, new MyCuriosDataProvider(gen, event));
         }
 
         private static class ModelsAndClientItems extends ModelProvider
@@ -304,6 +300,8 @@ public class ToolBelt
             {
                 tag(ItemTags.DYEABLE)
                         .add(BELT.get());
+                tag(CuriosTags.BELT)
+                        .add(BELT.getKey());
             }
         }
 
@@ -415,6 +413,22 @@ public class ToolBelt
             public String getName()
             {
                 return "Recipes";
+            }
+        }
+
+        private static class MyCuriosDataProvider extends CuriosDataProvider
+        {
+            public MyCuriosDataProvider(DataGenerator gen, GatherDataEvent.Client event)
+            {
+                super(ToolBelt.MODID, gen.getPackOutput(), event.getLookupProvider());
+            }
+
+            @Override
+            public void generate(HolderLookup.Provider registries)
+            {
+                this.createEntities("curio_slots")
+                        .addPlayer().addSlots("belt");
+                this.createSlot("belt").size(1);
             }
         }
     }

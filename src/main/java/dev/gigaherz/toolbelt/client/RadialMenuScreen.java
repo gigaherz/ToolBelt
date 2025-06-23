@@ -3,6 +3,7 @@ package dev.gigaherz.toolbelt.client;
 import com.google.common.collect.Lists;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
+import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.client.radial.*;
 import dev.gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
@@ -24,9 +25,25 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Objects;
 
-@EventBusSubscriber(Dist.CLIENT)
 public class RadialMenuScreen extends Screen
 {
+    @EventBusSubscriber(value=Dist.CLIENT, modid= ToolBelt.MODID, bus= EventBusSubscriber.Bus.GAME)
+    public static class Client
+    {
+
+        @SubscribeEvent
+        public static void overlayEvent(RenderGuiLayerEvent.Pre event)
+        {
+            if (!event.getName().equals(VanillaGuiLayers.CROSSHAIR))
+                return;
+
+            if (Minecraft.getInstance().screen instanceof RadialMenuScreen)
+            {
+                event.setCanceled(true);
+            }
+        }
+    }
+
     private final BeltFinder.BeltGetter getter;
     private ItemStack stackEquipped;
     private IItemHandler inventory;
@@ -82,18 +99,6 @@ public class RadialMenuScreen extends Screen
                 return RadialMenuScreen.this.trySwap(-1, ItemStack.EMPTY);
             }
         };
-    }
-
-    @SubscribeEvent
-    public static void overlayEvent(RenderGuiLayerEvent.Pre event)
-    {
-        if (!event.getName().equals(VanillaGuiLayers.CROSSHAIR))
-            return;
-
-        if (Minecraft.getInstance().screen instanceof RadialMenuScreen)
-        {
-            event.setCanceled(true);
-        }
     }
 
     @Override // removed
@@ -273,7 +278,7 @@ public class RadialMenuScreen extends Screen
 
     private void checkCycleKeybinds()
     {
-        if (ToolBeltClient.isKeyDown(ToolBeltClient.CYCLE_TOOL_MENU_LEFT_KEYBIND))
+        if (ToolBeltClient.CYCLE_TOOL_MENU_LEFT_KEYBIND != null && ToolBeltClient.isKeyDown(ToolBeltClient.CYCLE_TOOL_MENU_LEFT_KEYBIND))
         {
             if (!keyCycleBeforeL)
             {
@@ -286,7 +291,7 @@ public class RadialMenuScreen extends Screen
             keyCycleBeforeL = false;
         }
 
-        if (ToolBeltClient.isKeyDown(ToolBeltClient.CYCLE_TOOL_MENU_RIGHT_KEYBIND))
+        if (ToolBeltClient.CYCLE_TOOL_MENU_RIGHT_KEYBIND != null && ToolBeltClient.isKeyDown(ToolBeltClient.CYCLE_TOOL_MENU_RIGHT_KEYBIND))
         {
             if (!keyCycleBeforeR)
             {

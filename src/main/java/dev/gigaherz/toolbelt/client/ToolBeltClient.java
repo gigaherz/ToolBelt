@@ -21,6 +21,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModContainer;
@@ -30,6 +31,7 @@ import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Function;
@@ -107,17 +109,19 @@ public class ToolBeltClient
     }
 
 
-    public static KeyMapping OPEN_TOOL_MENU_KEYBIND;
-    public static KeyMapping CYCLE_TOOL_MENU_LEFT_KEYBIND;
-    public static KeyMapping CYCLE_TOOL_MENU_RIGHT_KEYBIND;
+    @Nullable public static KeyMapping OPEN_TOOL_MENU_KEYBIND;
+    @Nullable public static KeyMapping CYCLE_TOOL_MENU_LEFT_KEYBIND;
+    @Nullable public static KeyMapping CYCLE_TOOL_MENU_RIGHT_KEYBIND;
 
     public static KeyMapping OPEN_BELT_SLOT_KEYBIND;
 
     public static void wipeOpen()
     {
         // Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(false);
-        while (OPEN_TOOL_MENU_KEYBIND.consumeClick())
+        //noinspection StatementWithEmptyBody
+        while (OPEN_TOOL_MENU_KEYBIND != null && OPEN_TOOL_MENU_KEYBIND.consumeClick())
         {
+            // leave empty
         }
     }
 
@@ -129,10 +133,10 @@ public class ToolBeltClient
 
         if (mc.screen == null)
         {
-            boolean toolMenuKeyIsDown = OPEN_TOOL_MENU_KEYBIND.isDown();
+            boolean toolMenuKeyIsDown = OPEN_TOOL_MENU_KEYBIND != null && OPEN_TOOL_MENU_KEYBIND.isDown();
             if (toolMenuKeyIsDown && !toolMenuKeyWasDown)
             {
-                while (OPEN_TOOL_MENU_KEYBIND.consumeClick())
+                while (OPEN_TOOL_MENU_KEYBIND != null && OPEN_TOOL_MENU_KEYBIND.consumeClick())
                 {
                     if (mc.screen == null)
                     {
@@ -153,7 +157,7 @@ public class ToolBeltClient
 
         if (ConfigData.customBeltSlotEnabled)
         {
-            while (OPEN_BELT_SLOT_KEYBIND.consumeClick())
+            while (OPEN_BELT_SLOT_KEYBIND != null && OPEN_BELT_SLOT_KEYBIND.consumeClick())
             {
                 if (mc.screen == null)
                 {
@@ -178,12 +182,16 @@ public class ToolBeltClient
                     isKeyDown0(settings.keyShift),
                     isKeyDown0(settings.keySprint)
             );
-            eInput.forwardImpulse = eInput.keyPresses.forward() == eInput.keyPresses.backward() ? 0.0F : (eInput.keyPresses.forward() ? 1.0F : -1.0F);
-            eInput.leftImpulse = eInput.keyPresses.left() == eInput.keyPresses.right() ? 0.0F : (eInput.keyPresses.left() ? 1.0F : -1.0F);
+            eInput.moveVector = new Vec2(
+                eInput.keyPresses.left() == eInput.keyPresses.right() ? 0.0F : (eInput.keyPresses.left() ? 1.0F : -1.0F),
+                eInput.keyPresses.forward() == eInput.keyPresses.backward() ? 0.0F : (eInput.keyPresses.forward() ? 1.0F : -1.0F)
+            );
             if (Minecraft.getInstance().player.isMovingSlowly())
             {
-                eInput.leftImpulse = (float) ((double) eInput.leftImpulse * 0.3D);
-                eInput.forwardImpulse = (float) ((double) eInput.forwardImpulse * 0.3D);
+                eInput.moveVector = new Vec2(
+                        (float) ((double) eInput.moveVector.x * 0.3D),
+                        (float) ((double) eInput.moveVector.y * 0.3D)
+                );
             }
         }
     }
