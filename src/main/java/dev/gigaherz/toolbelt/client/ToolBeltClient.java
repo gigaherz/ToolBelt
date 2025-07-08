@@ -29,6 +29,7 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
@@ -161,7 +162,7 @@ public class ToolBeltClient
             {
                 if (mc.screen == null)
                 {
-                    PacketDistributor.sendToServer(OpenBeltSlotInventory.INSTANCE);
+                    ClientPacketDistributor.sendToServer(OpenBeltSlotInventory.INSTANCE);
                 }
             }
         }

@@ -18,6 +18,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
@@ -269,7 +270,7 @@ public class RadialMenuScreen extends Screen
         if (inHand.getCount() > 0 || itemMouseOver.getCount() > 0)
         {
             SwapItems.swapItem(slotNumber, minecraft.player);
-            PacketDistributor.sendToServer(new SwapItems(slotNumber));
+            ClientPacketDistributor.sendToServer(new SwapItems(slotNumber));
         }
 
         menu.close();

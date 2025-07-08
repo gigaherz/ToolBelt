@@ -13,6 +13,7 @@ import net.minecraft.world.inventory.*;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.network.PacketDistributor;
 
 import java.util.List;
@@ -60,7 +61,7 @@ public class BeltSlotMenu extends AbstractCraftingMenu
 
         if (playerInventory.player.level().isClientSide)
         {
-            PacketDistributor.sendToServer(ContainerSlotsHack.INSTANCE);
+            ClientPacketDistributor.sendToServer(ContainerSlotsHack.INSTANCE);
         }
     }
 

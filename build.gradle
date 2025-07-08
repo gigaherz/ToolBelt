@@ -3,11 +3,11 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.95'
+    id 'net.neoforged.moddev' version '2.0.99'
 }
 
-neoForge.version = "21.6.12-beta"
-version = "2.5.0"
+neoForge.version = "21.7.11-beta"
+version = "2.6.0"
 group = "dev.gigaherz.toolbelt"
 base.archivesName = "ToolBelt-${neoForge.minecraftVersion}"
 
@@ -97,8 +97,8 @@ neoForge {
     }
 
     parchment {
-        minecraftVersion = "1.21.4"
-        mappingsVersion = "2025.03.23"
+        minecraftVersion="1.21.6"
+        mappingsVersion="BLEEDING-SNAPSHOT"
     }
 }
 

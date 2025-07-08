@@ -16,9 +16,8 @@ public class ClientPacketHandlers
         Minecraft minecraft = Minecraft.getInstance();
         minecraft.execute(() -> {
             Entity entity = minecraft.level.getEntity(message.player());
-            if (!(entity instanceof Player))
+            if (!(entity instanceof Player player))
                 return;
-            Player player = (Player) entity;
             BeltFinder.setBeltFromPacket(player, message.where(), message.slot(), message.stack());
         });
     }
