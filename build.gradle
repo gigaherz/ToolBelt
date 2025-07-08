@@ -3,11 +3,11 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.88'
+    id 'net.neoforged.moddev' version '2.0.99'
 }
 
-neoForge.version = "21.5.66-beta"
-version = "2.5.0"
+neoForge.version = "21.5.82"
+version = "2.5.1"
 group = "dev.gigaherz.toolbelt"
 base.archivesName = "ToolBelt-${neoForge.minecraftVersion}"
 

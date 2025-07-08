@@ -239,7 +239,7 @@ public class ToolBelt
             ev.setCanceled(true);
             return;
         }
-        ev.setCost(cost);
+        ev.setXpCost(cost);
         ev.setMaterialCost(1);
 
         ev.setOutput(ToolBeltItem.makeUpgradedStack(left));
