@@ -9,6 +9,7 @@ import net.minecraft.client.gui.screens.inventory.AbstractRecipeBookScreen;
 import net.minecraft.client.gui.screens.inventory.EffectsInInventory;
 import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.CraftingRecipeBookComponent;
+import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
@@ -94,7 +95,7 @@ public class BeltSlotScreen extends AbstractRecipeBookScreen<BeltSlotMenu>
     }
 
     @Override
-    public boolean mouseReleased(double mouseX, double mouseY, int button)
+    public boolean mouseReleased(MouseButtonEvent p_446114_)
     {
         if (this.buttonClicked)
         {
@@ -103,7 +104,7 @@ public class BeltSlotScreen extends AbstractRecipeBookScreen<BeltSlotMenu>
         }
         else
         {
-            return super.mouseReleased(mouseX, mouseY, button);
+            return super.mouseReleased(p_446114_);
         }
     }
 }

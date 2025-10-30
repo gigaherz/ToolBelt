@@ -1,5 +1,5 @@
 package dev.gigaherz.toolbelt;
-
+/*
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -104,4 +104,4 @@ public class BeltFinderCurios extends BeltFinder
             // No need! Curios does its own sync. I think.
         }
     }
-}
+}*/

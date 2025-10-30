@@ -1,8 +1,10 @@
 package dev.gigaherz.toolbelt.common;
 
 import dev.gigaherz.toolbelt.BeltFinder;
+import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
@@ -11,16 +13,14 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ClickType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
+import net.minecraft.world.item.component.ItemContainerContents;
 
-import java.util.Objects;
-
-public class BeltContainer extends AbstractContainerMenu
+public class BeltContainer extends AbstractContainerMenu implements BeltFinder.BeltGetter
 {
-    public final int beltSlots;
+    private final Inventory playerInventory;
     private ItemStack blockedStack;
     private final int blockedSlot;
+    public final int inventorySize;
 
     public BeltContainer(int id, Inventory inventory, RegistryFriendlyByteBuf extraData)
     {
@@ -30,6 +30,7 @@ public class BeltContainer extends AbstractContainerMenu
     public BeltContainer(int id, Inventory playerInventory, int blockedSlot, ItemStack blockedStack)
     {
         super(ToolBelt.BELT_MENU.get(), id);
+        this.playerInventory = playerInventory;
         this.blockedStack = blockedStack;
         this.blockedSlot = blockedSlot;
         if (blockedSlot >= 0 && !stillValid(playerInventory.player))
@@ -37,16 +38,22 @@ public class BeltContainer extends AbstractContainerMenu
             blockedStack = ItemStack.EMPTY;
         }
 
-        IItemHandler beltInventory = Objects.requireNonNullElseGet(
-                stillValid(playerInventory.player) ? blockedStack.getCapability(Capabilities.ItemHandler.ITEM) : null,
-                () -> ToolBeltItem.getComponentItemHandler(new ItemStack(ToolBelt.BELT.get()))
-        );
+        ItemContainerContents inventory = stillValid(playerInventory.player) ? blockedStack.get(DataComponents.CONTAINER) : null;
+        inventorySize = ToolBeltItem.getBeltSize(blockedStack);
+        var wrapper = new ItemContainerWrapper(inventory, inventorySize, blockedStack, this);
 
-        beltSlots = beltInventory.getSlots();
-        int xoff = ((9 - beltSlots) * 18) / 2;
-        for (int k = 0; k < beltSlots; ++k)
+        int xoff = ((9 - inventorySize) * 18) / 2;
+        for (int k = 0; k < inventorySize; ++k)
         {
-            this.addSlot(new BeltSlot(playerInventory, blockedStack, blockedSlot, k, 8 + xoff + k * 18, 20));
+            this.addSlot(new Slot(wrapper, k, 8 + xoff + k * 18, 20)
+            {
+
+                @Override
+                public boolean mayPlace(ItemStack stack)
+                {
+                    return ConfigData.isItemStackAllowed(stack);
+                }
+            });
         }
 
         bindPlayerInventory(playerInventory);
@@ -81,7 +88,7 @@ public class BeltContainer extends AbstractContainerMenu
     public void removed(Player playerIn)
     {
         super.removed(playerIn);
-        if (!playerIn.level().isClientSide)
+        if (!playerIn.level().isClientSide())
             BeltFinder.sendSync(playerIn);
     }
 
@@ -94,6 +101,7 @@ public class BeltContainer extends AbstractContainerMenu
     @Override
     public boolean stillValid(Player playerIn)
     {
+        if (inventorySize <= 0) return false;
         ItemStack held = playerIn.getInventory().getItem(blockedSlot);
         var equal = blockedSlot < 0 || held == blockedStack || ItemStack.isSameItemSameComponents(held, blockedStack);
         blockedStack = held;
@@ -122,16 +130,16 @@ public class BeltContainer extends AbstractContainerMenu
         int start;
         int end;
         boolean reverse = false;
-        if (index < beltSlots)
+        if (index < inventorySize)
         {
-            start = beltSlots;
+            start = inventorySize;
             end = this.slots.size();
             reverse = true;
         }
         else
         {
             start = 0;
-            end = beltSlots;
+            end = inventorySize;
         }
 
         if (!this.moveItemStackTo(containedStack, start, end, reverse))
@@ -149,5 +157,24 @@ public class BeltContainer extends AbstractContainerMenu
         }
 
         return originalStack;
+    }
+
+    @Override
+    public ItemStack getBelt()
+    {
+        return playerInventory.getItem(blockedSlot);
+    }
+
+    @Override
+    public void setBelt(ItemStack stack)
+    {
+        playerInventory.setItem(blockedSlot, stack);
+        blockedStack = stack;
+    }
+
+    @Override
+    public void syncToClients()
+    {
+
     }
 }

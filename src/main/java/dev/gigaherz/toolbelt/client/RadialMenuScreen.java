@@ -4,27 +4,27 @@ import com.google.common.collect.Lists;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
+import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import dev.gigaherz.toolbelt.client.radial.*;
 import dev.gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.input.MouseButtonEvent;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.ItemContainerContents;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 
 public class RadialMenuScreen extends Screen
 {
@@ -47,7 +47,8 @@ public class RadialMenuScreen extends Screen
 
     private final BeltFinder.BeltGetter getter;
     private ItemStack stackEquipped;
-    private IItemHandler inventory;
+    private ItemContainerContents inventory;
+    private int inventorySize;
 
     private boolean keyCycleBeforeL = false;
     private boolean keyCycleBeforeR = false;
@@ -64,7 +65,8 @@ public class RadialMenuScreen extends Screen
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
 
-        inventory = stackEquipped.getCount() > 0 ? stackEquipped.getCapability(Capabilities.ItemHandler.ITEM) : null;
+        inventory = stackEquipped.isEmpty() ? null : stackEquipped.get(DataComponents.CONTAINER);
+        inventorySize = ToolBeltItem.getBeltSize(stackEquipped);
         menu = new GenericRadialMenu(Minecraft.getInstance(), new IRadialMenuHost()
         {
             @Override
@@ -140,7 +142,7 @@ public class RadialMenuScreen extends Screen
         else
         {
             ItemStack stack = getter.getBelt();
-            if (stack.getCount() <= 0)
+            if (stack.isEmpty())
             {
                 inventory = null;
                 stackEquipped = null;
@@ -149,7 +151,8 @@ public class RadialMenuScreen extends Screen
             else if (stackEquipped != stack)
             {
                 stackEquipped = stack;
-                inventory = Objects.requireNonNull(stack.getCapability(Capabilities.ItemHandler.ITEM));
+                inventory = stackEquipped.isEmpty() ? null : stackEquipped.get(DataComponents.CONTAINER);
+                inventorySize = ToolBeltItem.getBeltSize(stackEquipped);
                 needsRecheckStacks = true;
             }
         }
@@ -158,7 +161,7 @@ public class RadialMenuScreen extends Screen
         {
             menu.close();
         }
-        else if (!ToolBeltClient.isKeyDown(ToolBeltClient.OPEN_TOOL_MENU_KEYBIND))
+        else if (ToolBeltClient.OPEN_TOOL_MENU_KEYBIND != null && !ToolBeltClient.isKeyDown(ToolBeltClient.OPEN_TOOL_MENU_KEYBIND))
         {
             if (ConfigData.releaseToSwap)
             {
@@ -171,11 +174,11 @@ public class RadialMenuScreen extends Screen
         }
     }
 
-    @Override // mouseReleased
-    public boolean mouseReleased(double p_mouseReleased_1_, double p_mouseReleased_3_, int p_mouseReleased_5_)
+    @Override
+    public boolean mouseReleased(MouseButtonEvent p_446955_)
     {
         processClick(true);
-        return super.mouseReleased(p_mouseReleased_1_, p_mouseReleased_3_, p_mouseReleased_5_);
+        return super.mouseReleased(p_446955_);
     }
 
     protected void processClick(boolean triggeredByMouse)
@@ -197,9 +200,9 @@ public class RadialMenuScreen extends Screen
             if (needsRecheckStacks)
             {
                 cachedMenuItems.clear();
-                for (int i = 0; i < inventory.getSlots(); i++)
+                for (int i = 0; i < inventorySize; i++)
                 {
-                    ItemStack inSlot = inventory.getStackInSlot(i);
+                    ItemStack inSlot = i < inventory.getSlots() ? inventory.getStackInSlot(i) : ItemStack.EMPTY;
                     ItemStackRadialMenuItem item = getMenuItemForStack(i, inSlot, inHand);
                     cachedMenuItems.add(item);
                 }

@@ -39,7 +39,6 @@ import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
@@ -70,8 +69,6 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import top.theillusivec4.curios.api.CuriosDataProvider;
-import top.theillusivec4.curios.api.CuriosTags;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
@@ -189,10 +186,10 @@ public class ToolBelt
     {
         BeltFinderBeltSlot.initBeltSlot();
 
-        if (ModList.get().isLoaded("curios"))
+        /*if (ModList.get().isLoaded("curios"))
         {
             BeltFinderCurios.initCurios();
-        }
+        }*/
     }
 
     @EventBusSubscriber(value= Dist.CLIENT, modid = MODID)
@@ -211,7 +208,7 @@ public class ToolBelt
 
     public static int getUpgradeXP(ItemStack stack)
     {
-        int slots = ToolBeltItem.getSlotsCount(stack);
+        int slots = ToolBeltItem.getBeltSize(stack);
 
         if (slots >= 9)
             return -1;
@@ -259,7 +256,7 @@ public class ToolBelt
             gen.addProvider(true, new Recipes(gen.getPackOutput(), event.getLookupProvider()));
             gen.addProvider(true, new ModelsAndClientItems(gen.getPackOutput()));
             gen.addProvider(true, new ItemTagGen(gen.getPackOutput()));
-            gen.addProvider(true, new MyCuriosDataProvider(gen, event));
+            //gen.addProvider(true, new MyCuriosDataProvider(gen, event));
         }
 
         private static class ModelsAndClientItems extends ModelProvider
@@ -300,8 +297,8 @@ public class ToolBelt
             {
                 tag(ItemTags.DYEABLE)
                         .add(BELT.get());
-                tag(CuriosTags.BELT)
-                        .add(BELT.get());
+                /*tag(CuriosTags.BELT)
+                        .add(BELT.get());*/
             }
         }
 
@@ -416,7 +413,7 @@ public class ToolBelt
             }
         }
 
-        private static class MyCuriosDataProvider extends CuriosDataProvider
+        /*private static class MyCuriosDataProvider extends CuriosDataProvider
         {
             public MyCuriosDataProvider(DataGenerator gen, GatherDataEvent.Client event)
             {
@@ -430,6 +427,6 @@ public class ToolBelt
                         .addPlayer().addSlots("belt");
                 this.createSlot("belt").size(1);
             }
-        }
+        }*/
     }
 }

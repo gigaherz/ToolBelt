@@ -1,5 +1,6 @@
 package dev.gigaherz.toolbelt.client;
 
+import com.google.common.reflect.TypeToken;
 import com.mojang.blaze3d.platform.InputConstants;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
@@ -10,16 +11,21 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
+import net.minecraft.client.renderer.entity.player.AvatarRenderer;
+import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.resources.PlayerSkin;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.context.ContextKey;
+import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.entity.player.PlayerModelType;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
 import net.neoforged.api.distmarker.Dist;
@@ -30,8 +36,8 @@ import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.client.gui.ConfigurationScreen;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
+import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 import net.neoforged.neoforge.common.NeoForge;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -46,6 +52,7 @@ public class ToolBeltClient
         modEventBus.addListener(this::registerModelProperties);
         modEventBus.addListener(this::registerLayer);
         modEventBus.addListener(this::addLayers);
+        modEventBus.addListener(this::renderStateModifiers);
 
         NeoForge.EVENT_BUS.addListener(this::handleKeys);
         NeoForge.EVENT_BUS.addListener(this::updateInputEvent);
@@ -61,17 +68,20 @@ public class ToolBeltClient
 
     public void initKeybinds(RegisterKeyMappingsEvent event)
     {
+        var category = new KeyMapping.Category(ToolBelt.location("toolbelt"));
+        event.registerCategory(category);
+
         event.register(ToolBeltClient.OPEN_TOOL_MENU_KEYBIND =
-                new KeyMapping("key.toolbelt.open", GLFW.GLFW_KEY_R, "key.toolbelt.category"));
+                new KeyMapping("key.toolbelt.open", GLFW.GLFW_KEY_R, category));
 
         event.register(ToolBeltClient.CYCLE_TOOL_MENU_LEFT_KEYBIND =
-                new KeyMapping("key.toolbelt.cycle.left", InputConstants.UNKNOWN.getValue(), "key.toolbelt.category"));
+                new KeyMapping("key.toolbelt.cycle.left", InputConstants.UNKNOWN.getValue(), category));
 
         event.register(ToolBeltClient.CYCLE_TOOL_MENU_RIGHT_KEYBIND =
-                new KeyMapping("key.toolbelt.cycle.right", InputConstants.UNKNOWN.getValue(), "key.toolbelt.category"));
+                new KeyMapping("key.toolbelt.cycle.right", InputConstants.UNKNOWN.getValue(), category));
 
         event.register(ToolBeltClient.OPEN_BELT_SLOT_KEYBIND =
-                new KeyMapping("key.toolbelt.slot", GLFW.GLFW_KEY_V, "key.toolbelt.category"));
+                new KeyMapping("key.toolbelt.slot", GLFW.GLFW_KEY_V, category));
     }
 
     public void registerLayer(EntityRenderersEvent.RegisterLayerDefinitions event)
@@ -89,15 +99,17 @@ public class ToolBeltClient
         addLayerToHumanoid(event, EntityType.DROWNED, ToolBeltLayer::new);
         addLayerToHumanoid(event, EntityType.STRAY, ToolBeltLayer::new);
 
-        addLayerToPlayerSkin(event, PlayerSkin.Model.WIDE, ToolBeltLayer::new);
-        addLayerToPlayerSkin(event, PlayerSkin.Model.SLIM, ToolBeltLayer::new);
+        for(var skin : event.getSkins())
+        {
+            addLayerToPlayerSkin(event, skin, ToolBeltLayer::new);
+        }
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private static <E extends Player, S extends HumanoidRenderState, M extends HumanoidModel<S>>
-    void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, PlayerSkin.Model skinName, Function<LivingEntityRenderer<E, S, M>, ? extends RenderLayer<S, M>> factory)
+    void addLayerToPlayerSkin(EntityRenderersEvent.AddLayers event, PlayerModelType skinName, Function<LivingEntityRenderer<E, S, M>, ? extends RenderLayer<S, M>> factory)
     {
-        EntityRenderer renderer = event.getSkin(skinName);
+        EntityRenderer renderer = event.getPlayerRenderer(skinName);
         if (renderer instanceof LivingEntityRenderer ler) ler.addLayer(factory.apply(ler));
     }
 
@@ -109,12 +121,18 @@ public class ToolBeltClient
         if (renderer instanceof LivingEntityRenderer ler) ler.addLayer(factory.apply(ler));
     }
 
+    private void renderStateModifiers(RegisterRenderStateModifiersEvent event)
+    {
+        //noinspection unchecked,RedundantCast
+        event.registerEntityModifier(
+                (Class<? extends AvatarRenderer<AbstractClientPlayer>>)(Object)AvatarRenderer.class,
+                ToolBeltLayer::extractRenderState);
+    }
 
     @Nullable public static KeyMapping OPEN_TOOL_MENU_KEYBIND;
     @Nullable public static KeyMapping CYCLE_TOOL_MENU_LEFT_KEYBIND;
     @Nullable public static KeyMapping CYCLE_TOOL_MENU_RIGHT_KEYBIND;
-
-    public static KeyMapping OPEN_BELT_SLOT_KEYBIND;
+    @Nullable public static KeyMapping OPEN_BELT_SLOT_KEYBIND;
 
     public static void wipeOpen()
     {
@@ -205,27 +223,16 @@ public class ToolBeltClient
         return switch (keybind.getKey().getType())
         {
             case KEYSYM ->
-                    InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue());
+                    InputConstants.isKeyDown(Minecraft.getInstance().getWindow(), keybind.getKey().getValue());
             case MOUSE ->
-                    GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue()) == GLFW.GLFW_PRESS;
-            default -> false;
+                    GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().handle(), keybind.getKey().getValue()) == GLFW.GLFW_PRESS;
+            default -> keybind.isDown();
         };
     }
 
     public static boolean isKeyDown(KeyMapping keybind)
     {
-        if (keybind.isUnbound())
-            return false;
-
-        boolean isDown = switch (keybind.getKey().getType())
-        {
-            case KEYSYM ->
-                    InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue());
-            case MOUSE ->
-                    GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue()) == GLFW.GLFW_PRESS;
-            default -> false;
-        };
-        return isDown && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
+        return isKeyDown0(keybind) && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }
 
     public static ModelLayerLocation BELT_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("minecraft", "player"), "toolbelt_belt");

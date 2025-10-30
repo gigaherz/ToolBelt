@@ -34,7 +34,7 @@ public class BeltIngredient implements ICustomIngredient
     @Override
     public boolean test(ItemStack stack)
     {
-        return stack.getItem() == ToolBelt.BELT.get() && ToolBeltItem.getSlotsCount(stack) == size;
+        return stack.getItem() == ToolBelt.BELT.get() && ToolBeltItem.getBeltSize(stack) == size;
     }
 
     @Override

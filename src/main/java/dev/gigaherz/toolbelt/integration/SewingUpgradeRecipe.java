@@ -4,9 +4,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.sewingkit.SewingKitMod;
 import dev.gigaherz.sewingkit.api.SewingRecipe;
-import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
 import dev.gigaherz.sewingkit.table.SewingInput;
-import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
@@ -15,13 +13,11 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.RecipeType;
 
 import javax.annotation.Nullable;
 import java.util.Optional;
@@ -90,10 +86,10 @@ public class SewingUpgradeRecipe extends SewingRecipe
             var inputTag = inputBelt.getComponentsPatch();
             if (!inputTag.isEmpty())
             {
-                size = ToolBeltItem.getSlotsCount(upgradedBelt);
+                size = ToolBeltItem.getBeltSize(upgradedBelt);
                 upgradedBelt.applyComponents(inputTag);
             }
-            ToolBeltItem.setSlotsCount(upgradedBelt, Mth.clamp(size,2,9));
+            ToolBeltItem.setBeltSize(upgradedBelt, Mth.clamp(size,2,9));
         }
         return upgradedBelt;
     }

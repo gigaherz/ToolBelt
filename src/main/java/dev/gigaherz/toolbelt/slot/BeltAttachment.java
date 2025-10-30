@@ -3,17 +3,15 @@ package dev.gigaherz.toolbelt.slot;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.network.SyncBeltSlotContents;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
@@ -25,29 +23,27 @@ import net.neoforged.neoforge.attachment.AttachmentType;
 import net.neoforged.neoforge.attachment.IAttachmentHolder;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.common.util.ValueIOSerializable;
-import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
 import net.neoforged.neoforge.event.entity.living.LivingDropsEvent;
 import net.neoforged.neoforge.event.entity.player.PlayerEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
-import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.neoforged.neoforge.transfer.item.ItemResource;
+import net.neoforged.neoforge.transfer.item.ItemStacksResourceHandler;
+import net.neoforged.neoforge.transfer.item.ItemUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collection;
 import java.util.Objects;
 
 public class BeltAttachment implements ValueIOSerializable
 {
     private static final Logger LOGGER = LogManager.getLogger();
-    private static final boolean ENABLE_DEBUG_LOGGING = "true".equals(System.getProperty("toolbelt.debug", FMLEnvironment.production ? "false" : "true"));
+    private static final boolean ENABLE_DEBUG_LOGGING = "true".equals(System.getProperty("toolbelt.debug", FMLEnvironment.isProduction() ? "false" : "true"));
 
     private static void printDebugLog(String message, Object... params)
     {
@@ -88,7 +84,7 @@ public class BeltAttachment implements ValueIOSerializable
             if (!ConfigData.customBeltSlotEnabled)
                 return;
             Player target = event.getEntity();
-            if (target.level().isClientSide)
+            if (target.level().isClientSide())
                 return;
             get(target).syncToSelf();
         }
@@ -99,7 +95,7 @@ public class BeltAttachment implements ValueIOSerializable
             if (!ConfigData.customBeltSlotEnabled)
                 return;
             Player target = event.getEntity();
-            if (target.level().isClientSide)
+            if (target.level().isClientSide())
                 return;
             get(target).syncToSelf();
         }
@@ -110,7 +106,7 @@ public class BeltAttachment implements ValueIOSerializable
             if (!ConfigData.customBeltSlotEnabled)
                 return;
             Entity target = event.getTarget();
-            if (target.level().isClientSide)
+            if (target.level().isClientSide())
                 return;
             if (target instanceof Player playerTarget)
             {
@@ -195,8 +191,8 @@ public class BeltAttachment implements ValueIOSerializable
         if (stack.getCount() > 0)
         {
             printDebugLog("Entity {}({}) has item in the belt slot, but the belt is disabled. Dropping to the ground.", owner.getScoreboardName(), owner.getUUID());
-            if (owner instanceof Player)
-                ItemHandlerHelper.giveItemToPlayer((Player) owner, stack);
+            if (owner instanceof Player player)
+                player.getInventory().placeItemBackInInventory(stack, true);
             else if (owner.level() instanceof ServerLevel level)
                 owner.spawnAtLocation(level, stack, 0.1f);
             setContents(ItemStack.EMPTY);
@@ -224,11 +220,12 @@ public class BeltAttachment implements ValueIOSerializable
     }
 
     private final LivingEntity owner;
-    private final ItemStackHandler inventory = new ItemStackHandler(1)
+    private final ItemStacksResourceHandler inventory = new ItemStacksResourceHandler(1)
     {
         @Override
-        protected void onContentsChanged(int slot)
+        protected void onContentsChanged(int index, ItemStack previousContents)
         {
+            super.onContentsChanged(index, previousContents);
             BeltAttachment.this.onContentsChanged();
         }
     };
@@ -247,7 +244,7 @@ public class BeltAttachment implements ValueIOSerializable
     {
         if (!ConfigData.customBeltSlotEnabled)
             return;
-        if (!getOwner().level().isClientSide)
+        if (!getOwner().level().isClientSide())
             syncToTracking(getOwner());
     }
 
@@ -269,7 +266,7 @@ public class BeltAttachment implements ValueIOSerializable
     @Nonnull
     public ItemStack getContents()
     {
-        return inventory.getStackInSlot(0);
+        return ItemUtil.getStack(inventory, 0);
     }
 
     public void setContents(@Nonnull ItemStack stack)
@@ -278,7 +275,7 @@ public class BeltAttachment implements ValueIOSerializable
         if (oldStack == stack) return;
         if (!oldStack.isEmpty())
             notifyUnequip(oldStack);
-        inventory.setStackInSlot(0, stack);
+        inventory.set(0, ItemResource.of(stack), stack.getCount());
         if (!stack.isEmpty())
             notifyEquip(stack);
     }

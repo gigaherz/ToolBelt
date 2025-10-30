@@ -1,11 +1,9 @@
 package dev.gigaherz.toolbelt.common;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
@@ -40,7 +38,7 @@ public class BeltScreen extends AbstractContainerScreen<BeltContainer>
         int j = (this.height - this.imageHeight) / 2;
         graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_TEXTURE, i, j, 0, 0, this.imageWidth, this.imageHeight, 256,256);
 
-        int slots = this.getMenu().beltSlots;
+        int slots = this.getMenu().inventorySize;
         int width = slots * 18;
         int x = 7 + ((9 - slots) * 18) / 2;
         graphics.blit(RenderPipelines.GUI_TEXTURED, GUI_TEXTURE, i + x, j + 19, 0, this.imageHeight, width, 18, 256,256);

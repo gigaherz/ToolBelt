@@ -12,7 +12,6 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -24,7 +23,8 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.items.ComponentItemHandler;
+import net.neoforged.neoforge.transfer.access.ItemAccess;
+import net.neoforged.neoforge.transfer.item.ItemAccessItemHandler;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -38,7 +38,7 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
     public static void register(RegisterCapabilitiesEvent event)
     {
         event.registerItem(
-                Capabilities.ItemHandler.ITEM,
+                Capabilities.Item.ITEM,
                 (stack, context) -> getComponentItemHandler(stack),
                 ToolBelt.BELT
         );
@@ -49,10 +49,10 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
         );
     }
 
-    public static @NotNull ComponentItemHandler getComponentItemHandler(ItemStack stack)
+    public static @NotNull ItemAccessItemHandler getComponentItemHandler(ItemStack stack)
     {
-        var size = stack.get(ToolBelt.BELT_SIZE);
-        return new ComponentItemHandler(stack, DataComponents.CONTAINER, size != null ? size : 2);
+        int size = getBeltSize(stack);
+        return new ItemAccessItemHandler(ItemAccess.forStack(stack), DataComponents.CONTAINER, size);
     }
 
     private static int getSlotFor(Inventory inv, ItemStack stack)
@@ -80,19 +80,18 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
 
     public ItemStack forSize(int size)
     {
-        return setSlotsCount(new ItemStack(this), Math.clamp(size,2,9));
+        return setBeltSize(new ItemStack(this), Math.clamp(size,2,9));
     }
 
-    public static int getSlotsCount(ItemStack stack)
+    public static int getBeltSize(ItemStack stack)
     {
-        var actualSize = stack.get(ToolBelt.BELT_SIZE);
-        return Math.clamp(Objects.requireNonNullElse(actualSize,2), 2, 9);
+        var count = Objects.requireNonNullElse(stack.get(ToolBelt.BELT_SIZE), 2);
+        return Math.clamp(count, 2, 9);
     }
 
-    public static ItemStack setSlotsCount(ItemStack stack, int newSize)
+    public static ItemStack setBeltSize(ItemStack stack, int newSize)
     {
-        var oldCount = stack.get(ToolBelt.BELT_SIZE);
-        var oldSize = oldCount != null ? oldCount : 2;
+        var oldSize = getBeltSize(stack);
         if (newSize != oldSize)
         {
             var oldInv = stack.get(DataComponents.CONTAINER);
@@ -123,7 +122,7 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
         if (slot == -1)
             return InteractionResult.FAIL;
 
-        if (!world.isClientSide && player instanceof ServerPlayer serverPlayer)
+        if (!world.isClientSide() && player instanceof ServerPlayer serverPlayer)
         {
             Screens.openBeltScreen(serverPlayer, slot);
         }
@@ -149,10 +148,12 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
         return openBeltScreen(player, stack, world);
     }
 
+    @SuppressWarnings("deprecation")
+    @Deprecated
     @Override
     public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display, Consumer<Component> consumer, TooltipFlag advanced)
     {
-        int size = getSlotsCount(stack);
+        int size = getBeltSize(stack);
 
         consumer.accept(Component.translatable("text.toolbelt.tooltip", size - 2, size));
     }
@@ -177,19 +178,20 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
 
     public static ItemStack makeUpgradedStack(ItemStack stack)
     {
-        int slots = getSlotsCount(stack);
+        int slots = getBeltSize(stack);
 
         if (slots >= 9)
             return stack.copy();
 
         stack = stack.copy();
-        setSlotsCount(stack, slots + 1);
+        setBeltSize(stack, slots + 1);
         return stack;
     }
 
     private void tickAllSlots(ItemStack source)
     {
-        var inventory = Objects.requireNonNull(source.getCapability(Capabilities.ItemHandler.ITEM), "No inventory!");
+        var inventory = source.get(DataComponents.CONTAINER);
+        if (inventory == null) return;
 
         for (int i = 0; i < inventory.getSlots(); i++)
         {

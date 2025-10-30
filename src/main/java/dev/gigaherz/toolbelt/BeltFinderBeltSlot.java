@@ -72,7 +72,7 @@ public class BeltFinderBeltSlot extends BeltFinder
         public void syncToClients()
         {
             LivingEntity thePlayer = slot.getOwner();
-            if (thePlayer.level().isClientSide)
+            if (thePlayer.level().isClientSide())
                 return;
             PacketDistributor.sendToPlayersTrackingEntityAndSelf(thePlayer, new BeltContentsChange(thePlayer.getId(), FINDER_ID, 0, slot.getContents()));
         }

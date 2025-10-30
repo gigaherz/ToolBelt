@@ -1,14 +1,11 @@
 package dev.gigaherz.toolbelt;
 
-import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.core.NonNullList;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.Optional;
-import java.util.function.IntFunction;
 
 public abstract class BeltFinder
 {
@@ -55,22 +52,6 @@ public abstract class BeltFinder
 
     protected Optional<BeltGetter> getSlotFromId(Player player, int slotId)
     {
-        return Optional.empty();
-    }
-
-    protected final Optional<? extends BeltGetter> findBeltInInventory(IItemHandler inventory, IntFunction<? extends BeltGetter> getterFactory)
-    {
-        for (int i = 0; i < inventory.getSlots(); i++)
-        {
-            ItemStack inSlot = inventory.getStackInSlot(i);
-            if (inSlot.getCount() > 0)
-            {
-                if (inSlot.getItem() instanceof ToolBeltItem)
-                {
-                    return Optional.of(getterFactory.apply(i));
-                }
-            }
-        }
         return Optional.empty();
     }
 

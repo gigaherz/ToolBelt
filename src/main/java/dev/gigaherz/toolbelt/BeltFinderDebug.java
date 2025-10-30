@@ -17,7 +17,7 @@ public class BeltFinderDebug extends BeltFinder
     @SubscribeEvent
     public static void init(FMLCommonSetupEvent setup)
     {
-        if (!FMLEnvironment.production)
+        if (!FMLEnvironment.isProduction())
         {
             BeltFinder.addFinder(new BeltFinderDebug());
         }

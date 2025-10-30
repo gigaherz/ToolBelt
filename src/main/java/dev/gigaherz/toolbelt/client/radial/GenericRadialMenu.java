@@ -382,7 +382,7 @@ public class GenericRadialMenu
     {
         Screen owner = host.getScreen();
         Window mainWindow = minecraft.getWindow();
-        GLFW.glfwSetCursorPos(mainWindow.getWindow(), (int) (x * mainWindow.getScreenWidth() / owner.width), (int) (y * mainWindow.getScreenHeight() / owner.height));
+        GLFW.glfwSetCursorPos(mainWindow.handle(), (int) (x * mainWindow.getScreenWidth() / owner.width), (int) (y * mainWindow.getScreenHeight() / owner.height));
     }
 
     private static final double TWO_PI = 2.0 * Math.PI;
@@ -437,7 +437,7 @@ public class GenericRadialMenu
 
             double[] xPos = new double[1];
             double[] yPos = new double[1];
-            GLFW.glfwGetCursorPos(mainWindow.getWindow(), xPos, yPos);
+            GLFW.glfwGetCursorPos(mainWindow.handle(), xPos, yPos);
 
             double scaledX = xPos[0] - (windowWidth / 2.0f);
             double scaledY = yPos[0] - (windowHeight / 2.0f);
@@ -450,7 +450,7 @@ public class GenericRadialMenu
                 double fixedX = scaledX * radius / distance;
                 double fixedY = scaledY * radius / distance;
 
-                GLFW.glfwSetCursorPos(mainWindow.getWindow(), (int) (windowWidth / 2 + fixedX), (int) (windowHeight / 2 + fixedY));
+                GLFW.glfwSetCursorPos(mainWindow.handle(), (int) (windowWidth / 2 + fixedX), (int) (windowHeight / 2 + fixedY));
             }
         }
     }
@@ -517,7 +517,7 @@ public class GenericRadialMenu
         }
 
         @Override
-        public void buildVertices(VertexConsumer consumer, float z) {
+        public void buildVertices(VertexConsumer consumer) {
             float angle = endAngle - startAngle;
             int sections = Math.max(1, Mth.ceil(angle / PRECISION));
 
@@ -539,10 +539,10 @@ public class GenericRadialMenu
                 float pos2InX = x + radiusIn * (float) Math.cos(angle2);
                 float pos2InY = y + radiusIn * (float) Math.sin(angle2);
 
-                consumer.addVertexWith2DPose(this.pose(), pos1OutX, pos1OutY, z).setColor(this.color());
-                consumer.addVertexWith2DPose(this.pose(), pos1InX, pos1InY, z).setColor(this.color());
-                consumer.addVertexWith2DPose(this.pose(), pos2InX, pos2InY, z).setColor(this.color());
-                consumer.addVertexWith2DPose(this.pose(), pos2OutX, pos2OutY, z).setColor(this.color());
+                consumer.addVertexWith2DPose(this.pose(), pos1OutX, pos1OutY).setColor(this.color());
+                consumer.addVertexWith2DPose(this.pose(), pos1InX, pos1InY).setColor(this.color());
+                consumer.addVertexWith2DPose(this.pose(), pos2InX, pos2InY).setColor(this.color());
+                consumer.addVertexWith2DPose(this.pose(), pos2OutX, pos2OutY).setColor(this.color());
             }
         }
 

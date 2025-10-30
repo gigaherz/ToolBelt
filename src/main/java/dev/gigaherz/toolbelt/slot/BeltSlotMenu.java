@@ -59,7 +59,7 @@ public class BeltSlotMenu extends AbstractCraftingMenu
 
         this.addSlot(slotBelt = new BeltSlot(BeltAttachment.get(playerInventory.player), 77, 44));
 
-        if (playerInventory.player.level().isClientSide)
+        if (playerInventory.player.level().isClientSide())
         {
             ClientPacketDistributor.sendToServer(ContainerSlotsHack.INSTANCE);
         }
@@ -96,7 +96,7 @@ public class BeltSlotMenu extends AbstractCraftingMenu
     {
         super.removed(player);
         this.resultSlots.clearContent();
-        if (!player.level().isClientSide)
+        if (!player.level().isClientSide())
         {
             this.clearContainer(player, this.craftSlots);
         }
