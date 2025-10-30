@@ -3,16 +3,13 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.moddev' version '2.0.42-beta'
+    id 'net.neoforged.moddev' version '2.0.112'
 }
 
-version = "2.2.6"
+neoForge.version = "21.1.209"
+version = "2.2.7"
 group = "dev.gigaherz.toolbelt"
-
-var minecraftVersionResolver = project.neoForge.version.map { "1." + (it =~ /^(\d+(?:\.[1-9]\d*|))\./)[0][1] }
-base {
-    archivesName = minecraftVersionResolver.map { "ToolBelt-${it}" }
-}
+base.archivesName = "ToolBelt-${neoForge.minecraftVersion}"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
@@ -62,7 +59,6 @@ repositories {
 }
 
 neoForge {
-    version = "21.1.80"
 
     runs {
         // applies to all the run configs below
@@ -109,22 +105,24 @@ dependencies {
     compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.8"
     runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21:2.0.8"
 
-    compileOnly "mezz.jei:jei-1.21-common-api:19.5.0.56"
-    runtimeOnly "mezz.jei:jei-1.21-common:19.5.0.56"
-    compileOnly "mezz.jei:jei-1.21-neoforge-api:19.5.0.56"
-    runtimeOnly "mezz.jei:jei-1.21-neoforge:19.5.0.56"
+    compileOnly "mezz.jei:jei-1.21.1-common-api:19.21.0.247"
+    runtimeOnly "mezz.jei:jei-1.21.1-common:19.21.0.247"
+    compileOnly "mezz.jei:jei-1.21.1-neoforge-api:19.21.0.247"
+    runtimeOnly "mezz.jei:jei-1.21.1-neoforge:19.21.0.247"
 
-    compileOnly "curse.maven:adorned-1036809:5740650"
-    //runtimeOnly "curse.maven:adorned-1036809:5740650"
+    compileOnly "top.theillusivec4.curios:curios-neoforge:9.2.2+1.21.1"
+    runtimeOnly "top.theillusivec4.curios:curios-neoforge:9.2.2+1.21.1"
 
-    runtimeOnly "curse.maven:accessories-938917:5848473"
-    runtimeOnly "curse.maven:accessories-cc-layer-1005683:5823562"
-    runtimeOnly "curse.maven:owo-lib-532610:5900556"
+    //compileOnly ("curse.maven:controllable-317269:6850105")
+    //runtimeOnly ("curse.maven:controllable-317269:6850105")
 
-    //compileOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
-    //runtimeOnly "top.theillusivec4.curios:curios-neoforge:8.0.0-beta.4+1.20.6"
+    //compileOnly ("curse.maven:framework-549225:6531439")
+    //runtimeOnly ("curse.maven:framework-549225:6531439")
 
-    //runtimeOnly fg.deobf("curse.maven:corail-tombstone-243707:3836552")
+    runtimeOnly ("curse.maven:sophisticated-backpacks-422301:7057664")
+    runtimeOnly ("curse.maven:sophisticated-core-618298:7076819")
+
+    //implementation ("curse.maven:lambdynamiclights-unofficial-neoforge-1130792:5980174")
 }
 
 jar {

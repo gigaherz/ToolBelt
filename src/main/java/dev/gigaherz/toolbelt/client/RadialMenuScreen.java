@@ -151,7 +151,7 @@ public class RadialMenuScreen extends Screen
         {
             menu.close();
         }
-        else if (!ClientEvents.isKeyDown(ClientEvents.OPEN_TOOL_MENU_KEYBIND))
+        else if (ClientEvents.OPEN_TOOL_MENU_KEYBIND == null || !ClientEvents.isKeyDown(ClientEvents.OPEN_TOOL_MENU_KEYBIND))
         {
             if (ConfigData.releaseToSwap)
             {
@@ -266,7 +266,7 @@ public class RadialMenuScreen extends Screen
 
     private void checkCycleKeybinds()
     {
-        if (ClientEvents.isKeyDown(ClientEvents.CYCLE_TOOL_MENU_LEFT_KEYBIND))
+        if (ClientEvents.CYCLE_TOOL_MENU_LEFT_KEYBIND != null && ClientEvents.isKeyDown(ClientEvents.CYCLE_TOOL_MENU_LEFT_KEYBIND))
         {
             if (!keyCycleBeforeL)
             {
@@ -279,7 +279,7 @@ public class RadialMenuScreen extends Screen
             keyCycleBeforeL = false;
         }
 
-        if (ClientEvents.isKeyDown(ClientEvents.CYCLE_TOOL_MENU_RIGHT_KEYBIND))
+        if (ClientEvents.CYCLE_TOOL_MENU_RIGHT_KEYBIND != null && ClientEvents.isKeyDown(ClientEvents.CYCLE_TOOL_MENU_RIGHT_KEYBIND))
         {
             if (!keyCycleBeforeR)
             {

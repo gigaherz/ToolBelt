@@ -30,24 +30,24 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.network.PacketDistributor;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import javax.annotation.Nullable;
 import java.util.function.Function;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = ToolBelt.MODID, bus = EventBusSubscriber.Bus.GAME)
 public class ClientEvents
 {
-    public static KeyMapping OPEN_TOOL_MENU_KEYBIND;
-    public static KeyMapping CYCLE_TOOL_MENU_LEFT_KEYBIND;
-    public static KeyMapping CYCLE_TOOL_MENU_RIGHT_KEYBIND;
-
-    public static KeyMapping OPEN_BELT_SLOT_KEYBIND;
+    @Nullable public static KeyMapping OPEN_TOOL_MENU_KEYBIND;
+    @Nullable public static KeyMapping CYCLE_TOOL_MENU_LEFT_KEYBIND;
+    @Nullable public static KeyMapping CYCLE_TOOL_MENU_RIGHT_KEYBIND;
+    @Nullable public static KeyMapping OPEN_BELT_SLOT_KEYBIND;
 
     public static void wipeOpen()
     {
         // Minecraft.getInstance().keyboardHandler.setSendRepeatsToGui(false);
-        while (OPEN_TOOL_MENU_KEYBIND.consumeClick())
+        //noinspection StatementWithEmptyBody
+        while (OPEN_TOOL_MENU_KEYBIND != null && OPEN_TOOL_MENU_KEYBIND.consumeClick())
         {
         }
     }
@@ -61,10 +61,10 @@ public class ClientEvents
 
         if (mc.screen == null)
         {
-            boolean toolMenuKeyIsDown = OPEN_TOOL_MENU_KEYBIND.isDown();
+            boolean toolMenuKeyIsDown = OPEN_TOOL_MENU_KEYBIND != null && OPEN_TOOL_MENU_KEYBIND.isDown();
             if (toolMenuKeyIsDown && !toolMenuKeyWasDown)
             {
-                while (OPEN_TOOL_MENU_KEYBIND.consumeClick())
+                while (OPEN_TOOL_MENU_KEYBIND != null && OPEN_TOOL_MENU_KEYBIND.consumeClick())
                 {
                     if (mc.screen == null)
                     {
@@ -85,7 +85,7 @@ public class ClientEvents
 
         if (ConfigData.customBeltSlotEnabled)
         {
-            while (OPEN_BELT_SLOT_KEYBIND.consumeClick())
+            while (OPEN_BELT_SLOT_KEYBIND != null && OPEN_BELT_SLOT_KEYBIND.consumeClick())
             {
                 if (mc.screen == null)
                 {
@@ -121,28 +121,28 @@ public class ClientEvents
         if (keybind.isUnbound())
             return false;
 
+        if (ToolBelt.controllableEnabled)
+        {
+            /*
+            Boolean triStateDown = ControllableSupport.isButtonDown(keybind);
+            if (Boolean.TRUE.equals(triStateDown))
+                return true;
+             */
+        }
+
         return switch (keybind.getKey().getType())
         {
             case KEYSYM ->
                     InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue());
             case MOUSE ->
                     GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue()) == GLFW.GLFW_PRESS;
-            default -> false;
+            default -> keybind.isDown();
         };
     }
 
     public static boolean isKeyDown(KeyMapping keybind)
     {
-        if (keybind.isUnbound())
-            return false;
-
-        boolean isDown = switch (keybind.getKey().getType())
-                {
-                    case KEYSYM -> InputConstants.isKeyDown(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue());
-                    case MOUSE -> GLFW.glfwGetMouseButton(Minecraft.getInstance().getWindow().getWindow(), keybind.getKey().getValue()) == GLFW.GLFW_PRESS;
-                    default -> false;
-                };
-        return isDown && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
+        return isKeyDown0(keybind) && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }
 
     public static ModelLayerLocation BELT_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("minecraft","player"), "toolbelt_belt");

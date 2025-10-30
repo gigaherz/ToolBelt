@@ -98,6 +98,8 @@ public class ToolBelt
     public static DeferredHolder<DataComponentType<?>, DataComponentType<Integer>>
             BELT_SIZE = DATA_COMPONENT_TYPES.register("belt_size", () -> DataComponentType.<Integer>builder().persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
 
+    public static boolean controllableEnabled;
+
     public ToolBelt(ModContainer container, IEventBus modEventBus)
     {
         ITEMS.register(modEventBus);
@@ -120,12 +122,23 @@ public class ToolBelt
         container.registerConfig(ModConfig.Type.CLIENT, ConfigData.CLIENT_SPEC);
         container.registerConfig(ModConfig.Type.COMMON, ConfigData.COMMON_SPEC);
 
+        BeltAttachment.register(modEventBus);
+
         if (ModList.get().isLoaded("sewingkit"))
         {
             SewingKitIntegration.init(modEventBus);
         }
 
-        BeltAttachment.register(modEventBus);
+        /*if (ModList.get().isLoaded("controllable"))
+        {
+            controllableEnabled = true;
+            ControllableSupport.init();
+        }*/
+
+        /*if (ModList.get().isLoaded("lambdynlights"))
+        {
+            LambDynamicLightsCompat.init();
+        }*/
     }
 
     private void addItemsToTabs(BuildCreativeModeTabContentsEvent event)

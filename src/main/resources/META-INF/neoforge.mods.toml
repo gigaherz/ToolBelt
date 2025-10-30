@@ -17,7 +17,7 @@ authors="gigaherz"
 [[dependencies.toolbelt]]
    modId="neoforge"
    type="required"
-   versionRange="[21.0.10-beta,)"
+   versionRange="[21.1.10-beta,)"
    ordering="NONE"
    side="BOTH"
 [[dependencies.toolbelt]]
@@ -32,3 +32,9 @@ authors="gigaherz"
    versionRange="[2.0.1,)"
    ordering="NONE"
    side="BOTH"
+#[[dependencies.toolbelt]]
+#    modId="controllable"
+#    type="optional"
+#    versionRange="[0.25,)"
+#    ordering="AFTER"
+#    side="BOTH"
