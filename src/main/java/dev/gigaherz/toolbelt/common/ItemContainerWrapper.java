@@ -9,6 +9,7 @@ import net.minecraft.world.item.component.ItemContainerContents;
 
 import javax.annotation.Nullable;
 import java.util.ArrayList;
+import java.util.List;
 
 public class ItemContainerWrapper implements Container
 {
@@ -28,7 +29,7 @@ public class ItemContainerWrapper implements Container
     @Override
     public int getContainerSize()
     {
-        return inv != null ? inv.getSlots() : 0;
+        return actualSlots;
     }
 
     @Override
@@ -90,18 +91,20 @@ public class ItemContainerWrapper implements Container
     @Override
     public void setItem(int slot, ItemStack newStack)
     {
-        var newItems = new ArrayList<ItemStack>(inv.getSlots());
+        List<ItemStack> newItems = null;
         boolean didWork = false;
         for (int i = 0; i < actualSlots; i++)
         {
-            var stack = inv != null && i < inv.getSlots() ? inv.getStackInSlot(i) : ItemStack.EMPTY;
+            var stack = getItem(i);
             if (i == slot)
             {
+                if (newItems == null) newItems = new ArrayList<>(actualSlots);
                 newItems.add(newStack);
                 didWork = true;
             }
             else
             {
+                if (newItems == null) newItems = new ArrayList<>(actualSlots);
                 newItems.add(stack);
             }
         }

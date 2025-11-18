@@ -18,9 +18,9 @@ import net.minecraft.world.item.component.ItemContainerContents;
 public class BeltContainer extends AbstractContainerMenu implements BeltFinder.BeltGetter
 {
     private final Inventory playerInventory;
-    private ItemStack blockedStack;
     private final int blockedSlot;
-    public final int inventorySize;
+    private ItemStack blockedStack = ItemStack.EMPTY;
+    public int inventorySize = 0;
 
     public BeltContainer(int id, Inventory inventory, RegistryFriendlyByteBuf extraData)
     {
@@ -30,33 +30,38 @@ public class BeltContainer extends AbstractContainerMenu implements BeltFinder.B
     public BeltContainer(int id, Inventory playerInventory, int blockedSlot, ItemStack blockedStack)
     {
         super(ToolBelt.BELT_MENU.get(), id);
+
         this.playerInventory = playerInventory;
-        this.blockedStack = blockedStack;
         this.blockedSlot = blockedSlot;
-        if (blockedSlot >= 0 && !stillValid(playerInventory.player))
+        this.blockedStack = blockedStack;
+        if (blockedSlot >= 0 && !isInventoryStackCorrect(playerInventory.player))
         {
-            blockedStack = ItemStack.EMPTY;
+            this.blockedStack = ItemStack.EMPTY;
+            this.inventorySize = 0;
         }
-
-        ItemContainerContents inventory = stillValid(playerInventory.player) ? blockedStack.get(DataComponents.CONTAINER) : null;
-        inventorySize = ToolBeltItem.getBeltSize(blockedStack);
-        var wrapper = new ItemContainerWrapper(inventory, inventorySize, blockedStack, this);
-
-        int xoff = ((9 - inventorySize) * 18) / 2;
-        for (int k = 0; k < inventorySize; ++k)
+        else
         {
-            this.addSlot(new Slot(wrapper, k, 8 + xoff + k * 18, 20)
+            var actualStack = this.getBelt();
+            ItemContainerContents inventory = isInventoryStackCorrect(playerInventory.player) ? actualStack.get(DataComponents.CONTAINER) : null;
+            this.inventorySize = ToolBeltItem.getBeltSize(actualStack);
+            var wrapper = new ItemContainerWrapper(inventory, inventorySize, actualStack, this);
+
+            int xoff = ((9 - inventorySize) * 18) / 2;
+            for (int k = 0; k < inventorySize; ++k)
             {
-
-                @Override
-                public boolean mayPlace(ItemStack stack)
+                this.addSlot(new Slot(wrapper, k, 8 + xoff + k * 18, 20)
                 {
-                    return ConfigData.isItemStackAllowed(stack);
-                }
-            });
-        }
 
-        bindPlayerInventory(playerInventory);
+                    @Override
+                    public boolean mayPlace(ItemStack stack)
+                    {
+                        return ConfigData.isItemStackAllowed(stack);
+                    }
+                });
+            }
+
+            bindPlayerInventory(playerInventory);
+        }
     }
 
     private void bindPlayerInventory(Container playerInventory)
@@ -102,10 +107,22 @@ public class BeltContainer extends AbstractContainerMenu implements BeltFinder.B
     public boolean stillValid(Player playerIn)
     {
         if (inventorySize <= 0) return false;
-        ItemStack held = playerIn.getInventory().getItem(blockedSlot);
-        var equal = blockedSlot < 0 || held == blockedStack || ItemStack.isSameItemSameComponents(held, blockedStack);
-        blockedStack = held;
+        ItemStack actualStack = playerIn.getInventory().getItem(blockedSlot);
+        var equal = isInventoryStackCorrect(actualStack);
+        this.blockedStack = actualStack;
+        this.inventorySize = ToolBeltItem.getBeltSize(actualStack);
         return equal;
+    }
+
+    public boolean isInventoryStackCorrect(Player playerIn)
+    {
+        ItemStack held = playerIn.getInventory().getItem(blockedSlot);
+        return isInventoryStackCorrect(held);
+    }
+
+    private boolean isInventoryStackCorrect(ItemStack held)
+    {
+        return blockedSlot < 0 || held == blockedStack || ItemStack.isSameItemSameComponents(held, blockedStack);
     }
 
     @Override

@@ -6,6 +6,7 @@ import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import dev.gigaherz.toolbelt.client.radial.*;
+import dev.gigaherz.toolbelt.common.ItemContainerWrapper;
 import dev.gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -47,7 +48,6 @@ public class RadialMenuScreen extends Screen
 
     private final BeltFinder.BeltGetter getter;
     private ItemStack stackEquipped;
-    private ItemContainerContents inventory;
     private int inventorySize;
 
     private boolean keyCycleBeforeL = false;
@@ -65,7 +65,7 @@ public class RadialMenuScreen extends Screen
         this.getter = getter;
         this.stackEquipped = getter.getBelt();
 
-        inventory = stackEquipped.isEmpty() ? null : stackEquipped.get(DataComponents.CONTAINER);
+        //inventory = stackEquipped.isEmpty() ? null : stackEquipped.get(DataComponents.CONTAINER);
         inventorySize = ToolBeltItem.getBeltSize(stackEquipped);
         menu = new GenericRadialMenu(Minecraft.getInstance(), new IRadialMenuHost()
         {
@@ -129,7 +129,7 @@ public class RadialMenuScreen extends Screen
         {
             this.onClose();
         }
-        if (!menu.isReady() || inventory == null)
+        if (!menu.isReady())
         {
             return;
         }
@@ -137,27 +137,25 @@ public class RadialMenuScreen extends Screen
         ItemStack inHand = minecraft.player.getMainHandItem();
         if (!ConfigData.isItemStackAllowed(inHand))
         {
-            inventory = null;
+            stackEquipped = null;
         }
         else
         {
             ItemStack stack = getter.getBelt();
             if (stack.isEmpty())
             {
-                inventory = null;
                 stackEquipped = null;
             }
             // Reference comparison intended
             else if (stackEquipped != stack)
             {
                 stackEquipped = stack;
-                inventory = stackEquipped.isEmpty() ? null : stackEquipped.get(DataComponents.CONTAINER);
                 inventorySize = ToolBeltItem.getBeltSize(stackEquipped);
                 needsRecheckStacks = true;
             }
         }
 
-        if (inventory == null)
+        if (stackEquipped == null)
         {
             menu.close();
         }
@@ -195,14 +193,17 @@ public class RadialMenuScreen extends Screen
         poseStack.popMatrix();
 
         ItemStack inHand = minecraft.player.getMainHandItem();
-        if (ConfigData.isItemStackAllowed(inHand) && menu.isReady() && inventory != null)
+        if (ConfigData.isItemStackAllowed(inHand) && menu.isReady())
         {
             if (needsRecheckStacks)
             {
+                var inv0 = stackEquipped.isEmpty() ? null : stackEquipped.get(DataComponents.CONTAINER);
+                var inventory = new ItemContainerWrapper(inv0, inventorySize, stackEquipped, getter);
+
                 cachedMenuItems.clear();
                 for (int i = 0; i < inventorySize; i++)
                 {
-                    ItemStack inSlot = i < inventory.getSlots() ? inventory.getStackInSlot(i) : ItemStack.EMPTY;
+                    ItemStack inSlot = i < inventory.getContainerSize() ? inventory.getItem(i) : ItemStack.EMPTY;
                     ItemStackRadialMenuItem item = getMenuItemForStack(i, inSlot, inHand);
                     cachedMenuItems.add(item);
                 }
