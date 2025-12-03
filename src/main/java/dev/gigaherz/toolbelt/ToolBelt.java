@@ -191,7 +191,22 @@ public class ToolBelt
 
         BeltExtensionSlot.register();
         BeltFinderBeltSlot.initBaubles();
-        CURIOS.addListener(cap -> BeltFinderCurios.initCurios());
+        
+        // Initialize Curios support directly if the mod is loaded
+        // This ensures compatibility with Accessories mod's Curios compatibility layer
+        if (ModList.get().isLoaded("curios"))
+        {
+            BeltFinderCurios.initCurios();
+        }
+        
+        // Keep capability listener as a fallback for alternate initialization paths
+        CURIOS.addListener(cap -> {
+            // Only initialize if not already registered to prevent duplicates
+            if (!BeltFinder.isFinderRegistered("curios"))
+            {
+                BeltFinderCurios.initCurios();
+            }
+        });
     }
 
     private static final Capability<ICuriosItemHandler> CURIOS = CapabilityManager.get(new CapabilityToken<>()

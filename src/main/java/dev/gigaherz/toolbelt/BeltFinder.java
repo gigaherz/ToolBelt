@@ -19,6 +19,11 @@ public abstract class BeltFinder
         instances.add(0, finder);
     }
 
+    public static synchronized boolean isFinderRegistered(String name)
+    {
+        return instances.stream().anyMatch(f -> f.getName().equals(name));
+    }
+
     public static Optional<? extends BeltGetter> findBelt(LivingEntity player)
     {
         return findBelt(player, false);
