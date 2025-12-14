@@ -11,14 +11,13 @@ import net.minecraft.client.gui.screens.inventory.InventoryScreen;
 import net.minecraft.client.gui.screens.recipebook.CraftingRecipeBookComponent;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.client.renderer.RenderPipelines;
-import net.minecraft.client.renderer.RenderType;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 
 public class BeltSlotScreen extends AbstractRecipeBookScreen<BeltSlotMenu>
 {
-    private static final ResourceLocation SCREEN_BACKGROUND = ToolBelt.location("textures/gui/belt_slot.png");
+    private static final Identifier SCREEN_BACKGROUND = ToolBelt.location("textures/gui/belt_slot.png");
     private float oldMouseX;
     private float oldMouseY;
     private boolean buttonClicked;
@@ -68,8 +67,7 @@ public class BeltSlotScreen extends AbstractRecipeBookScreen<BeltSlotMenu>
     public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float partialTick)
     {
         super.render(guiGraphics, mouseX, mouseY, partialTick);
-        this.effects.renderEffects(guiGraphics, mouseX, mouseY);
-        this.effects.renderTooltip(guiGraphics, mouseX, mouseY);
+        this.effects.render(guiGraphics, mouseX, mouseY);
         this.oldMouseX = (float)mouseX;
         this.oldMouseY = (float)mouseY;
     }

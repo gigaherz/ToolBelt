@@ -1,5 +1,6 @@
 package dev.gigaherz.toolbelt.integration;
 
+import dev.gigaherz.sewingkit.api.SewingMaterial;
 import dev.gigaherz.sewingkit.api.SewingRecipe;
 import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
 import net.minecraft.core.HolderLookup;
@@ -18,7 +19,7 @@ public class SewingUpgradeRecipeBuilder extends SewingRecipeBuilder
     }
 
     @Override
-    protected SewingRecipe build(String group, RecipeBookCategory recipeBookCategory, NonNullList<SewingRecipe.Material> materials, Ingredient pattern, Ingredient tool, ItemStack result, boolean showNotification)
+    protected SewingRecipe build(String group, RecipeBookCategory recipeBookCategory, NonNullList<SewingMaterial> materials, Ingredient pattern, Ingredient tool, ItemStack result, boolean showNotification)
     {
         return new SewingUpgradeRecipe(group, recipeBookCategory, materials, pattern, tool, result, showNotification);
     }

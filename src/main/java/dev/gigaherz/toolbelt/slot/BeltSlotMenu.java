@@ -3,7 +3,7 @@ package dev.gigaherz.toolbelt.slot;
 import com.mojang.datafixers.util.Pair;
 import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.network.ContainerSlotsHack;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.Container;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -36,8 +36,8 @@ public class BeltSlotMenu extends AbstractCraftingMenu
         for (int i = 0; i < 4; i++)
         {
             EquipmentSlot equipmentslot = InventoryMenu.SLOT_IDS[i];
-            ResourceLocation resourcelocation = InventoryMenu.TEXTURE_EMPTY_SLOTS.get(equipmentslot);
-            this.addSlot(new ArmorSlot(playerInventory, owner, equipmentslot, 39 - i, 8, 8 + i * 18, resourcelocation));
+            Identifier Identifier = InventoryMenu.TEXTURE_EMPTY_SLOTS.get(equipmentslot);
+            this.addSlot(new ArmorSlot(playerInventory, owner, equipmentslot, 39 - i, 8, 8 + i * 18, Identifier));
         }
 
         this.addStandardInventorySlots(playerInventory, 8, 84);
@@ -51,7 +51,7 @@ public class BeltSlotMenu extends AbstractCraftingMenu
             }
 
             @Override
-            public ResourceLocation getNoItemIcon()
+            public Identifier getNoItemIcon()
             {
                 return InventoryMenu.EMPTY_ARMOR_SLOT_SHIELD;
             }

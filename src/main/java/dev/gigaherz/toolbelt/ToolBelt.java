@@ -15,7 +15,6 @@ import dev.gigaherz.toolbelt.network.*;
 import dev.gigaherz.toolbelt.slot.BeltAttachment;
 import dev.gigaherz.toolbelt.slot.BeltSlotMenu;
 import dev.gigaherz.toolbelt.slot.BeltSlotScreen;
-import net.minecraft.Util;
 import net.minecraft.client.color.item.Dye;
 import net.minecraft.client.data.models.BlockModelGenerators;
 import net.minecraft.client.data.models.ItemModelGenerators;
@@ -36,9 +35,10 @@ import net.minecraft.data.recipes.packs.VanillaRecipeProvider;
 import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Util;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
@@ -242,9 +242,9 @@ public class ToolBelt
         ev.setOutput(ToolBeltItem.makeUpgradedStack(left));
     }
 
-    public static ResourceLocation location(String path)
+    public static Identifier location(String path)
     {
-        return ResourceLocation.fromNamespaceAndPath(MODID, path);
+        return Identifier.fromNamespaceAndPath(MODID, path);
     }
 
     public static class DataGen
@@ -390,18 +390,18 @@ public class ToolBelt
                                     .save(output.withConditions(
                                             new ModLoadedCondition("sewingkit"),
                                             new Conditions.EnableSewingCrafting()
-                                    ), ResourceLocation.fromNamespaceAndPath(beltId.getNamespace(), beltId.getPath() + "_upgrade_" + (i - 1) + "_via_sewing"));
+                                    ), Identifier.fromNamespaceAndPath(beltId.getNamespace(), beltId.getPath() + "_upgrade_" + (i - 1) + "_via_sewing"));
                         }
                     }
 
-                    private ResourceLocation sewingRecipeId(DeferredHolder<?, ?> item)
+                    private Identifier sewingRecipeId(DeferredHolder<?, ?> item)
                     {
                         return sewingRecipeId(item.getId());
                     }
 
-                    private ResourceLocation sewingRecipeId(ResourceLocation item)
+                    private Identifier sewingRecipeId(Identifier item)
                     {
-                        return ResourceLocation.fromNamespaceAndPath(item.getNamespace(), item.getPath() + "_via_sewing");
+                        return Identifier.fromNamespaceAndPath(item.getNamespace(), item.getPath() + "_via_sewing");
                     }
                 };
             }

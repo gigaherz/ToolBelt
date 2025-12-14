@@ -13,7 +13,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraft.world.level.GameRules;
+import net.minecraft.world.level.gamerules.GameRules;
 import net.minecraft.world.level.storage.ValueInput;
 import net.minecraft.world.level.storage.ValueOutput;
 import net.neoforged.bus.api.IEventBus;
@@ -149,7 +149,7 @@ public class BeltAttachment implements ValueIOSerializable
                     {
                         if (entity instanceof ServerPlayer player)
                         {
-                            if (!player.level().getGameRules().getBoolean(GameRules.RULE_KEEPINVENTORY) && !player.isSpectator())
+                            if (!player.level().getGameRules().get(GameRules.KEEP_INVENTORY) && !player.isSpectator())
                             {
                                 printDebugLog("Entity is player, and keepInventory is not set. Spilling...");
                                 Collection<ItemEntity> old = entity.captureDrops(event.getDrops());

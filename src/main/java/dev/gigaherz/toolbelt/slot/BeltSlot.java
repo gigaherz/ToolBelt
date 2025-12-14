@@ -3,7 +3,7 @@ package dev.gigaherz.toolbelt.slot;
 import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
@@ -18,7 +18,7 @@ import javax.annotation.Nonnull;
  */
 public class BeltSlot extends Slot
 {
-    public static final ResourceLocation SLOT_BACKGROUND = ToolBelt.location("empty_belt_slot_background");
+    public static final Identifier SLOT_BACKGROUND = ToolBelt.location("empty_belt_slot_background");
 
     private static Container emptyInventory = new SimpleContainer(0);
     private final BeltAttachment slot;

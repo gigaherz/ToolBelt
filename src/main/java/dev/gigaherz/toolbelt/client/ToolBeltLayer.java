@@ -22,7 +22,7 @@ import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.component.DataComponents;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.HumanoidArm;
@@ -31,8 +31,8 @@ import net.minecraft.world.item.ItemStack;
 
 public class ToolBeltLayer<S extends HumanoidRenderState, M extends HumanoidModel<? super S>> extends RenderLayer<S, M>
 {
-    private static final ResourceLocation TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
-    private static final ResourceLocation TEXTURE_BELT_DYED = ToolBelt.location("textures/entity/dyed_belt.png");
+    private static final Identifier TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
+    private static final Identifier TEXTURE_BELT_DYED = ToolBelt.location("textures/entity/dyed_belt.png");
 
     private static ItemDisplayContext LEFTSIDE = Enum.valueOf(ItemDisplayContext.class, "TOOLBELT_LEFTSIDE");
     private static ItemDisplayContext RIGHTSIDE = Enum.valueOf(ItemDisplayContext.class, "TOOLBELT_RIGHTSIDE");
@@ -42,7 +42,7 @@ public class ToolBeltLayer<S extends HumanoidRenderState, M extends HumanoidMode
         public ItemStackRenderState leftItem = new ItemStackRenderState();
         public ItemStackRenderState rightItem = new ItemStackRenderState();
         public int dyeColor;
-        public ResourceLocation textureLocation;
+        public Identifier textureLocation;
     }
 
     public static final ContextKey<ToolBeltLayer.RenderState> KEY = new ContextKey<>(ToolBelt.location("belt_layer_state"));
@@ -156,7 +156,7 @@ public class ToolBeltLayer<S extends HumanoidRenderState, M extends HumanoidMode
         poseStack.popPose();
     }
 
-    private static ResourceLocation getTextureLocation(ItemStack stack)
+    private static Identifier getTextureLocation(ItemStack stack)
     {
         return stack.isEmpty() ? TEXTURE_BELT : (stack.has(DataComponents.DYED_COLOR)
                     ? TEXTURE_BELT_DYED : TEXTURE_BELT);

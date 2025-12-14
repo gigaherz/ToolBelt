@@ -5,7 +5,7 @@ import com.google.common.collect.Sets;
 import com.mojang.logging.LogUtils;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.item.BundleItem;
@@ -230,7 +230,7 @@ public class ConfigData
 
     private static ItemStack parseItemStack(String itemString)
     {
-        var item = BuiltInRegistries.ITEM.getOptional(ResourceLocation.parse(itemString)).orElse(Items.AIR);
+        var item = BuiltInRegistries.ITEM.getOptional(Identifier.parse(itemString)).orElse(Items.AIR);
 
         if (item == Items.AIR)
         {

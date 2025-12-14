@@ -10,7 +10,7 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
@@ -19,7 +19,7 @@ import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public record SwapItems(int swapWith) implements CustomPacketPayload
 {
-    public static final ResourceLocation ID = ToolBelt.location("swap_items");
+    public static final Identifier ID = ToolBelt.location("swap_items");
     public static final Type<SwapItems> TYPE = new Type<>(ID);
 
     public static final StreamCodec<ByteBuf, SwapItems> STREAM_CODEC = ByteBufCodecs.VAR_INT.map(SwapItems::new, SwapItems::swapWith);

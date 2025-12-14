@@ -3,6 +3,7 @@ package dev.gigaherz.toolbelt.integration;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.sewingkit.SewingKitMod;
+import dev.gigaherz.sewingkit.api.SewingMaterial;
 import dev.gigaherz.sewingkit.api.SewingRecipe;
 import dev.gigaherz.sewingkit.table.SewingInput;
 import dev.gigaherz.toolbelt.belt.ToolBeltItem;
@@ -40,21 +41,21 @@ public class SewingUpgradeRecipe extends SewingRecipe
     public static final StreamCodec<RegistryFriendlyByteBuf, SewingUpgradeRecipe> STREAM_CODEC = StreamCodec.composite(
             SewingKitMod.nullable(ByteBufCodecs.STRING_UTF8), SewingRecipe::group,
             ByteBufCodecs.registry(Registries.RECIPE_BOOK_CATEGORY), SewingRecipe::recipeBookCategory,
-            ByteBufCodecs.collection(NonNullList::createWithCapacity, Material.STREAM_CODEC), SewingRecipe::getMaterials,
-            ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC), SewingRecipe::getPattern,
-            ByteBufCodecs.optional(Ingredient.CONTENTS_STREAM_CODEC), SewingRecipe::getTool,
-            ItemStack.STREAM_CODEC, SewingRecipe::getOutput,
+            ByteBufCodecs.collection(NonNullList::createWithCapacity, SewingMaterial.STREAM_CODEC), SewingRecipe::materials,
+            SewingKitMod.nullable(Ingredient.CONTENTS_STREAM_CODEC), SewingRecipe::pattern,
+            SewingKitMod.nullable(Ingredient.CONTENTS_STREAM_CODEC), SewingRecipe::tool,
+            ItemStack.STREAM_CODEC, SewingRecipe::output,
             ByteBufCodecs.BOOL, SewingRecipe::showNotification,
             SewingUpgradeRecipe::new
     );
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public SewingUpgradeRecipe(String group, RecipeBookCategory recipeBookCategory, NonNullList<Material> materials, Optional<Ingredient> pattern, Optional<Ingredient> tool, ItemStack output, boolean showNotification)
+    public SewingUpgradeRecipe(String group, RecipeBookCategory recipeBookCategory, NonNullList<SewingMaterial> materials, Optional<Ingredient> pattern, Optional<Ingredient> tool, ItemStack output, boolean showNotification)
     {
         super(group, recipeBookCategory, materials, pattern, tool, output, showNotification);
     }
 
-    public SewingUpgradeRecipe(String group, RecipeBookCategory recipeBookCategory, NonNullList<Material> materials, @Nullable Ingredient pattern, @Nullable Ingredient tool, ItemStack output, boolean showNotification)
+    public SewingUpgradeRecipe(String group, RecipeBookCategory recipeBookCategory, NonNullList<SewingMaterial> materials, @Nullable Ingredient pattern, @Nullable Ingredient tool, ItemStack output, boolean showNotification)
     {
         super(group, recipeBookCategory, materials, pattern, tool, output, showNotification);
     }

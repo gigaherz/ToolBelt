@@ -7,7 +7,7 @@ import mezz.jei.api.IModPlugin;
 import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.recipe.vanilla.IVanillaRecipeFactory;
 import mezz.jei.api.registration.IRecipeRegistration;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Collections;
@@ -16,10 +16,10 @@ import java.util.List;
 @mezz.jei.api.JeiPlugin
 public class JeiPlugin implements IModPlugin
 {
-    private static final ResourceLocation ID = ToolBelt.location("jei_plugin");
+    private static final Identifier ID = ToolBelt.location("jei_plugin");
 
     @Override
-    public ResourceLocation getPluginUid()
+    public Identifier getPluginUid()
     {
         return ID;
     }

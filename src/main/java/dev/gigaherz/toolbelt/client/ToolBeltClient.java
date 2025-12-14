@@ -18,7 +18,7 @@ import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.EntityType;
@@ -237,6 +237,6 @@ public class ToolBeltClient
         return isKeyDown0(keybind) && keybind.getKeyConflictContext().isActive() && keybind.getKeyModifier().isActive(keybind.getKeyConflictContext());
     }
 
-    public static ModelLayerLocation BELT_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("minecraft", "player"), "toolbelt_belt");
-    public static ModelLayerLocation BUCKLE_LAYER = new ModelLayerLocation(ResourceLocation.fromNamespaceAndPath("minecraft", "player"), "toolbelt_belt_buckle");
+    public static ModelLayerLocation BELT_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath("minecraft", "player"), "toolbelt_belt");
+    public static ModelLayerLocation BUCKLE_LAYER = new ModelLayerLocation(Identifier.fromNamespaceAndPath("minecraft", "player"), "toolbelt_belt_buckle");
 }
