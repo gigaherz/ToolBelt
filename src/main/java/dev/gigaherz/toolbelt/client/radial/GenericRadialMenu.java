@@ -530,14 +530,14 @@ public class GenericRadialMenu
                 float angle1 = startAngle + i * slice;
                 float angle2 = startAngle + (i + 1) * slice;
 
-                float pos1InX = x + radiusIn * (float) Math.cos(angle1);
-                float pos1InY = y + radiusIn * (float) Math.sin(angle1);
-                float pos1OutX = x + radiusOut * (float) Math.cos(angle1);
-                float pos1OutY = y + radiusOut * (float) Math.sin(angle1);
-                float pos2OutX = x + radiusOut * (float) Math.cos(angle2);
-                float pos2OutY = y + radiusOut * (float) Math.sin(angle2);
-                float pos2InX = x + radiusIn * (float) Math.cos(angle2);
-                float pos2InY = y + radiusIn * (float) Math.sin(angle2);
+                float pos1InX = x + radiusIn * Mth.cos(angle1);
+                float pos1InY = y + radiusIn * Mth.sin(angle1);
+                float pos1OutX = x + radiusOut * Mth.cos(angle1);
+                float pos1OutY = y + radiusOut * Mth.sin(angle1);
+                float pos2OutX = x + radiusOut * Mth.cos(angle2);
+                float pos2OutY = y + radiusOut * Mth.sin(angle2);
+                float pos2InX = x + radiusIn * Mth.cos(angle2);
+                float pos2InY = y + radiusIn * Mth.sin(angle2);
 
                 consumer.addVertexWith2DPose(this.pose(), pos1OutX, pos1OutY).setColor(this.color());
                 consumer.addVertexWith2DPose(this.pose(), pos1InX, pos1InY).setColor(this.color());

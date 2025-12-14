@@ -220,6 +220,8 @@ public class ToolBeltClient
         if (keybind.isUnbound())
             return false;
 
+
+
         return switch (keybind.getKey().getType())
         {
             case KEYSYM ->

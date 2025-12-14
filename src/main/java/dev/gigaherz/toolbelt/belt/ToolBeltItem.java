@@ -52,7 +52,13 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
     public static @NotNull ItemAccessItemHandler getComponentItemHandler(ItemStack stack)
     {
         int size = getBeltSize(stack);
-        return new ItemAccessItemHandler(ItemAccess.forStack(stack), DataComponents.CONTAINER, size);
+        return new ItemAccessItemHandler(ItemAccess.forStack(stack), DataComponents.CONTAINER, size) {
+            @Override
+            public int size()
+            {
+                return getBeltSize(stack);
+            }
+        };
     }
 
     private static int getSlotFor(Inventory inv, ItemStack stack)

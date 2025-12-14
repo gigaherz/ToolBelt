@@ -61,22 +61,22 @@ public record SwapItems(int swapWith) implements CustomPacketPayload
                         var acc = inSlot.getCount() + inHand.getCount();
                         if (acc <= max)
                         {
-                            inHand = ItemStack.EMPTY;
                             var newStack = inSlot.copyWithCount(inSlot.getCount() + inHand.getCount());
                             wrapper.setItem(i, newStack);
+                            inHand = ItemStack.EMPTY;
                             break;
                         }
                         else
                         {
-                            inHand = inHand.copyWithCount(acc - max);
                             var newStack = inSlot.copyWithCount(max);
                             wrapper.setItem(i, newStack);
+                            inHand = inHand.copyWithCount(acc - max);
                         }
                     }
                     else if (inSlot.isEmpty())
                     {
-                        inHand = ItemStack.EMPTY;
                         wrapper.setItem(i, inHand);
+                        inHand = ItemStack.EMPTY;
                         break;
                     }
                 }
@@ -86,8 +86,8 @@ public record SwapItems(int swapWith) implements CustomPacketPayload
             else
             {
                 var inSlot = wrapper.getItem(swapWith);
-                player.setItemInHand(InteractionHand.MAIN_HAND, inSlot);
                 wrapper.setItem(swapWith, inHand);
+                player.setItemInHand(InteractionHand.MAIN_HAND, inSlot);
             }
             getter.syncToClients();
         });
