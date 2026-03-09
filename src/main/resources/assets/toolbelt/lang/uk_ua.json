@@ -1,12 +1,31 @@
 {
-  "item.toolbelt.belt": "Ремінь з інструментами",
+  "item.toolbelt.belt": "Інструментальний пояс",
   "item.toolbelt.pouch": "Поясний чохол",
   "key.toolbelt.open": "Замінити інструмент",
-  "key.toolbelt.category": "Ремінь з інструментами",
+  "key.toolbelt.category": "Інструментальний пояс",
+  "key.toolbelt.slot": "Відкрити інвентар слотів пояса",
+  "key.toolbelt.cycle.left": "Спорядити попередній інструмент",
+  "key.toolbelt.cycle.right": "Спорядити наступний інструмент",
   "text.toolbelt.empty": "ПОРОЖНЬО",
   "text.toolbelt.swap": "ЗАМІНИТИ",
-  "text.toolbelt.insert": "ВСТАВИТИ",
-  "text.toolbelt.extract": "ВИЛУЧИТИ",
+  "text.toolbelt.insert": "ПОКЛАСТИ",
+  "text.toolbelt.extract": "УЗЯТИ",
   "text.toolbelt.tooltip": "Покращення: %s (%s слотів)",
-  "text.toolbelt": "Ремінь з інструментами"
+  "text.toolbelt": "Інструментальний пояс",
+
+
+
+  "text.toolbelt.config.category.common_general": "Основні налаштування",
+  "text.toolbelt.config.category.client_display": "Налаштування відображення",
+  "text.toolbelt.config.category.client_menu": "Налаштування радіального меню",
+  "text.toolbelt.config.enable_sewing_kit_support": "Увімкнути рецепти SewingKit",
+  "text.toolbelt.config.anvil_upgrading": "Увімкнути рецепти покращення на ковадлі",
+  "text.toolbelt.config.enable_grid_crafting": "Увімкнути рецепти майстрування",
+  "text.toolbelt.config.custom_belt_slot_mode": "Користувацький слот пояса",
+  "text.toolbelt.config.show_belt_on_players": "Відображати пояс на гравцях",
+  "text.toolbelt.config.belt_item_scale": "Розмір предмета пояса",
+  "text.toolbelt.config.release_to_swap": "Відпустити для заміни",
+  "text.toolbelt.config.clip_mouse_to_circle": "Тримати мишу у колі",
+  "text.toolbelt.config.click_outside_bounds": "Розширити взаємодію поза колом",
+  "text.toolbelt.config.display_empty_slots" : "Відображати порожні слоти"
 }
