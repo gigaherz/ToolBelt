@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.entity.RenderLayerParent;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
+import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.component.DataComponents;
@@ -26,8 +27,11 @@ import net.minecraft.resources.Identifier;
 import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.HumanoidArm;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 public class ToolBeltLayer<S extends HumanoidRenderState, M extends HumanoidModel<? super S>> extends RenderLayer<S, M>
 {
@@ -43,39 +47,56 @@ public class ToolBeltLayer<S extends HumanoidRenderState, M extends HumanoidMode
         public ItemStackRenderState rightItem = new ItemStackRenderState();
         public int dyeColor;
         public Identifier textureLocation;
+        public boolean show;
     }
 
     public static final ContextKey<ToolBeltLayer.RenderState> KEY = new ContextKey<>(ToolBelt.location("belt_layer_state"));
-    public static void extractRenderState(Avatar owner, AvatarRenderState avatarState)
+    public static void extractRenderState(LivingEntity owner, HumanoidRenderState avatarState)
     {
         var itemModelResolver = Minecraft.getInstance().getItemModelResolver();
 
         var beltState = new RenderState();
 
         var getter = BeltFinder.findBelt(owner, true).orElse(null);
-        if (getter == null || getter.isHidden())
-            return;
-
-        var stack = getter.getBelt();
-
-        var cap = stack.get(DataComponents.CONTAINER);
-        if (cap != null)
+        if (getter != null && !getter.isHidden())
         {
-            boolean rightHanded = avatarState.attackArm == HumanoidArm.RIGHT;
+            var stack = getter.getBelt();
 
-            ItemStack firstItem = cap.getSlots() >= 1 ? cap.getStackInSlot(0) : ItemStack.EMPTY;
-            ItemStack secondItem = cap.getSlots() >= 2 ? cap.getStackInSlot(1) : ItemStack.EMPTY;
-            ItemStack leftItem = rightHanded ? firstItem : secondItem;
-            ItemStack rightItem = rightHanded ? secondItem : firstItem;
+            var cap = stack.get(DataComponents.CONTAINER);
+            if (cap != null)
+            {
+                boolean rightHanded = avatarState.attackArm == HumanoidArm.RIGHT;
 
-            itemModelResolver.updateForTopItem(beltState.leftItem, leftItem, LEFTSIDE, owner.level(), owner, 0);
-            itemModelResolver.updateForTopItem(beltState.rightItem, rightItem, RIGHTSIDE, owner.level(), owner, 0);
+                ItemStack firstItem = cap.getSlots() >= 1 ? cap.getStackInSlot(0) : ItemStack.EMPTY;
+                ItemStack secondItem = cap.getSlots() >= 2 ? cap.getStackInSlot(1) : ItemStack.EMPTY;
+                ItemStack leftItem = rightHanded ? firstItem : secondItem;
+                ItemStack rightItem = rightHanded ? secondItem : firstItem;
+
+                itemModelResolver.updateForTopItem(beltState.leftItem, leftItem, LEFTSIDE, owner.level(), owner, 0);
+                itemModelResolver.updateForTopItem(beltState.rightItem, rightItem, RIGHTSIDE, owner.level(), owner, 0);
+            }
+            else
+            {
+                itemModelResolver.updateForTopItem(beltState.leftItem, ItemStack.EMPTY, LEFTSIDE, owner.level(), owner, 0);
+                itemModelResolver.updateForTopItem(beltState.rightItem, ItemStack.EMPTY, RIGHTSIDE, owner.level(), owner, 0);
+            }
+
+            var dyeInfo = stack.get(DataComponents.DYED_COLOR);
+            beltState.dyeColor = dyeInfo != null ? 0xFF000000 | dyeInfo.rgb() : -1;
+
+            beltState.textureLocation = getTextureLocation(stack);
+
+            beltState.show = true;
         }
+        else
+        {
+            itemModelResolver.updateForTopItem(beltState.leftItem, ItemStack.EMPTY, LEFTSIDE, owner.level(), owner, 0);
+            itemModelResolver.updateForTopItem(beltState.rightItem, ItemStack.EMPTY, RIGHTSIDE, owner.level(), owner, 0);
+            beltState.dyeColor = -1;
+            beltState.textureLocation = getTextureLocation(ItemStack.EMPTY);
 
-        var dyeInfo = stack.get(DataComponents.DYED_COLOR);
-        beltState.dyeColor = dyeInfo != null ? 0xFF000000 | dyeInfo.rgb() : -1;
-
-        beltState.textureLocation = getTextureLocation(stack);
+            beltState.show = !FMLEnvironment.isProduction() && !(owner instanceof Player);
+        }
 
         avatarState.setRenderData(KEY, beltState);
     }
@@ -98,7 +119,7 @@ public class ToolBeltLayer<S extends HumanoidRenderState, M extends HumanoidMode
             return;
 
         var beltState = renderState.getRenderData(KEY);
-        if (beltState == null)
+        if (beltState == null || !beltState.show)
             return;
 
         poseStack.pushPose();

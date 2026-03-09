@@ -1,13 +1,16 @@
 package dev.gigaherz.toolbelt;
-/*
+
+import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
+import org.jetbrains.annotations.UnknownNullability;
 import top.theillusivec4.curios.api.CuriosCapability;
 import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
 import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
+import javax.annotation.Nonnull;
 import java.util.Optional;
+import java.util.function.IntFunction;
 
 public class BeltFinderCurios extends BeltFinder
 {
@@ -48,9 +51,25 @@ public class BeltFinderCurios extends BeltFinder
         return Optional.empty();
     }
 
-    private Optional<? extends BeltGetter> findBeltInInventory(LivingEntity entity, String slotName, boolean isCosmetic, IItemHandler inventory)
+    private Optional<? extends BeltGetter> findBeltInInventory(LivingEntity entity, String slotName, boolean isCosmetic, IDynamicStackHandler inventory)
     {
         return findBeltInInventory(inventory, i -> new CuriosBeltGetter(entity, slotName, isCosmetic, i));
+    }
+
+    private Optional<? extends BeltGetter> findBeltInInventory(IDynamicStackHandler inventory, IntFunction<? extends BeltGetter> getterFactory)
+    {
+        for (int i = 0; i < inventory.getSlots(); i++)
+        {
+            ItemStack inSlot = inventory.getStackInSlot(i);
+            if (inSlot.getCount() > 0)
+            {
+                if (inSlot.getItem() instanceof ToolBeltItem)
+                {
+                    return Optional.of(getterFactory.apply(i));
+                }
+            }
+        }
+        return Optional.empty();
     }
 
     private static class CuriosBeltGetter implements BeltGetter
@@ -104,4 +123,4 @@ public class BeltFinderCurios extends BeltFinder
             // No need! Curios does its own sync. I think.
         }
     }
-}*/
+}
