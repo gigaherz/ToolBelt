@@ -10,7 +10,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.inventory.ClickType;
+import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.ItemContainerContents;
@@ -126,11 +126,11 @@ public class BeltContainer extends AbstractContainerMenu implements BeltFinder.B
     }
 
     @Override
-    public void clicked(int slot, int button, ClickType clickType, Player player)
+    public void clicked(int slot, int button, ContainerInput containerInput, Player player)
     {
-        if (clickType == ClickType.SWAP && button == blockedSlot)
+        if (/*clickType == ClickType.SWAP &&*/ button == blockedSlot)
             return;
-        super.clicked(slot, button, clickType, player);
+        super.clicked(slot, button, containerInput, player);
     }
 
     @Override

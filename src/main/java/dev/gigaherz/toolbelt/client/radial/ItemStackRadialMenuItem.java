@@ -1,9 +1,7 @@
 package dev.gigaherz.toolbelt.client.radial;
 
-import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import org.joml.Matrix4fStack;
 
 public class ItemStackRadialMenuItem extends TextRadialMenuItem
 {
@@ -28,21 +26,21 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
     }
 
     @Override
-    public void draw(DrawingContext context)
+    public void extractRenderState(DrawingContext context)
     {
         if (stack.getCount() > 0)
         {
-            context.graphics.renderItem(stack, (int) context.x - 8, (int) context.y - 8);
-            context.graphics.renderItemDecorations(context.font, stack, (int) context.x - 8, (int) context.y - 8, "");
+            context.graphics.item(stack, (int) context.x - 8, (int) context.y - 8);
+            context.graphics.itemDecorations(context.font, stack, (int) context.x - 8, (int) context.y - 8, "");
         }
         else
         {
-            super.draw(context);
+            super.extractRenderState(context);
         }
     }
 
     @Override
-    public void drawTooltips(DrawingContext context)
+    public void prepareTooltip(DrawingContext context)
     {
         if (stack.getCount() > 0)
         {
@@ -50,7 +48,7 @@ public class ItemStackRadialMenuItem extends TextRadialMenuItem
         }
         else
         {
-            super.drawTooltips(context);
+            super.prepareTooltip(context);
         }
     }
 }

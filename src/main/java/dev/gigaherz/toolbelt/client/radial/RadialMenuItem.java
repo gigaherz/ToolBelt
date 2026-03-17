@@ -48,9 +48,9 @@ public abstract class RadialMenuItem
         this.hovered = hovered;
     }
 
-    public abstract void draw(DrawingContext context);
+    public abstract void extractRenderState(DrawingContext context);
 
-    public abstract void drawTooltips(DrawingContext context);
+    public abstract void prepareTooltip(DrawingContext context);
 
     public boolean onClick()
     {

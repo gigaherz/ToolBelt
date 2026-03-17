@@ -29,10 +29,7 @@
     }
   ],
   "result": {
-    "components": {
-      "toolbelt:belt_size": 9
-    },
-    "count": 1,
+    "count": 9,
     "id": "toolbelt:belt"
   },
   "tool": "#sewingkit:needles/netherite_or_higher"

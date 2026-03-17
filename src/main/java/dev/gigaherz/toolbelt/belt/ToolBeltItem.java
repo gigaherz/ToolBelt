@@ -16,6 +16,7 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.component.ItemContainerContents;
 import net.minecraft.world.item.component.TooltipDisplay;
@@ -82,6 +83,11 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
     public static ItemStack of(int level)
     {
         return ToolBelt.BELT.get().forSize(level);
+    }
+
+    public static ItemStackTemplate template(int level)
+    {
+        return new ItemStackTemplate(ToolBelt.BELT, level);
     }
 
     public ItemStack forSize(int size)

@@ -3,23 +3,20 @@ package dev.gigaherz.toolbelt.client.radial;
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.pipeline.RenderPipeline;
 import com.mojang.blaze3d.platform.Window;
-import com.mojang.blaze3d.textures.GpuTextureView;
 import com.mojang.blaze3d.vertex.*;
 import dev.gigaherz.toolbelt.ConfigData;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.navigation.ScreenRectangle;
 import net.minecraft.client.gui.render.TextureSetup;
-import net.minecraft.client.gui.render.state.GuiElementRenderState;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
+import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.Identifier;
 import net.minecraft.util.Mth;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.joml.Matrix3x2f;
-import org.joml.Matrix3x2fStack;
 import org.lwjgl.glfw.GLFW;
 
 import javax.annotation.Nullable;
@@ -198,7 +195,7 @@ public class GenericRadialMenu
         //updateAnimationState(minecraft.getRenderPartialTicks());
     }
 
-    public void draw(GuiGraphics graphics, float partialTicks, int mouseX, int mouseY)
+    public void extractRenderState(GuiGraphicsExtractor graphics, float partialTicks, int mouseX, int mouseY)
     {
         updateAnimationState(partialTicks);
 
@@ -224,14 +221,14 @@ public class GenericRadialMenu
         poseStack.pushMatrix();
         poseStack.translate(0, animTop);
 
-        drawBackground(graphics, x, y, radiusIn, radiusOut);
+        extractBackground(graphics, x, y, radiusIn, radiusOut);
 
         poseStack.popMatrix();
 
         if (isReady())
         {
             poseStack.pushMatrix();
-            drawItems(graphics, x, y, owner.width, owner.height, font);
+            extractItemsRenderState(graphics, x, y, owner.width, owner.height, font);
             poseStack.popMatrix();
 
             Component currentCentralText = centralText;
@@ -251,11 +248,11 @@ public class GenericRadialMenu
                 String text = currentCentralText.getString();
                 float textX = (owner.width - font.width(text)) / 2.0f;
                 float textY = (owner.height - font.lineHeight) / 2.0f;
-                graphics.drawString(font, text, (int)textX, (int)textY, 0xFFFFFFFF, true);
+                graphics.text(font, text, (int)textX, (int)textY, 0xFFFFFFFF, true);
             }
 
             poseStack.pushMatrix();
-            drawTooltips(graphics, mouseX, mouseY);
+            prepareTooltip(graphics, mouseX, mouseY);
             poseStack.popMatrix();
         }
     }
@@ -286,7 +283,7 @@ public class GenericRadialMenu
         animProgress = openAnimation; // MathHelper.clamp(openAnimation, 0, 1);
     }
 
-    private void drawTooltips(GuiGraphics graphics, int mouseX, int mouseY)
+    private void prepareTooltip(GuiGraphicsExtractor graphics, int mouseX, int mouseY)
     {
         Screen owner = host.getScreen();
         Font fontRenderer = host.getFontRenderer();
@@ -296,12 +293,12 @@ public class GenericRadialMenu
             if (item.isHovered())
             {
                 DrawingContext context = new DrawingContext(graphics, owner.width, owner.height, mouseX, mouseY, 0, fontRenderer);
-                item.drawTooltips(context);
+                item.prepareTooltip(context);
             }
         }
     }
 
-    private void drawItems(GuiGraphics graphics, int x, int y, int width, int height, Font font)
+    private void extractItemsRenderState(GuiGraphicsExtractor graphics, int x, int y, int width, int height, Font font)
     {
         iterateVisible((item, s, e) -> {
             float middle = (s + e) * 0.5f;
@@ -309,7 +306,7 @@ public class GenericRadialMenu
             float posY = y + itemRadius * (float) Math.sin(middle);
 
             DrawingContext context = new DrawingContext(graphics, width, height, posX, posY, 0, font);
-            item.draw(context);
+            item.extractRenderState(context);
         });
     }
 
@@ -326,13 +323,13 @@ public class GenericRadialMenu
         }
     }
 
-    private void drawBackground(GuiGraphics graphics, float x, float y, float radiusIn, float radiusOut)
+    private void extractBackground(GuiGraphicsExtractor graphics, float x, float y, float radiusIn, float radiusOut)
     {
         if (visibleItems.size() > 0)
         {
             iterateVisible((item, s, e) -> {
                 int color = item.isHovered() ? backgroundColorHover : backgroundColor;
-                drawPieArc(graphics, x, y, radiusIn, radiusOut, s, e, color);
+                submitPieArc(graphics, x, y, radiusIn, radiusOut, s, e, color);
             });
         }
     }
@@ -458,13 +455,12 @@ public class GenericRadialMenu
     {
         if (numItems == 0)
             return 0;
-        double angle = ((i / numItems) + 0.25) * TWO_PI + Math.PI;
-        return angle;
+        return ((i / numItems) + 0.25) * TWO_PI + Math.PI;
     }
 
     private static final float PRECISION = 2.5f / 360.0f;
 
-    private void drawPieArc(GuiGraphics graphics, float x, float y, float radiusIn, float radiusOut, float startAngle, float endAngle, int color)
+    private void submitPieArc(GuiGraphicsExtractor graphics, float x, float y, float radiusIn, float radiusOut, float startAngle, float endAngle, int color)
     {
         graphics.submitGuiElementRenderState(new BlitPieArc(
                 RenderPipelines.GUI, TextureSetup.noTexture(), graphics.pose(), x, y, radiusIn, radiusOut, startAngle, endAngle, color, null

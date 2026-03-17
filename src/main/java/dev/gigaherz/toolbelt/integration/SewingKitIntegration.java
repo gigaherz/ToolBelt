@@ -11,7 +11,7 @@ public class SewingKitIntegration
 {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(BuiltInRegistries.RECIPE_SERIALIZER, ToolBelt.MODID);
     public static DeferredHolder<RecipeSerializer<?>, RecipeSerializer<SewingUpgradeRecipe>>
-            SEWING_UGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("sewing_upgrade", SewingUpgradeRecipe.Serializer::new);
+            SEWING_UGRADE_SERIALIZER = RECIPE_SERIALIZERS.register("sewing_upgrade", () -> new RecipeSerializer<>(SewingUpgradeRecipe.CODEC, SewingUpgradeRecipe.STREAM_CODEC));
 
     public static void init(IEventBus modEventBus)
     {

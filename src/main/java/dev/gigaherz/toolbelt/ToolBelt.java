@@ -1,6 +1,7 @@
 package dev.gigaherz.toolbelt;
 
 import com.mojang.serialization.Codec;
+import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.MapCodec;
 import dev.gigaherz.sewingkit.SewingKitMod;
 import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
@@ -22,7 +23,8 @@ import net.minecraft.client.data.models.ModelProvider;
 import net.minecraft.client.data.models.model.ItemModelUtils;
 import net.minecraft.client.data.models.model.ModelLocationUtils;
 import net.minecraft.client.data.models.model.ModelTemplates;
-import net.minecraft.core.HolderLookup;
+import net.minecraft.client.resources.model.sprite.Material;
+import net.minecraft.core.*;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -36,6 +38,8 @@ import net.minecraft.data.registries.VanillaRegistries;
 import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.Identifier;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Util;
@@ -43,6 +47,13 @@ import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.minecraft.world.level.biome.Biome;
+import net.minecraft.world.level.levelgen.GenerationStep;
+import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
+import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
+import net.minecraft.world.level.levelgen.placement.PlacedFeature;
+import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
+import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -59,7 +70,9 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import net.neoforged.neoforge.common.crafting.IngredientType;
+import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.common.world.BiomeModifiers;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.AnvilUpdateEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -69,11 +82,15 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
+import net.neoforged.neoforge.registries.holdersets.NotHolderSet;
 import top.theillusivec4.curios.api.CuriosDataProvider;
 import top.theillusivec4.curios.api.CuriosTags;
 
 import java.util.List;
+import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
+import java.util.stream.Stream;
 
 @Mod(ToolBelt.MODID)
 public class ToolBelt
@@ -105,7 +122,7 @@ public class ToolBelt
             BELT_MENU = MENU_TYPES.register("belt_container", () -> IMenuTypeExtension.create(BeltContainer::new));
 
     public static DeferredHolder<IngredientType<?>, IngredientType<BeltIngredient>>
-            BELT_INGREDIENT = INGREDIENT_TYPES.register("belt_upgrade_level", () -> new IngredientType<BeltIngredient>(BeltIngredient.CODEC));
+            BELT_INGREDIENT = INGREDIENT_TYPES.register("belt_upgrade_level", () -> new IngredientType<>(BeltIngredient.CODEC));
 
     public static DeferredHolder<DataComponentType<?>, DataComponentType<Integer>>
             BELT_SIZE = DATA_COMPONENT_TYPES.register("belt_size", () -> DataComponentType.<Integer>builder().persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
@@ -258,7 +275,7 @@ public class ToolBelt
             gen.addProvider(true, new Recipes(gen.getPackOutput(), event.getLookupProvider()));
             gen.addProvider(true, new ModelsAndClientItems(gen.getPackOutput()));
             gen.addProvider(true, new ItemTagGen(gen.getPackOutput()));
-            gen.addProvider(true, new MyCuriosDataProvider(gen, event));
+            //gen.addProvider(true, new MyCuriosDataProvider(gen, event));
         }
 
         private static class ModelsAndClientItems extends ModelProvider
@@ -271,8 +288,8 @@ public class ToolBelt
             @Override
             protected void registerModels(BlockModelGenerators blockModels, ItemModelGenerators itemModels)
             {
-                itemModels.generateLayeredItem(BELT.get(), location("item/belt"), location("item/belt_buckle"));
-                itemModels.generateLayeredItem(location("item/dyed_belt"), location("item/dyed_belt"), location("item/belt_buckle"));
+                itemModels.generateLayeredItem(BELT.get(), new Material(location("item/belt")), new Material(location("item/belt_buckle")));
+                itemModels.generateLayeredItem(location("item/dyed_belt"), new Material(location("item/dyed_belt")), new Material(location("item/belt_buckle")));
                 itemModels.itemModelOutput.accept(BELT.get(),
                         ItemModelUtils.conditional(
                                 HasCustomColor.INSTANCE,
@@ -291,16 +308,13 @@ public class ToolBelt
             public ItemTagGen(PackOutput packOutput)
             {
                 super(packOutput, Registries.ITEM, CompletableFuture.supplyAsync(VanillaRegistries::createLookup, Util.backgroundExecutor()),
-                        (item) -> BuiltInRegistries.ITEM.getResourceKey(item).orElseThrow(), SewingKitMod.MODID);
+                        (item) -> item.builtInRegistryHolder().key(), SewingKitMod.MODID);
             }
 
             @Override
             protected void addTags(HolderLookup.Provider lookup)
             {
-                tag(ItemTags.DYEABLE)
-                        .add(BELT.get());
-                tag(CuriosTags.BELT)
-                        .add(BELT.get());
+                //tag(CuriosTags.BELT).add(BELT.get());
             }
         }
 
@@ -382,7 +396,7 @@ public class ToolBelt
                         for (int i = 2; i < 9; i++)
                         {
                             var beltId = ToolBelt.BELT.getId();
-                            SewingUpgradeRecipe.builder(items, ToolBeltItem.of(i + 1))
+                            SewingUpgradeRecipe.builder(items, ToolBeltItem.template(i + 1))
                                     .withTool(needleTiers.get(i - 2))
                                     .addMaterial(BeltIngredient.withLevel(i).toVanilla())
                                     .addMaterial(Ingredient.of(POUCH.get()))
@@ -394,6 +408,8 @@ public class ToolBelt
                                             new Conditions.EnableSewingCrafting()
                                     ), Identifier.fromNamespaceAndPath(beltId.getNamespace(), beltId.getPath() + "_upgrade_" + (i - 1) + "_via_sewing"));
                         }
+
+                        this.dyedItem(BELT.get(), "dyed_armor");
                     }
 
                     private Identifier sewingRecipeId(DeferredHolder<?, ?> item)
@@ -415,7 +431,7 @@ public class ToolBelt
             }
         }
 
-        private static class MyCuriosDataProvider extends CuriosDataProvider
+        /*private static class MyCuriosDataProvider extends CuriosDataProvider
         {
             public MyCuriosDataProvider(DataGenerator gen, GatherDataEvent.Client event)
             {
@@ -429,6 +445,6 @@ public class ToolBelt
                         .addPlayer().addSlots("belt");
                 this.createSlot("belt").size(1);
             }
-        }
+        }*/
     }
 }

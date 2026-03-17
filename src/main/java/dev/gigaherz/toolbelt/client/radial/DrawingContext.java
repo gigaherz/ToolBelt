@@ -1,7 +1,7 @@
 package dev.gigaherz.toolbelt.client.radial;
 
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 
 public class DrawingContext
 {
@@ -11,9 +11,9 @@ public class DrawingContext
     public final float y;
     public final float z;
     public final Font font;
-    public final GuiGraphics graphics;
+    public final GuiGraphicsExtractor graphics;
 
-    public DrawingContext(GuiGraphics graphics, int width, int height, float x, float y, float z, Font font)
+    public DrawingContext(GuiGraphicsExtractor graphics, int width, int height, float x, float y, float z, Font font)
     {
         this.graphics = graphics;
         this.width = width;

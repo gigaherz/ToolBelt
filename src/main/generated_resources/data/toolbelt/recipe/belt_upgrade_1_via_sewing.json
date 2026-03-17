@@ -29,10 +29,7 @@
     }
   ],
   "result": {
-    "components": {
-      "toolbelt:belt_size": 3
-    },
-    "count": 1,
+    "count": 3,
     "id": "toolbelt:belt"
   },
   "tool": "#sewingkit:needles/wood_or_higher"

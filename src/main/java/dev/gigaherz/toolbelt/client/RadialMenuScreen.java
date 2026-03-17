@@ -10,13 +10,12 @@ import dev.gigaherz.toolbelt.common.ItemContainerWrapper;
 import dev.gigaherz.toolbelt.network.SwapItems;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
-import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.GuiGraphicsExtractor;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.input.MouseButtonEvent;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.component.ItemContainerContents;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -24,6 +23,8 @@ import net.neoforged.neoforge.client.event.RenderGuiLayerEvent;
 import net.neoforged.neoforge.client.gui.VanillaGuiLayers;
 import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
+import org.jspecify.annotations.NonNull;
 
 import java.util.List;
 
@@ -70,7 +71,7 @@ public class RadialMenuScreen extends Screen
         menu = new GenericRadialMenu(Minecraft.getInstance(), new IRadialMenuHost()
         {
             @Override
-            public void renderTooltip(GuiGraphics graphics, ItemStack stack, int mouseX, int mouseY)
+            public void extractTooltip(@UnknownNullability @NonNull GuiGraphicsExtractor graphics, ItemStack stack, int mouseX, int mouseY)
             {
                 graphics.setTooltipForNextFrame(font, stack, mouseX, mouseY);
             }
@@ -185,11 +186,11 @@ public class RadialMenuScreen extends Screen
     }
 
     @Override
-    public void render(GuiGraphics graphics, int mouseX, int mouseY, float partialTicks)
+    public void extractRenderState(GuiGraphicsExtractor graphics, int mouseX, int mouseY, float partialTicks)
     {
         var poseStack = graphics.pose();
         poseStack.pushMatrix();
-        super.render(graphics, mouseX, mouseY, partialTicks);
+        super.extractRenderState(graphics, mouseX, mouseY, partialTicks);
         poseStack.popMatrix();
 
         ItemStack inHand = minecraft.player.getMainHandItem();
@@ -234,7 +235,7 @@ public class RadialMenuScreen extends Screen
             checkCycleKeybinds();
         }
 
-        menu.draw(graphics, partialTicks, mouseX, mouseY);
+        menu.extractRenderState(graphics, partialTicks, mouseX, mouseY);
     }
 
     private @NotNull ItemStackRadialMenuItem getMenuItemForStack(int i, ItemStack inSlot, ItemStack inHand)

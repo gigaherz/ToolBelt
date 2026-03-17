@@ -6,17 +6,28 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.140'
 }
 
-neoForge.version = "21.11.38-beta"
+neoForge.version = "26.1.0.0-alpha.15+pre-3"
 version = "2.8.1"
 group = "dev.gigaherz.toolbelt"
 base.archivesName = "ToolBelt-${neoForge.minecraftVersion}"
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java.toolchain.languageVersion = JavaLanguageVersion.of(25)
 
 java.withSourcesJar()
 
 sourceSets {
     main.resources.srcDirs += 'src/main/generated_resources'
+}
+
+repositories {
+    maven {
+        name = "Maven for PR #2993" // https://github.com/neoforged/NeoForge/pull/2993
+        url = uri("https://prmaven.neoforged.net/NeoForge/pr2993")
+        content {
+            includeModule("net.neoforged", "neoforge")
+            includeModule("net.neoforged", "testframework")
+        }
+    }
 }
 
 repositories {
@@ -103,8 +114,8 @@ neoForge {
 }
 
 dependencies {
-    compileOnly "dev.gigaherz.sewingkit:SewingKit-1.21.11:2.6.0"
-    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-1.21.11:2.6.0"
+    compileOnly "dev.gigaherz.sewingkit:SewingKit-26.1-pre-2:2.7.0-alpha.2"
+    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-26.1-pre-2:2.7.0-alpha.2"
 
     //compileOnly "mezz.jei:jei-1.21.10-common-api:26.0.0.4"
     //runtimeOnly "mezz.jei:jei-1.21.10-common:26.0.0.4"
@@ -115,7 +126,7 @@ dependencies {
     //implementation("io.wispforest:accessories-neoforge:1.0.0-beta.9+1.21")
 
     compileOnly "top.theillusivec4.curios:curios-neoforge:14.0.0+1.21.11"
-    runtimeOnly "top.theillusivec4.curios:curios-neoforge:14.0.0+1.21.11"
+    //runtimeOnly "top.theillusivec4.curios:curios-neoforge:14.0.0+1.21.11"
 
     //runtimeOnly fg.deobf("curse.maven:corail-tombstone-243707:3836552")
 }

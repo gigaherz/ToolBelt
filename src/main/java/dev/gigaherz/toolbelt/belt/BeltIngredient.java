@@ -7,6 +7,7 @@ import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.core.Holder;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.display.SlotDisplay;
 import net.neoforged.neoforge.common.crafting.ICustomIngredient;
 import net.neoforged.neoforge.common.crafting.IngredientType;
@@ -46,7 +47,7 @@ public class BeltIngredient implements ICustomIngredient
     @Override
     public SlotDisplay display()
     {
-        return new SlotDisplay.ItemStackSlotDisplay(ToolBelt.BELT.get().forSize(size));
+        return new SlotDisplay.ItemStackSlotDisplay(new ItemStackTemplate(ToolBelt.BELT.get(), size));
     }
 
     @Override

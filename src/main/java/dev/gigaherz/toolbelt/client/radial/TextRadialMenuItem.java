@@ -32,16 +32,16 @@ public class TextRadialMenuItem extends RadialMenuItem
     }
 
     @Override
-    public void draw(DrawingContext context)
+    public void extractRenderState(DrawingContext context)
     {
         String textString = text.getString();
         float x = context.x - context.font.width(textString) / 2.0f;
         float y = context.y - context.font.lineHeight / 2.0f;
-        context.graphics.drawString(context.font, textString, (int)x, (int)y, color, true);
+        context.graphics.text(context.font, textString, (int)x, (int)y, color, true);
     }
 
     @Override
-    public void drawTooltips(DrawingContext context)
+    public void prepareTooltip(DrawingContext context)
     {
         // nothing to do (yet)
     }

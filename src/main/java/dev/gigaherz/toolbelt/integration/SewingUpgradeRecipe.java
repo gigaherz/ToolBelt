@@ -16,6 +16,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.ItemStackTemplate;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -27,10 +28,10 @@ public class SewingUpgradeRecipe extends SewingRecipe
 {
     public static SewingUpgradeRecipeBuilder builder(HolderLookup.RegistryLookup<Item> items, Item result, int count)
     {
-        return new SewingUpgradeRecipeBuilder(items, new ItemStack(result, count));
+        return new SewingUpgradeRecipeBuilder(items, new ItemStackTemplate(result, count));
     }
 
-    public static SewingUpgradeRecipeBuilder builder(HolderLookup.RegistryLookup<Item> items, ItemStack result)
+    public static SewingUpgradeRecipeBuilder builder(HolderLookup.RegistryLookup<Item> items, ItemStackTemplate result)
     {
         return new SewingUpgradeRecipeBuilder(items, result);
     }
@@ -44,18 +45,18 @@ public class SewingUpgradeRecipe extends SewingRecipe
             ByteBufCodecs.collection(NonNullList::createWithCapacity, SewingMaterial.STREAM_CODEC), SewingRecipe::materials,
             SewingKitMod.nullable(Ingredient.CONTENTS_STREAM_CODEC), SewingRecipe::pattern,
             SewingKitMod.nullable(Ingredient.CONTENTS_STREAM_CODEC), SewingRecipe::tool,
-            ItemStack.STREAM_CODEC, SewingRecipe::output,
+            ItemStackTemplate.STREAM_CODEC, SewingRecipe::output,
             ByteBufCodecs.BOOL, SewingRecipe::showNotification,
             SewingUpgradeRecipe::new
     );
 
     @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
-    public SewingUpgradeRecipe(String group, RecipeBookCategory recipeBookCategory, NonNullList<SewingMaterial> materials, Optional<Ingredient> pattern, Optional<Ingredient> tool, ItemStack output, boolean showNotification)
+    public SewingUpgradeRecipe(String group, RecipeBookCategory recipeBookCategory, NonNullList<SewingMaterial> materials, Optional<Ingredient> pattern, Optional<Ingredient> tool, ItemStackTemplate output, boolean showNotification)
     {
         super(group, recipeBookCategory, materials, pattern, tool, output, showNotification);
     }
 
-    public SewingUpgradeRecipe(String group, RecipeBookCategory recipeBookCategory, NonNullList<SewingMaterial> materials, @Nullable Ingredient pattern, @Nullable Ingredient tool, ItemStack output, boolean showNotification)
+    public SewingUpgradeRecipe(String group, RecipeBookCategory recipeBookCategory, NonNullList<SewingMaterial> materials, @Nullable Ingredient pattern, @Nullable Ingredient tool, ItemStackTemplate output, boolean showNotification)
     {
         super(group, recipeBookCategory, materials, pattern, tool, output, showNotification);
     }
@@ -69,7 +70,7 @@ public class SewingUpgradeRecipe extends SewingRecipe
     }
 
     @Override
-    public ItemStack assemble(SewingInput inv, HolderLookup.Provider provider)
+    public ItemStack assemble(SewingInput inv)
     {
         ItemStack inputBelt = ItemStack.EMPTY;
         for (int i = 2; i < 6; i++)
@@ -80,7 +81,7 @@ public class SewingUpgradeRecipe extends SewingRecipe
                 break;
             }
         }
-        ItemStack upgradedBelt = super.assemble(inv, provider);
+        ItemStack upgradedBelt = super.assemble(inv);
         if (inputBelt.getCount() > 0)
         {
             int size = 2;
@@ -93,20 +94,5 @@ public class SewingUpgradeRecipe extends SewingRecipe
             ToolBeltItem.setBeltSize(upgradedBelt, Mth.clamp(size,2,9));
         }
         return upgradedBelt;
-    }
-
-    public static class Serializer implements RecipeSerializer<SewingUpgradeRecipe>
-    {
-        @Override
-        public MapCodec<SewingUpgradeRecipe> codec()
-        {
-            return CODEC;
-        }
-
-        @Override
-        public StreamCodec<RegistryFriendlyByteBuf, SewingUpgradeRecipe> streamCodec()
-        {
-            return STREAM_CODEC;
-        }
     }
 }
