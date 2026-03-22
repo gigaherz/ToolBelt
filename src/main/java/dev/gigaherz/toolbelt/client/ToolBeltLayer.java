@@ -16,10 +16,9 @@ import net.minecraft.client.model.geom.builders.MeshDefinition;
 import net.minecraft.client.model.geom.builders.PartDefinition;
 import net.minecraft.client.renderer.SubmitNodeCollector;
 import net.minecraft.client.renderer.entity.RenderLayerParent;
+import net.minecraft.client.renderer.entity.VillagerRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.entity.state.AvatarRenderState;
-import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
+import net.minecraft.client.renderer.entity.state.*;
 import net.minecraft.client.renderer.item.ItemStackRenderState;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.component.DataComponents;
@@ -53,6 +52,10 @@ public class ToolBeltLayer<S extends HumanoidRenderState, M extends HumanoidMode
     public static final ContextKey<ToolBeltLayer.RenderState> KEY = new ContextKey<>(ToolBelt.location("belt_layer_state"));
     public static void extractRenderState(LivingEntity owner, HumanoidRenderState avatarState)
     {
+        extractRenderState(owner, avatarState, avatarState.attackArm == HumanoidArm.RIGHT);
+    }
+    private static void extractRenderState(LivingEntity owner, EntityRenderState avatarState, boolean rightHanded)
+    {
         var itemModelResolver = Minecraft.getInstance().getItemModelResolver();
 
         var beltState = new RenderState();
@@ -65,7 +68,6 @@ public class ToolBeltLayer<S extends HumanoidRenderState, M extends HumanoidMode
             var cap = stack.get(DataComponents.CONTAINER);
             if (cap != null)
             {
-                boolean rightHanded = avatarState.attackArm == HumanoidArm.RIGHT;
 
                 ItemStack firstItem = cap.getSlots() >= 1 ? cap.getStackInSlot(0) : ItemStack.EMPTY;
                 ItemStack secondItem = cap.getSlots() >= 2 ? cap.getStackInSlot(1) : ItemStack.EMPTY;

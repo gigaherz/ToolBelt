@@ -11,15 +11,11 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.renderer.entity.*;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
 import net.minecraft.client.renderer.entity.player.AvatarRenderer;
-import net.minecraft.client.renderer.entity.state.AvatarRenderState;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
-import net.minecraft.client.renderer.entity.state.LivingEntityRenderState;
 import net.minecraft.resources.Identifier;
-import net.minecraft.util.context.ContextKey;
 import net.minecraft.world.entity.Avatar;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -39,6 +35,7 @@ import net.neoforged.neoforge.client.network.ClientPacketDistributor;
 import net.neoforged.neoforge.client.renderstate.RegisterRenderStateModifiersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import org.jetbrains.annotations.Nullable;
+import org.jspecify.annotations.NonNull;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.function.Function;
@@ -111,7 +108,9 @@ public class ToolBeltClient
         addLayerToHumanoid(event, EntityType.PIGLIN_BRUTE, ToolBeltLayer::new);
         addLayerToHumanoid(event, EntityType.ZOMBIFIED_PIGLIN, ToolBeltLayer::new);
 
-        // NOT COMPATIBLE: not a HumanoidModel
+        addLayerToHumanoid(event, EntityType.MANNEQUIN, ToolBeltLayer::new);
+
+        // NOT COMPATIBLE: not HumanoidModel
         //addLayerToHumanoid(event, EntityType.WITCH, ToolBeltLayer::new);
         //addLayerToHumanoid(event, EntityType.VILLAGER, ToolBeltLayer::new);
         //addLayerToHumanoid(event, EntityType.PILLAGER, ToolBeltLayer::new);
@@ -142,38 +141,26 @@ public class ToolBeltClient
 
     private void renderStateModifiers(RegisterRenderStateModifiersEvent event)
     {
-        //noinspection unchecked,RedundantCast
-        event.registerEntityModifier(
-                (Class<? extends AvatarRenderer<AbstractClientPlayer>>)(Object)AvatarRenderer.class,
-                ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(new TypeToken<AvatarRenderer<?>>(){}, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(ArmorStandRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(ZombieRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(HuskRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(DrownedRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(SkeletonRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(StrayRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(BoggedRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(ParchedRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(WitherSkeletonRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(ZombieVillagerRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(PiglinRenderer.class, ToolBeltLayer::extractRenderState);
+        event.registerEntityModifier(ZombifiedPiglinRenderer.class, ToolBeltLayer::extractRenderState);
 
-        registerEntityModifier(event, ArmorStandRenderer.class);
-        registerEntityModifier(event, ZombieRenderer.class);
-        registerEntityModifier(event, HuskRenderer.class);
-        registerEntityModifier(event, DrownedRenderer.class);
-        registerEntityModifier(event, SkeletonRenderer.class);
-        registerEntityModifier(event, StrayRenderer.class);
-        registerEntityModifier(event, BoggedRenderer.class);
-        registerEntityModifier(event, ParchedRenderer.class);
-        registerEntityModifier(event, WitherSkeletonRenderer.class);
-        registerEntityModifier(event, ZombieVillagerRenderer.class);
-        registerEntityModifier(event, PiglinRenderer.class);
-        registerEntityModifier(event, ZombifiedPiglinRenderer.class);
-
-        // NOT COMPATIBLE: not a HumanoidModel
-        //registerEntityModifier(event, WitchRenderer.class);
-        //registerEntityModifier(event, VillagerRenderer.class);
-        //registerEntityModifier(event, PillagerRenderer.class);
-        //registerEntityModifier(event, VindicatorRenderer.class);
-        //registerEntityModifier(event, IllusionerRenderer.class);
-    }
-
-    private static void registerEntityModifier(RegisterRenderStateModifiersEvent event,
-                                               Class<? extends LivingEntityRenderer<?,? extends HumanoidRenderState,? extends HumanoidModel<?>>> renderer)
-    {
-        event.registerEntityModifier(
-                renderer,
-                ToolBeltLayer::extractRenderState);
+        // NOT COMPATIBLE: not HumanoidModel or not HumanoidRenderState
+        //event.registerEntityModifier(PillagerRenderer.class, ToolBeltLayer::extractRenderState);
+        //event.registerEntityModifier(VindicatorRenderer.class, ToolBeltLayer::extractRenderState);
+        //event.registerEntityModifier(IllusionerRenderer.class, ToolBeltLayer::extractRenderState);
+        //event.registerEntityModifier(WitchRenderer.class, ToolBeltLayer::extractRenderState);
+        //event.registerEntityModifier(VillagerRenderer.class, ToolBeltLayer::extractRenderState);
     }
 
     @Nullable public static KeyMapping OPEN_TOOL_MENU_KEYBIND;
