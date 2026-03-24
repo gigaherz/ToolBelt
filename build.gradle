@@ -6,8 +6,8 @@ plugins {
     id 'net.neoforged.moddev' version '2.0.140'
 }
 
-neoForge.version = "26.1.0.0-alpha.15+pre-3"
-version = "2.8.1"
+neoForge.version = "26.1.0.1-beta"
+version = "2.9.0"
 group = "dev.gigaherz.toolbelt"
 base.archivesName = "ToolBelt-${neoForge.minecraftVersion}"
 
@@ -17,17 +17,6 @@ java.withSourcesJar()
 
 sourceSets {
     main.resources.srcDirs += 'src/main/generated_resources'
-}
-
-repositories {
-    maven {
-        name = "Maven for PR #2993" // https://github.com/neoforged/NeoForge/pull/2993
-        url = uri("https://prmaven.neoforged.net/NeoForge/pr2993")
-        content {
-            includeModule("net.neoforged", "neoforge")
-            includeModule("net.neoforged", "testframework")
-        }
-    }
 }
 
 repositories {
@@ -114,8 +103,8 @@ neoForge {
 }
 
 dependencies {
-    compileOnly "dev.gigaherz.sewingkit:SewingKit-26.1-pre-2:2.7.0-alpha.2"
-    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-26.1-pre-2:2.7.0-alpha.2"
+    compileOnly "dev.gigaherz.sewingkit:SewingKit-26.1:2.7.0"
+    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-26.1:2.7.0"
 
     //compileOnly "mezz.jei:jei-1.21.10-common-api:26.0.0.4"
     //runtimeOnly "mezz.jei:jei-1.21.10-common:26.0.0.4"
