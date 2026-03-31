@@ -275,7 +275,7 @@ public class ToolBelt
             gen.addProvider(true, new Recipes(gen.getPackOutput(), event.getLookupProvider()));
             gen.addProvider(true, new ModelsAndClientItems(gen.getPackOutput()));
             gen.addProvider(true, new ItemTagGen(gen.getPackOutput()));
-            //gen.addProvider(true, new MyCuriosDataProvider(gen, event));
+            gen.addProvider(true, new MyCuriosDataProvider(gen, event));
         }
 
         private static class ModelsAndClientItems extends ModelProvider
@@ -314,7 +314,7 @@ public class ToolBelt
             @Override
             protected void addTags(HolderLookup.Provider lookup)
             {
-                //tag(CuriosTags.BELT).add(BELT.get());
+                tag(CuriosTags.BELT).add(BELT.get());
             }
         }
 
@@ -431,7 +431,7 @@ public class ToolBelt
             }
         }
 
-        /*private static class MyCuriosDataProvider extends CuriosDataProvider
+        private static class MyCuriosDataProvider extends CuriosDataProvider
         {
             public MyCuriosDataProvider(DataGenerator gen, GatherDataEvent.Client event)
             {
@@ -445,6 +445,6 @@ public class ToolBelt
                         .addPlayer().addSlots("belt");
                 this.createSlot("belt").size(1);
             }
-        }*/
+        }
     }
 }
