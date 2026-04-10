@@ -17,9 +17,14 @@ import net.minecraft.world.item.component.ItemContainerContents;
 
 public class BeltContainer extends AbstractContainerMenu implements BeltFinder.BeltGetter
 {
+    public static final int PLAYER_INV_LEFT = 8;
+    public static final int PLAYER_INV_TOP = 51;
+    public static final int PLAYER_INV_BOTTOM = PLAYER_INV_TOP + 3 * SLOT_SIZE;
+    public static final int HOTBAR_TOP = PLAYER_INV_BOTTOM + 4;
+
     private final Inventory playerInventory;
     private final int blockedSlot;
-    private ItemStack blockedStack = ItemStack.EMPTY;
+    private ItemStack blockedStack;
     public int inventorySize = 0;
 
     public BeltContainer(int id, Inventory inventory, RegistryFriendlyByteBuf extraData)
@@ -46,10 +51,10 @@ public class BeltContainer extends AbstractContainerMenu implements BeltFinder.B
             this.inventorySize = ToolBeltItem.getBeltSize(actualStack);
             var wrapper = new ItemContainerWrapper(inventory, inventorySize, actualStack, this);
 
-            int xoff = ((9 - inventorySize) * 18) / 2;
+            int xoff = ((9 - inventorySize) * SLOT_SIZE) / 2;
             for (int k = 0; k < inventorySize; ++k)
             {
-                this.addSlot(new Slot(wrapper, k, 8 + xoff + k * 18, 20)
+                this.addSlot(new Slot(wrapper, k, PLAYER_INV_LEFT + xoff + k * SLOT_SIZE, 20)
                 {
 
                     @Override
@@ -66,25 +71,26 @@ public class BeltContainer extends AbstractContainerMenu implements BeltFinder.B
 
     private void bindPlayerInventory(Container playerInventory)
     {
-        for (int l = 0; l < 3; ++l)
+        for (int row = 0; row < 3; ++row)
         {
-            for (int j1 = 0; j1 < 9; ++j1)
+            for (int column = 0; column < SLOTS_PER_ROW; ++column)
             {
-                int index = j1 + l * 9 + 9;
-                this.addSlot(
-                        blockedSlot == index
-                                ? new LockedSlot(playerInventory, index, 8 + j1 * 18, l * 18 + 51)
-                                : new Slot(playerInventory, index, 8 + j1 * 18, l * 18 + 51)
+                int index = column + (row + 1) * SLOTS_PER_ROW;
+                int x = PLAYER_INV_LEFT + column * SLOT_SIZE;
+                int y = row * SLOT_SIZE + PLAYER_INV_TOP;
+                this.addSlot(blockedSlot == index
+                                ? new LockedSlot(playerInventory, index, x, y)
+                                : new Slot(playerInventory, index, x, y)
                 );
             }
         }
 
-        for (int i1 = 0; i1 < 9; ++i1)
+        for (int column = 0; column < SLOTS_PER_ROW; ++column)
         {
-            this.addSlot(
-                    blockedSlot == i1
-                            ? new LockedSlot(playerInventory, i1, 8 + i1 * 18, 109)
-                            : new Slot(playerInventory, i1, 8 + i1 * 18, 109)
+            int x = PLAYER_INV_LEFT + column * SLOT_SIZE;
+            this.addSlot(blockedSlot == column
+                            ? new LockedSlot(playerInventory, column, x, HOTBAR_TOP)
+                            : new Slot(playerInventory, column, x, HOTBAR_TOP)
             );
         }
     }
@@ -128,7 +134,7 @@ public class BeltContainer extends AbstractContainerMenu implements BeltFinder.B
     @Override
     public void clicked(int slot, int button, ContainerInput containerInput, Player player)
     {
-        if (/*clickType == ClickType.SWAP &&*/ button == blockedSlot)
+        if (containerInput == ContainerInput.SWAP && button == blockedSlot)
             return;
         super.clicked(slot, button, containerInput, player);
     }

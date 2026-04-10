@@ -7,7 +7,7 @@ plugins {
 }
 
 neoForge.version = "26.1.0.18-beta"
-version = "2.9.1"
+version = "2.9.2"
 group = "dev.gigaherz.toolbelt"
 base.archivesName = "ToolBelt-${neoForge.minecraftVersion}"
 
@@ -104,7 +104,7 @@ neoForge {
 
 dependencies {
     compileOnly "dev.gigaherz.sewingkit:SewingKit-26.1:2.7.1"
-    runtimeOnly "dev.gigaherz.sewingkit:SewingKit-26.1:2.7.1"
+    //runtimeOnly "dev.gigaherz.sewingkit:SewingKit-26.1:2.7.1"
 
     compileOnly "mezz.jei:jei-26.1-common-api:29.2.0.20"
     runtimeOnly "mezz.jei:jei-26.1-common:29.2.0.20"
