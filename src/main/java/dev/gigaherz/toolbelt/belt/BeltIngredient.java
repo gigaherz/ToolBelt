@@ -5,6 +5,7 @@ import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import dev.gigaherz.toolbelt.ToolBelt;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.ItemStackTemplate;
@@ -17,7 +18,7 @@ import java.util.stream.Stream;
 public class BeltIngredient implements ICustomIngredient
 {
     public static final MapCodec<BeltIngredient> CODEC = RecordCodecBuilder.mapCodec(inst -> inst.group(
-            Codec.INT.fieldOf("size").forGetter(obj -> obj.size)
+            Codec.INT.fieldOf("size").forGetter(obj -> obj.beltSize)
     ).apply(inst, BeltIngredient::new));
 
     public static BeltIngredient withLevel(int level)
@@ -25,29 +26,31 @@ public class BeltIngredient implements ICustomIngredient
         return new BeltIngredient(level);
     }
 
-    private final int size;
+    private final int beltSize;
 
-    protected BeltIngredient(int size)
+    protected BeltIngredient(int beltSize)
     {
-        this.size = size;
+        this.beltSize = beltSize;
     }
 
     @Override
     public boolean test(ItemStack stack)
     {
-        return stack.getItem() == ToolBelt.BELT.get() && ToolBeltItem.getBeltSize(stack) == size;
+        return stack.getItem() == ToolBelt.BELT.get() && ToolBeltItem.getBeltSize(stack) == beltSize;
     }
 
     @Override
     public Stream<Holder<Item>> items()
     {
-        return Stream.of(ToolBelt.BELT); // RIP -- can't show the ingredient including the required components?!?!?!
+        return Stream.of(ToolBelt.BELT); // RIP -- can't show the ingredient including the required components...
     }
 
     @Override
     public SlotDisplay display()
     {
-        return new SlotDisplay.ItemStackSlotDisplay(new ItemStackTemplate(ToolBelt.BELT.get(), size));
+        return new SlotDisplay.ItemStackSlotDisplay(new ItemStackTemplate(ToolBelt.BELT.get(), 1, DataComponentPatch.builder()
+                .set(ToolBelt.BELT_SIZE.get(), beltSize)
+                .build()));
     }
 
     @Override

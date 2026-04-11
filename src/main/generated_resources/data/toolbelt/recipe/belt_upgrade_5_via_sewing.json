@@ -29,7 +29,9 @@
     }
   ],
   "result": {
-    "count": 7,
+    "components": {
+      "toolbelt:belt_size": 7
+    },
     "id": "toolbelt:belt"
   },
   "tool": "#sewingkit:needles/diamond_or_higher"

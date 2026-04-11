@@ -4,6 +4,7 @@ import dev.gigaherz.toolbelt.ToolBelt;
 import dev.gigaherz.toolbelt.common.Screens;
 import dev.gigaherz.toolbelt.slot.BeltAttachment;
 import dev.gigaherz.toolbelt.slot.IBeltSlotItem;
+import net.minecraft.core.component.DataComponentPatch;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -87,7 +88,9 @@ public class ToolBeltItem extends Item implements IBeltSlotItem
 
     public static ItemStackTemplate template(int level)
     {
-        return new ItemStackTemplate(ToolBelt.BELT, level);
+        return new ItemStackTemplate(ToolBelt.BELT, 1, DataComponentPatch.builder()
+                .set(ToolBelt.BELT_SIZE.get(), level)
+                .build());
     }
 
     public ItemStack forSize(int size)

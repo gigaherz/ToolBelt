@@ -26,11 +26,6 @@ import java.util.Optional;
 
 public class SewingUpgradeRecipe extends SewingRecipe
 {
-    public static SewingUpgradeRecipeBuilder builder(HolderLookup.RegistryLookup<Item> items, Item result, int count)
-    {
-        return new SewingUpgradeRecipeBuilder(items, new ItemStackTemplate(result, count));
-    }
-
     public static SewingUpgradeRecipeBuilder builder(HolderLookup.RegistryLookup<Item> items, ItemStackTemplate result)
     {
         return new SewingUpgradeRecipeBuilder(items, result);

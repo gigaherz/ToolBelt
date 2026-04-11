@@ -29,7 +29,9 @@
     }
   ],
   "result": {
-    "count": 5,
+    "components": {
+      "toolbelt:belt_size": 5
+    },
     "id": "toolbelt:belt"
   },
   "tool": "#sewingkit:needles/iron_or_higher"
