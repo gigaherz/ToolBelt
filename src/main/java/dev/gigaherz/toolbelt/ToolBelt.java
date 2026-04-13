@@ -46,6 +46,7 @@ import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.conditions.IConditionBuilder;
 import net.neoforged.neoforge.common.crafting.IngredientType;
@@ -276,7 +277,7 @@ public class ToolBelt
                         .define('s', Ingredient.of(Items.STRING))
                         .define('l', Ingredient.of(Items.LEATHER))
                         .define('i', Ingredient.of(Items.IRON_INGOT))
-                        .unlockedBy("has_leather", has(itemTag("forge:leather")))
+                        .unlockedBy("has_leather", has(Tags.Items.LEATHERS))
                         .save(consumer.withConditions(
                                 new Conditions.EnableNormalCrafting()
                         ));
@@ -287,7 +288,7 @@ public class ToolBelt
                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET), 3)
                         .addMaterial(Ingredient.of(Items.IRON_INGOT), 1)
                         .addMaterial(Ingredient.of(Items.STRING), 2)
-                        .addCriterion("has_leather", has(itemTag("forge:leather")))
+                        .addCriterion("has_leather", has(Tags.Items.LEATHERS))
                         .save(consumer.withConditions(
                                 modLoaded("sewingkit"),
                                 new Conditions.EnableSewingCrafting()
@@ -300,7 +301,7 @@ public class ToolBelt
                         .define('s', Ingredient.of(Items.STRING))
                         .define('l', Ingredient.of(Items.LEATHER))
                         .define('g', Ingredient.of(Items.GOLD_INGOT))
-                        .unlockedBy("has_leather", has(itemTag("forge:leather")))
+                        .unlockedBy("has_leather", has(Tags.Items.LEATHERS))
                         .save(consumer.withConditions(
                                 new Conditions.EnableNormalCrafting()
                         ));
@@ -311,7 +312,7 @@ public class ToolBelt
                         .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET.get()), 3)
                         .addMaterial(Ingredient.of(Items.GOLD_INGOT))
                         .addMaterial(Ingredient.of(Items.STRING))
-                        .addCriterion("has_leather", has(itemTag("forge:leather")))
+                        .addCriterion("has_leather", has(Tags.Items.LEATHERS))
                         .save(consumer.withConditions(
                                 modLoaded("sewingkit"),
                                 new Conditions.EnableSewingCrafting()
@@ -335,7 +336,7 @@ public class ToolBelt
                             .addMaterial(Ingredient.of(POUCH.get()))
                             .addMaterial(Ingredient.of(Items.STRING))
                             .setGroup("toolbelt_belt_upgrade")
-                            .addCriterion("has_leather", has(itemTag("forge:leather")))
+                            .addCriterion("has_leather", has(Tags.Items.LEATHERS))
                             .save(consumer.withConditions(
                                     modLoaded("sewingkit"),
                                     new Conditions.EnableSewingCrafting()

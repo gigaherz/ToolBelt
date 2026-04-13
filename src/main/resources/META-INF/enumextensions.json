@@ -1,0 +1,16 @@
+{
+  "entries": [
+    {
+      "enum": "net/minecraft/world/item/ItemDisplayContext",
+      "name": "TOOLBELT_LEFTSIDE",
+      "constructor": "(ILjava/lang/String;Ljava/lang/String;)V",
+      "parameters": [ -1, "toolbelt:leftside", "THIRD_PERSON_LEFT_HAND" ]
+    },
+    {
+      "enum": "net/minecraft/world/item/ItemDisplayContext",
+      "name": "TOOLBELT_RIGHTSIDE",
+      "constructor": "(ILjava/lang/String;Ljava/lang/String;)V",
+      "parameters": [ -1, "toolbelt:rightside", "THIRD_PERSON_RIGHT_HAND" ]
+    }
+  ]
+}

@@ -7,7 +7,7 @@ plugins {
 }
 
 neoForge.version = "21.1.209"
-version = "2.2.7"
+version = "2.2.8"
 group = "dev.gigaherz.toolbelt"
 base.archivesName = "ToolBelt-${neoForge.minecraftVersion}"
 

@@ -34,6 +34,9 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
     private static final ResourceLocation TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
     private static final ResourceLocation TEXTURE_BELT_DYED = ToolBelt.location("textures/entity/dyed_belt.png");
 
+    private static ItemDisplayContext LEFTSIDE = Enum.valueOf(ItemDisplayContext.class, "TOOLBELT_LEFTSIDE");
+    private static ItemDisplayContext RIGHTSIDE = Enum.valueOf(ItemDisplayContext.class, "TOOLBELT_RIGHTSIDE");
+
     private final BeltModel<T> beltModel;
 
     public ToolBeltLayer(RenderLayerParent<T, M> owner)
@@ -91,8 +94,8 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
                             matrixStack.scale(0.5F, 0.5F, 0.5F);
                         }
 
-                        renderHeldItem(entity, rightItem, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, HumanoidArm.RIGHT, matrixStack, buffer, lightness);
-                        renderHeldItem(entity, leftItem, ItemDisplayContext.THIRD_PERSON_LEFT_HAND, HumanoidArm.LEFT, matrixStack, buffer, lightness);
+                        renderHeldItem(entity, rightItem, LEFTSIDE, HumanoidArm.RIGHT, matrixStack, buffer, lightness);
+                        renderHeldItem(entity, leftItem, RIGHTSIDE, HumanoidArm.LEFT, matrixStack, buffer, lightness);
 
                         matrixStack.popPose();
                     }

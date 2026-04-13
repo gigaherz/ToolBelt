@@ -13,6 +13,7 @@ Declutter your inventory of tools
 displayURL="https://github.com/gigaherz/ToolBelt"
 logoFile="logo.png"
 authors="gigaherz"
+enumExtensions="META-INF/enumextensions.json"
 
 [[dependencies.toolbelt]]
    modId="neoforge"
