@@ -18,6 +18,7 @@ import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Input;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
@@ -227,10 +228,8 @@ public class ToolBeltClient
             );
             if (Minecraft.getInstance().player.isMovingSlowly())
             {
-                eInput.moveVector = new Vec2(
-                        (float) ((double) eInput.moveVector.x * 0.3D),
-                        (float) ((double) eInput.moveVector.y * 0.3D)
-                );
+                float sneakingMovementFactor = (float)Minecraft.getInstance().player.getAttributeValue(Attributes.SNEAKING_SPEED);
+                eInput.moveVector = eInput.moveVector.scale(sneakingMovementFactor);
             }
         }
     }
@@ -239,8 +238,6 @@ public class ToolBeltClient
     {
         if (keybind.isUnbound())
             return false;
-
-
 
         return switch (keybind.getKey().getType())
         {

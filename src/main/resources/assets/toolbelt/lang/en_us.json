@@ -27,5 +27,6 @@
   "text.toolbelt.config.release_to_swap": "Release to Swap",
   "text.toolbelt.config.clip_mouse_to_circle": "Clip mouse to circle",
   "text.toolbelt.config.click_outside_bounds": "Allow clicking outside bounds",
-  "text.toolbelt.config.display_empty_slots" : "Display empty slots"
+  "text.toolbelt.config.display_empty_slots" : "Display empty slots",
+  "text.toolbelt.config.minecraft_has_no_circles" : "Minecraft has no circles"
 }

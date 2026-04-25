@@ -14,6 +14,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.RenderPipelines;
 import net.minecraft.client.renderer.state.gui.GuiElementRenderState;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.ARGB;
 import net.minecraft.util.Mth;
 import org.apache.logging.log4j.util.TriConsumer;
 import org.joml.Matrix3x2f;
@@ -192,7 +193,10 @@ public class GenericRadialMenu
             animProgress = 0;
         }
 
-        //updateAnimationState(minecraft.getRenderPartialTicks());
+        for (RadialMenuItem visibleItem : visibleItems)
+        {
+            visibleItem.tick();
+        }
     }
 
     public void extractRenderState(GuiGraphicsExtractor graphics, float partialTicks, int mouseX, int mouseY)
@@ -221,7 +225,7 @@ public class GenericRadialMenu
         poseStack.pushMatrix();
         poseStack.translate(0, animTop);
 
-        extractBackground(graphics, x, y, radiusIn, radiusOut);
+        extractBackground(graphics, x, y, radiusIn, radiusOut, partialTicks);
 
         poseStack.popMatrix();
 
@@ -323,13 +327,36 @@ public class GenericRadialMenu
         }
     }
 
-    private void extractBackground(GuiGraphicsExtractor graphics, float x, float y, float radiusIn, float radiusOut)
+    private void extractBackground(GuiGraphicsExtractor graphics, float x, float y, float radiusIn, float radiusOut, float partialTick)
     {
-        if (visibleItems.size() > 0)
+        if (!visibleItems.isEmpty())
         {
             iterateVisible((item, s, e) -> {
-                int color = item.isHovered() ? backgroundColorHover : backgroundColor;
-                submitPieArc(graphics, x, y, radiusIn, radiusOut, s, e, color);
+                float hoverState = item.getHoverState(partialTick);
+                int color = ARGB.srgbLerp(hoverState, backgroundColor, backgroundColorHover);
+
+                var radius = (radiusIn + radiusOut)/2;
+                float angle;
+                if (s > e) {
+                    angle = (s + e + Mth.TWO_PI) / 2;
+                }
+                else {
+                    angle = (s + e) / 2;
+                }
+
+                if (ConfigData.minecraftHasNoCircles)
+                {
+                    var size = 10.0f + 2.0f * hoverState;
+                    var cx = x + Mth.cos(angle) * radius;
+                    var cy = y + Mth.sin(angle) * radius;
+
+                    graphics.fill(Mth.floor(cx - size), Mth.floor(cy - size), Mth.ceil(cx + size), Mth.ceil(cy + size), color);
+                }
+                else
+                {
+                    var radiusExpand = 4.0f * hoverState;
+                    submitPieArc(graphics, x, y, radiusIn, radiusOut + radiusExpand, s, e, color);
+                }
             });
         }
     }

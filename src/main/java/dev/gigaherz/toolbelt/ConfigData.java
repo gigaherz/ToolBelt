@@ -69,6 +69,8 @@ public class ConfigData
     public static boolean allowClickOutsideBounds = true;
     public static boolean displayEmptySlots = true;
 
+    public static boolean minecraftHasNoCircles;
+
     public static boolean enableSewingKitSupport = true;
 
     public static ThreeWayChoice anvilUpgrading = ThreeWayChoice.AUTO;
@@ -156,6 +158,7 @@ public class ConfigData
         public final ModConfigSpec.BooleanValue clipMouseToCircle;
         public final ModConfigSpec.BooleanValue allowClickOutsideBounds;
         public final ModConfigSpec.BooleanValue displayEmptySlots;
+        public final ModConfigSpec.BooleanValue minecraftHasNoCircles;
 
         ClientConfig(ModConfigSpec.Builder builder)
         {
@@ -190,6 +193,10 @@ public class ConfigData
                     .comment("If set to TRUE, the radial menu will always display all the slots, even when empty, and will allow choosing which empty slot to insert into.")
                     .translation("text.toolbelt.config.display_empty_slots")
                     .define("displayEmptySlots", false);
+            minecraftHasNoCircles = builder
+                    .comment("If set to TRUE, the radial menu will be drawn as a series of squares.")
+                    .translation("text.toolbelt.config.minecraft_has_no_circles")
+                    .define("minecraftHasNoCircles", false);
             builder.pop();
         }
     }
@@ -202,6 +209,7 @@ public class ConfigData
         clipMouseToCircle = CLIENT.clipMouseToCircle.get();
         allowClickOutsideBounds = CLIENT.allowClickOutsideBounds.get();
         displayEmptySlots = CLIENT.displayEmptySlots.get();
+        minecraftHasNoCircles = CLIENT.minecraftHasNoCircles.get();
     }
 
     public static void refreshCommon()
