@@ -10,7 +10,7 @@
       "conditions": {
         "items": [
           {
-            "items": "#forge:leather"
+            "items": "#c:leathers"
           }
         ]
       },
