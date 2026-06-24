@@ -11,13 +11,13 @@ import net.minecraft.client.Options;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.model.geom.ModelLayerLocation;
-import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.LivingEntityRenderer;
 import net.minecraft.client.renderer.entity.layers.RenderLayer;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.client.resources.PlayerSkin;
+import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EntityType;
@@ -27,12 +27,13 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.neoforge.client.event.*;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 @EventBusSubscriber(value = Dist.CLIENT, modid = ToolBelt.MODID, bus = EventBusSubscriber.Bus.GAME)
@@ -167,15 +168,46 @@ public class ClientEvents
         }
 
         @SubscribeEvent
-        public static void clientSetup(FMLClientSetupEvent event)
+        public static void registerAdditionalModels(ModelEvent.RegisterAdditional event)
         {
-            event.enqueueWork(() -> {
-                ItemProperties.register(ToolBelt.BELT.get(), ToolBelt.location("has_custom_color"),
-                        (ItemStack pStack, @Nullable ClientLevel pLevel, @Nullable LivingEntity pEntity, int pSeed) ->
-                                pStack.has(DataComponents.DYED_COLOR)
-                                        ? 1 : 0
-                );
-            });
+            var rm = Minecraft.getInstance().getResourceManager();
+
+            event.register(ModelResourceLocation.standalone(ToolBelt.location("item/dyed_belt")));
+
+            for (int i = 2; i <= 9; i++) {
+                if (rm.getResource(ToolBelt.location("models/item/belt_" + i + ".json")).isPresent()
+                        && rm.getResource(ToolBelt.location("textures/item/belt_" + i + ".png")).isPresent())
+                    event.register(ModelResourceLocation.standalone(ToolBelt.location("item/belt_" + i)));
+
+                if (rm.getResource(ToolBelt.location("models/item/belt_" + i + "_dyed.json")).isPresent()
+                        && rm.getResource(ToolBelt.location("textures/item/belt_" + i + "_dyed.png")).isPresent())
+                    event.register(ModelResourceLocation.standalone(ToolBelt.location("item/belt_" + i + "_dyed")));
+            }
+        }
+
+        @SubscribeEvent
+        public static void modifyBakingResult(ModelEvent.ModifyBakingResult event)
+        {
+            Map<ModelResourceLocation, BakedModel> models = event.getModels();
+
+            ModelResourceLocation beltKey = ModelResourceLocation.inventory(ToolBelt.location("belt"));
+            BakedModel baseModel = models.get(beltKey);
+            if (baseModel == null) {
+                return;
+            }
+
+            Map<Integer, BakedModel> tierModels = new HashMap<>();
+            Map<Integer, BakedModel> tierDyedModels = new HashMap<>();
+            for (int i = 2; i <= 9; i++) {
+                BakedModel tier = models.get(ModelResourceLocation.standalone(ToolBelt.location("item/belt_" + i)));
+                if (tier != null) tierModels.put(i, tier);
+                BakedModel dyedTier = models.get(ModelResourceLocation.standalone(ToolBelt.location("item/belt_" + i + "_dyed")));
+                if (dyedTier != null) tierDyedModels.put(i, dyedTier);
+            }
+
+            BakedModel dyedBase = models.get(ModelResourceLocation.standalone(ToolBelt.location("item/dyed_belt")));
+
+            models.put(beltKey, new DynamicBeltModel(baseModel, tierModels, tierDyedModels, dyedBase));
         }
 
         @SubscribeEvent

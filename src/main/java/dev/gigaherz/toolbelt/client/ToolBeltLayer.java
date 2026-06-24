@@ -6,6 +6,7 @@ import com.mojang.math.Axis;
 import dev.gigaherz.toolbelt.BeltFinder;
 import dev.gigaherz.toolbelt.ConfigData;
 import dev.gigaherz.toolbelt.ToolBelt;
+import dev.gigaherz.toolbelt.belt.ToolBeltItem;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.model.HumanoidModel;
@@ -29,10 +30,24 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.capabilities.Capabilities;
 
+
 public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> extends RenderLayer<T, M>
 {
     private static final ResourceLocation TEXTURE_BELT = ToolBelt.location("textures/entity/belt.png");
     private static final ResourceLocation TEXTURE_BELT_DYED = ToolBelt.location("textures/entity/dyed_belt.png");
+
+    private static ResourceLocation resolveTexture(int slots, boolean dyed)
+    {
+        var rm = Minecraft.getInstance().getResourceManager();
+        if (dyed) {
+            var dyedCandidate = ToolBelt.location("textures/entity/belt_" + slots + "_dyed.png");
+            if (rm.getResource(dyedCandidate).isPresent())
+                return dyedCandidate;
+            return TEXTURE_BELT_DYED;
+        }
+        var candidate = ToolBelt.location("textures/entity/belt_" + slots + ".png");
+        return rm.getResource(candidate).isPresent() ? candidate : TEXTURE_BELT;
+    }
 
     private static ItemDisplayContext LEFTSIDE = Enum.valueOf(ItemDisplayContext.class, "TOOLBELT_LEFTSIDE");
     private static ItemDisplayContext RIGHTSIDE = Enum.valueOf(ItemDisplayContext.class, "TOOLBELT_RIGHTSIDE");
@@ -143,9 +158,9 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
     {
         return BeltFinder.findBelt(pEntity, true).map((getter) -> {
             var stack = getter.getBelt();
-            return stack.has(DataComponents.DYED_COLOR)
-                    ? TEXTURE_BELT_DYED
-                    : TEXTURE_BELT;
+            int slots = ToolBeltItem.getSlotsCount(stack);
+            boolean dyed = stack.has(DataComponents.DYED_COLOR);
+            return resolveTexture(slots, dyed);
         }).orElse(TEXTURE_BELT);
     }
 
@@ -200,7 +215,7 @@ public class ToolBeltLayer<T extends LivingEntity, M extends HumanoidModel<T>> e
 
             if (hasColor)
             {
-                var dye = FastColor.ARGB32.colorFromFloat(dyeRed, dyeGreen, dyeBlue, 1.0f);
+                var dye = FastColor.ARGB32.colorFromFloat(1.0f, dyeRed, dyeGreen, dyeBlue);
                 color2 = FastColor.ARGB32.multiply(color, dye);
             }
 
