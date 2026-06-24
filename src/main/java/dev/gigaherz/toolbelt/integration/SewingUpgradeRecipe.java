@@ -81,14 +81,14 @@ public class SewingUpgradeRecipe extends SewingRecipe
         ItemStack upgradedBelt = super.assemble(inv, provider);
         if (inputBelt.getCount() > 0)
         {
-            int size = 2;
+            int size = ToolBeltItem.getSlotsCount(upgradedBelt);
             var inputTag = inputBelt.getComponentsPatch();
             if (!inputTag.isEmpty())
             {
-                size = ToolBeltItem.getSlotsCount(upgradedBelt);
                 upgradedBelt.applyComponents(inputTag);
             }
-            ToolBeltItem.setSlotsCount(upgradedBelt, Mth.clamp(size,2,9));
+            //noinspection DataFlowIssue
+            upgradedBelt = ToolBeltItem.setSlotsCount(upgradedBelt, Mth.clamp(size,2,9));
         }
         return upgradedBelt;
     }

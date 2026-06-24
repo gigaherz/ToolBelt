@@ -94,7 +94,7 @@ public class ToolBelt
             BELT_MENU = MENU_TYPES.register("belt_container", () -> IMenuTypeExtension.create(BeltContainer::new));
 
     public static DeferredHolder<IngredientType<?>, IngredientType<BeltIngredient>>
-            BELT_INGREDIENT = INGREDIENT_TYPES.register("belt_upgrade_level", () -> new IngredientType<BeltIngredient>(BeltIngredient.CODEC));
+            BELT_INGREDIENT = INGREDIENT_TYPES.register("belt_upgrade_level", () -> new IngredientType<>(BeltIngredient.CODEC));
 
     public static DeferredHolder<DataComponentType<?>, DataComponentType<Integer>>
             BELT_SIZE = DATA_COMPONENT_TYPES.register("belt_size", () -> DataComponentType.<Integer>builder().persistent(Codec.INT).networkSynchronized(ByteBufCodecs.VAR_INT).build());
