@@ -104,11 +104,11 @@ public class ConfigData
             whitelist = builder
                     .comment("List of items to force-allow placing in the belt. Takes precedence over blacklist.")
                     .translation("text.toolbelt.config.whitelist")
-                    .defineList("whitelist", Lists.newArrayList(), o -> o instanceof String);
+                    .defineList("whitelist", Lists.newArrayList(), () -> "", o -> o instanceof String);
             blacklist = builder
                     .comment("List of items to disallow from placing in the belt. (whitelist takes precedence)")
                     .translation("text.toolbelt.config.blacklist")
-                    .defineList("blacklist", Lists.newArrayList(), o -> o instanceof String);
+                    .defineList("blacklist", Lists.newArrayList(), () -> "", o -> o instanceof String);
             allowAllNonStackableItems = builder
                     .comment("When set to false, stackable items will no longer be allowed by default.")
                     .translation("text.toolbelt.config.allownonstackable")

@@ -1,7 +1,7 @@
-@MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
+@NullMarked
 package dev.gigaherz.toolbelt.client;
 
-import com.mojang.logging.annotations.MethodsReturnNonnullByDefault;
+import org.jspecify.annotations.NullMarked;
 
 import javax.annotation.ParametersAreNonnullByDefault;

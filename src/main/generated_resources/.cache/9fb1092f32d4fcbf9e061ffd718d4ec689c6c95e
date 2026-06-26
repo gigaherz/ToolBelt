@@ -1,6 +1,6 @@
-// 26.1.2	2026-04-11T16:31:23.2612325	Recipes
+// 26.2	2026-06-26T18:55:47.9256655	Recipes
 5c1e89aa8e0226cb28da8bddd7430ba36f50458d data/minecraft/advancement/recipes/misc/belt_dyed.json
-224eff7c33e6c43ff7e4677f8d0892443be13026 data/minecraft/recipe/belt_dyed.json
+8d9d9886275c7e46149f420e46c8fb9658f46e47 data/minecraft/recipe/belt_dyed.json
 7e56ce05cd8bc64e380d2d47acc0388375281f82 data/toolbelt/advancement/recipes/misc/belt_upgrade_1_via_sewing.json
 7760a214b2091b3e773223c7ab7e89573fb1f192 data/toolbelt/advancement/recipes/misc/belt_upgrade_2_via_sewing.json
 a96b01a4bf8014b40242dc81374900731f507d0b data/toolbelt/advancement/recipes/misc/belt_upgrade_3_via_sewing.json

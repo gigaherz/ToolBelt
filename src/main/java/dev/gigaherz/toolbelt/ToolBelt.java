@@ -1,7 +1,6 @@
 package dev.gigaherz.toolbelt;
 
 import com.mojang.serialization.Codec;
-import com.mojang.serialization.Lifecycle;
 import com.mojang.serialization.MapCodec;
 import dev.gigaherz.sewingkit.SewingKitMod;
 import dev.gigaherz.sewingkit.api.SewingRecipeBuilder;
@@ -34,26 +33,14 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.packs.VanillaRecipeProvider;
-import net.minecraft.data.registries.VanillaRegistries;
-import net.minecraft.data.tags.IntrinsicHolderTagsProvider;
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.network.codec.ByteBufCodecs;
 import net.minecraft.resources.Identifier;
-import net.minecraft.resources.ResourceKey;
-import net.minecraft.tags.BlockTags;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
-import net.minecraft.util.Util;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.level.biome.Biome;
-import net.minecraft.world.level.levelgen.GenerationStep;
-import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.minecraft.world.level.levelgen.feature.configurations.NoneFeatureConfiguration;
-import net.minecraft.world.level.levelgen.placement.PlacedFeature;
-import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
-import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -70,9 +57,7 @@ import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.common.conditions.ICondition;
 import net.neoforged.neoforge.common.conditions.ModLoadedCondition;
 import net.neoforged.neoforge.common.crafting.IngredientType;
-import net.neoforged.neoforge.common.data.DatapackBuiltinEntriesProvider;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
-import net.neoforged.neoforge.common.world.BiomeModifiers;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.event.AnvilUpdateEvent;
 import net.neoforged.neoforge.event.BuildCreativeModeTabContentsEvent;
@@ -82,15 +67,11 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import net.neoforged.neoforge.registries.NeoForgeRegistries;
-import net.neoforged.neoforge.registries.holdersets.NotHolderSet;
 import top.theillusivec4.curios.api.CuriosDataProvider;
 import top.theillusivec4.curios.api.CuriosTags;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.Set;
 import java.util.concurrent.CompletableFuture;
-import java.util.stream.Stream;
 
 @Mod(ToolBelt.MODID)
 public class ToolBelt
@@ -274,8 +255,8 @@ public class ToolBelt
 
             gen.addProvider(true, new Recipes(gen.getPackOutput(), event.getLookupProvider()));
             gen.addProvider(true, new ModelsAndClientItems(gen.getPackOutput()));
-            gen.addProvider(true, new ItemTagGen(gen.getPackOutput()));
-            gen.addProvider(true, new MyCuriosDataProvider(gen, event));
+            gen.addProvider(true, new ItemTagGen(gen.getPackOutput(), event.getLookupProvider()));
+            //gen.addProvider(true, new MyCuriosDataProvider(gen, event.getLookupProvider()));
         }
 
         private static class ModelsAndClientItems extends ModelProvider
@@ -303,18 +284,17 @@ public class ToolBelt
             }
         }
 
-        private static class ItemTagGen extends IntrinsicHolderTagsProvider<Item>
+        private static class ItemTagGen extends TagsProvider<Item>
         {
-            public ItemTagGen(PackOutput packOutput)
+            public ItemTagGen(PackOutput packOutput, CompletableFuture<HolderLookup.Provider> lookupProvider)
             {
-                super(packOutput, Registries.ITEM, CompletableFuture.supplyAsync(VanillaRegistries::createLookup, Util.backgroundExecutor()),
-                        (item) -> item.builtInRegistryHolder().key(), SewingKitMod.MODID);
+                super(packOutput, Registries.ITEM, lookupProvider, SewingKitMod.MODID);
             }
 
             @Override
             protected void addTags(HolderLookup.Provider lookup)
             {
-                tag(CuriosTags.BELT).add(BELT.get());
+                //tag(CuriosTags.BELT).add(BELT.getKey());
             }
         }
 
@@ -349,7 +329,7 @@ public class ToolBelt
                                 ));
 
                         SewingRecipeBuilder.begin(items, RecipeCategory.TOOLS, ToolBelt.BELT.get())
-                                .withTool(SewingKitMod.WOOD_OR_HIGHER)
+                                .withTool(SewingKitMod.WOOD_OR_HIGHER_NEEDLE)
                                 .addMaterial(Ingredient.of(SewingKitMod.LEATHER_STRIP), 2)
                                 .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET), 3)
                                 .addMaterial(Ingredient.of(Items.IRON_INGOT), 1)
@@ -373,7 +353,7 @@ public class ToolBelt
                                 ));
 
                         SewingRecipeBuilder.begin(items, RecipeCategory.TOOLS, ToolBelt.POUCH.get())
-                                .withTool(SewingKitMod.WOOD_OR_HIGHER)
+                                .withTool(SewingKitMod.WOOD_OR_HIGHER_NEEDLE)
                                 .addMaterial(Ingredient.of(SewingKitMod.LEATHER_STRIP.get()), 2)
                                 .addMaterial(Ingredient.of(SewingKitMod.LEATHER_SHEET.get()), 3)
                                 .addMaterial(Ingredient.of(Items.GOLD_INGOT))
@@ -385,13 +365,13 @@ public class ToolBelt
                                 ), sewingRecipeId(POUCH));
 
                         List<TagKey<Item>> needleTiers = List.of(
-                                SewingKitMod.WOOD_OR_HIGHER,
-                                SewingKitMod.BONE_OR_HIGHER,
-                                SewingKitMod.IRON_OR_HIGHER,
-                                SewingKitMod.IRON_OR_HIGHER,
-                                SewingKitMod.DIAMOND_OR_HIGHER,
-                                SewingKitMod.DIAMOND_OR_HIGHER,
-                                SewingKitMod.NETHERITE_OR_HIGHER
+                                SewingKitMod.WOOD_OR_HIGHER_NEEDLE,
+                                SewingKitMod.BONE_OR_HIGHER_NEEDLE,
+                                SewingKitMod.IRON_OR_HIGHER_NEEDLE,
+                                SewingKitMod.IRON_OR_HIGHER_NEEDLE,
+                                SewingKitMod.DIAMOND_OR_HIGHER_NEEDLE,
+                                SewingKitMod.DIAMOND_OR_HIGHER_NEEDLE,
+                                SewingKitMod.NETHERITE_OR_HIGHER_NEEDLE
                         );
                         for (int i = 2; i < 9; i++)
                         {
@@ -431,11 +411,11 @@ public class ToolBelt
             }
         }
 
-        private static class MyCuriosDataProvider extends CuriosDataProvider
+        /*private static class MyCuriosDataProvider extends CuriosDataProvider
         {
-            public MyCuriosDataProvider(DataGenerator gen, GatherDataEvent.Client event)
+            public MyCuriosDataProvider(DataGenerator gen, CompletableFuture<HolderLookup.Provider> lookupProvider)
             {
-                super(ToolBelt.MODID, gen.getPackOutput(), event.getLookupProvider());
+                super(ToolBelt.MODID, gen.getPackOutput(), lookupProvider);
             }
 
             @Override
@@ -445,6 +425,6 @@ public class ToolBelt
                         .addPlayer().addSlots("belt");
                 this.createSlot("belt").size(1);
             }
-        }
+        }*/
     }
 }

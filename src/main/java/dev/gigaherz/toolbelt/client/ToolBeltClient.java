@@ -17,6 +17,7 @@ import net.minecraft.client.renderer.entity.player.AvatarRenderer;
 import net.minecraft.client.renderer.entity.state.HumanoidRenderState;
 import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.player.Input;
@@ -84,8 +85,6 @@ public class ToolBeltClient
         event.registerLayerDefinition(ToolBeltClient.BUCKLE_LAYER, ToolBeltLayer.BeltModel::createBuckleLayer);
     }
 
-    public static final TypeToken<AvatarRenderer<?>> AVATAR_RENDERER = new TypeToken<>(){};
-
     public void addLayers(EntityRenderersEvent.AddLayers event)
     {
         for(var skin : event.getSkins())
@@ -95,20 +94,20 @@ public class ToolBeltClient
                 renderer.addLayer(new ToolBeltLayer<>(renderer));
         }
 
-        addLayerToHumanoid(event, EntityType.MANNEQUIN, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.ARMOR_STAND, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.ZOMBIE, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.HUSK, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.DROWNED, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.SKELETON, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.STRAY, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.BOGGED, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.PARCHED, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.WITHER_SKELETON, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.ZOMBIE_VILLAGER, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.PIGLIN, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.PIGLIN_BRUTE, ToolBeltLayer::new);
-        addLayerToHumanoid(event, EntityType.ZOMBIFIED_PIGLIN, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.MANNEQUIN, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.ARMOR_STAND, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.ZOMBIE, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.HUSK, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.DROWNED, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.SKELETON, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.STRAY, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.BOGGED, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.PARCHED, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.WITHER_SKELETON, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.ZOMBIE_VILLAGER, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.PIGLIN, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.PIGLIN_BRUTE, ToolBeltLayer::new);
+        addLayerToHumanoid(event, EntityTypes.ZOMBIFIED_PIGLIN, ToolBeltLayer::new);
 
         // NOT COMPATIBLE: not HumanoidModel
         //addLayerToHumanoid(event, EntityType.WITCH, ToolBeltLayer::new);
@@ -125,6 +124,8 @@ public class ToolBeltClient
         EntityRenderer<E, S> renderer = event.getRenderer(entityType);
         if (renderer instanceof LivingEntityRenderer ler) ler.addLayer(factory.apply(ler));
     }
+
+    private static final TypeToken<AvatarRenderer<?>> AVATAR_RENDERER = new TypeToken<>(){};
 
     private void renderStateModifiers(RegisterRenderStateModifiersEvent event)
     {
@@ -171,19 +172,19 @@ public class ToolBeltClient
     {
         Minecraft mc = Minecraft.getInstance();
 
-        if (mc.screen == null)
+        if (mc.gui.screen() == null)
         {
             boolean toolMenuKeyIsDown = OPEN_TOOL_MENU_KEYBIND != null && OPEN_TOOL_MENU_KEYBIND.isDown();
             if (toolMenuKeyIsDown && !toolMenuKeyWasDown)
             {
                 while (OPEN_TOOL_MENU_KEYBIND != null && OPEN_TOOL_MENU_KEYBIND.consumeClick())
                 {
-                    if (mc.screen == null)
+                    if (mc.gui.screen() == null)
                     {
                         ItemStack inHand = mc.player.getMainHandItem();
                         if (ConfigData.isItemStackAllowed(inHand))
                         {
-                            BeltFinder.findBelt(mc.player).ifPresent((getter) -> mc.setScreen(new RadialMenuScreen(getter)));
+                            BeltFinder.findBelt(mc.player).ifPresent((getter) -> mc.gui.setScreen(new RadialMenuScreen(getter)));
                         }
                     }
                 }
@@ -199,7 +200,7 @@ public class ToolBeltClient
         {
             while (OPEN_BELT_SLOT_KEYBIND != null && OPEN_BELT_SLOT_KEYBIND.consumeClick())
             {
-                if (mc.screen == null)
+                if (mc.gui.screen() == null)
                 {
                     ClientPacketDistributor.sendToServer(OpenBeltSlotInventory.INSTANCE);
                 }
@@ -209,7 +210,7 @@ public class ToolBeltClient
 
     public void updateInputEvent(MovementInputUpdateEvent event)
     {
-        if (Minecraft.getInstance().screen instanceof RadialMenuScreen)
+        if (Minecraft.getInstance().gui.screen() instanceof RadialMenuScreen)
         {
             Options settings = Minecraft.getInstance().options;
             var eInput = event.getInput();

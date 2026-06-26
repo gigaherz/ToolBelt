@@ -6,7 +6,7 @@
   "key.toolbelt.slot": "Open Belt Slot Inventory",
   "key.toolbelt.cycle.left": "Cycle Tool Left",
   "key.toolbelt.cycle.right": "Cycle Tool Right",
-  "text.toolbelt.empty": "EMPTY",
+  "text.toolbelt.empty": "",
   "text.toolbelt.swap": "SWAP",
   "text.toolbelt.insert": "INSERT",
   "text.toolbelt.extract": "EXTRACT",

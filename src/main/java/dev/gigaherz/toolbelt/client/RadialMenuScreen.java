@@ -40,7 +40,7 @@ public class RadialMenuScreen extends Screen
             if (!event.getName().equals(VanillaGuiLayers.CROSSHAIR))
                 return;
 
-            if (Minecraft.getInstance().screen instanceof RadialMenuScreen)
+            if (Minecraft.getInstance().gui.screen() instanceof RadialMenuScreen)
             {
                 event.setCanceled(true);
             }
