@@ -227,9 +227,7 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                 return;
             Player oldPlayer = event.getOriginal();
 
-            // FIXME: workaround for a forge issue that seems to be reappearing too often
-            // at this time it's only needed when returning from the end alive
-            oldPlayer.revive();
+            oldPlayer.reviveCaps();
 
             Player newPlayer = event.getEntity();
 
@@ -252,6 +250,8 @@ public class BeltExtensionSlot implements IExtensionContainer, INBTSerializable<
                     return Unit.INSTANCE;
                 });
             });
+
+            oldPlayer.invalidateCaps();
         }
     }
 
